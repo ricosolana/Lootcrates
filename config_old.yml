@@ -1,0 +1,502 @@
+# / - \ - / - \ - / - \ - / - \ - / - \
+#
+#             MISC. SETUP
+#
+# / - \ - / - \ - / - \ - / - \ - / - \
+
+# DEBUG MODE
+debug-enabled: false
+
+# Enable QualityArmory Hook?
+qa-hook: false
+
+# scroll speed
+# if set to 0, will instantly reveal items
+# 2 = 1 item / 2 ticks
+# 5 = 1 item / 5 ticks
+#
+raffle-speed: 5
+
+# selection sound
+# do "none" for no sound
+# ENTITY_EXPERIENCE_ORB_PICKUP
+selection-sound: ENTITY_EXPERIENCE_ORB_PICKUP # ORB_PICKUP <for older versions> (includes: 1.8)
+
+# name of crate inventory
+inventory-name: "&8Opening supply crate"
+
+# size of crate
+inventory-size: 27
+
+# selections that player can make
+max-selections: 4
+
+# main menu:
+#  - show "Crates"
+#    + show all crates in first menu
+#      - show crate itemstack (mat, name, lore)
+#      - used loot tiers (with chance)
+#  - show "Loot"
+#    + show all loot tiers
+#      - show itemstack (mat, name, lore)
+#      - show "Items"
+#        + show each item
+#  - show "Misc"
+#    + show selected itemstack (mat, name, lore)
+#    + show unselected item slot
+#    + show firework settings
+
+gui:
+  selected:
+    item: "WHITE_STAINED_GLASS_PANE"
+    name: "&f&l???"
+    lore:
+      - "&7You have selected this mystery chest"
+  unselected:
+    item: "CHEST"
+    name: "&f&l???"
+    lore:
+      - "&7Choose 4 mystery chests, and"
+      - "&7your loot will be revealed!"
+  loot-group:
+    common:
+      item: "WHITE_STAINED_GLASS_PANE"
+      name: "&f&lCommon Reward"
+      lore:
+        - "&7Click to redeem!"
+    regular:
+      item: "YELLOW_STAINED_GLASS_PANE"
+      name: "&e&lRegular Reward"
+      lore:
+        - "&7Click to redeem!"
+    ultra:
+      item: "BLUE_STAINED_GLASS_PANE"
+      name: "&b&lUltra Reward"
+      lore:
+        - "&7Click to redeem!"
+    rare:
+      item: "PURPLE_STAINED_GLASS_PANE"
+      name: "&5&lRare Reward"
+      lore:
+        - "&7Click to redeem!"
+    legendary:
+      item: "RED_STAINED_GLASS_PANE"
+      name: "&c&lLegendary Reward"
+      lore:
+        - "&7Click to redeem!"
+    weapon:
+      item: "ORANGE_STAINED_GLASS_PANE"
+      name: "&6&lWeapon Reward"
+      lore:
+        - "&7Click to redeem!"
+
+# / - \ - / - \ - / - \ - / - \ - / - \
+#
+#              CRATE ITEMS
+#
+# / - \ - / - \ - / - \ - / - \ - / - \
+
+# IMPORTANT :
+#
+# 'items' are completely different from crates
+# 'common' items are a type of reward / chance
+# 'common' crate is a type of crate
+#
+# common crates can have common rewards and rare rewards
+# legendary crates can have rare rewards and legendary rewards
+
+# chances must sum to 1 This will NOT be error checked
+
+crates:
+  common:
+    item: "chest"
+    name: "&f&lCommon Supply Crate &r&7(Tier 1)"
+    lore:
+      - "&7Right click on this item to unlock"
+      - "&7four pieces of loot!"
+    chances:
+      common: 70
+      regular: 22
+      ultra: 8
+  regular:
+    item: "chest"
+    name: "&e&lRegular Supply Crate &r&7(Tier 2)"
+    lore:
+      - "&7Right click on this item to unlock"
+      - "&7four pieces of loot!"
+    chances:
+      common: 40
+      regular: 35
+      ultra: 17
+      rare: 8
+  ultra:
+    item: "chest"
+    name: "&b&lUltra Supply Crate &r&7(Tier 3)"
+    lore:
+      - "&7Right click on this item to unlock"
+      - "&7four pieces of loot!"
+    chances:
+      common: 11
+      regular: 29
+      ultra: 35
+      rare: 17
+      legendary: 8
+  rare:
+    item: "chest"
+    name: "&5&lRare Supply Crate &r&7(Tier 4)"
+    lore:
+      - "&7Right click on this item to unlock"
+      - "&7four pieces of loot!"
+    chances:
+      regular: 13
+      ultra: 28
+      rare: 39
+      legendary: 20
+  legendary:
+    item: "chest"
+    name: "&c&lLegendary Supply Crate &r&7(Tier 5)"
+    lore:
+      - "&7Right click on this item to unlock"
+      - "&7four pieces of loot!"
+    chances:
+      ultra: 28
+      rare: 32
+      legendary: 40
+  weapon:
+    item: "chest"
+    name: "&6&lWeapon Supply Crate"
+    lore:
+      - "&7Right click on this item to unlock"
+      - "&7four Quality Armory items!"
+    chances:
+      weapon: 100
+
+# in the way I decided to map loot, the loot-chance-tiers are the tiers used
+# ie, all the loot-tiers above: (common, rare, legendary) must exist in
+# the loot keys below, or errors will occur
+
+loot:
+  weapon:
+    items:
+      item0:
+        qa-item: fusion_cell
+        count: 5
+      item1:
+        qa-item: lazerrifle
+  common:
+    items:
+      item0:
+        item: tnt
+        range: 1 31
+      item1:
+        item: tnt
+        count: 32
+      item2:
+        item: diamond
+        count: 16
+      item3:
+        item: cactus
+        range: 1 31
+      item4:
+        item: cactus
+        count: 64
+      item5:
+        item: coal
+        range: 1 31
+      item6:
+        item: coal
+        count: 64
+      item7:
+        item: experience_bottle
+        name: "&e&lExperience"
+        lore:
+          - "&7Amount: &f500XP"
+        command:
+          - "xp add {player} 500"
+      item8:
+        item: experience_bottle
+        name: "&e&lExperience"
+        lore:
+          - "&7Amount: &f1000XP"
+        command:
+          - "xp add {player} 1000"
+      item9:
+        item: blaze_rod
+        range: 1 31
+      item10:
+        item: blaze_rod
+        count: 64
+      item11:
+        item: obsidian
+        range: 1 31
+      item12:
+        item: obsidian
+        count: 32
+      item13:
+        item: diamond_block
+        count: 4
+      item14:
+        item: potato
+        range: 1 15
+      item15:
+        item: potato
+        count: 16
+      item16:
+        item: iron_block
+        count: 2
+      item17:
+        item: sugar_cane
+        range: 1 31
+      item18:
+        item: sugar_cane
+        count: 64
+      item19:
+        item: cooked_beef
+        range: 1 32
+      item20:
+        item: diamond
+        range: 1 15
+      item21:
+        item: iron_ingot
+        range: 1 15
+      item22:
+        item: diamond
+        count: 16
+      item23:
+        item: hopper
+        count: 1
+    crates:
+      rare:
+        count: 1
+  regular:
+    items:
+      item0:
+        item: gold_block
+        count: 8
+      item1:
+        item: obsidian
+        range: 1 31
+      item2:
+        item: obsidian
+        count: 32
+      item3:
+        item: sponge
+        count: 10
+      item4:
+        item: sponge
+        count: 32
+      item5:
+        item: diamond_block
+        count: 4
+      item6:
+        item: experience_bottle
+        name: "&e&lExperience"
+        lore:
+          - "&7Amount: &f1000XP"
+        command:
+          - "xp add {player} 1000"
+      item7:
+        item: hopper
+        range: 1 2
+    crates:
+      regular:
+        count: 1
+      ultra:
+        count: 1
+  ultra:
+    items:
+      item0:
+        item: cooked_beef
+        range: 1 31
+      item1:
+        item: experience_bottle
+        name: "&e&lExperience"
+        lore:
+          - "&7Amount: &f1000XP"
+        command:
+          - "xp add {player} 1000"
+      item2:
+        item: diamond_block
+        count: 6
+      item3:
+        item: gold_block
+        count: 16
+      item4:
+        item: iron_block
+        count: 16
+      item5:
+        item: obsidian
+        range: 31 63
+      item6:
+        item: obsidian
+        count: 64
+      item7:
+        item: hopper
+        range: 1 5
+      item8:
+        item: diamond_helmet
+        enchantments:
+          protection:
+            level: 3
+      item9:
+        item: diamond_chestplate
+        enchantments:
+          protection:
+            level: 3
+    crates:
+      regular:
+        count: 1
+      ultra:
+        count: 1
+      rare:
+        count: 1
+  rare:
+    items:
+      item0:
+        item: emerald_block
+        count: 12
+      item1:
+        item: tnt
+        count: 32
+      item2:
+        item: gold_block
+        count: 32
+      item3:
+        item: experience_bottle
+        name: "&e&lExperience"
+        lore:
+          - "&7Amount: &f1500XP"
+        command:
+          - "xp add {player} 1500"
+      item4:
+        item: diamond_helmet
+        name: "&dRare Helmet"
+        lore:
+          - "&d&oAn armor piece exclusively"
+          - "&d&olooted from a supply crate"
+        enchantments:
+          protection:
+            level: 4
+          unbreaking:
+            level: 3
+          respiration:
+            level: 3
+          aqua_affinity:
+            level: 1
+      item5:
+        item: diamond_pickaxe
+        name: "&dRare Pickaxe"
+        lore:
+          - "&d&oA tool piece exclusively"
+          - "&d&olooted from a supply crate"
+        enchantments:
+          efficiency:
+            level: 5
+          unbreaking:
+            level: 3
+          fortune:
+            level: 3
+      item6:
+        item: diamond_sword
+        name: "&dRare Slayer"
+        lore:
+          - "&d&oA weapon exclusively looted"
+          - "&d&ofrom a supply crate"
+        enchantments:
+          sharpness:
+            level: 5
+          smite:
+            level: 5
+          bane_of_anthropods:
+            level: 4
+          fire_aspect:
+            level: 2
+          looting:
+            level: 3
+      item7:
+        item: diamond_sword
+        name: "&dRare Wrecker"
+        lore:
+          - "&d&oA weapon exclusively looted"
+          - "&d&ofrom a supply crate"
+        enchantments:
+          sharpness:
+            level: 5
+          unbreaking:
+            level: 3
+          fire_aspect:
+            level: 2
+      item8:
+        item: diamond_axe
+        name: "&dRare Axe"
+        lore:
+          - "&d&oA tool exclusively looted"
+          - "&d&ofrom a supply crate"
+        enchantments:
+          efficiency:
+            level: 5
+          unbreaking:
+            level: 3
+    crates:
+      legendary:
+        count: 1
+  legendary:
+    items:
+      item0:
+        item: diamond_leggings
+        name: "&bFabled Leggings"
+        lore:
+          - "&b&oAn armor piece exclusively looted"
+          - "&b&ofrom a supply crate"
+        enchantments:
+          protection:
+            level: 4
+          fire_protection:
+            level: 1
+          unbreaking:
+            level: 3
+          blast_protection:
+            level: 1
+      item1:
+        item: diamond_helmet
+        name: "&bFabled Helmet"
+        lore:
+          - "&b&oAn armor piece exclusively looted"
+          - "&b&ofrom a supply crate"
+        enchantments:
+          protection:
+            level: 4
+          respiration:
+            level: 3
+          unbreaking:
+            level: 3
+          blast_protection:
+            level: 1
+      item2:
+        item: hopper
+        count: 6
+      item3:
+        item: golden_apple
+        count: 8
+      item4:
+        item: diamond_sword
+        enchantments:
+          sharpness:
+            level: 5
+          looting:
+            level: 5
+      item5:
+        item: enchanted_golden_apple
+
+# firework explosion on scroll end?
+firework-explosion: true
+
+firework:
+  colors:
+    - blue
+    - red
+    - white
+  #fade-colors:
+  #  - green
+  trail: false
+  flicker: true

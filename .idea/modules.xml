@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/LootCrates!.iml" filepath="$PROJECT_DIR$/LootCrates!.iml" />
+      <module fileurl="file://$PROJECT_DIR$/LootCrates.iml" filepath="$PROJECT_DIR$/LootCrates.iml" />
     </modules>
   </component>
 </project>

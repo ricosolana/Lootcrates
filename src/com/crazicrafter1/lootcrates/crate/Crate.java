@@ -4,6 +4,7 @@ import com.crazicrafter1.lootcrates.ItemBuilder;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.Seasonal;
 import com.crazicrafter1.lootcrates.Util;
+import com.sun.istack.internal.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -146,6 +147,10 @@ public final class Crate {
 //
     //    return null;
     //}
+
+    public static Crate crateByID(String id) {
+        return Main.crates.getOrDefault(id, null);
+    }
 
     public static Crate matchCrate(ItemStack item) {
 

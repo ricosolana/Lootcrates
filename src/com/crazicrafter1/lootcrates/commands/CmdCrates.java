@@ -26,13 +26,12 @@ public class CmdCrates extends CmdBase {
 
             //if (Util.isNumeric(args[2])) return false;
 
-            Crate crate = null;
+            Crate crate = Crate.crateByID(args[1]);
             Player player = null;
             int count = 1;
 
-            if (plugin.config.crateNameIds.containsKey(args[1])) {
-                crate = plugin.config.crates.get(plugin.config.crateNameIds.get(args[1])); //crateItem = ConfigWrapper.crate_items.get(args[1]);
-            } else return error(sender, "That crate doesn't exist");
+            if (crate == null)
+                return error(sender, "That crate doesn't exist");
 
             //player = Bukkit.getServer().getPlayer(args[2]);
 
@@ -62,7 +61,7 @@ public class CmdCrates extends CmdBase {
 
         else if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
             feedback(sender, "Reloading config...");
-            plugin.config.reload();
+            Main.getInstance().reloadConfigValues();
             return feedback(sender, "ConfigWrapper was reloaded.");
         }
 

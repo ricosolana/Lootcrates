@@ -94,7 +94,7 @@ public class Main extends JavaPlugin
         reloadConfigValues();
         try {
             if (autoUpdate)
-                GithubUpdater.autoUpdate(this, "ZombieStriker", "QualityArmory", "QualityArmory.jar");
+                GithubUpdater.autoUpdate(this, "owner", "name", "resource");
         } catch (Exception e) {
         }
 

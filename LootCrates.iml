@@ -11,18 +11,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../QualityArmory.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/../QualityArmory.jar!/src/main/java" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../GraphicalAPI.jar!/" />
+          <root url="jar://D:/MinecraftDev/Plugins/buildtools/1.16.4/Spigot/Spigot-API/target/spigot-api-1.16.4-R0.1-SNAPSHOT-shaded.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -31,7 +20,18 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../buildtools/1.16.4/Spigot/Spigot-API/target/spigot-api-1.16.4-R0.1-SNAPSHOT-shaded.jar!/" />
+          <root url="jar://D:/MinecraftDev/Plugins/QualityArmory.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://D:/MinecraftDev/Plugins/QualityArmory.jar!/src/main/java" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://D:/MinecraftDev/Plugins/GraphicalAPI.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

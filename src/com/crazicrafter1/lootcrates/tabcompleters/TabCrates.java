@@ -35,7 +35,9 @@ public class TabCrates extends BaseTabCompleter {
                 if (args.length == 2) {
                     // set string -> string[]
 
-                    return getMatches(args[1], plugin.config.crateNameIds.keySet().toArray(new String[0]));
+
+
+                    return getMatches(args[1], Main.crateNameIds.keySet().toArray(new String[0]));
                 }
                 if (args.length == 3) {
                     // add player name

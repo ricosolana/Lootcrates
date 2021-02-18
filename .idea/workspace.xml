@@ -133,7 +133,7 @@
             <entry file="file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/commands/CmdCrates.java">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="356">
-                  <caret line="49" column="21" lean-forward="true" selection-start-line="49" selection-start-column="21" selection-end-line="49" selection-end-column="21" />
+                  <caret line="49" column="21" selection-start-line="49" selection-start-column="21" selection-end-line="49" selection-end-column="21" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -145,7 +145,7 @@
             <entry file="file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/tabcompleters/TabCrates.java">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="255">
-                  <caret line="36" lean-forward="true" selection-start-line="36" selection-end-line="36" />
+                  <caret line="36" selection-start-line="36" selection-end-line="36" />
                 </state>
               </provider>
             </entry>
@@ -880,7 +880,7 @@
     <entry file="file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/commands/CmdCrates.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="356">
-          <caret line="49" column="21" lean-forward="true" selection-start-line="49" selection-start-column="21" selection-end-line="49" selection-end-column="21" />
+          <caret line="49" column="21" selection-start-line="49" selection-start-column="21" selection-end-line="49" selection-end-column="21" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -897,7 +897,7 @@
     <entry file="file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/tabcompleters/TabCrates.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
-          <caret line="36" lean-forward="true" selection-start-line="36" selection-end-line="36" />
+          <caret line="36" selection-start-line="36" selection-end-line="36" />
         </state>
       </provider>
     </entry>

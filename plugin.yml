@@ -17,7 +17,7 @@ permissions:
     description: Allows access to /crates command
     default: op
 
-# 3.0.0 (2/
+# 3.0.0 (2/19/2021)
 # loot types are now completely object oriented
 # added custom potion support
 # LootGroup chances are cumulatively weighted instead of adding up to 100

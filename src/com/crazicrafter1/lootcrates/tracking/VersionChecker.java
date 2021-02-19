@@ -37,6 +37,8 @@ public class VersionChecker {
         URLConnection con = this.checkURL.openConnection();
         this.latestVersion = (new BufferedReader(new InputStreamReader(con.getInputStream()))).readLine();
         //plugin.important("LATEST VERSION: " + latestVersion + " " + checkURL.toString());
-        return !this.plugin.getDescription().getVersion().equals(this.latestVersion);
+        return Integer.parseInt(latestVersion.replaceAll("\\.", "")) >
+                Integer.parseInt(this.plugin.getDescription().getVersion().replaceAll("\\.", ""));
+        //return !this.plugin.getDescription().getVersion().equals(this.latestVersion);
     }
 }

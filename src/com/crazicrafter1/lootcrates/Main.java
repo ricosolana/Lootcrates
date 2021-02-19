@@ -80,12 +80,13 @@ public class Main extends JavaPlugin
         }
         supportQualityArmory = Bukkit.getPluginManager().isPluginEnabled("QualityArmory");
 
-        autoUpdate = (boolean) a("auto-update", false);
+        //autoUpdate = (boolean) a("auto-update", false);
 
         //https://www.spigotmc.org/resources/68424
         VersionChecker updater = new VersionChecker(this, 68424);
 
         try {
+            //int vr = Integer.parseInt(updater.getLatestVersion().replaceAll("\\.", ""));
             if (updater.hasNewUpdate()) {
                 important("New update : " + updater.getLatestVersion() + ChatColor.DARK_BLUE + " (" + updater.getResourceURL() + ")");
 
@@ -106,21 +107,28 @@ public class Main extends JavaPlugin
 
         if (Bukkit.getPluginManager().isPluginEnabled("GraphicalAPI"))
             editor = new ClickEditGUI();
+
         //try {
         //    if (autoUpdate)
         //        GithubUpdater.autoUpdate(this, "owner", "name", "resource");
         //} catch (Exception e) {
         //}
 
-        //int pluginId = 10366; // <-- Replace with the id of your plugin!
-        //Metrics metrics = new Metrics(this, pluginId);
-        //// Optional: Add custom charts
+        //int pluginId = 10395; // <-- Replace with the id of your plugin!
+        Metrics metrics = new Metrics(this, 10395);
+        // Optional: Add custom charts
         //metrics.addCustomChart(new Metrics.SimplePie("chart_id", () -> "My value"));
-
+        metrics.addCustomChart(
+                new Metrics.SimplePie("using_old_config_format", new java.util.concurrent.Callable<String>() {
+                    @Override
+                    public String call() throws Exception {
+                        return String.valueOf(oldConfigFormat);
+                    }
+                }));
 
         //instance = this;
 
-        String v = Bukkit.getVersion();
+        //String v = Bukkit.getVersion();
 
         //boolean valid = v.contains("1.14") || v.startsWith("1.15") || v.startsWith("1.16");
 

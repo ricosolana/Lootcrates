@@ -70,7 +70,7 @@ gui:
     footer:
       - "&7You have selected this mystery chest"
   unselected:
-    icon: "CHEST"
+    icon: "chest"
     title: "&f&l???"
     footer:
       - "&7Choose 4 mystery chests, and"

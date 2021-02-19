@@ -102,9 +102,11 @@ public final class ActiveCrate {
                 TODO
                 replace null with the AbstractLoot instance
              */
-            slots.put(slot, new QSlot(true, lootChances[slot].getRandomLoot()));
-            //plugin.debug("Set to selected (SelectSlot) with loot " + item.getType().name());
 
+            AbstractLoot randomLoot = lootChances[slot].getRandomLoot();
+            slots.put(slot, new QSlot(true, randomLoot));
+            //plugin.debug("Set to selected (SelectSlot) with loot " + item.getType().name());
+            Main.getInstance().debug("abstractLoot: " + randomLoot.getClass().getSimpleName());
 
 
             if (Main.selectionSound != null)
@@ -192,7 +194,7 @@ public final class ActiveCrate {
     private boolean flipSlot(int slot, QSlot qSlot) {
         if (!qSlot.isSelected) return false;
 
-        ItemStack visual = lootChances[slot].getRandomLoot().getAccurateVisual(); //crate.lootGroups.g
+        ItemStack visual = qSlot.randomLoot.getAccurateVisual(); //crate.lootGroups.g
 
         inventory.setItem(slot, visual);
         qSlot.isSelected = false;
@@ -213,7 +215,15 @@ public final class ActiveCrate {
                 // give player the loot they didnt get
                 // If is a pane still, give random item, else give the inventory item
                 //if (slots.get(slot).isSelected) {
-                slots.get(slot).randomLoot.perform(this);
+
+
+
+                if (slots.get(slot).isSelected || !(slots.get(slot).randomLoot instanceof LootItem)) {
+                    slots.get(slot).randomLoot.perform(this);
+                } else {
+                    Util.giveItemToPlayer(getPlayer(), inventory.getItem(slot));
+                }
+
                     //this.lootChances[slot].getRandomLoot().perform(this);
                 //    return;
                 //}
@@ -287,8 +297,7 @@ public final class ActiveCrate {
                 // if cursor took an item
                 Main.getInstance().debug("item in hand: " + getPlayer().getItemOnCursor().getType().name());
 
-                // player pressed the item, do something
-
+                // If item placed back into crate
                 if (getPlayer().getItemOnCursor().getType() != Material.AIR) {
                     e.setCancelled(true);
                     return;
@@ -300,14 +309,22 @@ public final class ActiveCrate {
                 // test instance of AbstractLoot
                 slots.remove(slot);
 
+
+
                 if (qSlot.randomLoot instanceof LootItem) {
+
                     // do not cancel event, give them the item
+                    Main.getInstance().debug("Letting have loot! " + qSlot.randomLoot.getClass().getName());
                     return;
                 }
+
+                Main.getInstance().debug("Performing action!");
 
                 // else, an event or command slot / macro etc ... was clicked
                 // do the thing, and cancel event
                 qSlot.randomLoot.perform(this);
+
+                inventory.setItem(slot, null);
 
                 e.setCancelled(true);
 

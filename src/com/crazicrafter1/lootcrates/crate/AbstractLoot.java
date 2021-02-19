@@ -8,10 +8,12 @@ import com.crazicrafter1.lootcrates.crate.loot.*;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.MemorySection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionEffectTypeWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +43,7 @@ public abstract class AbstractLoot {
         baseVisual.setItemMeta(itemMeta);
     }
 
-    public static AbstractLoot fromNewConfig(Map<String, Object> instance, Result result) {
+    static AbstractLoot fromNewConfig(Map<String, Object> instance, Result result) {
 
         //Map<String, Object> instance = (config.getMapList(path).get(index);
 
@@ -49,17 +51,18 @@ public abstract class AbstractLoot {
 
         int min = 1, max = 1;
 
-        Object _c = instance.getOrDefault("count", null);
+        Object _count = instance.getOrDefault("count", null);
         result.code = Result.Code.INVALID_COUNT;
         if (instance.get("count") instanceof Integer) {
             min = (int)instance.get("count");
             max = min;
-        } else if (_c != null){
+        } else if (_count != null){
             // read as range, string
-            String[] split = ((String)instance.get("count")).replaceAll(" ", "").split(",");
+            String[] split = ((String)_count).replaceAll(" ", "").split(",");
             min = Integer.parseInt(split[0]);
             max = Integer.parseInt(split[1]);
         }
+        Main.getInstance().debug("" + min + " " + max);
 
         if (instance.containsKey("item")) {
             result.code = Result.Code.INVALID_ITEM;
@@ -78,43 +81,56 @@ public abstract class AbstractLoot {
                 builder.lore((List<String>) instance.get("lore"));
 
 
-            result.code = Result.Code.INVALID_COLOR;
-            if (instance.containsKey("color") && item.contains("potion"))
-                builder.color(Util.matchColor((String) instance.get("color")));
+            result.code = Result.Code.INVALID_COMMAND;
+            if (instance.containsKey("command")) {
+                Main.getInstance().debug("Command type");
+                List<String> commands = (List<String>) instance.get("command");
+                return new LootCommand(builder.toItem(), commands.toArray(new String[0]));
+            }
 
 
-            result.code = Result.Code.INVALID_GLOW;
-            if (instance.containsKey("glow") && !instance.containsKey("enchantments") && !instance.containsKey("effects"))
-                builder.glow(true);
-
-
-            result.code = Result.Code.INVALID_EFFECT_FORMAT;
             if (instance.containsKey("effects") && item.contains("potion")) {
+
+
+                result.code = Result.Code.INVALID_COLOR;
+                if (instance.containsKey("color"))
+                    builder.color(Util.matchColor((String) instance.get("color")));
+
+
+                result.code = Result.Code.INVALID_EFFECT_FORMAT;
                 LootPotionItem.QPotionEffect[] qEffects =
                         new LootPotionItem.QPotionEffect[((List)instance.get("effects")).size()];
 
                 // then read enchants
-                List list = ((List)instance.get("effects"));
+                //noinspection unchecked
+                ArrayList<Object> list = (ArrayList<Object>) instance.get("effects");
 
                 //result.code = Result.Code.INVALID_COUNT;
                 // iterate the list
                 for (int i=0; i<list.size(); i++) {
 
+                    //noinspection unchecked
                     Map<String, Object> enchantMap = (Map<String, Object>) list.get(i);
 
                     result.code = Result.Code.INVALID_EFFECT;
-                    PotionEffectType effect = PotionEffectType.getByName((String)enchantMap.get("effect"));
-                    int amp = Integer.parseInt((String)enchantMap.get("amp"));
+                    PotionEffectType effect = PotionEffectType.getByName(((String)enchantMap.get("effect")).toUpperCase());
+                    //PotionEffectTypeWrapper.
+                    if (effect == null)
+                        throw new RuntimeException(new Exception());
+
+                    result.code = Result.Code.INVALID_EFFECT_AMPLIFIER;
+                    int amp = (int)enchantMap.get("amp");
 
                     int emin, emax;
 
                     result.code = Result.Code.INVALID_DURATION;
-                    if (enchantMap.get("duration") instanceof Integer) {
-                        emin = (int)enchantMap.get("duration");
+                    Object _duration = enchantMap.get("duration");
+                    if (_duration instanceof Integer) {
+                        emin = (int)_duration;
                         emax = emin;
                     } else {
                         // read as range, string
-                        String[] split = ((String)enchantMap.get("duration")).replaceAll(" ", "").split(",");
+                        String[] split = ((String)_duration).replaceAll(" ", "").split(",");
                         emin = Integer.parseInt(split[0]);
                         emax = Integer.parseInt(split[1]);
                     }
@@ -123,13 +139,6 @@ public abstract class AbstractLoot {
                 }
 
                 return new LootPotionItem(builder.toItem(), qEffects);
-            }
-
-
-            result.code = Result.Code.INVALID_COMMAND;
-            if (instance.containsKey("command")) {
-                List<String> commands = (List<String>) instance.get("command");
-                return new LootCommand(builder.toItem(), commands.toArray(new String[0]));
             }
 
 
@@ -147,17 +156,22 @@ public abstract class AbstractLoot {
                     Map<String, Object> enchantMap = (Map<String, Object>) list.get(i);
 
                     result.code = Result.Code.INVALID_ENCHANT;
+                    //Enchantment enchantment = Enchantment.getByName((String)enchantMap.get("enchant"));
                     Enchantment enchantment = Util.matchEnchant((String)enchantMap.get("enchant"));
+
+                    if (enchantment == null)
+                        throw new RuntimeException(new Exception());
 
                     int emin, emax;
 
                     result.code = Result.Code.INVALID_LEVEL;
-                    if (enchantMap.get("level") instanceof Integer) {
-                        emin = (int)enchantMap.get("level");
+                    Object _level = enchantMap.get("level");
+                    if (_level instanceof Integer) {
+                        emin = (int)_level;
                         emax = emin;
                     } else {
                         // read as range, string
-                        String[] split = ((String)enchantMap.get("level")).replaceAll(" ", "").split(",");
+                        String[] split = ((String)_level).replaceAll(" ", "").split(",");
                         emin = Integer.parseInt(split[0]);
                         emax = Integer.parseInt(split[1]);
                     }
@@ -168,6 +182,12 @@ public abstract class AbstractLoot {
                 return new LootEnchantableItem(builder.toItem(), qEnchantments);
             }
 
+            result.code = Result.Code.INVALID_GLOW;
+            if (instance.containsKey("glow"))
+                builder.glow(true);
+
+            return new LootItem(builder.toItem(), min, max);
+
         } else if (instance.containsKey("qa") && Main.supportQualityArmory) {
             // qa item
             result.code = Result.Code.INVALID_QA;
@@ -175,7 +195,15 @@ public abstract class AbstractLoot {
         }  else if (instance.containsKey("crate")) {
             // crate
             result.code = Result.Code.INVALID_CRATE;
-            Crate crate = Main.crates.get(instance.get("crate"));
+            String _crate = (String) instance.get("crate");
+            Crate crate = Main.crates.get(_crate);
+            Main.getInstance().debug("Crate-s: " + _crate + ", Crate is null: " + (crate == null));
+            if (crate != null) {
+                Main.getInstance().debug("" + crate.getPreppedItemStack(false).getItemMeta().getDisplayName());
+            }
+            for (Crate c : Main.crates.values()) {
+                Main.getInstance().debug("c: " + c.getId());
+            }
             return new LootCrate(crate, min, max);
         }
 
@@ -186,7 +214,7 @@ public abstract class AbstractLoot {
 
 
 
-    public static AbstractLoot fromOldConfig(MemorySection instance, Result result) {
+    static AbstractLoot fromOldConfig(MemorySection instance, Result result) {
         /*
             Will hold the value of the current path being tested in the case
             of an error, can print the path of issue

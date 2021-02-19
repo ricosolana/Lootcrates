@@ -1,9 +1,10 @@
 package com.crazicrafter1.lootcrates;
 
 import com.crazicrafter1.guiapi.GraphicalAPI;
-import com.crazicrafter1.guiapi.GriddedMenuElement;
 import com.crazicrafter1.guiapi.MenuElement;
 import com.crazicrafter1.guiapi.TemplateMenu;
+import com.crazicrafter1.lootcrates.crate.Crate;
+import com.crazicrafter1.lootcrates.crate.LootGroup;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,59 +16,91 @@ public class ClickEditGUI {
     public final TemplateMenu MAIN_MENU;
 
     private final TemplateMenu CRATE_MENU;
-    private final TemplateMenu LOOT_MENU;
+    private final TemplateMenu LOOTGROUP_MENU;
     private final TemplateMenu MISC_MENU;
 
     private final ItemStack CRATE_MENU_ICON = ItemBuilder.builder(Material.CHEST).name("&8Crates").toItem();
-    private final ItemStack LOOT_MENU_ICON = ItemBuilder.builder(Material.ENCHANTED_GOLDEN_APPLE).name("&6Loot").toItem();
+    private final ItemStack LOOT_MENU_ICON = ItemBuilder.builder(Material.ENCHANTED_GOLDEN_APPLE).name("&6Lootgroups").toItem();
     private final ItemStack MISC_MENU_ICON = ItemBuilder.builder(Material.FIREWORK_ROCKET).name("&8Misc").toItem();
 
     //private static TemplateMenu
 
+    private static int clamp(int i, int a, int b) {
+        return i < a ? a : i > b ? b : i;
+    }
+
     public ClickEditGUI() {
         // menu init
-        MAIN_MENU = new TemplateMenu(ChatColor.DARK_GRAY + "Lootcrates", 1,
-                new MenuElement(ItemBuilder.builder(Material.BLACK_STAINED_GLASS_PANE).name(" ").toItem()));
+        ItemStack background = ItemBuilder.builder(Material.BLACK_STAINED_GLASS_PANE).name(" ").toItem();
+        MAIN_MENU = new TemplateMenu(ChatColor.DARK_GRAY + "LootCrates",
+                1,
+                new MenuElement(background));
 
-        CRATE_MENU = new TemplateMenu(ChatColor.DARK_GREEN + "Lootcrates > Crates", 1,
-                new MenuElement(ItemBuilder.builder(Material.BLACK_STAINED_GLASS_PANE).name(" ").toItem()));
+        CRATE_MENU = new TemplateMenu(ChatColor.DARK_GREEN + "LootCrates > Crates",
+                clamp((Main.crates.size()/9)+1, 1, 6),
+                new MenuElement(background));
 
-        LOOT_MENU = new TemplateMenu(ChatColor.DARK_GREEN + "Lootcrates > Loot", 1,
-                new MenuElement(ItemBuilder.builder(Material.BLACK_STAINED_GLASS_PANE).name(" ").toItem()));
+        LOOTGROUP_MENU = new TemplateMenu(ChatColor.DARK_GREEN + "LootCrates > Lootgroups",
+                clamp((Main.lootGroups.size()/9)+1, 1, 6),
+                new MenuElement(background));
 
-        MISC_MENU = new TemplateMenu(ChatColor.DARK_GREEN + "Lootcrates -> Misc", 1,
-                new MenuElement(ItemBuilder.builder(Material.BLACK_STAINED_GLASS_PANE).name(" ").toItem()));
+        MISC_MENU = new TemplateMenu(ChatColor.DARK_GREEN + "LootCrates -> Misc",
+                1,
+                new MenuElement(background));
 
-        // menu icon init
-        MAIN_MENU.addGriddedElement(new GriddedMenuElement(CRATE_MENU_ICON, 2, 0) {
+        /*
+            MAIN MENU INIT
+         */
+        MAIN_MENU.addElement(new MenuElement(CRATE_MENU_ICON) {
             @Override
             public void onLeftClick(Player p) {
                 // open crate menu
                 GraphicalAPI.openMenu(p, CRATE_MENU);
             }
-        });
+        }, 2, 0);
 
-        MAIN_MENU.addGriddedElement(new GriddedMenuElement(LOOT_MENU_ICON, 4, 0) {
+        MAIN_MENU.addElement(new MenuElement(LOOT_MENU_ICON) {
             @Override
             public void onLeftClick(Player p) {
                 // open crate menu
-                GraphicalAPI.openMenu(p, LOOT_MENU);
+                GraphicalAPI.openMenu(p, LOOTGROUP_MENU);
             }
-        });
+        }, 4, 0);
 
-        MAIN_MENU.addGriddedElement(new GriddedMenuElement(MISC_MENU_ICON, 6, 0) {
+        MAIN_MENU.addElement(new MenuElement(MISC_MENU_ICON) {
             @Override
             public void onLeftClick(Player p) {
                 // open crate menu
                 GraphicalAPI.openMenu(p, MISC_MENU);
             }
-        });
+        }, 6, 0);
 
+        /*
+            add all crates to crates menu
+         */
+        int pitch = 0;
 
+        for (Crate crate : Main.crates.values()) {
+            if (pitch == 54) break;
+            CRATE_MENU.addElement(new MenuElement(crate.getPreppedItemStack(false)) {
+                @Override
+                public void onLeftClick(Player p) {
+                    // do nothing yet
+                }
+            }, pitch++);
+        }
 
-        // crate menu icon init
+        pitch = 0;
+        for (LootGroup lootGroup : Main.lootGroups.values()) {
+            if (pitch == 54) break;
+            LOOTGROUP_MENU.addElement(new MenuElement(lootGroup.getPanel()) {
+                @Override
+                public void onLeftClick(Player p) {
+                    // do nothing yet
+                }
+            }, pitch++);
+        }
 
-        //CRATE_EDITOR = new TemplateMenu(ChatColor.DARK_GRAY + "Lootcrates Editor", 1, );
     }
 
 }

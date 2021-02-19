@@ -31,7 +31,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://D:/MinecraftDev/Plugins/GraphicalAPI.jar!/" />
+          <root url="jar://D:/MinecraftDev/Servers/1.16.5 crates/plugins/GraphicalAPI.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

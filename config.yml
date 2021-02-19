@@ -26,17 +26,14 @@
 
 
 # DEBUG MODE
-debug-enabled: false
+debug: false
 
-# Enable QualityArmory Hook?
-qa-hook: false
-
-# scroll speed
+# scroll speed (multiples of 20)
 # if set to 0, will instantly reveal items
 # 2 = 1 item / 2 ticks
 # 5 = 1 item / 5 ticks
-#
-raffle-speed: 5
+# etc ...
+raffle-speed: 4
 
 # selection sound
 # do "none" for no sound
@@ -149,7 +146,7 @@ crates:
       rare: 8
   knight:
     icon: "chest"
-    title: "&b&lKnight Spoils&r&7(Tier 3)"
+    title: "&b&lKnight Spoils &r&7(Tier 3)"
     footer:
       - "&7Right click on this item to unlock"
       - "&7four pieces of loot!"
@@ -250,24 +247,25 @@ loot:
       lore:
         - "&o&8become as fast as &elightning"
       effects:
-        - effect: speed
+        # see https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/potion/PotionEffectType.html
+        - effect: SPEED
           amp: 2
           duration: 3600
-        - effect: haste
+        - effect: FAST_DIGGING
           amp: 1
           duration: 24000
     - item: tnt
-      range: 1 31
+      count: 1, 31
     - item: tnt
       count: 32
     - item: diamond
       count: 16
     - item: cactus
-      range: 1 31
+      count: 1, 31
     - item: cactus
       count: 64
     - item: coal
-      range: 1 31
+      count: 1, 31
     - item: experience_bottle
       name: "&e&lExperience"
       lore:
@@ -281,28 +279,28 @@ loot:
       command:
         - "xp add {player} 1000"
     - item: blaze_rod
-      range: 1 31
+      count: 1, 31
     - item: obsidian
       count: 32
     - item: diamond_block
       count: 4
     - item: potato
-      range: 1 15
+      count: 1, 15
     - item: iron_block
       count: 2
     - item: sugar_cane
-      range: 1 31
+      count: 1, 31
     - item: cooked_beef
-      range: 1 32
+      count: 1, 32
     - item: diamond
-      range: 1 15
-    - crate: rare
+      count: 1, 15
+    - crate: folk
       count: 1
   regular:
     - item: gold_block
       count: 8
     - item: obsidian
-      range: 1 31
+      count: 1, 31
     - item: obsidian
       count: 32
     - item: sponge
@@ -318,14 +316,14 @@ loot:
       command:
         - "xp add {player} 1000"
     - item: hopper
-      range: 1 2
-    - crate: regular
+      count: 1, 2
+    - crate: folk
       count: 1
-    - crate: ultra
+    - crate: knight
       count: 1
   ultra:
     - item: cooked_beef
-      range: 1 31
+      count: 1, 31
     - item: experience_bottle
       name: "&e&lExperience"
       lore:
@@ -341,7 +339,7 @@ loot:
     - item: obsidian
       count: 64
     - item: hopper
-      range: 1 5
+      count: 1, 5
     - item: diamond_helmet
       enchantments:
         - enchant: protection
@@ -350,11 +348,11 @@ loot:
       enchantments:
         - enchant: protection
           level: 3
-    - crate: regular
+    - crate: folk
       count: 1
-    - crate: ultra
+    - crate: knight
       count: 1
-    - crate: rare
+    - crate: pope
       count: 1
   rare:
     - item: emerald_block
@@ -433,7 +431,7 @@ loot:
           level: 5
         - enchant: unbreaking
           level: 3
-    - crate: legendary
+    - crate: king
       count: 1
   legendary:
     - item: diamond_leggings

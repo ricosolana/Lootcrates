@@ -104,7 +104,7 @@ public class LootGroup {
             i++;
         }
 
-        return new LootGroup(id, item, (AbstractLoot[]) abstractLoots.toArray());
+        return new LootGroup(id, item, abstractLoots.toArray(new AbstractLoot[0]));
     }
 
     public static LootGroup fromOldConfig(String id) {

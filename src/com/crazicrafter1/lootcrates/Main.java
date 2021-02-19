@@ -27,7 +27,7 @@ public class Main extends JavaPlugin
     public static HashSet<UUID> crateFireWorks = new HashSet<>();
 
     public static boolean supportQualityArmory = false;
-    public static boolean supportGraphicalAPI = false;
+    //public static boolean supportGraphicalAPI = false;
     public static boolean debug = false;
     public static boolean autoUpdate = true;
     public static String inventoryName = "";
@@ -101,6 +101,9 @@ public class Main extends JavaPlugin
             error("Possible config issue around " + temp_path);
             e.printStackTrace();
         }
+
+        if (Bukkit.getPluginManager().isPluginEnabled("GraphicalAPI"))
+            editor = new ClickEditGUI();
         //try {
         //    if (autoUpdate)
         //        GithubUpdater.autoUpdate(this, "owner", "name", "resource");
@@ -118,10 +121,6 @@ public class Main extends JavaPlugin
         String v = Bukkit.getVersion();
 
         //boolean valid = v.contains("1.14") || v.startsWith("1.15") || v.startsWith("1.16");
-        supportGraphicalAPI = Bukkit.getPluginManager().isPluginEnabled("GraphicalAPI");
-
-        if (supportGraphicalAPI)
-            editor = new ClickEditGUI();
 
         new CmdCrates(this);
         new TabCrates(this);
@@ -163,6 +162,10 @@ public class Main extends JavaPlugin
         reloadConfig();
 
         boolean old = oldConfigFormat = isOldConfigFormat();
+
+        if (old) info("Reading as old config format");
+        else  info("Reading as new config format");
+
         debug = (boolean) a(old ? "debug-enabled" : "debug", true);
 
         selectionSound = Sound.valueOf((String) a("selection-sound", "ENTITY_EXPERIENCE_ORB_PICKUP"));
@@ -238,10 +241,14 @@ public class Main extends JavaPlugin
                     builder(Material.matchMaterial((String) a(path + (old ? ".item" : ".icon"), null))).
                     name((String)a(path + (old ? ".name" : ".title"), null));
 
-            if (config.contains(path + (old ? ".lore" : ".footer")))
-                builder.lore(config.getStringList(path + (old ? ".lore" : ".footer")));
-
+            {
+                Object _footer = a(path + (old ? ".lore" : ".footer"), null);
+                if (_footer != null)
+                    builder.lore((List<String>)_footer);
+            }
             Crate crate = new Crate(id, builder.toItem());
+
+            debug("loadedCrate: " + id);
 
             Main.crates.put(id, crate);
             Main.crateNameIds.put(builder.toItem().getItemMeta().getDisplayName(), id);
@@ -264,7 +271,7 @@ public class Main extends JavaPlugin
         // 4th: full parse crates
         for (String s : Main.crates.keySet()) {
             //Crate crate = Crate.fromConfig(s);
-            MemorySection mem = (MemorySection) config.get("crates." + s + ".chances");
+            MemorySection mem = (MemorySection) a("crates." + s + ".chances", null);
 
             Map<String, Integer> lootgroupChances = new HashMap<>();
 
@@ -283,6 +290,8 @@ public class Main extends JavaPlugin
             Main.crates.get(s).setLootGroups(lootGroups);
         }
 
+        //if (supportGraphicalAPI)
+
     }
 
     public void info(String s) {
@@ -298,7 +307,7 @@ public class Main extends JavaPlugin
     }
 
     public void debug(String s) {
-        //if (debug)
+        if (debug)
             Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.YELLOW + s);
     }
 

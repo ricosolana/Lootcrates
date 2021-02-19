@@ -80,7 +80,7 @@ public class Main extends JavaPlugin
         }
         supportQualityArmory = Bukkit.getPluginManager().isPluginEnabled("QualityArmory");
 
-
+        autoUpdate = (boolean) a("auto-update", false);
 
         //https://www.spigotmc.org/resources/68424
         VersionChecker updater = new VersionChecker(this, 68424);
@@ -88,9 +88,11 @@ public class Main extends JavaPlugin
         try {
             if (updater.hasNewUpdate()) {
                 important("New update : " + updater.getLatestVersion() + ChatColor.DARK_BLUE + " (" + updater.getResourceURL() + ")");
+
             } else {
                 info("LootCrates is up-to-date!");
             }
+
         } catch (Exception e) {
             error("Unable to check for updates!");
         }
@@ -168,7 +170,7 @@ public class Main extends JavaPlugin
 
         boolean old = oldConfigFormat = isOldConfigFormat();
 
-        if (old) info("Reading as old config format");
+        if (old) important("Reading as old config format. \nI would recommend you using the new configuration file format (it supports a whole lot more, and is a lot less error prone!)");
         else  info("Reading as new config format");
 
         debug = (boolean) a(old ? "debug-enabled" : "debug", true);
@@ -177,7 +179,6 @@ public class Main extends JavaPlugin
         inventoryName = ChatColor.translateAlternateColorCodes('&',(String) a("inventory-name", ""));
         inventorySize = (int) a("inventory-size", 36);
         raffleSpeed = (int) a("raffle-speed", 5);
-        autoUpdate = (boolean) a("auto-update", true);
 
         selections = (int) a(old ? "max-selections" : "selections", 4);
 

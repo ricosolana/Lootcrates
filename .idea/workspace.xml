@@ -7,16 +7,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="228d0725-a467-4829-a811-e48ed8b6f0a2" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LootCrates.iml" beforeDir="false" afterPath="$PROJECT_DIR$/LootCrates.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/config.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/ClickEditGUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/ClickEditGUI.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Result.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Result.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/AbstractLoot.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/AbstractLoot.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/ActiveCrate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/ActiveCrate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/LootGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/LootGroup.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/config/ConfigMigrator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/config/ConfigMigrator.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -28,18 +20,30 @@
     <option name="isMigrated" value="true" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.859352">
+    <splitter split-orientation="horizontal" split-proportion="0.690535">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="311">
-                  <caret line="103" selection-start-line="103" selection-end-line="103" />
+                <state relative-caret-position="228">
+                  <caret line="174" lean-forward="true" selection-start-line="174" selection-end-line="174" />
                   <folding>
-                    <element signature="e#11094#11095#0" expanded="true" />
-                    <element signature="e#11222#11223#0" expanded="true" />
-                    <element signature="e#11343#11344#0" expanded="true" />
+                    <element signature="e#11405#11406#0" expanded="true" />
+                    <element signature="e#11533#11534#0" expanded="true" />
+                    <element signature="e#11654#11655#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/config/ConfigMigrator.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="170">
+                  <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
+                  <folding>
+                    <element signature="imports" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -69,11 +73,11 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/ClickEditGUI.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="527">
-                  <caret line="94" column="35" selection-start-line="94" selection-start-column="35" selection-end-line="94" selection-end-column="35" />
+                <state relative-caret-position="306">
+                  <caret line="81" lean-forward="true" selection-start-line="81" selection-end-line="81" />
                   <folding>
                     <element signature="imports" expanded="true" />
                     <element signature="e#1124#1125#0" expanded="true" />
@@ -135,24 +139,11 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootCrate.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="119">
-                  <caret line="7" column="58" selection-start-line="7" selection-start-column="58" selection-end-line="7" selection-end-column="58" />
-                  <folding>
-                    <element signature="e#195#196#0" expanded="true" />
-                    <element signature="e#260#261#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
         </leaf>
       </split-first>
       <split-second>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/config.yml">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="206">
@@ -161,7 +152,7 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/ClickEditGUI.java">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="161">
@@ -252,7 +243,6 @@
         <option value="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/config/ConfigWrapper.java" />
         <option value="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/GitHubUpdater.java" />
         <option value="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/config/ConfigConverter.java" />
-        <option value="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/config/ConfigMigrator.java" />
         <option value="$PROJECT_DIR$/config_old.yml" />
         <option value="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootQA.java" />
         <option value="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItem.java" />
@@ -280,8 +270,9 @@
         <option value="$PROJECT_DIR$/config.yml" />
         <option value="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/AbstractLoot.java" />
         <option value="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/ActiveCrate.java" />
-        <option value="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java" />
         <option value="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/ClickEditGUI.java" />
+        <option value="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java" />
+        <option value="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/config/ConfigMigrator.java" />
       </list>
     </option>
   </component>
@@ -349,6 +340,15 @@
               <item name="crazicrafter1" type="462c0819:PsiDirectoryNode" />
               <item name="lootcrates" type="462c0819:PsiDirectoryNode" />
               <item name="commands" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="LootCrates" type="b2602c69:ProjectViewProjectNode" />
+              <item name="LootCrates" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="crazicrafter1" type="462c0819:PsiDirectoryNode" />
+              <item name="lootcrates" type="462c0819:PsiDirectoryNode" />
+              <item name="config" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="LootCrates" type="b2602c69:ProjectViewProjectNode" />
@@ -453,7 +453,7 @@
     <frame x="-8" y="-8" width="1616" height="876" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12724936" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.21915168" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="UI Designer" order="3" />
@@ -630,16 +630,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="512">
           <caret line="46" selection-start-line="46" selection-end-line="46" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/config/ConfigMigrator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="31" column="17" selection-start-line="31" selection-start-column="17" selection-end-line="31" selection-end-column="17" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -903,25 +893,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/config.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="206">
-          <caret line="364" column="28" selection-start-line="364" selection-start-column="28" selection-end-line="364" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="311">
-          <caret line="103" selection-start-line="103" selection-end-line="103" />
-          <folding>
-            <element signature="e#11094#11095#0" expanded="true" />
-            <element signature="e#11222#11223#0" expanded="true" />
-            <element signature="e#11343#11344#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://D:/MinecraftDev/Plugins/GraphicalAPI.jar!/com/crazicrafter1/guiapi/GriddedMenuElement.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="38">
@@ -938,12 +909,41 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/ClickEditGUI.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="527">
-          <caret line="94" column="35" selection-start-line="94" selection-start-column="35" selection-end-line="94" selection-end-column="35" />
+        <state relative-caret-position="306">
+          <caret line="81" lean-forward="true" selection-start-line="81" selection-end-line="81" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#1124#1125#0" expanded="true" />
             <element signature="e#1172#1173#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="206">
+          <caret line="364" column="28" selection-start-line="364" selection-start-column="28" selection-end-line="364" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="228">
+          <caret line="174" lean-forward="true" selection-start-line="174" selection-end-line="174" />
+          <folding>
+            <element signature="e#11405#11406#0" expanded="true" />
+            <element signature="e#11533#11534#0" expanded="true" />
+            <element signature="e#11654#11655#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/config/ConfigMigrator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>

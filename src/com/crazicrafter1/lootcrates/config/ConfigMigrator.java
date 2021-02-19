@@ -16,6 +16,7 @@ public class ConfigMigrator {
     private YamlConfiguration newConfig;
 
     public ConfigMigrator(Main plugin, YamlConfiguration old_config) {
+        if (true) throw new RuntimeException("This migrator is incomplete and might be destructive to your config / files");
         // load config, test if it old version based on appearance
         //FileConfiguration config = plugin.getConfig();
 

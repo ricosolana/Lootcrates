@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 public class CmdCrates extends CmdBase {
 
     public CmdCrates(Main plugin) {
-        super(plugin, "crates");
+        super(plugin, "lootcrates");
     }
 
     @Override
@@ -73,7 +73,7 @@ public class CmdCrates extends CmdBase {
                     return true;
                 }
                 return error(sender, "Can only be executed by a player");
-            } else return error(sender, "GraphicalAPI was not found or MC version is not 1.14/1.15");
+            } else return error(sender, "GraphicalAPI was not found or MC version is not 1.14+");
         }
 
         /*

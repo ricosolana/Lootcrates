@@ -6,9 +6,13 @@ import com.crazicrafter1.lootcrates.Seasonal;
 import com.crazicrafter1.lootcrates.Util;
 import com.sun.istack.internal.Nullable;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
+import java.io.BufferedReader;
 import java.util.*;
 
 public final class Crate {
@@ -37,42 +41,69 @@ public final class Crate {
     //private String name;
     private final ItemStack itemStack;
     //private final HashMap<String, Integer> lootGroups;
-    public final HashMap<LootGroup, Integer> lootGroups;
+    private HashMap<LootGroup, Integer> lootGroups;
     private static ItemStack seasonalVariant;
-    private final LootGroup[] sortedByChance;
-    private final int chanceSum;
+    //private LootGroup[] sortedByChance;
+    private int chanceSum;
 
-    public Crate(String id, ItemStack itemStack, HashMap<LootGroup, Integer> lootGroups) {
+    public Crate(String id, ItemStack itemStack) {
         this.id = id;
         this.itemStack = itemStack;
+    }
+
+    public void setLootGroups(HashMap<LootGroup, Integer> lootGroups) {
+
+        /*
+            sort should return the map in an ordered way
+         */
+
+        //Main.getInstance().debug("before chances:");
+        //for (Map.Entry<LootGroup, Integer> entry : lootGroups.entrySet()) {
+        //    Main.getInstance().debug("" + entry.getValue());
+        //}
+
+
+        lootGroups = sortByValue(lootGroups);
+        //Main.getInstance().debug("sorted chances:");
+        //for (Map.Entry<LootGroup, Integer> entry : lootGroups.entrySet()) {
+        //    Main.getInstance().debug("" + entry.getValue());
+        //}
+
+        int last = 0;
+        /*
+            iterate values, summing the previous value to the current
+         */
+        for (Map.Entry<LootGroup, Integer> entry : lootGroups.entrySet()) {
+
+            //lootGroups.put(entry.)
+            entry.setValue(last + entry.getValue());
+            last = entry.getValue();
+        }
+
+        //Main.getInstance().debug("after values:");
+        //for (Map.Entry<LootGroup, Integer> entry : lootGroups.entrySet()) {
+        //    Main.getInstance().debug("" + entry.getValue());
+        //}
+
         this.lootGroups = lootGroups;
+        this.chanceSum = last;
 
-        int sum = 0;
+        //Main.getInstance().debug("sum: " + this.chanceSum);
 
-        HashMap<String, Integer> namesAndChances = new HashMap<>();
-        for (LootGroup key : lootGroups.keySet()) {
-            namesAndChances.put(key.getName(), lootGroups.get(key));
-            sum += lootGroups.get(key);
-        }
+        /*
+            extensive test
+         */
 
+        //for (int i=0; i<200; i++) {
+        //    LootGroup basedRandom = this.getBasedRandom();
+        //    //if (basedRandom == null) {
+        //    //Main.getInstance().debug("Error of null item");
+        //    //Main.debug
+        //    //    Scanner scanner = new Scanner(System.in);
+        //    //    scanner.next();
+        //    //}
+        //}
 
-        chanceSum = sum;
-
-
-        HashMap<String, LootGroup> namesAndLootGroups = new HashMap<>();
-        for (LootGroup key : lootGroups.keySet()) {
-            namesAndLootGroups.put(key.getName(), key);
-        }
-
-
-
-        Map<String, Integer> hm1 = Crate.sortByValue(namesAndChances);
-
-        int end = 0;
-        this.sortedByChance = new LootGroup[lootGroups.size()];
-        for (Map.Entry<String, Integer> en : hm1.entrySet()) {
-            this.sortedByChance[end++] = namesAndLootGroups.get(en.getKey());
-        }
     }
 
     public String getId() {
@@ -97,11 +128,23 @@ public final class Crate {
     }
 
     public LootGroup getBasedRandom() {
+
+
+
         int rand = Util.randomRange(0, chanceSum-1);
 
-        for (LootGroup lootGroup : sortedByChance) {
-            if (lootGroups.get(lootGroup) > rand) return lootGroup;
+        //Main.getInstance().debug("rand: " + rand);
+
+        for (Map.Entry<LootGroup, Integer> entry : this.lootGroups.entrySet()) {
+            if (lootGroups.get(entry.getKey()) > rand) return entry.getKey();
         }
+
+        //for (LootGroup lootGroup : sortedByChance) {
+        //    Main.getInstance().debug("" + ChatColor.GRAY + lootGroups.get(lootGroup));
+        //    if (lootGroups.get(lootGroup) > rand) return lootGroup;
+        //}
+
+        //Main.getInstance().debug(ChatColor.RED + "null");
 
         return null;
     }
@@ -154,8 +197,13 @@ public final class Crate {
 
     public static Crate matchCrate(ItemStack item) {
 
-        String name = Objects.requireNonNull(item.getItemMeta()).getDisplayName();
-        return Main.crates.getOrDefault(name, null);
+        if (item == null) return null;
+
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return null;
+
+        String name = meta.getDisplayName();
+        return Main.crates.getOrDefault(Main.crateNameIds.getOrDefault(name, null), null);
 
         //net.minecraft.server.v1_14_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
         //NBTTagCompound nbt = nmsStack.getOrCreateTag();
@@ -177,8 +225,36 @@ public final class Crate {
         return false;
     }
 
+    @Deprecated
+    public static Crate fromConfig(String id) {
+        FileConfiguration config = Main.getInstance().getConfig();
+
+        String temp_path = "crates." + id;
+
+        ItemBuilder builder = ItemBuilder.
+                builder(Material.matchMaterial(config.getString(temp_path + ".item"))).
+                name(config.getString(temp_path + ".name"));
+
+        if (config.contains(temp_path + ".lore"))
+            builder.lore(config.getStringList(temp_path + ".lore"));
+
+        /*
+        Map<String, Integer> lootgroupChances = (Map<String, Integer>) config.get(temp_path + ".chances");
+
+        HashMap<LootGroup, Integer> lootGroups = new HashMap<>();
+        for (String group : lootgroupChances.keySet()) {
+            lootGroups.put(Main.lootGroups.get(group), lootgroupChances.get(group));
+        }
+        */
+
+        // lootGroups
+
+        return new Crate(id, builder.toItem());
+    }
+
     // assumes that player exists with open crate
     public static void closeCrate(Player p) {
-        Main.openCrates.get(p.getUniqueId()).close();
+        Main.openCrates.get(p.getUniqueId()).close(false);
+        Main.openCrates.remove(p.getUniqueId());
     }
 }

@@ -65,49 +65,49 @@ selections: 4
 
 
 
-
+# 'icon', 'title', and 'footer' are respectively 'item', 'name', and 'lore'
 gui:
   selected:
-    item: "WHITE_STAINED_GLASS_PANE"
-    name: "&f&l???"
-    lore:
+    icon: "WHITE_STAINED_GLASS_PANE"
+    title: "&f&l???"
+    footer:
       - "&7You have selected this mystery chest"
   unselected:
-    item: "CHEST"
-    name: "&f&l???"
-    lore:
+    icon: "CHEST"
+    title: "&f&l???"
+    footer:
       - "&7Choose 4 mystery chests, and"
       - "&7your loot will be revealed!"
-  loot-group:
-    peasant:
-      item: "WHITE_STAINED_GLASS_PANE"
-      name: "&f&lCommon Reward"
-      lore:
+  lootgroup:
+    common:
+      icon: "WHITE_STAINED_GLASS_PANE"
+      title: "&f&lCommon Reward"
+      footer:
         - "&7Click to redeem!"
-    folk:
-      item: "YELLOW_STAINED_GLASS_PANE"
-      name: "&e&lRegular Reward"
-      lore:
+    regular:
+      icon: "YELLOW_STAINED_GLASS_PANE"
+      title: "&e&lRegular Reward"
+      footer:
         - "&7Click to redeem!"
-    knight:
-      item: "BLUE_STAINED_GLASS_PANE"
-      name: "&b&lUltra Reward"
-      lore:
+    ultra:
+      icon: "BLUE_STAINED_GLASS_PANE"
+      title: "&b&lUltra Reward"
+      footer:
         - "&7Click to redeem!"
-    pope:
-      item: "PURPLE_STAINED_GLASS_PANE"
-      name: "&5&lRare Reward"
-      lore:
+    rare:
+      icon: "PURPLE_STAINED_GLASS_PANE"
+      title: "&5&lRare Reward"
+      footer:
         - "&7Click to redeem!"
-    king:
-      item: "RED_STAINED_GLASS_PANE"
-      name: "&c&lLegendary Reward"
-      lore:
+    legendary:
+      icon: "RED_STAINED_GLASS_PANE"
+      title: "&c&lLegendary Reward"
+      footer:
         - "&7Click to redeem!"
     laser:
-      item: "ORANGE_STAINED_GLASS_PANE"
-      name: "&6&lWeapon Reward"
-      lore:
+      icon: "ORANGE_STAINED_GLASS_PANE"
+      title: "&6&lWeapon Reward"
+      footer:
         - "&7Click to redeem!"
 
 
@@ -127,9 +127,9 @@ gui:
 
 crates:
   peasant:
-    item: "chest"
-    name: "&f&lPeasant Supply Crate &r&7(Tier 1)"
-    lore:
+    icon: "chest"
+    title: "&f&lPeasant Loot &r&7(Tier 1)"
+    footer:
       - "&7Right click on this item to unlock"
       - "&7four pieces of loot!"
     chances:
@@ -137,9 +137,9 @@ crates:
       regular: 22
       ultra: 8
   folk:
-    item: "chest"
-    name: "&e&lRegular Supply Crate &r&7(Tier 2)"
-    lore:
+    icon: "chest"
+    title: "&e&lFolk Barrel &r&7(Tier 2)"
+    footer:
       - "&7Right click on this item to unlock"
       - "&7four pieces of loot!"
     chances:
@@ -148,9 +148,9 @@ crates:
       ultra: 17
       rare: 8
   knight:
-    item: "chest"
-    name: "&b&lUltra Supply Crate &r&7(Tier 3)"
-    lore:
+    icon: "chest"
+    title: "&b&lKnight Spoils&r&7(Tier 3)"
+    footer:
       - "&7Right click on this item to unlock"
       - "&7four pieces of loot!"
     chances:
@@ -160,9 +160,9 @@ crates:
       rare: 17
       legendary: 8
   pope:
-    item: "chest"
-    name: "&5&lRare Supply Crate &r&7(Tier 4)"
-    lore:
+    icon: "chest"
+    title: "&5&lPope Fortunes &r&7(Tier 4)"
+    footer:
       - "&7Right click on this item to unlock"
       - "&7four pieces of loot!"
     chances:
@@ -171,9 +171,9 @@ crates:
       rare: 39
       legendary: 20
   king:
-    item: "chest"
-    name: "&c&lLegendary Supply Crate &r&7(Tier 5)"
-    lore:
+    icon: "chest"
+    title: "&c&lKing treasure &r&7(Tier 5)"
+    footer:
       - "&7Right click on this item to unlock"
       - "&7four pieces of loot!"
     chances:
@@ -181,13 +181,13 @@ crates:
       rare: 32
       legendary: 40
   laser:
-    item: "chest"
-    name: "&6&lWeapon Supply Crate"
-    lore:
+    icon: "chest"
+    title: "&6&lPowPow Box"
+    footer:
       - "&7Right click on this item to unlock"
       - "&7four Quality Armory items!"
     chances:
-      weapon: 100
+      laser: 100
 
 
 
@@ -246,7 +246,7 @@ loot:
   common:
     - item: potion
       name: "&6&lPotion of Agility"
-      color: 0xFFEE11
+      color: ORANGE
       lore:
         - "&o&8become as fast as &elightning"
       effects:

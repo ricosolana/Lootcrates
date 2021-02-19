@@ -2,10 +2,15 @@ package com.crazicrafter1.lootcrates.listeners;
 
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -22,25 +27,55 @@ public class ListenerOnInventoryClick extends BaseListener {
                 "FURNACE",
                 "WORKBENCH",
                 "SMOKER",
-                ""
-                //InventoryType.I
+                "BLAST_FURNACE"
                 ));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent e)
     {
-        Player p = (Player) e.getView().getPlayer();
+        Player p = (Player) e.getWhoClicked();
 
+        // If player is opening crate
         if (Main.openCrates.containsKey(p.getUniqueId()))
         {
             Main.openCrates.get(p.getUniqueId()).onInventoryClick(e);
         } else {
-            String invName = e.getInventory().getType().name();
+            /*
+                TODO
+                somehow prevent crates from being used as fuel or crafting recipes
+             */
 
-            if (preventTypes.contains(invName)) {
-                e.setCancelled(true);
-            }
+            //Main.getInstance().debug("hotbarbutton: " + e.getHotbarButton());
+            //Main.getInstance().debug("slot: " + e.getSlot());
+//
+            //if (e.getClickedInventory() instanceof PlayerInventory)
+            //    return;
+//
+            //Inventory clicked = e.getClickedInventory();
+//
+            //if (clicked == null || !preventTypes.contains(clicked.getType().name())) return;
+//
+            //ItemStack itemStack = e.getCurrentItem();
+//
+            //if (itemStack == null) {
+//
+            //    int hotbar = e.getHotbarButton();
+            //    if (hotbar != -1)
+            //        itemStack = p.getInventory().getItem(hotbar);
+//
+            //}
+//
+//
+//
+            //// If an item was PLACED INTO
+            //if (itemStack != null && itemStack.getType() != Material.AIR) {
+            //    // test that item
+            //    if (Crate.matchCrate(itemStack) != null) {
+            //        e.setCancelled(true);
+            //    }
+            //}
+
         }
 
     }

@@ -63,6 +63,8 @@ public class ClickEditGUI {
             }
         });
 
+
+
         // crate menu icon init
 
         //CRATE_EDITOR = new TemplateMenu(ChatColor.DARK_GRAY + "Lootcrates Editor", 1, );

@@ -8,6 +8,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.FileOutputStream;
 import java.net.URL;
@@ -48,19 +49,33 @@ public class Util {
     }
 
     public static void giveItemToPlayer(Player p, ItemStack item) {
-        HashMap<Integer, ItemStack> remaining = null;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
 
-        if (!(remaining = p.getInventory().addItem(item)).isEmpty()) {
-            for (ItemStack itemStack : remaining.values()) {
+                Main.getInstance().debug("Gave item to player");
 
-                //getPlayer().getWorld().dropItem(getPlayer().getLocation(), itemStack);
-                p.getWorld().dropItem(p.getLocation(), itemStack);
+                if (!p.isDead()) {
+                    HashMap<Integer, ItemStack> remaining = null;
+                    if (!(remaining = p.getInventory().addItem(item)).isEmpty()) {
+                        for (ItemStack itemStack : remaining.values()) {
 
+                            //getPlayer().getWorld().dropItem(getPlayer().getLocation(), itemStack);
+                            p.getWorld().dropItem(p.getLocation(), itemStack);
+
+                        }
+                        //ItemStack remaining =
+                    }
+                } else {
+
+                    //getPlayer().getWorld().dropItem(getPlayer().getLocation(), itemStack);
+                    p.getWorld().dropItem(p.getLocation(), item);
+
+                    //ItemStack remaining =
+
+                }
             }
-            //ItemStack remaining =
-
-
-        }
+        }.runTaskLater(Main.getInstance(), 1);
     }
 
     public static ItemStack getItem(String name, boolean useOldMethods) {

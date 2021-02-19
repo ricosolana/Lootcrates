@@ -12,7 +12,7 @@ import java.util.List;
 public class TabCrates extends BaseTabCompleter {
 
     public TabCrates(Main plugin) {
-        super(plugin, "crates");
+        super(plugin, "lootcrates");
     }
 
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args){
@@ -29,15 +29,13 @@ public class TabCrates extends BaseTabCompleter {
                     }
                 }
                  */
-                return getMatches(args[0], new String[] {"crate", "reload"});
+                return getMatches(args[0], new String[] {"crate", "reload", "editor"});
             }
             if (args[0].equals("crate")) {
                 if (args.length == 2) {
                     // set string -> string[]
 
-
-
-                    return getMatches(args[1], Main.crateNameIds.keySet().toArray(new String[0]));
+                    return getMatches(args[1], Main.crates.keySet().toArray(new String[0]));
                 }
                 if (args.length == 3) {
                     // add player name

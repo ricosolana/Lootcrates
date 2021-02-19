@@ -2,16 +2,18 @@ package com.crazicrafter1.lootcrates.crate;
 
 import com.crazicrafter1.lootcrates.ItemBuilder;
 import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.Result;
 import com.crazicrafter1.lootcrates.Util;
 import com.crazicrafter1.lootcrates.crate.loot.*;
 import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.MemorySection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,10 +33,6 @@ public abstract class AbstractLoot {
 
     public abstract ItemStack getAccurateVisual();
 
-    /**
-     * Return whether the method did anything
-     * (basic items and giving should return false for performance since visual is same resulting item)
-     */
     public void perform(ActiveCrate activeCrate) {
         Util.giveItemToPlayer(activeCrate.getPlayer(), getAccurateVisual());
     }
@@ -43,18 +41,20 @@ public abstract class AbstractLoot {
         baseVisual.setItemMeta(itemMeta);
     }
 
-    public static AbstractLoot fromNewConfig(Map<String, Object> instance) {
+    public static AbstractLoot fromNewConfig(Map<String, Object> instance, Result result) {
 
         //Map<String, Object> instance = (config.getMapList(path).get(index);
 
         //config.getMapList;
 
-        int min, max;
+        int min = 1, max = 1;
 
+        Object _c = instance.getOrDefault("count", null);
+        result.code = Result.Code.INVALID_COUNT;
         if (instance.get("count") instanceof Integer) {
             min = (int)instance.get("count");
             max = min;
-        } else {
+        } else if (_c != null){
             // read as range, string
             String[] split = ((String)instance.get("count")).replaceAll(" ", "").split(",");
             min = Integer.parseInt(split[0]);
@@ -62,45 +62,53 @@ public abstract class AbstractLoot {
         }
 
         if (instance.containsKey("item")) {
+            result.code = Result.Code.INVALID_ITEM;
 
             String item = (String)instance.get("item");
             ItemBuilder builder = ItemBuilder.builder(Material.matchMaterial(item));
 
+
+            result.code = Result.Code.INVALID_NAME;
             if (instance.containsKey("name"))
                 builder.name((String)instance.get("name"));
 
 
+            result.code = Result.Code.INVALID_LORE;
             if (instance.containsKey("lore"))
                 builder.lore((List<String>) instance.get("lore"));
 
 
-            {
-                if (instance.containsKey("color") && item.contains("potion"))
-                    builder.color((Color) instance.get("color"));
-            }
+            result.code = Result.Code.INVALID_COLOR;
+            if (instance.containsKey("color") && item.contains("potion"))
+                builder.color(Util.matchColor((String) instance.get("color")));
 
 
+            result.code = Result.Code.INVALID_GLOW;
             if (instance.containsKey("glow") && !instance.containsKey("enchantments") && !instance.containsKey("effects"))
                 builder.glow(true);
 
 
-            if (instance.containsKey("effects")) {
+            result.code = Result.Code.INVALID_EFFECT_FORMAT;
+            if (instance.containsKey("effects") && item.contains("potion")) {
                 LootPotionItem.QPotionEffect[] qEffects =
-                        new LootPotionItem.QPotionEffect[((Map)instance.get("effects")).size()];
+                        new LootPotionItem.QPotionEffect[((List)instance.get("effects")).size()];
 
                 // then read enchants
                 List list = ((List)instance.get("effects"));
 
+                //result.code = Result.Code.INVALID_COUNT;
                 // iterate the list
                 for (int i=0; i<list.size(); i++) {
 
                     Map<String, Object> enchantMap = (Map<String, Object>) list.get(i);
 
+                    result.code = Result.Code.INVALID_EFFECT;
                     PotionEffectType effect = PotionEffectType.getByName((String)enchantMap.get("effect"));
                     int amp = Integer.parseInt((String)enchantMap.get("amp"));
 
                     int emin, emax;
 
+                    result.code = Result.Code.INVALID_DURATION;
                     if (enchantMap.get("duration") instanceof Integer) {
                         emin = (int)enchantMap.get("duration");
                         emax = emin;
@@ -118,15 +126,17 @@ public abstract class AbstractLoot {
             }
 
 
+            result.code = Result.Code.INVALID_COMMAND;
             if (instance.containsKey("command")) {
                 List<String> commands = (List<String>) instance.get("command");
-                return new LootCommand(builder.toItem(), (String[]) commands.toArray());
+                return new LootCommand(builder.toItem(), commands.toArray(new String[0]));
             }
 
 
+            result.code = Result.Code.INVALID_ENCHANT_FORMAT;
             if (instance.containsKey("enchantments")) {
                 LootEnchantableItem.QEnchantment[] qEnchantments =
-                        new LootEnchantableItem.QEnchantment[((Map)instance.get("enchantments")).size()];
+                        new LootEnchantableItem.QEnchantment[((List)instance.get("enchantments")).size()];
 
                 // then read enchants
                 List list = ((List)instance.get("enchantments"));
@@ -136,10 +146,12 @@ public abstract class AbstractLoot {
 
                     Map<String, Object> enchantMap = (Map<String, Object>) list.get(i);
 
+                    result.code = Result.Code.INVALID_ENCHANT;
                     Enchantment enchantment = Util.matchEnchant((String)enchantMap.get("enchant"));
 
                     int emin, emax;
 
+                    result.code = Result.Code.INVALID_LEVEL;
                     if (enchantMap.get("level") instanceof Integer) {
                         emin = (int)enchantMap.get("level");
                         emax = emin;
@@ -158,22 +170,23 @@ public abstract class AbstractLoot {
 
         } else if (instance.containsKey("qa") && Main.supportQualityArmory) {
             // qa item
+            result.code = Result.Code.INVALID_QA;
             return new LootQA((String)instance.get("qa"), min, max);
         }  else if (instance.containsKey("crate")) {
             // crate
-            Crate crate = Main.crates.get((String)instance.get("crate"));
+            result.code = Result.Code.INVALID_CRATE;
+            Crate crate = Main.crates.get(instance.get("crate"));
             return new LootCrate(crate, min, max);
-        } else {
-
-            // throw?
-
         }
+
+        result.code = Result.Code.INVALID_LOOT;
+
         return null;
     }
 
 
 
-    public static AbstractLoot fromOldConfig(Map<String, Object> instance) {
+    public static AbstractLoot fromOldConfig(MemorySection instance, Result result) {
         /*
             Will hold the value of the current path being tested in the case
             of an error, can print the path of issue
@@ -187,65 +200,80 @@ public abstract class AbstractLoot {
 
         int min = 1, max = min;
 
-
-        if (instance.containsKey("count")) {
+        result.code = Result.Code.INVALID_COUNT;
+        if (instance.contains("count")) {
             min = (int)instance.get("count");
             max = min;
-        } else if (instance.containsKey("range")) {
+        } else if (instance.contains("range")) {
+            result.code = Result.Code.INVALID_RANGE;
             String[] split = ((String)instance.get("range")).split(" ");
             min = Integer.parseInt(split[0]);
             max = Integer.parseInt(split[1]);
         }
 
-        if (instance.containsKey("item")) {
+        result.code = Result.Code.INVALID_ITEM;
+        if (instance.contains("item")) {
 
             ItemBuilder builder = ItemBuilder.builder(Material.matchMaterial((String)instance.get("item")));
 
-            if (instance.containsKey("name"))
+
+            result.code = Result.Code.INVALID_NAME;
+            if (instance.contains("name"))
                 builder.name((String)instance.get("name"));
 
 
-            if (instance.containsKey("lore"))
+            result.code = Result.Code.INVALID_LORE;
+            if (instance.contains("lore"))
                 builder.lore((List<String>) instance.get("lore"));
 
 
-            if (instance.containsKey("command")) {
-                List<String> commands = (List<String>) instance.get("command");
-                return new LootCommand(builder.toItem(), (String[]) commands.toArray());
+            result.code = Result.Code.INVALID_COMMAND;
+            if (instance.contains("command")) {
+                Main.getInstance().debug(instance.get("command").getClass().getName());
+                ArrayList<String> commands = (ArrayList<String>) instance.get("command");
+
+                String[] arr = commands.toArray(new String[0]);
+                Main.getInstance().debug(arr[0]);
+                return new LootCommand(builder.toItem(), arr);
             }
 
 
-            if (instance.containsKey("enchantments")) {
-                Map<String, Map<String, Integer>> _enchantMap = ((Map<String, Map<String, Integer>>) instance.get("enchantments"));
 
-                LootEnchantableItem.QEnchantment[] qEnchantments =
-                        new LootEnchantableItem.QEnchantment[_enchantMap.size()];
+            result.code = Result.Code.INVALID_ENCHANT_FORMAT;
+            if (instance.contains("enchantments")) {
+                ArrayList<LootEnchantableItem.QEnchantment> qEnchantments = new ArrayList<>();
+                MemorySection enchantSection = (MemorySection) instance.get("enchantments");
+
+                //LootEnchantableItem.QEnchantment[] qEnchantments =
+                //        new LootEnchantableItem.QEnchantment[enchantSection..size()];
 
 
                 // iterate the entries
-                int i = 0;
-                for (String enchantKey : _enchantMap.keySet()) {
-                    int level = _enchantMap.get(enchantKey).get("level");
+                result.code = Result.Code.INVALID_ENCHANT;
+                //int i = 0;
+                for (String enchantKey : enchantSection.getKeys(false)) {
+                    int level = (int)((MemorySection)enchantSection.get(enchantKey)).get("level");
                     Enchantment enchantment = Util.matchEnchant(enchantKey);
 
-                    qEnchantments[i++] = new LootEnchantableItem.QEnchantment(enchantment, level, level);
+                    //qEnchantments[i++] = new LootEnchantableItem.QEnchantment(enchantment, level, level);
+                    qEnchantments.add(new LootEnchantableItem.QEnchantment(enchantment, level, level));
                 }
 
-                return new LootEnchantableItem(builder.toItem(), qEnchantments);
+                return new LootEnchantableItem(builder.toItem(), qEnchantments.toArray(
+                        new LootEnchantableItem.QEnchantment[0]));
             }
 
             return new LootItem(builder.toItem(), min, max);
 
-        } else if (instance.containsKey("qa-item") && Main.supportQualityArmory) {
+        } else if (instance.contains("qa-item") && Main.supportQualityArmory) {
             // qa item
+            result.code = Result.Code.INVALID_QA;
             String name = (String)instance.get("qa-item");
             return new LootQA(name, min, max);
 
-        } else {
-            //throw new Exception();
-            // error
-
         }
+
+        result.code = Result.Code.INVALID_LOOT;
 
         return null;
 

@@ -5,10 +5,10 @@ api-version: 1.13
 author: crazicrafter1
 softdepend: [QualityArmory, GraphicalAPI]
 commands:
-  crates:
+  lootcrates:
     description: Access the features of the loot crates plugin.
     usage: /crates <crate/reload/editor> [type/tier] [player / <*>] [amount]
-    permission: crates.admin
+    permission: lootcrates.admin
 permissions:
   crates.open:
     description: Allow for users to open crates

@@ -3,6 +3,7 @@ package com.crazicrafter1.lootcrates.listeners;
 import com.crazicrafter1.lootcrates.Main;
 import org.bukkit.entity.Firework;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 public class ListenerOnEntityDamageByEntity extends BaseListener {
@@ -11,14 +12,13 @@ public class ListenerOnEntityDamageByEntity extends BaseListener {
         super(plugin);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
 
-        if ((e.getDamager() instanceof Firework)) {
-            if (plugin.crateFireWorks.contains(e.getDamager())) {
-                e.setCancelled(true);
-            }
+        if (Main.crateFireWorks.contains(e.getDamager().getUniqueId())) {
+            e.setCancelled(true);
         }
+
         /*
         if ((e.getDamager() instanceof Firework))
         {

@@ -17,9 +17,10 @@ public class ListenerOnInventoryClose extends BaseListener {
     {
         Player p = (Player)e.getPlayer();
 
-        if (plugin.openCrates.containsKey(p.getUniqueId())) {
+        if (Main.openCrates.containsKey(p.getUniqueId())) {
             //plugin.openCrates.get(p.getUniqueId()).onInventoryClose(e);
             //plugin.openCrates.get(p.getUniqueId()).giveAndCancel();
+            Main.getInstance().debug("onInventoryClose()");
             Crate.closeCrate(p);
         }
     }

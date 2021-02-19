@@ -134,15 +134,20 @@ public class Main extends JavaPlugin
         new ListenerOnPlayerQuit(this);
         //new ListenerOnPortal(this);
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                //debug("Checking the season...");
-                for (Crate crate : crates.values()) {
-                    crate.prepSeasonalVariant();
-                }
-            }
-        }.runTaskTimer(this, 0, 20*60*60); // Checks every hour
+        /*
+            TODO
+            fix seasonal crates, might be broken Crate.getPreppedItem...() returned null
+         */
+
+        //new BukkitRunnable() {
+        //    @Override
+        //    public void run() {
+        //        //debug("Checking the season...");
+        //        for (Crate crate : crates.values()) {
+        //            crate.prepSeasonalVariant();
+        //        }
+        //    }
+        //}.runTaskTimer(this, 0, 20*60*60); // Checks every hour
 
         info("Everything was successfully loaded!");
     }

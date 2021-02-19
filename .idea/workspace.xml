@@ -72,8 +72,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/ClickEditGUI.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="85">
-                  <caret line="65" column="57" lean-forward="true" selection-start-line="65" selection-start-column="57" selection-end-line="65" selection-end-column="57" />
+                <state relative-caret-position="527">
+                  <caret line="94" column="35" selection-start-line="94" selection-start-column="35" selection-end-line="94" selection-end-column="35" />
                   <folding>
                     <element signature="imports" expanded="true" />
                     <element signature="e#1124#1125#0" expanded="true" />
@@ -450,9 +450,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="28" y="135" width="1414" height="666" extended-state="0" />
+    <frame x="-8" y="-8" width="1616" height="876" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14623338" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12724936" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="UI Designer" order="3" />
@@ -937,8 +938,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/ClickEditGUI.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="65" column="57" lean-forward="true" selection-start-line="65" selection-start-column="57" selection-end-line="65" selection-end-column="57" />
+        <state relative-caret-position="527">
+          <caret line="94" column="35" selection-start-line="94" selection-start-column="35" selection-end-line="94" selection-end-column="35" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#1124#1125#0" expanded="true" />

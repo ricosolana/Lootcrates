@@ -1,14 +1,15 @@
 name: LootCrates
 main: com.crazicrafter1.lootcrates.Main
-version: 3.0.0 # 2.1.7 was previous
+version: 3.0.1 # 3.0.0 was previous
 api-version: 1.13
 author: crazicrafter1
 softdepend: [QualityArmory, GraphicalAPI]
 commands:
   lootcrates:
     description: Access the features of the loot crates plugin.
-    usage: /crates <crate/reload/editor> [type/tier] [player / <*>] [amount]
+    usage: /lootcrates <crate/reload/editor> [type/tier] [player / <*>] [amount]
     permission: lootcrates.admin
+    aliases: [crates]
 permissions:
   crates.open:
     description: Allow for users to open crates
@@ -16,6 +17,10 @@ permissions:
   crates.admin:
     description: Allows access to /crates command
     default: op
+
+# 3.0.1 (3/22/2021)
+# crates can *almost* now be edited ingame via a cool looking gui (so close)
+# autoupdater
 
 # 3.0.0 (2/19/2021)
 # loot types are now completely object oriented

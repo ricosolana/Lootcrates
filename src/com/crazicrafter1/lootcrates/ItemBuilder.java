@@ -94,23 +94,9 @@ public class ItemBuilder {
 
     public ItemBuilder lore(String[] lores)
     {
-        if (lores == null) return getBuilder();
+        if (lores == null) return this;
 
-        ItemStack item = new ItemStack(itemStack);
-
-        ItemMeta meta = item.getItemMeta();
-
-        ArrayList<String> loreList = new ArrayList<>(Arrays.asList(lores));
-
-        for (int i=0; i<loreList.size(); i++)
-        {
-            loreList.set(i, ChatColor.translateAlternateColorCodes('&', "&r"+loreList.get(i)));
-        }
-
-        meta.setLore(loreList);
-
-        item.setItemMeta(meta);
-        return this;
+        return lore(Arrays.asList(lores));
     }
 
 

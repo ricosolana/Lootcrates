@@ -254,7 +254,7 @@ public final class Crate {
 
     // assumes that player exists with open crate
     public static void closeCrate(Player p) {
-        Main.openCrates.get(p.getUniqueId()).close(false);
+        Main.openCrates.get(p.getUniqueId()).close();
         Main.openCrates.remove(p.getUniqueId());
     }
 }

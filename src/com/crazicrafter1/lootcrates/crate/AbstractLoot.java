@@ -5,15 +5,12 @@ import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.Result;
 import com.crazicrafter1.lootcrates.Util;
 import com.crazicrafter1.lootcrates.crate.loot.*;
-import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.MemorySection;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionEffectTypeWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +40,7 @@ public abstract class AbstractLoot {
         baseVisual.setItemMeta(itemMeta);
     }
 
+    @SuppressWarnings({"unchecked", "ConstantConditions"})
     static AbstractLoot fromNewConfig(Map<String, Object> instance, Result result) {
 
         //Map<String, Object> instance = (config.getMapList(path).get(index);
@@ -214,6 +212,7 @@ public abstract class AbstractLoot {
 
 
 
+    @SuppressWarnings({"ConstantConditions", "unchecked"})
     static AbstractLoot fromOldConfig(MemorySection instance, Result result) {
         /*
             Will hold the value of the current path being tested in the case

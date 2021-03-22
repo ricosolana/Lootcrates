@@ -8,8 +8,6 @@ import com.crazicrafter1.lootcrates.crate.loot.LootItem;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
@@ -18,11 +16,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 public final class ActiveCrate {
 
 
-    private static class QSlot {
-        public boolean isSelected;
-        public AbstractLoot randomLoot;
+    private class QSlot {
+        boolean isSelected;
+        AbstractLoot randomLoot;
 
-        public QSlot(boolean isSelected, AbstractLoot randomLoot) {
+        QSlot(boolean isSelected, AbstractLoot randomLoot) {
             this.isSelected = isSelected;
             this.randomLoot = randomLoot;
         }
@@ -51,7 +49,7 @@ public final class ActiveCrate {
     //private int iterations = 0;
     private final int SIZE;
 
-    int taskID = -1;
+    private int taskID = -1;
 
     ActiveCrate(Player p, Crate crate, int lockSlot) { //}, Main pl) {
         //this.slotsSelected = new HashSet<>();
@@ -94,14 +92,6 @@ public final class ActiveCrate {
 
 
 
-            // do not need to put this here, can put later
-            //ItemStack item = getRewardItem(lootChances[slot], slot);
-
-            //slotsSelected.add(slot);
-            /*
-                TODO
-                replace null with the AbstractLoot instance
-             */
 
             AbstractLoot randomLoot = lootChances[slot].getRandomLoot();
             slots.put(slot, new QSlot(true, randomLoot));
@@ -206,9 +196,10 @@ public final class ActiveCrate {
         TODO
         test whether player is online,
         whether is dead,
+        any sketch cases
         etc...
      */
-    void close(boolean unsafe) {
+    void close() {
         //for (int slot : slotsSelected) {
         if (revealing || revealed)
             for (int slot : slots.keySet()) {

@@ -80,23 +80,34 @@ public class Main extends JavaPlugin
         }
         supportQualityArmory = Bukkit.getPluginManager().isPluginEnabled("QualityArmory");
 
-        //autoUpdate = (boolean) a("auto-update", false);
+        autoUpdate = (boolean) a("auto-update", false);
 
         //https://www.spigotmc.org/resources/68424
         VersionChecker updater = new VersionChecker(this, 68424);
 
-        try {
-            //int vr = Integer.parseInt(updater.getLatestVersion().replaceAll("\\.", ""));
-            if (updater.hasNewUpdate()) {
-                important("New update : " + updater.getLatestVersion() + ChatColor.DARK_BLUE + " (" + updater.getResourceURL() + ")");
+        if (!autoUpdate) {
+            try {
+                //int vr = Integer.parseInt(updater.getLatestVersion().replaceAll("\\.", ""));
+                if (updater.hasNewUpdate()) {
+                    important("New update : " + updater.getLatestVersion() + ChatColor.DARK_BLUE + " (" + updater.getResourceURL() + ")");
 
-            } else {
-                info("LootCrates is up-to-date!");
+                } else {
+                    info("LootCrates is up-to-date!");
+                }
+
+            } catch (Exception e) {
+                error("Unable to check for updates!");
             }
-
-        } catch (Exception e) {
-            error("Unable to check for updates!");
+        } else {
+            GithubUpdater.autoUpdate(this, "PeriodicSeizures", "LootCrates", "LootCrates.jar");
+            //try {
+            //    if (autoUpdate)
+            //        GithubUpdater.autoUpdate(this, "owner", "name", "resource");
+            //} catch (Exception e) {
+            //}
         }
+
+
 
         try {
             reloadConfigValues();
@@ -107,12 +118,11 @@ public class Main extends JavaPlugin
 
         if (Bukkit.getPluginManager().isPluginEnabled("GraphicalAPI"))
             editor = new ClickEditGUI();
+        else {
+            info("GraphicalAPI was not found; gui crate editing is disabled");
+        }
 
-        //try {
-        //    if (autoUpdate)
-        //        GithubUpdater.autoUpdate(this, "owner", "name", "resource");
-        //} catch (Exception e) {
-        //}
+
 
         //int pluginId = 10395; // <-- Replace with the id of your plugin!
         Metrics metrics = new Metrics(this, 10395);

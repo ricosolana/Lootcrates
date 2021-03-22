@@ -49,6 +49,9 @@ inventory-size: 27
 # selections that player can make
 selections: 4
 
+# auto-update from Github
+auto-update: true
+
 
 
 

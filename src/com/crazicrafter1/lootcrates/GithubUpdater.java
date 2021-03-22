@@ -14,23 +14,23 @@ public class GithubUpdater {
             String version = main.getDescription().getVersion();
             String parseVersion = version.replace(".", "");
 
-            String tagname = null;
+            String tagname;
             URL api = new URL("https://api.github.com/repos/" + author + "/" + githubProject + "/releases/latest");
             URLConnection con = api.openConnection();
             con.setConnectTimeout(15000);
             con.setReadTimeout(15000);
 
-            JsonObject json = null;
+            JsonObject json;
             try {
                 json = new JsonParser().parse(new InputStreamReader(con.getInputStream())).getAsJsonObject();
-            } catch (Error | Exception e45) {
+            } catch (Exception e) {
                 return false;
             }
             tagname = json.get("tag_name").getAsString();
 
             String parsedTagName = tagname.replace(".", "");
 
-            int latestVersion = Integer.valueOf(parsedTagName.substring(1, parsedTagName.length()).replaceAll("[^\\d.]", ""));
+            int latestVersion = Integer.valueOf(parsedTagName.substring(1).replaceAll("[^\\d.]", ""));
             int parsedVersion = Integer.parseInt(parseVersion.replaceAll("[^\\d.]", ""));
 
             final URL download = new URL("https://github.com/" + author + "/" + githubProject + "/releases/download/"
@@ -50,7 +50,7 @@ public class GithubUpdater {
 
                             InputStream in = download.openStream();
 
-                            File pluginFile = null;
+                            File pluginFile;
 
                             try {
                                 pluginFile = new File(URLDecoder.decode(
@@ -65,13 +65,16 @@ public class GithubUpdater {
                             // temp.mkdir();
                             // }
 
+                            // Copy the current plugin to 'plugin-backup.jar'
                             File tempInCaseSomethingGoesWrong = new File(main.getName() + "-backup.jar");
                             copy(new FileInputStream(pluginFile), new FileOutputStream(tempInCaseSomethingGoesWrong));
 
-                            // Path path = new File("plugins/update" + File.separator + "COD.jar").toPath();
+
+                            // Delete the old plugin,
                             pluginFile.setWritable(true, false);
                             pluginFile.delete();
-                            // Files.copy(in, pluginFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+                            // Write the new plugin to the old plugin
                             copy(in, new FileOutputStream(pluginFile));
 
                             if (pluginFile.length() < 1000) {
@@ -88,7 +91,7 @@ public class GithubUpdater {
                             e.printStackTrace();
                         }
                     }
-                }.runTaskLaterAsynchronously(main, 0);
+                }.runTaskAsynchronously(main);
                 return true;
             }
         } catch (IOException e) {
@@ -106,7 +109,6 @@ public class GithubUpdater {
                 break;
             out.write(buf, 0, r);
             bytes += r;
-            // debug("Another 4K, current: " + r);
         }
         out.flush();
         out.close();

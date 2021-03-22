@@ -22,7 +22,6 @@ public class CmdCrates extends CmdBase {
     {
         // crates crate <type> <player> <count>
         if (args.length >= 3 && args[0].equalsIgnoreCase("crate")) {
-            ItemStack crateItem = null;
 
             //if (Util.isNumeric(args[2])) return false;
 
@@ -95,6 +94,8 @@ public class CmdCrates extends CmdBase {
             return feedback(sender, "You received 1 signature crate");
         }
         */
+
+        plugin.info("LootCrates version: " + plugin.getDescription().getVersion());
 
         return false;
     }

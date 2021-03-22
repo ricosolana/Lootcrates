@@ -4,18 +4,19 @@ import java.io.*;
 import java.net.*;
 import com.google.gson.*;
 import org.bukkit.*;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class GithubUpdater {
 
-    public static boolean autoUpdate(final Plugin main, String author, String githubProject, String jarname) {
+    public static boolean autoUpdate(final Main main, String author, String githubProject, String jarname) {
         try {
             String version = main.getDescription().getVersion();
             String parseVersion = version.replace(".", "");
 
             String tagname;
-            URL api = new URL("https://api.github.com/repos/" + author + "/" + githubProject + "/releases/latest");
+            String s = "https://api.github.com/repos/" + author + "/" + githubProject + "/releases/latest";
+            main.debug("autoupdater url: " + s);
+            URL api = new URL(s);
             URLConnection con = api.openConnection();
             con.setConnectTimeout(15000);
             con.setReadTimeout(15000);
@@ -28,17 +29,19 @@ public class GithubUpdater {
             }
             tagname = json.get("tag_name").getAsString();
 
-            String parsedTagName = tagname.replace(".", "");
+            int latestVersion = Integer.parseInt(tagname.replaceAll("\\.", ""));
+            int myVersion = Integer.parseInt(parseVersion.replaceAll("\\.", ""));
 
-            int latestVersion = Integer.valueOf(parsedTagName.substring(1).replaceAll("[^\\d.]", ""));
-            int myVersion = Integer.parseInt(parseVersion.replaceAll("[^\\d.]", ""));
+            s = "https://github.com/" + author + "/" + githubProject + "/releases/download/"
+                    + tagname + "/" + jarname;
+            main.debug("download url: " + s);
+            final URL download = new URL(s);
 
-            final URL download = new URL("https://github.com/" + author + "/" + githubProject + "/releases/download/"
-                    + tagname + "/" + jarname);
+            main.debug("latestVersion: " + latestVersion);
+            main.debug("myVersion: " + myVersion);
 
             if (latestVersion > myVersion) {
-                Bukkit.getConsoleSender()
-                        .sendMessage(ChatColor.GREEN + "Found a new version of " + ChatColor.GOLD
+                main.important(ChatColor.GREEN + "Found a new version of " + ChatColor.GOLD
                                 + main.getDescription().getName() + ": " + ChatColor.WHITE + tagname
                                 + ChatColor.LIGHT_PURPLE + " downloading now!!");
 

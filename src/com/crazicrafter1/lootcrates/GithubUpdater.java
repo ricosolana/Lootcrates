@@ -10,8 +10,6 @@ public class GithubUpdater {
 
     public static boolean autoUpdate(final Main main, String author, String githubProject, String jarname) {
         try {
-            String version = main.getDescription().getVersion();
-            String parseVersion = version.replace(".", "");
 
             String tagname;
             String s = "https://api.github.com/repos/" + author + "/" + githubProject + "/releases/latest";
@@ -21,16 +19,33 @@ public class GithubUpdater {
             con.setConnectTimeout(15000);
             con.setReadTimeout(15000);
 
+            /*
+                will retrieve version from Github updater first if possible
+                if that fails, will retrieve version from spigotmc
+             */
+
             JsonObject json;
+            int latestVersion;
             try {
                 json = new JsonParser().parse(new InputStreamReader(con.getInputStream())).getAsJsonObject();
+                tagname = json.get("tag_name").getAsString();
+                //latestVersion = Integer.parseInt(tagname.replaceAll("\\.", ""));
             } catch (Exception e) {
+                //e.printStackTrace();
+                try {
+                    if (main.updater.hasNewUpdate())
+                        tagname = main.updater.getLatestVersion();
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                    return false;
+                }
+
                 return false;
             }
-            tagname = json.get("tag_name").getAsString();
 
-            int latestVersion = Integer.parseInt(tagname.replaceAll("\\.", ""));
-            int myVersion = Integer.parseInt(parseVersion.replaceAll("\\.", ""));
+            latestVersion = Integer.parseInt(tagname.replaceAll("\\.", ""));
+
+            final int myVersion = Integer.parseInt(main.getDescription().getVersion().replaceAll("\\.", ""));
 
             s = "https://github.com/" + author + "/" + githubProject + "/releases/download/"
                     + tagname + "/" + jarname;
@@ -43,7 +58,7 @@ public class GithubUpdater {
             if (latestVersion > myVersion) {
                 main.important(ChatColor.GREEN + "Found a new version of " + ChatColor.GOLD
                                 + main.getDescription().getName() + ": " + ChatColor.WHITE + tagname
-                                + ChatColor.LIGHT_PURPLE + " downloading now!!");
+                                + ChatColor.LIGHT_PURPLE + " downloading now!");
 
                 new BukkitRunnable() {
 
@@ -89,6 +104,41 @@ public class GithubUpdater {
                                 // Plugin is valid, and we can delete the temp
                                 tempInCaseSomethingGoesWrong.delete();
                             }
+
+                            //main.debug("delaying new thread for reload");
+
+                            // will throw an error
+                            /*
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    main.debug("enabling...");
+                                    Bukkit.getPluginManager().enablePlugin(main);
+                                }
+                            }.runTaskLaterAsynchronously(main, 20*5);
+                             */
+
+                            // will be put inot a loop of indefinite autoupdating
+                            /*
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        Thread.sleep(5000);
+                                        main.debug("enabling...");
+                                        Bukkit.getPluginManager().enablePlugin(main);
+                                        //Bukkit.getPluginManager().en
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }).start();
+                             */
+
+                            //main.debug("disabling lootcrates for githubupdater");
+                            //Bukkit.getPluginManager().disablePlugin(main);
+
+                            main.info("Please restart the server to take advantages of the changes present in the update!");
 
                         } catch (IOException e) {
                             e.printStackTrace();

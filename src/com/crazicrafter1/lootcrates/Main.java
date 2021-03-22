@@ -43,6 +43,8 @@ public class Main extends JavaPlugin
     public static HashMap<String, String> crateNameIds = new HashMap<>();
     public static HashMap<String, LootGroup> lootGroups = new HashMap<>();
 
+    VersionChecker updater = new VersionChecker(this, 68424);
+
     //public ConfigWrapper configWrapper;
     private FileConfiguration config;
     private File configFile;
@@ -101,7 +103,6 @@ public class Main extends JavaPlugin
         //https://www.spigotmc.org/resources/68424
 
         if (!autoUpdate) {
-            VersionChecker updater = new VersionChecker(this, 68424);
             try {
                 //int vr = Integer.parseInt(updater.getLatestVersion().replaceAll("\\.", ""));
                 if (updater.hasNewUpdate()) {

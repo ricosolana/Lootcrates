@@ -12,7 +12,6 @@ import com.crazicrafter1.lootcrates.tabcompleters.TabCrates;
 import com.crazicrafter1.lootcrates.commands.CmdCrates;
 import com.crazicrafter1.lootcrates.listeners.*;
 import com.crazicrafter1.lootcrates.tracking.VersionChecker;
-import me.zombie_striker.qg.GithubUpdater;
 import org.bukkit.*;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -80,12 +79,29 @@ public class Main extends JavaPlugin
         }
         supportQualityArmory = Bukkit.getPluginManager().isPluginEnabled("QualityArmory");
 
+
+
+        try {
+            reloadConfigValues();
+        } catch (Exception e) {
+            error("Possible config issue around " + temp_path);
+            e.printStackTrace();
+        }
+
+
+
+        if (!config.contains("auto-update")) {
+            config.addDefault("auto-update", true);
+            info("auto-update flag not found, adding default of true");
+            this.saveConfig();
+        }
+
         autoUpdate = (boolean) a("auto-update", false);
 
         //https://www.spigotmc.org/resources/68424
-        VersionChecker updater = new VersionChecker(this, 68424);
 
         if (!autoUpdate) {
+            VersionChecker updater = new VersionChecker(this, 68424);
             try {
                 //int vr = Integer.parseInt(updater.getLatestVersion().replaceAll("\\.", ""));
                 if (updater.hasNewUpdate()) {
@@ -99,7 +115,7 @@ public class Main extends JavaPlugin
                 error("Unable to check for updates!");
             }
         } else {
-            GithubUpdater.autoUpdate(this, "PeriodicSeizures", "LootCrates", "LootCrates.jar");
+            com.crazicrafter1.lootcrates.GithubUpdater.autoUpdate(this, "PeriodicSeizures", "LootCrates", "LootCrates.jar");
             //try {
             //    if (autoUpdate)
             //        GithubUpdater.autoUpdate(this, "owner", "name", "resource");
@@ -108,13 +124,6 @@ public class Main extends JavaPlugin
         }
 
 
-
-        try {
-            reloadConfigValues();
-        } catch (Exception e) {
-            error("Possible config issue around " + temp_path);
-            e.printStackTrace();
-        }
 
         if (Bukkit.getPluginManager().isPluginEnabled("GraphicalAPI"))
             editor = new ClickEditGUI();

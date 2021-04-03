@@ -15,10 +15,8 @@ import com.crazicrafter1.lootcrates.tracking.VersionChecker;
 import org.bukkit.*;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Firework;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class Main extends JavaPlugin
 {
@@ -33,7 +31,7 @@ public class Main extends JavaPlugin
     public static int inventorySize = 36;
     public static int selections = 4;
     public static int raffleSpeed = 5;
-    public static Sound selectionSound = Sound.valueOf("ENTITY_EXPERIENCE_ORB_PICKUP");
+    public static Sound selectionSound = Sound.ENTITY_EXPERIENCE_ORB_PICKUP;
     public static ItemStack unSelectedItem = null;
     public static ItemStack selectedItem = null;
     public static boolean enableFirework = true;
@@ -75,7 +73,7 @@ public class Main extends JavaPlugin
 
     @Override
     public void onEnable() {
-        main = this;
+        Main.main = this;
         if(!this.getDataFolder().exists()){
             this.getDataFolder().mkdirs();
         }
@@ -100,11 +98,8 @@ public class Main extends JavaPlugin
 
         autoUpdate = (boolean) a("auto-update", false);
 
-        //https://www.spigotmc.org/resources/68424
-
         if (!autoUpdate) {
             try {
-                //int vr = Integer.parseInt(updater.getLatestVersion().replaceAll("\\.", ""));
                 if (updater.hasNewUpdate()) {
                     important("New update : " + updater.getLatestVersion() + ChatColor.DARK_BLUE + " (" + updater.getResourceURL() + ")");
 
@@ -116,7 +111,7 @@ public class Main extends JavaPlugin
                 error("Unable to check for updates!");
             }
         } else {
-            com.crazicrafter1.lootcrates.GithubUpdater.autoUpdate(this, "PeriodicSeizures", "LootCrates", "LootCrates.jar");
+            GithubUpdater.autoUpdate(this, "PeriodicSeizures", "LootCrates", "LootCrates.jar");
             //try {
             //    if (autoUpdate)
             //        GithubUpdater.autoUpdate(this, "owner", "name", "resource");
@@ -134,10 +129,8 @@ public class Main extends JavaPlugin
 
 
 
-        //int pluginId = 10395; // <-- Replace with the id of your plugin!
+        // bStats metrics
         Metrics metrics = new Metrics(this, 10395);
-        // Optional: Add custom charts
-        //metrics.addCustomChart(new Metrics.SimplePie("chart_id", () -> "My value"));
         metrics.addCustomChart(
                 new Metrics.SimplePie("using_old_config_format", new java.util.concurrent.Callable<String>() {
                     @Override
@@ -145,12 +138,6 @@ public class Main extends JavaPlugin
                         return String.valueOf(oldConfigFormat);
                     }
                 }));
-
-        //instance = this;
-
-        //String v = Bukkit.getVersion();
-
-        //boolean valid = v.contains("1.14") || v.startsWith("1.15") || v.startsWith("1.16");
 
         new CmdCrates(this);
         new TabCrates(this);
@@ -162,30 +149,28 @@ public class Main extends JavaPlugin
         new ListenerOnInventoryDrag();
         new ListenerOnPlayerInteract();
         new ListenerOnPlayerQuit();
-        //new ListenerOnPortal(this);
 
         /*
             TODO
             fix seasonal crates, might be broken Crate.getPreppedItem...() returned null
          */
 
-        //new BukkitRunnable() {
-        //    @Override
-        //    public void run() {
-        //        //debug("Checking the season...");
-        //        for (Crate crate : crates.values()) {
-        //            crate.prepSeasonalVariant();
-        //        }
-        //    }
-        //}.runTaskTimer(this, 0, 20*60*60); // Checks every hour
+        /*
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                //debug("Checking the season...");
+                for (Crate crate : crates.values()) {
+                    crate.prepSeasonalVariant();
+                }
+            }
+        }.runTaskTimer(this, 0, 20*60*60); // Checks every hour
+         */
 
         info("Everything was successfully loaded!");
     }
 
     private boolean isOldConfigFormat() {
-
-        //debug(config.getString("loot.weapon.items.item0.qa-item"));
-
         return config.contains("gui.selected.item");
     }
 

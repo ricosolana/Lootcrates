@@ -2,10 +2,8 @@ package com.crazicrafter1.lootcrates.crate;
 
 import com.crazicrafter1.lootcrates.*;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -43,7 +41,7 @@ public final class Crate {
 
     public Crate(String id, ItemStack itemStack) {
         this.id = id;
-        this.itemStack = itemStack;
+        this.itemStack = asMarkedCrate(itemStack, id);
     }
 
     public void setLootGroups(HashMap<LootGroup, Integer> lootGroups) {
@@ -113,7 +111,7 @@ public final class Crate {
 
                 ItemBuilder builder = ItemBuilder.builder(head).name(finalName);
 
-                //seasonalVariant = markCrate(builder.toItem(), this.id);
+                //seasonalVariant = asMarkedCrate(builder.toItem(), this.id);
                 seasonalVariant = builder.toItem();
                 return;
             }
@@ -153,13 +151,7 @@ public final class Crate {
     }
 
     public ItemStack getPreppedItemStack(boolean useSeasonal) {
-
-        Main.getInstance().debug("Crate#getPreppedItemStack() - ran");
-
-        if (useSeasonal && seasonalVariant != null) {
-            return seasonalVariant.clone();
-        }
-        return itemStack.clone();
+        return getPreppedItemStack(useSeasonal, 1);
     }
 
     public ItemStack getPreppedItemStack(boolean useSeasonal, int count) {
@@ -168,13 +160,13 @@ public final class Crate {
             cloned.setAmount(count);
             return cloned;
         }
-        ItemStack cloned = itemStack.clone();
-        cloned.setAmount(count);
-        return cloned; //markCrate(this);
+        ItemStack copy = new ItemStack(itemStack);
+        copy.setAmount(count);
+        return copy;
     }
 
 
-    public static ItemStack markCrate(ItemStack item, final String crate) {
+    public static ItemStack asMarkedCrate(ItemStack item, final String crate) {
 
         //net.minecraft.server.v1_14_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
 

@@ -142,7 +142,7 @@ public class LootGroup {
             for (String itemKey : config.getConfigurationSection(tempPath).getKeys(false)) {
                 String path = tempPath + "." + itemKey;
 
-                Result result = new Result(null);
+                Result result = new Result(Result.Code.OK);
 
                 try {
                     MemorySection instance = (MemorySection) config.get(path);

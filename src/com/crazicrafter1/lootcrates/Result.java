@@ -26,7 +26,8 @@ public class Result {
         INVALID_LEVEL,
         INVALID_QA,
         INVALID_CRATE,
-        INVALID_LOOT
+        INVALID_LOOT,
+        OK
     }
 
 }

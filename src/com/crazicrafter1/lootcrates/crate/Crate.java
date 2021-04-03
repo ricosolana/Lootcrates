@@ -213,7 +213,7 @@ public final class Crate {
     }
 
     /**
-     * Assumes that crate by 'id' does exist
+     * Opens a crate by id to a player
      */
     public static boolean openCrate(Player p, String id, int lock_slot) {
         if (!Main.openCrates.containsKey(p.getUniqueId())) {
@@ -225,34 +225,9 @@ public final class Crate {
         return false;
     }
 
-    @Deprecated
-    public static Crate fromConfig(String id) {
-        FileConfiguration config = Main.getInstance().getConfig();
-
-        String temp_path = "crates." + id;
-
-        ItemBuilder builder = ItemBuilder.
-                builder(Material.matchMaterial(config.getString(temp_path + ".item"))).
-                name(config.getString(temp_path + ".name"));
-
-        if (config.contains(temp_path + ".lore"))
-            builder.lore(config.getStringList(temp_path + ".lore"));
-
-        /*
-        Map<String, Integer> lootgroupChances = (Map<String, Integer>) config.get(temp_path + ".chances");
-
-        HashMap<LootGroup, Integer> lootGroups = new HashMap<>();
-        for (String group : lootgroupChances.keySet()) {
-            lootGroups.put(Main.lootGroups.get(group), lootgroupChances.get(group));
-        }
-        */
-
-        // lootGroups
-
-        return new Crate(id, builder.toItem());
-    }
-
-    // assumes that player exists with open crate
+    /**
+     * Close a crate to a player
+     */
     public static void closeCrate(Player p) {
         Main.openCrates.get(p.getUniqueId()).close();
         Main.openCrates.remove(p.getUniqueId());

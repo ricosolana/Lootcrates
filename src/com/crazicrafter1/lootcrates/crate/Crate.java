@@ -1,18 +1,13 @@
 package com.crazicrafter1.lootcrates.crate;
 
-import com.crazicrafter1.lootcrates.ItemBuilder;
-import com.crazicrafter1.lootcrates.Main;
-import com.crazicrafter1.lootcrates.Seasonal;
-import com.crazicrafter1.lootcrates.Util;
-import com.sun.istack.internal.Nullable;
+import com.crazicrafter1.lootcrates.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.io.BufferedReader;
+import java.lang.reflect.Method;
 import java.util.*;
 
 public final class Crate {
@@ -179,17 +174,43 @@ public final class Crate {
     }
 
 
-    //private static ItemStack markCrate(@SuppressWarnings("unused") ItemStack item, @SuppressWarnings("unused") String crate) {
-//
-    //    // When CraftBukkit was used
-    //    //net.minecraft.server.v1_14_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
-    //    //NBTTagCompound nbt = nmsStack.getOrCreateTag(); //nmsStack.hasTag() ? nmsStack.getTag() : new NBTTagCompound();
-    //    //nbt.setString("Crate", crate);
-    //    //nmsStack.setTag(nbt);
-    //    //return CraftItemStack.asCraftMirror(nmsStack);
-//
-    //    return null;
-    //}
+    public static ItemStack markCrate(ItemStack item, final String crate) {
+
+        //net.minecraft.server.v1_14_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
+
+        Class<?> craftItemStackClass = ReflectionUtil.getCraftClass("inventory.CraftItemStack");
+
+        Method asNMSCopyMethod = ReflectionUtil.getMethod(craftItemStackClass, "asNMSCopy", ItemStack.class);
+        Object nmsStack = ReflectionUtil.invokeStaticMethod(asNMSCopyMethod, item);
+
+
+
+        //NBTTagCompound nbt = nmsStack.getOrCreateTag(); //nmsStack.hasTag() ? nmsStack.getTag() : new NBTTagCompound();
+
+        Method getOrCreateTagMethod = ReflectionUtil.getMethod(nmsStack.getClass(), "getOrCreateTag");
+        Object nbt = ReflectionUtil.invokeMethod(getOrCreateTagMethod, nmsStack);
+
+
+
+        //nbt.setString("Crate", crate);
+
+        Method setStringMethod = ReflectionUtil.getMethod(nbt.getClass(), "setString", String.class, String.class);
+        ReflectionUtil.invokeMethod(setStringMethod, nbt, "Crate", crate);
+
+
+
+        //nmsStack.setTag(nbt);
+
+        Method setTagMethod = ReflectionUtil.getMethod(nmsStack.getClass(), "setTag", nbt.getClass());
+        ReflectionUtil.invokeMethod(setTagMethod, nmsStack, nbt);
+
+
+
+        //return CraftItemStack.asCraftMirror(nmsStack);
+
+        Method asCraftMirrorMethod = ReflectionUtil.getMethod(craftItemStackClass, "asCraftMirror", nmsStack.getClass());
+        return (ItemStack) ReflectionUtil.invokeStaticMethod(asCraftMirrorMethod, nmsStack);
+    }
 
     public static Crate crateByID(String id) {
         return Main.crates.getOrDefault(id, null);
@@ -197,19 +218,43 @@ public final class Crate {
 
     public static Crate matchCrate(ItemStack item) {
 
-        if (item == null) return null;
+        //if (item == null) return null;
 
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) return null;
+        //ItemMeta meta = item.getItemMeta();
+        //if (meta == null) return null;
 
-        String name = meta.getDisplayName();
-        return Main.crates.getOrDefault(Main.crateNameIds.getOrDefault(name, null), null);
+        //String name = meta.getDisplayName();
+        //return Main.crates.getOrDefault(Main.crateNameIds.getOrDefault(name, null), null);
+
+
+
+
+
 
         //net.minecraft.server.v1_14_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
-        //NBTTagCompound nbt = nmsStack.getOrCreateTag();
-        //String crateType = nbt.getString("Crate");
-        //return plugin.config.crates.getOrDefault(crateType, null);
 
+        Class<?> craftItemStackClass = ReflectionUtil.getCraftClass("inventory.CraftItemStack");
+
+        Method asNMSCopyMethod = ReflectionUtil.getMethod(craftItemStackClass, "asNMSCopy", ItemStack.class);
+        Object nmsStack = ReflectionUtil.invokeStaticMethod(asNMSCopyMethod, item);
+
+
+
+        //NBTTagCompound nbt = nmsStack.getOrCreateTag();
+
+        Method getOrCreateTagMethod = ReflectionUtil.getMethod(nmsStack.getClass(), "getOrCreateTag");
+        Object nbt = ReflectionUtil.invokeMethod(getOrCreateTagMethod, nmsStack);
+
+
+
+        //String crateType = nbt.getString("Crate");
+
+        Method getStringMethod = ReflectionUtil.getMethod(nbt.getClass(), "getString", String.class);
+        String crateType = (String) ReflectionUtil.invokeMethod(getStringMethod, nbt, "Crate");
+
+
+
+        return Main.crates.getOrDefault(crateType, null);
     }
 
     /**

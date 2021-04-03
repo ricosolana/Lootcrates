@@ -52,6 +52,11 @@ selections: 4
 # auto-update from Github
 auto-update: true
 
+# create backups of this config.yml
+# when changes to crates are made ingame?
+# (might help with avoiding data loss after fatal crashes)
+backup: true
+
 
 
 

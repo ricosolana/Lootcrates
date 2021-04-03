@@ -5,9 +5,13 @@ import com.crazicrafter1.guiapi.MenuElement;
 import com.crazicrafter1.guiapi.TemplateMenu;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootGroup;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
@@ -121,9 +125,23 @@ public class ClickEditGUI {
                                         new String[] {"" + entry.getValue()}).toItem();
 
 
+                        // when a lootgroup icon is clicked, open its weight for setting in an anvil
+                       //SUB_CRATE_MENU.addElement(new MenuElement(itemStack) {
 
-                        SUB_CRATE_MENU.addElement(new MenuElement(itemStack), i++);
+                       //    AnvilInventory anvilInventory =
+                       //            (AnvilInventory) Bukkit.createInventory(
+                       //                    p,
+                       //                    InventoryType.ANVIL,
+                       //                    ChatColor.DARK_GREEN + "LootCrates -> Crates -> " + crate.getId() + " -> " + entry.getKey().getName());
+
+                       //    @Override
+                       //    public void onLeftClick(Player p1) {
+                       //        p1.openInventory(anvilInventory);
+                       //    }
+                       //}, i++);
                     }
+
+                    //Enchantment.getByName()
 
                     // open menu
                     GraphicalAPI.openMenu(p, SUB_CRATE_MENU);

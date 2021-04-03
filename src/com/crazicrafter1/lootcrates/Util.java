@@ -78,6 +78,7 @@ public class Util {
         }.runTaskLater(Main.getInstance(), 1);
     }
 
+    @Deprecated
     public static ItemStack getItem(String name, boolean useOldMethods) {
 
         if (!useOldMethods && name != null) {
@@ -111,72 +112,47 @@ public class Util {
 
     public static Color matchColor(String c)
     {
-        String color = c.toUpperCase();
+        String color = c.toUpperCase().replaceAll(" ", "_");
         // BLUE, RED, WHITE, GRAY, GREEN, YELLOW, AQUA, BLACK, FUCHSIA, LIME, MAROON, NAVY, OLIVE
         // ORANGE, PURPLE, SILVER, TEAL
-        if (color.equals("BLUE"))
-            return Color.BLUE;
-        if (color.equals("RED"))
-            return Color.RED;
-        if (color.equals("WHITE"))
-            return Color.WHITE;
-        if (color.equals("GRAY"))
-            return Color.GRAY;
-        if (color.equals("GREEN"))
-            return Color.GREEN;
-        if (color.equals("YELLOW"))
-            return Color.YELLOW;
-        if (color.equals("AQUA"))
-            return Color.AQUA;
-        if (color.equals("BLACK"))
-            return Color.BLACK;
-        if (color.equals("FUCHSIA"))
-            return Color.FUCHSIA;
-        if (color.equals("LIME"))
-            return Color.LIME;
-        if (color.equals("MAROON"))
-            return Color.MAROON;
-        if (color.equals("NAVY"))
-            return Color.NAVY;
-        if (color.equals("OLIVE"))
-            return Color.OLIVE;
-        if (color.equals("ORANGE"))
-            return Color.ORANGE;
-        if (color.equals("PURPLE"))
-            return Color.PURPLE;
-        if (color.equals("SILVER"))
-            return Color.SILVER;
-        if (color.equals("TEAL"))
-            return Color.TEAL;
-        return null;
-    }
-
-    public static void setName(ItemStack item, String name)
-    {
-        /*
-        name
-         */
-        ItemMeta meta = item.getItemMeta();
-
-        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&r"+name));
-        //item.setItemMeta(meta);
-
-
-        item.setItemMeta(meta);
-    }
-
-    public static void setLore(ItemStack item, List<String> lore)
-    {
-        ItemMeta meta = item.getItemMeta();
-
-        for (int i = 0; i< lore.size(); i++)
-        {
-            lore.set(i, ChatColor.translateAlternateColorCodes('&', "&r"+ lore.get(i)));
+        switch (color) {
+            case "BLUE":
+                return Color.BLUE;
+            case "RED":
+                return Color.RED;
+            case "WHITE":
+                return Color.WHITE;
+            case "GRAY":
+                return Color.GRAY;
+            case "GREEN":
+                return Color.GREEN;
+            case "YELLOW":
+                return Color.YELLOW;
+            case "AQUA":
+                return Color.AQUA;
+            case "BLACK":
+                return Color.BLACK;
+            case "FUCHSIA":
+                return Color.FUCHSIA;
+            case "LIME":
+                return Color.LIME;
+            case "MAROON":
+                return Color.MAROON;
+            case "NAVY":
+                return Color.NAVY;
+            case "OLIVE":
+                return Color.OLIVE;
+            case "ORANGE":
+                return Color.ORANGE;
+            case "PURPLE":
+                return Color.PURPLE;
+            case "SILVER":
+                return Color.SILVER;
+            case "TEAL":
+                return Color.TEAL;
+            default:
+                return null;
         }
-
-        meta.setLore(lore);
-
-        item.setItemMeta(meta);
     }
 
     public static int randomRange(int min, int max)
@@ -198,11 +174,13 @@ public class Util {
     }
 
     // argument: float 0 -> 1
+    @Deprecated
     public static boolean randomChance(float i)
     {
         return i >= Math.random();
     }
 
+    @Deprecated
     public static boolean randomChance(float i, Random random)
     {
         return i <= (float)randomRange(0, 100, random) / 100f;
@@ -241,85 +219,114 @@ public class Util {
 
     public static Enchantment matchEnchant(String enchant)
     {
-        String e = enchant.toUpperCase();
+        String e = enchant.toUpperCase().replaceAll(" ", "_");
 
-        if (e.equals("DURABILITY") || e.equals("UNBREAKING"))
-            return Enchantment.DURABILITY;
-        if (e.equals("ARROW_DAMAGE") || e.equals("POWER"))
-            return Enchantment.ARROW_DAMAGE;
-        if (e.equals("ARROW_FIRE") || e.equals("FLAME"))
-            return Enchantment.ARROW_FIRE;
-        if (e.equals("ARROW_INFINITE") || e.equals("INFINITY"))
-            return Enchantment.ARROW_INFINITE;
-        if (e.equals("ARROW_KNOCKBACK") || e.equals("PUNCH"))
-            return Enchantment.ARROW_KNOCKBACK;
-        if (e.equals("BINDING_CURSE") || e.equals("CURSE_OF_BINDING"))
-            return Enchantment.BINDING_CURSE;
-        if (e.equals("CHANELLING"))
-            return Enchantment.CHANNELING;
-        if (e.equals("DAMAGE_ALL") || e.equals("SHARPNESS"))
-            return Enchantment.DAMAGE_ALL;
-        if (e.equals("DAMAGE_ANTHROPODS") || e.equals("BANE_OF_ANTHROPODS"))
-            return Enchantment.DAMAGE_ARTHROPODS;
-        if (e.equals("DAMAGE_UNDEAD") || e.equals("SMITE"))
-            return Enchantment.DAMAGE_UNDEAD;
-        if (e.equals("DEPTH_STRIDER"))
-            return Enchantment.DEPTH_STRIDER;
-        if (e.equals("DIG_SPEED") || e.equals("EFFICIENCY"))
-            return Enchantment.DIG_SPEED;
-        if (e.equals("FIRE_ASPECT"))
-            return Enchantment.FIRE_ASPECT;
-        if (e.equals("FROST_WALKER"))
-            return Enchantment.FROST_WALKER;
-        if (e.equals("IMPALING"))
-            return Enchantment.IMPALING;
-        if (e.equals("KNOCKBACK"))
-            return Enchantment.KNOCKBACK;
-        if (e.equals("LOOT_BONUS_BLOCKS") || e.equals("FORTUNE"))
-            return Enchantment.LOOT_BONUS_BLOCKS;
-        if (e.equals("LOOT_BONUS_MOBS") || e.equals("LOOTING"))
-            return Enchantment.LOOT_BONUS_MOBS;
-        if (e.equals("LOYALTY"))
-            return Enchantment.LOYALTY;
-        if (e.equals("LUCK") || e.equals("LUCK_OF_THE_SEA"))
-            return Enchantment.LUCK;
-        if (e.equals("LURE"))
-            return Enchantment.LURE;
-        if (e.equals("MENDING"))
-            return Enchantment.MENDING;
-        if (e.equals("MULTISHOT"))
-            return Enchantment.MULTISHOT;
-        if (e.equals("OXYGEN") || e.equals("RESPIRATION"))
-            return Enchantment.OXYGEN;
-        if (e.equals("PIERCING"))
-            return Enchantment.PIERCING;
-        if (e.equals("PROTECTION_ENVIRONMENTAL") || e.equals("PROTECTION"))
-            return Enchantment.PROTECTION_ENVIRONMENTAL;
-        if (e.equals("PROTECTION_FIRE") || e.equals("FIRE_PROTECTION"))
-            return Enchantment.PROTECTION_FIRE;
-        if (e.equals("PROTECTION_FALL") || e.equals("FEATHER_FALLING"))
-            return  Enchantment.PROTECTION_FALL;
-        if (e.equals("PROTECTION_EXPLOSIONS") || e.equals("BLAST_PROTECTION"))
-            return Enchantment.PROTECTION_EXPLOSIONS;
-        if (e.equals("PROTECTION_PROJECTILE") || e.equals("PROJECTILE_PROTECTION"))
-            return Enchantment.PROTECTION_PROJECTILE;
-        if (e.equals("QUICK_CHARGE"))
-            return Enchantment.QUICK_CHARGE;
-        if (e.equals("RIPTIDE"))
-            return Enchantment.RIPTIDE;
-        if (e.equals("SILK_TOUCH"))
-            return Enchantment.SILK_TOUCH;
-        if (e.equals("SWEEPING_EDGE"))
-            return Enchantment.SWEEPING_EDGE;
-        if (e.equals("THORNS"))
-            return Enchantment.THORNS;
-        if (e.equals("VANISHING_CURSE") || e.equals("CURSE_OF_VANISHING"))
-            return Enchantment.VANISHING_CURSE;
-        if (e.equals("WATER_WORKER") || e.equals("AQUA_AFFINITY"))
-            return Enchantment.WATER_WORKER;
-        return null;
+        switch (e) {
+            case "ARROW_DAMAGE":
+            case "POWER":
+                return Enchantment.ARROW_DAMAGE;
+            case "ARROW_FIRE":
+            case "FLAME":
+                return Enchantment.ARROW_FIRE;
+            case "ARROW_INFINITE":
+            case "INFINITY":
+                return Enchantment.ARROW_INFINITE;
+            case "ARROW_KNOCKBACK":
+            case "PUNCH":
+                return Enchantment.ARROW_KNOCKBACK;
+            case "BINDING_CURSE":
+            case "CURSE_OF_BINDING":
+                return Enchantment.BINDING_CURSE;
+            case "CHANNELING":
+                return Enchantment.CHANNELING;
+            case "DAMAGE_ALL":
+            case "SHARPNESS":
+                return Enchantment.DAMAGE_ALL;
+            case "DAMAGE_ANTHROPODS":
+            case "BANE_OF_ANTHROPODS":
+                return Enchantment.DAMAGE_ARTHROPODS;
+            case "DAMAGE_UNDEAD":
+            case "SMITE":
+                return Enchantment.DAMAGE_UNDEAD;
+            case "DEPTH_STRIDER":
+                return Enchantment.DEPTH_STRIDER;
+            case "DIG_SPEED":
+            case "EFFICIENCY":
+                return Enchantment.DIG_SPEED;
+            case "DURABILITY":
+            case "UNBREAKING":
+                return Enchantment.DURABILITY;
+            case "FIRE_ASPECT":
+                return Enchantment.FIRE_ASPECT;
+            case "FROST_WALKER":
+                return Enchantment.FROST_WALKER;
+            case "IMPALING":
+                return Enchantment.IMPALING;
+            case "KNOCKBACK":
+                return Enchantment.KNOCKBACK;
+            case "LOOT_BONUS_BLOCKS":
+            case "FORTUNE":
+                return Enchantment.LOOT_BONUS_BLOCKS;
+            case "LOOT_BONUS_MOBS":
+            case "LOOTING":
+                return Enchantment.LOOT_BONUS_MOBS;
+            case "LOYALTY":
+                return Enchantment.LOYALTY;
+            case "LUCK":
+            case "LUCK_OF_THE_SEA":
+                return Enchantment.LUCK;
+            case "LURE":
+                return Enchantment.LURE;
+            case "MENDING":
+                return Enchantment.MENDING;
+            case "MULTISHOT":
+                return Enchantment.MULTISHOT;
+            case "OXYGEN":
+            case "RESPIRATION":
+                return Enchantment.OXYGEN;
+            case "PIERCING":
+                return Enchantment.PIERCING;
+            case "PROTECTION_ENVIRONMENTAL":
+            case "PROTECTION":
+                return Enchantment.PROTECTION_ENVIRONMENTAL;
+            case "PROTECTION_FIRE":
+            case "FIRE_PROTECTION":
+                return Enchantment.PROTECTION_FIRE;
+            case "PROTECTION_FALL":
+            case "FEATHER_FALLING":
+                return Enchantment.PROTECTION_FALL;
+            case "PROTECTION_EXPLOSIONS":
+            case "BLAST_PROTECTION":
+                return Enchantment.PROTECTION_EXPLOSIONS;
+            case "PROTECTION_PROJECTILE":
+            case "PROJECTILE_PROTECTION":
+                return Enchantment.PROTECTION_PROJECTILE;
+            case "QUICK_CHARGE":
+                return Enchantment.QUICK_CHARGE;
+            case "RIPTIDE":
+                return Enchantment.RIPTIDE;
+            case "SILK_TOUCH":
+                return Enchantment.SILK_TOUCH;
+            case "SOUL_SPEED":
+                return Enchantment.SOUL_SPEED;
+            case "SWEEPING_EDGE":
+                return Enchantment.SWEEPING_EDGE;
+            case "THORNS":
+                return Enchantment.THORNS;
+            case "VANISHING_CURSE":
+            case "CURSE_OF_VANISHING":
+                return Enchantment.VANISHING_CURSE;
+            case "WATER_WORKER":
+            case "AQUA_AFFINITY":
+                return Enchantment.WATER_WORKER;
+            default:
+                return null;
+        }
     }
 
+    /*
+        can this be trusted?
+     */
     static void downloadURLAsFile(String link, String out) {
         try {
             URL website = new URL(link);

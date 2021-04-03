@@ -155,13 +155,13 @@ public class Main extends JavaPlugin
         new CmdCrates(this);
         new TabCrates(this);
 
-        new ListenerOnDeath(this);
-        new ListenerOnEntityDamageByEntity(this);
-        new ListenerOnInventoryClick(this);
-        new ListenerOnInventoryClose(this);
-        new ListenerOnInventoryDrag(this);
-        new ListenerOnPlayerInteract(this);
-        new ListenerOnPlayerQuit(this);
+        new ListenerOnDeath();
+        new ListenerOnEntityDamageByEntity();
+        new ListenerOnInventoryClick();
+        new ListenerOnInventoryClose();
+        new ListenerOnInventoryDrag();
+        new ListenerOnPlayerInteract();
+        new ListenerOnPlayerQuit();
         //new ListenerOnPortal(this);
 
         /*

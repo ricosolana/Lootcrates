@@ -17,10 +17,6 @@ import java.util.HashSet;
 
 public class ListenerOnInventoryClick extends BaseListener {
 
-    public ListenerOnInventoryClick(Main plugin) {
-        super(plugin);
-    }
-
     private static HashSet<String> preventTypes = new HashSet<>();
     static {
         preventTypes.addAll(Arrays.asList(

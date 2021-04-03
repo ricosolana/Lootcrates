@@ -6,10 +6,9 @@ import org.bukkit.event.Listener;
 
 public class BaseListener implements Listener {
 
-    protected static Main plugin;
+    protected static Main plugin = Main.getInstance();
 
-    public BaseListener(Main plugin) {
-        BaseListener.plugin = plugin;
+    public BaseListener() {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 

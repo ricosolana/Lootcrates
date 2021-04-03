@@ -8,10 +8,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class ListenerOnPlayerQuit extends BaseListener {
 
-    public ListenerOnPlayerQuit(Main plugin) {
-        super(plugin);
-    }
-
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e)
     {

@@ -9,10 +9,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 
 public class ListenerOnDeath extends BaseListener {
 
-    public ListenerOnDeath(Main plugin) {
-        super(plugin);
-    }
-
     // get the handle first
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onDeath(PlayerDeathEvent e) {

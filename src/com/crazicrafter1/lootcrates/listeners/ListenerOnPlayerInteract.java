@@ -10,10 +10,6 @@ import org.bukkit.inventory.ItemStack;
 
 public class ListenerOnPlayerInteract extends BaseListener {
 
-    public ListenerOnPlayerInteract(Main plugin) {
-        super(plugin);
-    }
-
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e)
     {

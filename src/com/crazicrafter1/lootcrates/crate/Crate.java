@@ -68,26 +68,20 @@ public final class Crate {
     }
 
     public void prepSeasonalVariant() {
-        for (Seasonal seasonal : Seasonal.values()) {
-            if (seasonal.isToday()) {
-                ItemStack head = seasonal.getHead();
-                String finalName = seasonal.getPrefix() + " " + ChatColor.RESET + Objects.requireNonNull(itemStack.getItemMeta()).getDisplayName();
+        if (Main.seasonal)
+            seasonalVariant = ItemBuilder.builder(Crate.makeCrate(Seasonal.getSeasonalItem(), id)).mergeLexicals(this.itemStack).toItem();
+        else seasonalVariant = null;
 
-                ItemBuilder builder = ItemBuilder.builder(head).name(finalName);
 
-                //seasonalVariant = asMarkedCrate(builder.toItem(), this.id);
-                seasonalVariant = builder.toItem();
-                return;
-            }
-        }
 
-        seasonalVariant = null;
+        Crate crate = Crate.crateByItem(Seasonal.getSeasonalItem());
+        if (crate != null)
+            Main.getInstance().important("r: " + crate.getId()); // reversed id
+        else Main.getInstance().important("r: null"); // reversed id
+        Main.getInstance().important("C: " + id);
     }
 
     public LootGroup getBasedRandom() {
-
-
-
         int rand = Util.randomRange(0, chanceSum-1);
 
         for (Map.Entry<LootGroup, Integer> entry : this.lootGroups.entrySet()) {
@@ -101,21 +95,28 @@ public final class Crate {
         return lootGroups;
     }
 
+    public ItemStack getItemStack(int count) {
+        if (Main.seasonal && this.seasonalVariant != null) {
+            seasonalVariant.setAmount(count);
+            return seasonalVariant;
         }
-        ItemStack copy = new ItemStack(itemStack);
-        copy.setAmount(count);
-        return copy;
+        ItemStack itemStack = new ItemStack(this.itemStack);
+
+        itemStack.setAmount(count);
+        return itemStack;
     }
 
 
-    public static ItemStack asMarkedCrate(ItemStack item, final String crate) {
+    private static ItemStack makeCrate(ItemStack itemStack, final @NotNull String crate) {
 
         //net.minecraft.server.v1_14_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
+
+        Main.getInstance().debug(" | " + crate);
 
         Class<?> craftItemStackClass = ReflectionUtil.getCraftClass("inventory.CraftItemStack");
 
         Method asNMSCopyMethod = ReflectionUtil.getMethod(craftItemStackClass, "asNMSCopy", ItemStack.class);
-        Object nmsStack = ReflectionUtil.invokeStaticMethod(asNMSCopyMethod, item);
+        Object nmsStack = ReflectionUtil.invokeStaticMethod(asNMSCopyMethod, itemStack);
 
 
 
@@ -150,7 +151,7 @@ public final class Crate {
         return Main.crates.getOrDefault(id, null);
     }
 
-    public static Crate matchCrate(ItemStack item) {
+    public static Crate crateByItem(ItemStack item) {
 
         //if (item == null) return null;
 
@@ -187,8 +188,10 @@ public final class Crate {
         String crateType = (String) ReflectionUtil.invokeMethod(getStringMethod, nbt, "Crate");
 
 
+        Main.getInstance().debug(crateType);
 
-        return Main.crates.getOrDefault(crateType, null);
+
+        return Crate.crateByID(crateType);
     }
 
     /**

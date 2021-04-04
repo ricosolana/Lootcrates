@@ -3,7 +3,7 @@ package com.crazicrafter1.lootcrates.crate;
 import java.util.*;
 
 import com.crazicrafter1.lootcrates.Main;
-import com.crazicrafter1.lootcrates.Util;
+import com.crazicrafter1.lootcrates.util.Util;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
 import org.bukkit.*;
 import org.bukkit.entity.*;

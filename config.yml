@@ -43,7 +43,7 @@ selection-sound: ENTITY_EXPERIENCE_ORB_PICKUP # ORB_PICKUP <for older versions> 
 # name of crate inventory
 inventory-name: "&8Opening supply crate"
 
-# size of crate
+# size of crate (multiple of 9)
 inventory-size: 27
 
 # selections that player can make
@@ -52,10 +52,15 @@ selections: 4
 # auto-update from Github
 auto-update: true
 
+# seasonal crates?
+seasonal: true
+
 # create backups of this config.yml
 # when changes to crates are made ingame?
 # (might help with avoiding data loss after fatal crashes)
-backup: true
+# backup: true
+
+
 
 
 

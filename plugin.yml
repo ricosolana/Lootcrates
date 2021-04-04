@@ -7,7 +7,7 @@ softdepend: [QualityArmory, GraphicalAPI]
 commands:
   lootcrates:
     description: Access the features of the loot crates plugin.
-    usage: /lootcrates <crate/reload/editor> [type/tier] [player / <*>] [amount]
+    usage: /lootcrates <crate/reload/editor/version/flair> <id> <player/*> [amount]
     permission: lootcrates.admin
     aliases: [crates]
 permissions:
@@ -22,9 +22,11 @@ permissions:
 # fixed mispelled enchantment and added soul speed
 # some performance fixes
 
+
 # 3.0.1 (3/22/2021)
 # crates can *almost* now be edited ingame via a cool looking gui (so close)
 # autoupdater
+
 
 # 3.0.0 (2/19/2021)
 # loot types are now completely object oriented

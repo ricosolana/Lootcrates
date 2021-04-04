@@ -2,77 +2,104 @@ package com.crazicrafter1.lootcrates.commands;
 
 import com.crazicrafter1.guiapi.GraphicalAPI;
 import com.crazicrafter1.lootcrates.Main;
-import com.crazicrafter1.lootcrates.Util;
+import com.crazicrafter1.lootcrates.util.IntegerC;
+import com.crazicrafter1.lootcrates.util.Util;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collection;
+
 public class CmdCrates extends CmdBase {
 
-    public CmdCrates(Main plugin) {
-        super(plugin, "lootcrates");
+    public CmdCrates() {
+        super("lootcrates");
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
     {
         // crates crate <type> <player> <count>
-        if (args.length >= 3 && args[0].equalsIgnoreCase("crate")) {
+        if (args.length == 0)
+            return error(sender, "Input some arguments");
 
-            //if (Util.isNumeric(args[2])) return false;
+        switch (args[0].toLowerCase()) {
+            case "crate": {
+                if (args.length < 3) return error(sender, "Input more arguments");
 
-            Crate crate = Crate.crateByID(args[1]);
-            Player player = null;
-            int count = 1;
+                Crate crate = Crate.crateByID(args[1]);
 
-            if (crate == null)
-                return error(sender, "That crate doesn't exist");
+                if (crate == null)
+                    return error(sender, "That crate doesn't exist");
 
-            //player = Bukkit.getServer().getPlayer(args[2]);
+                feedback(sender, crate.getId());
 
-            if (!args[2].equals("*") &&
-                    ((player=Bukkit.getServer().getPlayer(args[2])) == null || !player.isOnline())) return error(sender, "That player cannot be found");
+                int count = 1;
 
-            // /crates crate legendary crazicrafter1 5
-            if (args.length == 4) {
-                if (Util.isNumeric(args[3])) {
-                    count = Util.safeToInt(args[3]); //crateItem.setAmount(Util.safeToInt(args[3]));
-                    if (count <= 0) return error(sender, "Count must be greater than 0");
-                } else error(sender, "Invalid count");
-            }
-
-            if (!args[2].equals("*")) {
-                player.getInventory().addItem(crate.getPreppedItemStack(true, count));
-                return feedback(sender, "Gave " + count + " " + args[1] + " crate to " + ChatColor.GOLD + player.getName());
-            } else {
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.getInventory().addItem(crate.getPreppedItemStack(true, count));
+                // crates crate legendary crazicrafter1 5
+                if (args.length == 4) {
+                    IntegerC wrapped = new IntegerC();
+                    if (Util.toInt(args[3], wrapped)) {
+                        count = wrapped.value; //crateItem.setAmount(Util.toInt(args[3]));
+                        if (count <= 0) return error(sender, "Count must be greater than 0");
+                    } else return error(sender, "Count must be numeric");
                 }
-                return feedback(sender, "Gave " + count + " " + args[1] + " crate to all players (" + ChatColor.LIGHT_PURPLE + Bukkit.getOnlinePlayers().size() + ChatColor.GRAY + " online)");
-            }
 
+                if (!args[2].equals("*")) {
+                    Player p = Bukkit.getServer().getPlayer(args[2]);
 
-        }
+                    if (p == null)
+                        return error(sender, "That player cannot be found");
 
-        else if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
-            feedback(sender, "Reloading config...");
-            Main.getInstance().reloadConfigValues();
-            return feedback(sender, "ConfigWrapper was reloaded.");
-        }
+                    p.getInventory().addItem(crate.getItemStack(count));
 
-        else if (args.length == 1 && args[0].equalsIgnoreCase("editor")) {
+                    //crate.crateByItem(crate.getItemStack(1));
 
-            if (plugin.editor != null) {
-                if (sender instanceof Player) {
-                    GraphicalAPI.openMenu((Player) sender, plugin.editor.MAIN_MENU);
-                    return true;
+                    return feedback(sender, "Gave " + count + " " + args[1] + " crate to " + ChatColor.GOLD + p.getName());
+                } else {
+                    for (Player p : players) {
+                        p.getInventory().addItem(crate.getItemStack(count));
+                    }
+                    return feedback(sender, "Gave " + count + " " + args[1] + " crate to all players (" + ChatColor.LIGHT_PURPLE + players.size() + ChatColor.GRAY + " online)");
                 }
-                return error(sender, "Can only be executed by a player");
-            } else return error(sender, "GraphicalAPI was not found or MC version is not 1.14+");
+            } case "reload":
+                feedback(sender, "Reloading config...");
+                Main.getInstance().reloadConfigValues();
+                return feedback(sender, "Config was reloaded.");
+            case "editor":
+                if (plugin.editor != null) {
+                    if (sender instanceof Player) {
+                        GraphicalAPI.openMenu((Player) sender, plugin.editor.MAIN_MENU);
+                        return true;
+                    }
+                    return error(sender, "Can only be executed by a player");
+                }
+                return error(sender, "GraphicalAPI was not found or MC version is not 1.14+");
+            case "version":
+                return feedback(sender, "LootCrates version: " + plugin.getDescription().getVersion());
+            case "flair":
+                return error(sender, "Unimplemented");
+            case "detect": {
+                if (!(sender instanceof Player))
+                    return error(sender, "Only a player can execute this argument");
+                Player p = (Player) sender;
+                ItemStack itemStack = p.getInventory().getItemInMainHand();
+                if (itemStack.getType() != Material.AIR) {
+                    Crate crate = Crate.crateByItem(itemStack);
+                    if (crate != null) {
+                        return feedback(sender, "Item is a crate (" + crate.getId() + ")");
+                    } else {
+                        return feedback(sender, "Item is a not a crate");
+                    }
+                }
+                return error(sender, "Must hold an item to detect");
+            } default:
+                return error(sender, "Invalid initial argument");
         }
 
         /*
@@ -94,10 +121,6 @@ public class CmdCrates extends CmdBase {
             return feedback(sender, "You received 1 signature crate");
         }
         */
-
-        plugin.info("LootCrates version: " + plugin.getDescription().getVersion());
-
-        return false;
     }
 
 }

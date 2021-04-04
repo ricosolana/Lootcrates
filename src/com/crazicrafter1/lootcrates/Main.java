@@ -12,29 +12,32 @@ import com.crazicrafter1.lootcrates.tabcompleters.TabCrates;
 import com.crazicrafter1.lootcrates.commands.CmdCrates;
 import com.crazicrafter1.lootcrates.listeners.*;
 import com.crazicrafter1.lootcrates.tracking.VersionChecker;
+import com.crazicrafter1.lootcrates.util.ItemBuilder;
+import com.crazicrafter1.lootcrates.util.Util;
 import org.bukkit.*;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class Main extends JavaPlugin
 {
     public static HashMap<java.util.UUID, ActiveCrate> openCrates = new HashMap<>();
     public static HashSet<UUID> crateFireWorks = new HashSet<>();
 
+    public static boolean seasonal = false;
     public static boolean supportQualityArmory = false;
-    //public static boolean supportGraphicalAPI = false;
     public static boolean debug = false;
-    public static boolean autoUpdate = true;
-    public static String inventoryName = "";
+    public static boolean autoUpdate = false;
+    public static String inventoryName = null;
     public static int inventorySize = 36;
     public static int selections = 4;
     public static int raffleSpeed = 5;
-    public static Sound selectionSound = Sound.ENTITY_EXPERIENCE_ORB_PICKUP;
+    public static Sound selectionSound = null;
     public static ItemStack unSelectedItem = null;
     public static ItemStack selectedItem = null;
-    public static boolean enableFirework = true;
+    public static boolean enableFirework = false;
     public static FireworkEffect fireworkEffect = null;
 
     public static HashMap<String, Crate> crates = new HashMap<>();
@@ -59,15 +62,27 @@ public class Main extends JavaPlugin
     }
 
 
-
+    private boolean saveTheConfig = false;
     private static String temp_path;
+
+    // set default if not present
     public Object a(String path, Object def) {
         temp_path = path;
         if (getConfig().contains(path)) {
             return getConfig().get(path);
         }
+        info("Setting default for " + path + ": " + def.toString());
         getConfig().set(path, def);
-        //saveTheConfig = true;
+        saveTheConfig = true;
+        return def;
+    }
+
+    // retrieve if present
+    public Object b(String path, Object def) {
+        temp_path = path;
+        if (getConfig().contains(path)) {
+            return getConfig().get(path);
+        }
         return def;
     }
 
@@ -77,6 +92,9 @@ public class Main extends JavaPlugin
         if(!this.getDataFolder().exists()){
             this.getDataFolder().mkdirs();
         }
+
+
+
         supportQualityArmory = Bukkit.getPluginManager().isPluginEnabled("QualityArmory");
 
 
@@ -90,13 +108,10 @@ public class Main extends JavaPlugin
 
 
 
-        if (!config.contains("auto-update")) {
-            config.addDefault("auto-update", true);
-            info("auto-update flag not found, adding default of true");
-            this.saveConfig();
-        }
+        autoUpdate = (boolean) a("auto-update", true);
 
-        autoUpdate = (boolean) a("auto-update", false);
+        //if (saveTheConfig)
+        //    this.saveConfig();
 
         if (!autoUpdate) {
             try {
@@ -186,31 +201,32 @@ public class Main extends JavaPlugin
         if (old) important("Reading as old config format. \nI would recommend you using the new configuration file format (it supports a whole lot more, and is a lot less error prone!)");
         else  info("Reading as new config format");
 
-        debug = (boolean) a(old ? "debug-enabled" : "debug", true);
+        seasonal = (boolean) a("seasonal", false);
 
-        selectionSound = Sound.valueOf((String) a("selection-sound", "ENTITY_EXPERIENCE_ORB_PICKUP"));
-        inventoryName = ChatColor.translateAlternateColorCodes('&',(String) a("inventory-name", ""));
-        inventorySize = (int) a("inventory-size", 36);
-        raffleSpeed = (int) a("raffle-speed", 5);
+        debug = (boolean) a(old ? "debug-enabled" : "debug", false);
 
-        selections = (int) a(old ? "max-selections" : "selections", 4);
+        selectionSound = Sound.valueOf((String) a("selection-sound", Sound.ENTITY_EXPERIENCE_ORB_PICKUP.name()));
+        inventoryName = ChatColor.translateAlternateColorCodes('&',(String) a("inventory-name", "crate"));
+        inventorySize = (int) a("inventory-size", 27);
+        raffleSpeed = (int) a("raffle-speed", 4);
+
+        selections = (int) a(old ? "max-selections" : "selections", selections);
 
         unSelectedItem = ItemBuilder.builder(
                 Material.matchMaterial((String) a(old ? "gui.unselected.item" : "gui.unselected.icon", null))).
                 name((String) a(old ? "gui.unselected.name" : "gui.unselected.title", null))
-                .lore((List<String>) a(old ? "gui.unselected.lore" : "gui.unselected.footer", new ArrayList<String>())).
-                        glow((boolean) a("gui.unselected.glow", false)).toItem();
+                .lore((List<String>) b(old ? "gui.unselected.lore" : "gui.unselected.footer", new ArrayList<String>())).
+                        glow((boolean) b("gui.unselected.glow", false)).toItem();
 
         selectedItem = ItemBuilder.builder(
                 Material.matchMaterial((String) a(old ? "gui.selected.item" : "gui.selected.icon", null))).
                 name((String) a(old ? "gui.selected.name" : "gui.selected.title", null))
-                .lore((List<String>) a(old ? "gui.selected.lore" : "gui.selected.footer", new ArrayList<String>())).
-                        glow((boolean) a("gui.selected.glow", false)).toItem();
+                .lore((List<String>) b(old ? "gui.selected.lore" : "gui.selected.footer", new ArrayList<String>())).
+                        glow((boolean) b("gui.selected.glow", false)).toItem();
 
-        enableFirework = (boolean) a(old ? "firework-explosion" : "firework.enabled", true);
+        enableFirework = (boolean) a(old ? "firework-explosion" : "firework.enabled", enableFirework);
 
         {
-            //fireworkEffect =
             ArrayList<Color> colors = new ArrayList<>(), fade = new ArrayList<>();
             boolean flicker;
 
@@ -238,17 +254,16 @@ public class Main extends JavaPlugin
 
         }
 
-        /*
-
-                    ORDER SPECIFIC LOADING:
-
-         */
+        /* *\  /* *\  /* *\  /* *\  /* *\  /* *\
+        |                                      |
+        |        ORDER SPECIFIC LOADING:       |
+        |                                      |
+        /* *\  /* *\  /* *\  /* *\  /* *\  /* */
 
         // 1st: store lootgroup ids
         for (String lootGroupKey : config.getConfigurationSection(old ? "gui.loot-group" : "gui.lootgroup").getKeys(false)) {
             lootGroups.put(lootGroupKey, null);
         }
-
 
         // 2nd: partially parse each crate
         for (String id : ((MemorySection)a("crates", null)).getKeys(false)) {
@@ -261,7 +276,7 @@ public class Main extends JavaPlugin
                     name((String)a(path + (old ? ".name" : ".title"), null));
 
             {
-                Object _footer = a(path + (old ? ".lore" : ".footer"), null);
+                Object _footer = b(path + (old ? ".lore" : ".footer"), null);
                 if (_footer != null)
                     builder.lore((List<String>)_footer);
             }
@@ -286,10 +301,8 @@ public class Main extends JavaPlugin
             }
         }
 
-
         // 4th: full parse crates
         for (String s : Main.crates.keySet()) {
-            //Crate crate = Crate.fromConfig(s);
             MemorySection mem = (MemorySection) a("crates." + s + ".chances", null);
 
             Map<String, Integer> lootgroupChances = new HashMap<>();
@@ -299,8 +312,6 @@ public class Main extends JavaPlugin
                 lootgroupChances.put(group, weight);
             }
 
-            //= (Map<String, Integer>) config.get("crates." + s + ".chances");
-
             HashMap<LootGroup, Integer> lootGroups = new HashMap<>();
             for (String group : lootgroupChances.keySet()) {
                 lootGroups.put(Main.lootGroups.get(group), lootgroupChances.get(group));
@@ -309,7 +320,8 @@ public class Main extends JavaPlugin
             Main.crates.get(s).setLootGroups(lootGroups);
         }
 
-        //if (supportGraphicalAPI)
+        if (saveTheConfig)
+            this.saveConfig();
 
     }
 
@@ -328,6 +340,11 @@ public class Main extends JavaPlugin
     public void debug(String s) {
         if (debug)
             Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.YELLOW + s);
+    }
+
+    @Override
+    public void onDisable() {
+
     }
 
     @Override

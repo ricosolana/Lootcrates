@@ -1,6 +1,8 @@
-package com.crazicrafter1.lootcrates;
+package com.crazicrafter1.lootcrates.util;
 
 //import net.minecraft.server.v1_14_R1.*;
+import com.crazicrafter1.lootcrates.util.refl.GameProfileMirror;
+import com.crazicrafter1.lootcrates.util.refl.PropertyMirror;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -12,7 +14,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,22 +46,61 @@ public class ItemBuilder {
         String name = itemStack.getItemMeta().getDisplayName();
         ArrayList<String> lore = new ArrayList<>(itemStack.getItemMeta().getLore());
         itemStack.setType(Material.PLAYER_HEAD);
-
-        UUID hashAsId = new UUID(base64.hashCode(), base64.hashCode());
-        itemStack =  Bukkit.getUnsafe().modifyItemStack(itemStack,
-                "{SkullOwner:{Id:\"" + hashAsId + "\",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}"
-        );
-
-        return new ItemBuilder(itemStack).name(name).lore(lore);
+    public ItemBuilder mergeLexicals(ItemStack itemStack) {
+        return this.name(itemStack.getItemMeta().getDisplayName()).lore(itemStack.getItemMeta().getLore());
     }
 
-    public ItemBuilder name(String name)
-    {
-        if (name == null) return getBuilder();
+    private static Object makeProfile(String b64) {
+        // random uuid based on the b64 string
+        UUID id = new UUID(
+                b64.substring(b64.length() - 20).hashCode(),
+                b64.substring(b64.length() - 10).hashCode()
+        );
+
+        // https://github.com/deanveloper/SkullCreator/blob/master/src/main/java/dev/dbassett/skullcreator/SkullCreator.java#L260
+
+        GameProfileMirror profile = new GameProfileMirror(id, "aaaaa");
+        profile.putProperty("textures", new PropertyMirror("textures", b64, null));
+        return profile.getInstance();
+
+        //GameProfile profile = new GameProfile(id, "aaaaa");
+        //profile.getProperties().put("textures", new Property("textures", b64));
+        //return profile;
+    }
+
+
+    public ItemBuilder skull(String base64) {
+        if (base64 == null)
+            return this;
+
+        //itemStack.setType(Material.PLAYER_HEAD);
+
+        SkullMeta meta = (SkullMeta)itemStack.getItemMeta();
+
+        Method setProfileMethod = ReflectionUtil.getMethod(
+                ReflectionUtil.getCraftClass("inventory.CraftMetaSkull"),
+                "setProfile",
+                GameProfileMirror.gameProfileClass);
+
+        ReflectionUtil.invokeMethod(setProfileMethod, meta, makeProfile(base64));
+
+        //String name = itemStack.getItemMeta().getDisplayName();
+        //List<String> lore = itemStack.getItemMeta().getLore();
+
+        itemStack.setItemMeta(meta);
+
+        //UUID hashAsId = new UUID(base64.hashCode(), base64.hashCode());
+        //this.itemStack = Bukkit.getUnsafe().modifyItemStack(itemStack,
+        //        "{SkullOwner:{Id:\"" + hashAsId + "\",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}");
+
+        return this;
+
+    public ItemBuilder name(String name) {
+        if (name == null)
+            return this;
 
         ItemMeta meta = itemStack.getItemMeta();
 
-        //noinspection ConstantConditions
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&r"+name));
         itemStack.setItemMeta(meta);
         return this;
@@ -65,16 +108,15 @@ public class ItemBuilder {
 
     public ItemBuilder lore(List<String> lores)
     {
-        if (lores == null) return getBuilder();
+        if (lores == null)
+            return this;
 
         ItemMeta meta = itemStack.getItemMeta();
 
         ArrayList<String> loreList = new ArrayList<>(lores);
 
         for (int i=0; i<loreList.size(); i++)
-        {
             loreList.set(i, ChatColor.translateAlternateColorCodes('&', "&r"+loreList.get(i)));
-        }
 
         meta.setLore(loreList);
 
@@ -89,9 +131,6 @@ public class ItemBuilder {
         PotionMeta meta = (PotionMeta) itemStack.getItemMeta();
         meta.setColor(color);
         itemStack.setItemMeta(meta);
-        return this;
-    }
-
     public ItemBuilder lore(String[] lores)
     {
         if (lores == null) return this;
@@ -111,6 +150,8 @@ public class ItemBuilder {
         item.setItemMeta(meta);
 
         return this;
+     */
+    public ItemBuilder color(int r, int g, int b) {
     }
 
     public ItemBuilder dye(Color color) {
@@ -121,29 +162,28 @@ public class ItemBuilder {
         LeatherArmorMeta meta = ((LeatherArmorMeta)item.getItemMeta());
 
         meta.setColor(color);
-        item.setItemMeta(meta);
 
+            ((LeatherArmorMeta)meta).setColor(color);
+            itemStack.setItemMeta(meta);
+        }
         return this;
     }
 
     public ItemBuilder unbreakable() {
         ItemStack item = new ItemStack(itemStack);
-
         ItemMeta meta = item.getItemMeta();
         meta.setUnbreakable(true);
-        item.setItemMeta(meta);
+        itemStack.setItemMeta(meta);
         return this;
     }
 
     public ItemBuilder enchant(Enchantment e, int level) {
-
         itemStack.addUnsafeEnchantment(e, level);
 
         return this;
     }
 
     public ItemBuilder hideFlags(ItemFlag ... flags) {
-
         ItemMeta meta = itemStack.getItemMeta();
         meta.addItemFlags(flags);
         itemStack.setItemMeta(meta);
@@ -190,7 +230,4 @@ public class ItemBuilder {
     }
 
     public ItemBuilder getBuilder() {
-        return new ItemBuilder(itemStack);
-    }
-
 }

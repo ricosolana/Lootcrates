@@ -240,8 +240,13 @@ public final class ActiveCrate {
     }
 
     public void onInventoryClick(InventoryClickEvent e) {
-        // Valid clicks
-        if (!e.isShiftClick() && (e.isLeftClick() || e.isRightClick())) {
+        /*
+            Right clicks would break things:
+                - when a player right clicked a pane, the intent was to select it, which works fine
+                - the issue is that when any click occurs, that slot is removed from selected slots, and the player wouldnt get the item if they
+                  halved it with a right click
+         */
+        if (!e.isShiftClick() && e.isLeftClick()) {
             int slot = e.getRawSlot();
 
             // If crate space was clicked on

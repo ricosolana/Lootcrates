@@ -9,8 +9,8 @@ import java.util.UUID;
 
 public class GameProfileMirror {
 
-    public static Class gameProfileClass = ReflectionUtil.getCanonicalClass("com.mojang.authlib.GameProfile");
-    private static Constructor<?> constructor = ReflectionUtil.getConstructor(gameProfileClass, UUID.class, String.class);
+    public final static Class gameProfileClass = ReflectionUtil.getCanonicalClass("com.mojang.authlib.GameProfile");
+    private final static Constructor<?> constructor = ReflectionUtil.getConstructor(gameProfileClass, UUID.class, String.class);
 
     private final static Field propertyMapField = ReflectionUtil.getField(gameProfileClass, "properties");
 

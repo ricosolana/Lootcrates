@@ -1,5 +1,6 @@
-package com.crazicrafter1.lootcrates;
+package com.crazicrafter1.lootcrates.util;
 
+import com.crazicrafter1.lootcrates.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
@@ -97,7 +98,7 @@ public class Util {
 
                 switch (name.toUpperCase()) {
 
-                    case "EXPERIENCE_BOTTLE": return new ItemStack(Material.matchMaterial("EXP_BOTTLE"));
+                    case "EXPERIENCE_BOTTLE": return new ItemStack(Material.EXPERIENCE_BOTTLE);
                     case "GOLDEN_APPLE": return new ItemStack(Material.GOLDEN_APPLE, 1, (short) 0);
                     case "ENCHANTED_GOLDEN_APPLE": return new ItemStack(Material.GOLDEN_APPLE, 1, (short) 1);
                 }
@@ -190,31 +191,14 @@ public class Util {
         return (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2);
     }
 
-    public static int safeToInt(String s)
+    public static boolean toInt(String s, IntegerC wrapper)
     {
-        //if ()
-        // test if is numeric
-
-        if (isNumeric(s))
-        {
-            return Integer.parseInt(s);
+        try {
+            wrapper.value = Integer.parseInt(s);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
-        return 0;
-    }
-
-    public static boolean isNumeric(String s)
-    {
-        for (int i=0;i<s.length();i++)
-        {
-            try {
-                Integer.parseInt(s.substring(i));
-            }
-            catch(NumberFormatException e)
-            {
-                return false;
-            }
-        }
-        return true;
     }
 
     public static Enchantment matchEnchant(String enchant)

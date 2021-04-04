@@ -42,10 +42,7 @@ public class ItemBuilder {
         return new ItemBuilder(itemStack);
     }
 
-    public ItemBuilder asCustomSkull(String base64) {
-        String name = itemStack.getItemMeta().getDisplayName();
-        ArrayList<String> lore = new ArrayList<>(itemStack.getItemMeta().getLore());
-        itemStack.setType(Material.PLAYER_HEAD);
+    // lexicals
     public ItemBuilder mergeLexicals(ItemStack itemStack) {
         return this.name(itemStack.getItemMeta().getDisplayName()).lore(itemStack.getItemMeta().getLore());
     }
@@ -95,6 +92,9 @@ public class ItemBuilder {
 
         return this;
 
+        //return this.name(name).lore(lore);
+    }
+
     public ItemBuilder name(String name) {
         if (name == null)
             return this;
@@ -124,13 +124,6 @@ public class ItemBuilder {
         return this;
     }
 
-    /**
-       Color can work for potions
-     */
-    public ItemBuilder color(Color color) {
-        PotionMeta meta = (PotionMeta) itemStack.getItemMeta();
-        meta.setColor(color);
-        itemStack.setItemMeta(meta);
     public ItemBuilder lore(String[] lores)
     {
         if (lores == null) return this;
@@ -138,31 +131,20 @@ public class ItemBuilder {
         return lore(Arrays.asList(lores));
     }
 
-
-    public ItemBuilder dye(int r, int g, int b) {
-        ItemStack item = new ItemStack(itemStack);
-
-        if (!(item.getItemMeta() instanceof LeatherArmorMeta)) return getBuilder();
-
-        LeatherArmorMeta meta = ((LeatherArmorMeta)item.getItemMeta());
-
-        meta.setColor(Color.fromRGB(r, g, b));
-        item.setItemMeta(meta);
-
-        return this;
+    /**
+       works for potions or leather armor
      */
     public ItemBuilder color(int r, int g, int b) {
+        return this.color(Color.fromRGB(r, g, b));
     }
 
-    public ItemBuilder dye(Color color) {
-        ItemStack item = new ItemStack(itemStack);
+    public ItemBuilder color(Color color) {
+        ItemMeta meta = itemStack.getItemMeta();
 
-        if (!(item.getItemMeta() instanceof LeatherArmorMeta)) return getBuilder();
-
-        LeatherArmorMeta meta = ((LeatherArmorMeta)item.getItemMeta());
-
-        meta.setColor(color);
-
+        if (meta instanceof PotionMeta) {
+            ((PotionMeta)meta).setColor(color);
+            itemStack.setItemMeta(meta);
+        } else if (meta instanceof LeatherArmorMeta) {
             ((LeatherArmorMeta)meta).setColor(color);
             itemStack.setItemMeta(meta);
         }
@@ -170,8 +152,7 @@ public class ItemBuilder {
     }
 
     public ItemBuilder unbreakable() {
-        ItemStack item = new ItemStack(itemStack);
-        ItemMeta meta = item.getItemMeta();
+        ItemMeta meta = itemStack.getItemMeta();
         meta.setUnbreakable(true);
         itemStack.setItemMeta(meta);
         return this;
@@ -229,5 +210,4 @@ public class ItemBuilder {
         return itemStack;
     }
 
-    public ItemBuilder getBuilder() {
 }

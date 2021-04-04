@@ -1,11 +1,14 @@
-package com.crazicrafter1.lootcrates;
+package com.crazicrafter1.lootcrates.util;
 
+import com.crazicrafter1.lootcrates.Main;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import org.bukkit.Bukkit;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 public final class ReflectionUtil {
 
@@ -16,7 +19,7 @@ public final class ReflectionUtil {
     private ReflectionUtil() { }
 
     // get class by package dir
-    private static @NotNull Class getCanonicalClass(final @NotNull String canonicalName) {
+    public static @NotNull Class getCanonicalClass(final @NotNull String canonicalName) {
         try {
             return Class.forName(canonicalName);
         } catch (ClassNotFoundException e) {
@@ -28,7 +31,7 @@ public final class ReflectionUtil {
         return getCanonicalClass(CRAFTBUKKIT + "." + name);
     }
 
-    public static Class<?> getMinecraftClass(String name) {
+    public static Class<?> getNMSClass(String name) {
         return getCanonicalClass(NMS + "." + name);
     }
 
@@ -53,6 +56,49 @@ public final class ReflectionUtil {
         try {
             method.setAccessible(true);
             return method.invoke(instance, args);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Constructor<?> getConstructor(String clazzName, Class<?>... params) {
+        Class<?> clazz = getCanonicalClass(clazzName);
+        try {
+            return clazz.getConstructor(params);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Constructor<?> getConstructor(Class<?> clazz, Class<?>... params) {
+        try {
+            return clazz.getConstructor(params);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Object invokeConstructor(Constructor<?> constructor, Object... args) {
+        try {
+            constructor.setAccessible(true);
+            return constructor.newInstance(args);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Field getField(Class<?> clazz, String fieldName) {
+        try {
+            return clazz.getDeclaredField(fieldName);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Object getFieldInstance(Field field, Object instance) {
+        try {
+            field.setAccessible(true);
+            return field.get(instance);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -1,6 +1,6 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
-import com.crazicrafter1.lootcrates.Util;
+import com.crazicrafter1.lootcrates.util.Util;
 import com.crazicrafter1.lootcrates.crate.AbstractLoot;
 import org.bukkit.inventory.ItemStack;
 

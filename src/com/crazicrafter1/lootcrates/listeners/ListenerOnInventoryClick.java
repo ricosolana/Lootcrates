@@ -67,7 +67,7 @@ public class ListenerOnInventoryClick extends BaseListener {
             //// If an item was PLACED INTO
             //if (itemStack != null && itemStack.getType() != Material.AIR) {
             //    // test that item
-            //    if (Crate.matchCrate(itemStack) != null) {
+            //    if (Crate.crateByItem(itemStack) != null) {
             //        e.setCancelled(true);
             //    }
             //}

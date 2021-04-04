@@ -1,6 +1,6 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
-import com.crazicrafter1.lootcrates.Util;
+import com.crazicrafter1.lootcrates.util.Util;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;

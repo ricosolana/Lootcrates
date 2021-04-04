@@ -1,9 +1,9 @@
 package com.crazicrafter1.lootcrates.crate;
 
-import com.crazicrafter1.lootcrates.ItemBuilder;
+import com.crazicrafter1.lootcrates.util.ItemBuilder;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.Result;
-import com.crazicrafter1.lootcrates.Util;
+import com.crazicrafter1.lootcrates.util.Util;
 import com.crazicrafter1.lootcrates.crate.loot.*;
 import org.bukkit.Material;
 import org.bukkit.configuration.MemorySection;
@@ -197,7 +197,7 @@ public abstract class AbstractLoot {
             Crate crate = Main.crates.get(_crate);
             Main.getInstance().debug("Crate-s: " + _crate + ", Crate is null: " + (crate == null));
             if (crate != null) {
-                Main.getInstance().debug("" + crate.getPreppedItemStack(false).getItemMeta().getDisplayName());
+                Main.getInstance().debug("" + crate.getItemStack(1).getItemMeta().getDisplayName());
             }
             for (Crate c : Main.crates.values()) {
                 Main.getInstance().debug("c: " + c.getId());

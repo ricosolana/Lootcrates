@@ -127,11 +127,6 @@ public class Main extends JavaPlugin
             }
         } else {
             GithubUpdater.autoUpdate(this, "PeriodicSeizures", "LootCrates", "LootCrates.jar");
-            //try {
-            //    if (autoUpdate)
-            //        GithubUpdater.autoUpdate(this, "owner", "name", "resource");
-            //} catch (Exception e) {
-            //}
         }
 
 
@@ -154,7 +149,7 @@ public class Main extends JavaPlugin
                     }
                 }));
 
-        new CmdCrates(this);
+        new CmdCrates();
         new TabCrates(this);
 
         new ListenerOnDeath();
@@ -165,22 +160,15 @@ public class Main extends JavaPlugin
         new ListenerOnPlayerInteract();
         new ListenerOnPlayerQuit();
 
-        /*
-            TODO
-            fix seasonal crates, might be broken Crate.getPreppedItem...() returned null
-         */
-
-        /*
+        // the check every 1 hours
         new BukkitRunnable() {
             @Override
             public void run() {
-                //debug("Checking the season...");
                 for (Crate crate : crates.values()) {
                     crate.prepSeasonalVariant();
                 }
             }
-        }.runTaskTimer(this, 0, 20*60*60); // Checks every hour
-         */
+        }.runTaskTimer(this, 0, 20*60*60*6); // 20 * 60 * 60 * 24
 
         info("Everything was successfully loaded!");
     }

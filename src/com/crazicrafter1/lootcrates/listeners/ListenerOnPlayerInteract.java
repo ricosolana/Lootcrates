@@ -1,6 +1,5 @@
 package com.crazicrafter1.lootcrates.listeners;
 
-import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,7 +33,7 @@ public class ListenerOnPlayerInteract extends BaseListener {
                 // -1.8?
                 //ItemStack item = p.getInventory().getItemInHand();
 
-                Crate crate = Crate.matchCrate(item);
+                Crate crate = Crate.crateByItem(item);
                 if (crate != null) {
                     plugin.debug("Successful crate validation");
 

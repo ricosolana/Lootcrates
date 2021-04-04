@@ -29,7 +29,7 @@ public class TabCrates extends BaseTabCompleter {
                     }
                 }
                  */
-                return getMatches(args[0], new String[] {"crate", "reload", "editor"});
+                return getMatches(args[0], new String[] {"crate", "detect", "editor", "flair", "reload", "version"});
             }
             if (args[0].equals("crate")) {
                 if (args.length == 2) {

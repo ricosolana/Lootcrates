@@ -5,13 +5,10 @@ import com.crazicrafter1.guiapi.MenuElement;
 import com.crazicrafter1.guiapi.TemplateMenu;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootGroup;
-import org.bukkit.Bukkit;
+import com.crazicrafter1.lootcrates.util.ItemBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
@@ -105,7 +102,7 @@ public class ClickEditGUI {
         int pitch = 0;
         for (Crate crate : Main.crates.values()) {
             if (pitch == 54) break;
-            CRATE_MENU.addElement(new MenuElement(crate.getPreppedItemStack(false)) {
+            CRATE_MENU.addElement(new MenuElement(crate.getItemStack(1)) {
                 @Override
                 public void onLeftClick(Player p) {
                     // when crate clicked, open its data things

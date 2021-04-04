@@ -5,6 +5,6 @@ import com.crazicrafter1.lootcrates.crate.Crate;
 public class LootCrate extends LootItem {
 
     public LootCrate(Crate crate, int min, int max) {
-        super(crate.getPreppedItemStack(false), min, max);
+        super(crate.getItemStack(1), min, max);
     }
 }

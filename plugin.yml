@@ -7,7 +7,7 @@ softdepend: [QualityArmory, GraphicalAPI]
 commands:
   lootcrates:
     description: Access the features of the loot crates plugin.
-    usage: /lootcrates <crate/reload/editor/version/flair> <id> <player/*> [amount]
+    usage: /lootcrates <crate/detect/editor/flair/reload/version> <id> <player/*> [amount]
     permission: lootcrates.admin
     aliases: [crates]
 permissions:
@@ -23,6 +23,7 @@ permissions:
 #   - fixed seasonal crates after being broken for a few months
 #   - added config option for seasonal crates
 #   - seasonal crates are seasonal (multiple days) instead of on a one day basis
+#   - crates are now detected via nbt not name/lore...
 
 
 # 3.0.2 (4/2/2021)

@@ -30,8 +30,6 @@ public final class Crate {
         return temp;
     }
 
-
-
     private final String id;
     private final ItemStack itemStack;
     private HashMap<LootGroup, Integer> lootGroups;
@@ -39,18 +37,11 @@ public final class Crate {
     private int chanceSum;
 
     public Crate(String id, ItemStack itemStack) {
-        //Main.getInstance().important("ID: " + id);
-
         this.id = id;
         this.itemStack = Crate.makeCrate(itemStack, id);
     }
 
     public void setLootGroups(HashMap<LootGroup, Integer> lootGroups) {
-
-        /*
-            sort should return the map in an ordered way
-         */
-
         lootGroups = sortByValue(lootGroups);
 
         int last = 0;
@@ -71,17 +62,9 @@ public final class Crate {
         if (Main.seasonal)
             seasonalVariant = ItemBuilder.builder(Crate.makeCrate(Seasonal.getSeasonalItem(), id)).mergeLexicals(this.itemStack).toItem();
         else seasonalVariant = null;
-
-
-
-        Crate crate = Crate.crateByItem(Seasonal.getSeasonalItem());
-        if (crate != null)
-            Main.getInstance().important("r: " + crate.getId()); // reversed id
-        else Main.getInstance().important("r: null"); // reversed id
-        Main.getInstance().important("C: " + id);
     }
 
-    public LootGroup getBasedRandom() {
+    LootGroup getBasedRandom() {
         int rand = Util.randomRange(0, chanceSum-1);
 
         for (Map.Entry<LootGroup, Integer> entry : this.lootGroups.entrySet()) {
@@ -106,44 +89,38 @@ public final class Crate {
         return itemStack;
     }
 
-
     private static ItemStack makeCrate(ItemStack itemStack, final @NotNull String crate) {
 
+        /*
+            Back when I used CraftBukkit to 'easily' get and set NBT data, the comments below are the code
+            that was used just for future reference
+         */
+
         //net.minecraft.server.v1_14_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
-
-        Main.getInstance().debug(" | " + crate);
-
         Class<?> craftItemStackClass = ReflectionUtil.getCraftClass("inventory.CraftItemStack");
 
         Method asNMSCopyMethod = ReflectionUtil.getMethod(craftItemStackClass, "asNMSCopy", ItemStack.class);
         Object nmsStack = ReflectionUtil.invokeStaticMethod(asNMSCopyMethod, itemStack);
 
 
-
-        //NBTTagCompound nbt = nmsStack.getOrCreateTag(); //nmsStack.hasTag() ? nmsStack.getTag() : new NBTTagCompound();
-
+        //NBTTagCompound nbt = nmsStack.getOrCreateTag();
         Method getOrCreateTagMethod = ReflectionUtil.getMethod(nmsStack.getClass(), "getOrCreateTag");
         Object nbt = ReflectionUtil.invokeMethod(getOrCreateTagMethod, nmsStack);
 
 
-
         //nbt.setString("Crate", crate);
-
         Method setStringMethod = ReflectionUtil.getMethod(nbt.getClass(), "setString", String.class, String.class);
         ReflectionUtil.invokeMethod(setStringMethod, nbt, "Crate", crate);
 
 
-
         //nmsStack.setTag(nbt);
-
         Method setTagMethod = ReflectionUtil.getMethod(nmsStack.getClass(), "setTag", nbt.getClass());
         ReflectionUtil.invokeMethod(setTagMethod, nmsStack, nbt);
 
 
-
         //return CraftItemStack.asCraftMirror(nmsStack);
-
         Method asCraftMirrorMethod = ReflectionUtil.getMethod(craftItemStackClass, "asCraftMirror", nmsStack.getClass());
+
         return (ItemStack) ReflectionUtil.invokeStaticMethod(asCraftMirrorMethod, nmsStack);
     }
 
@@ -151,45 +128,34 @@ public final class Crate {
         return Main.crates.getOrDefault(id, null);
     }
 
-    public static Crate crateByItem(ItemStack item) {
+    public static Crate crateByItem(final @NotNull ItemStack item) {
 
-        //if (item == null) return null;
+        /*
+            Old code when custom name of the item was used to get crates
+         */
 
         //ItemMeta meta = item.getItemMeta();
-        //if (meta == null) return null;
-
         //String name = meta.getDisplayName();
         //return Main.crates.getOrDefault(Main.crateNameIds.getOrDefault(name, null), null);
 
 
 
 
-
-
         //net.minecraft.server.v1_14_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
-
         Class<?> craftItemStackClass = ReflectionUtil.getCraftClass("inventory.CraftItemStack");
 
         Method asNMSCopyMethod = ReflectionUtil.getMethod(craftItemStackClass, "asNMSCopy", ItemStack.class);
         Object nmsStack = ReflectionUtil.invokeStaticMethod(asNMSCopyMethod, item);
 
 
-
         //NBTTagCompound nbt = nmsStack.getOrCreateTag();
-
         Method getOrCreateTagMethod = ReflectionUtil.getMethod(nmsStack.getClass(), "getOrCreateTag");
         Object nbt = ReflectionUtil.invokeMethod(getOrCreateTagMethod, nmsStack);
 
 
-
         //String crateType = nbt.getString("Crate");
-
         Method getStringMethod = ReflectionUtil.getMethod(nbt.getClass(), "getString", String.class);
         String crateType = (String) ReflectionUtil.invokeMethod(getStringMethod, nbt, "Crate");
-
-
-        Main.getInstance().debug(crateType);
-
 
         return Crate.crateByID(crateType);
     }

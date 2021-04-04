@@ -10,17 +10,16 @@ import java.util.List;
 
 public abstract class BaseTabCompleter implements TabCompleter {
 
-    protected static Main plugin; //Main.getInstance();
+    protected static Main plugin = Main.getInstance();
 
-    BaseTabCompleter(Main plugin, String name) {
-        BaseTabCompleter.plugin = plugin;
+    BaseTabCompleter(String name) {
         plugin.getCommand(name).setTabCompleter(this);
     }
 
     @Override
     public abstract List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args);
 
-    final ArrayList<String> getMatches(String arg, String[] samples){
+    static ArrayList<String> getMatches(String arg, String[] samples){
 
         ArrayList<String> matches = new ArrayList<>();
 

@@ -18,13 +18,11 @@ import java.util.Map;
 
 public abstract class AbstractLoot {
 
-    // base indicator, the count can change (upon cloning)
     private final ItemStack baseVisual;
 
     public AbstractLoot(ItemStack baseVisual) {
         this.baseVisual = baseVisual;
     }
-
 
     protected final ItemStack getBaseVisual() {
         return baseVisual.clone();
@@ -36,16 +34,8 @@ public abstract class AbstractLoot {
         Util.giveItemToPlayer(activeCrate.getPlayer(), getAccurateVisual());
     }
 
-    public final void setBaseVisualMeta(ItemMeta itemMeta) {
-        baseVisual.setItemMeta(itemMeta);
-    }
-
-    @SuppressWarnings({"unchecked", "ConstantConditions"})
+    @SuppressWarnings({"unchecked"})
     static AbstractLoot fromNewConfig(Map<String, Object> instance, Result result) {
-
-        //Map<String, Object> instance = (config.getMapList(path).get(index);
-
-        //config.getMapList;
 
         int min = 1, max = 1;
 
@@ -112,7 +102,6 @@ public abstract class AbstractLoot {
 
                     result.code = Result.Code.INVALID_EFFECT;
                     PotionEffectType effect = PotionEffectType.getByName(((String)enchantMap.get("effect")).toUpperCase());
-                    //PotionEffectTypeWrapper.
                     if (effect == null)
                         throw new RuntimeException(new Exception());
 
@@ -154,7 +143,6 @@ public abstract class AbstractLoot {
                     Map<String, Object> enchantMap = (Map<String, Object>) list.get(i);
 
                     result.code = Result.Code.INVALID_ENCHANT;
-                    //Enchantment enchantment = Enchantment.getByName((String)enchantMap.get("enchant"));
                     Enchantment enchantment = Util.matchEnchant((String)enchantMap.get("enchant"));
 
                     if (enchantment == null)
@@ -168,7 +156,6 @@ public abstract class AbstractLoot {
                         emin = (int)_level;
                         emax = emin;
                     } else {
-                        // read as range, string
                         String[] split = ((String)_level).replaceAll(" ", "").split(",");
                         emin = Integer.parseInt(split[0]);
                         emax = Integer.parseInt(split[1]);
@@ -195,13 +182,6 @@ public abstract class AbstractLoot {
             result.code = Result.Code.INVALID_CRATE;
             String _crate = (String) instance.get("crate");
             Crate crate = Main.crates.get(_crate);
-            Main.getInstance().debug("Crate-s: " + _crate + ", Crate is null: " + (crate == null));
-            if (crate != null) {
-                Main.getInstance().debug("" + crate.getItemStack(1).getItemMeta().getDisplayName());
-            }
-            for (Crate c : Main.crates.values()) {
-                Main.getInstance().debug("c: " + c.getId());
-            }
             return new LootCrate(crate, min, max);
         }
 
@@ -218,12 +198,6 @@ public abstract class AbstractLoot {
             Will hold the value of the current path being tested in the case
             of an error, can print the path of issue
          */
-
-
-
-        //ItemStack itemStack;
-
-
 
         int min = 1, max = min;
 
@@ -271,18 +245,12 @@ public abstract class AbstractLoot {
                 ArrayList<LootEnchantableItem.QEnchantment> qEnchantments = new ArrayList<>();
                 MemorySection enchantSection = (MemorySection) instance.get("enchantments");
 
-                //LootEnchantableItem.QEnchantment[] qEnchantments =
-                //        new LootEnchantableItem.QEnchantment[enchantSection..size()];
-
-
                 // iterate the entries
                 result.code = Result.Code.INVALID_ENCHANT;
-                //int i = 0;
                 for (String enchantKey : enchantSection.getKeys(false)) {
                     int level = (int)((MemorySection)enchantSection.get(enchantKey)).get("level");
                     Enchantment enchantment = Util.matchEnchant(enchantKey);
 
-                    //qEnchantments[i++] = new LootEnchantableItem.QEnchantment(enchantment, level, level);
                     qEnchantments.add(new LootEnchantableItem.QEnchantment(enchantment, level, level));
                 }
 

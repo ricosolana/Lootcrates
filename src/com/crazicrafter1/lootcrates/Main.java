@@ -150,7 +150,7 @@ public class Main extends JavaPlugin
                 }));
 
         new CmdCrates();
-        new TabCrates(this);
+        new TabCrates();
 
         new ListenerOnDeath();
         new ListenerOnEntityDamageByEntity();

@@ -139,6 +139,7 @@ public class Main extends JavaPlugin
 
 
 
+
         // bStats metrics
         Metrics metrics = new Metrics(this, 10395);
         metrics.addCustomChart(
@@ -261,16 +262,10 @@ public class Main extends JavaPlugin
 
             ItemBuilder builder = ItemBuilder.
                     builder(Material.matchMaterial((String) a(path + (old ? ".item" : ".icon"), null))).
-                    name((String)a(path + (old ? ".name" : ".title"), null));
+                    name((String)a(path + (old ? ".name" : ".title"), null)).
+                    lore((List<String>)b(path + (old ? ".lore" : ".footer"), null));
 
-            {
-                Object _footer = b(path + (old ? ".lore" : ".footer"), null);
-                if (_footer != null)
-                    builder.lore((List<String>)_footer);
-            }
             Crate crate = new Crate(id, builder.toItem());
-
-            debug("loadedCrate: " + id);
 
             Main.crates.put(id, crate);
             Main.crateNameIds.put(builder.toItem().getItemMeta().getDisplayName(), id);

@@ -264,7 +264,7 @@ public class Main extends JavaPlugin
                     builder(Material.matchMaterial((String) a(path + (old ? ".item" : ".icon"), null))).
                     name((String) a(path + (old ? ".name" : ".title"), null)).
                     lore((List<String>) b(path + (old ? ".lore" : ".footer"), null)).
-                    customModelData((int) b(path + ".model", null));
+                    customModelData((Integer) b(path + ".model", null));
 
             Crate crate = new Crate(id, builder.toItem());
 

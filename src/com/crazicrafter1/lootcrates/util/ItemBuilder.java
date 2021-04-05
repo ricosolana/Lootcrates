@@ -11,10 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.inventory.meta.*;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -70,8 +67,6 @@ public class ItemBuilder {
         if (base64 == null)
             return this;
 
-        //itemStack.setType(Material.PLAYER_HEAD);
-
         SkullMeta meta = (SkullMeta)itemStack.getItemMeta();
 
         Method setProfileMethod = ReflectionUtil.getMethod(
@@ -86,13 +81,24 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder customModelData(int i) {
+    /**
+        Set the custom model data of the item to work with a texture pack
+     @param i the id of the texture
+     */
+    public ItemBuilder customModelData(Integer i) {
+        if (i == null)
+            return this;
+
         ItemMeta meta = itemStack.getItemMeta();
         meta.setCustomModelData(i);
         itemStack.setItemMeta(meta);
         return this;
     }
 
+    /**
+        Set the custom display name of an item
+     @param name the name with &codes
+     */
     public ItemBuilder name(String name) {
         if (name == null)
             return this;
@@ -104,39 +110,43 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder lore(List<String> lores)
-    {
-        if (lores == null)
+    /**
+        Set the lore of an item
+     @param lore the lore
+     */
+    public ItemBuilder lore(String[] lore) {
+        return lore(Arrays.asList(lore));
+    }
+
+    public ItemBuilder lore(List<String> lore) {
+        if (lore == null)
             return this;
 
         ItemMeta meta = itemStack.getItemMeta();
 
-        ArrayList<String> loreList = new ArrayList<>(lores);
+        for (int i=0; i<lore.size(); i++)
+            lore.set(i, ChatColor.translateAlternateColorCodes('&', "&r"+lore.get(i)));
 
-        for (int i=0; i<loreList.size(); i++)
-            loreList.set(i, ChatColor.translateAlternateColorCodes('&', "&r"+loreList.get(i)));
-
-        meta.setLore(loreList);
+        meta.setLore(lore);
 
         itemStack.setItemMeta(meta);
         return this;
     }
 
-    public ItemBuilder lore(String[] lores)
-    {
-        if (lores == null) return this;
-
-        return lore(Arrays.asList(lores));
-    }
-
     /**
-       works for potions or leather armor
+       Set the color of leather armor or a potion
+     @param r red
+     @param g green
+     @param b blue
      */
     public ItemBuilder color(int r, int g, int b) {
         return this.color(Color.fromRGB(r, g, b));
     }
 
     public ItemBuilder color(Color color) {
+        if (color == null)
+            return this;
+
         ItemMeta meta = itemStack.getItemMeta();
 
         if (meta instanceof PotionMeta) {
@@ -149,8 +159,15 @@ public class ItemBuilder {
         return this;
     }
 
+    /**
+       Flag an item as unbreakable
+     */
     public ItemBuilder unbreakable() {
         ItemMeta meta = itemStack.getItemMeta();
+
+        if (!(meta instanceof Damageable))
+            return this;
+
         meta.setUnbreakable(true);
         itemStack.setItemMeta(meta);
         return this;

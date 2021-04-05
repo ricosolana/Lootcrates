@@ -103,14 +103,16 @@ public final class ActiveCrate {
             if (Main.selectionSound != null)
                 getPlayer().playSound(getPlayer().getLocation(), Main.selectionSound, 1, 1);
 
-            // last slot was selected
-            //if (slotsSelected.size() == config.getCrateSelections()) {
+            // Player finished selecting
             if (slots.size() == Main.selections) {
+                // Decrement crate (the COST)
+                {
+                    ItemStack itemStack = getPlayer().getInventory().getItem(lockSlot);
+                    itemStack.setAmount(itemStack.getAmount() - 1);
+                }
+
                 // Invalidate lockslot, so that it may be reused for whatever (since crate was consumed)
                 lockSlot = -1;
-
-                getPlayer().getInventory().getItemInMainHand().setAmount(getPlayer().getInventory().getItemInMainHand().getAmount() - 1);
-                //isRevealing = true;
 
                 revealing = true;
 

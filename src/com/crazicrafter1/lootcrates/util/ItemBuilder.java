@@ -81,18 +81,16 @@ public class ItemBuilder {
 
         ReflectionUtil.invokeMethod(setProfileMethod, meta, makeProfile(base64));
 
-        //String name = itemStack.getItemMeta().getDisplayName();
-        //List<String> lore = itemStack.getItemMeta().getLore();
-
         itemStack.setItemMeta(meta);
 
-        //UUID hashAsId = new UUID(base64.hashCode(), base64.hashCode());
-        //this.itemStack = Bukkit.getUnsafe().modifyItemStack(itemStack,
-        //        "{SkullOwner:{Id:\"" + hashAsId + "\",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}");
-
         return this;
+    }
 
-        //return this.name(name).lore(lore);
+    public ItemBuilder customModelData(int i) {
+        ItemMeta meta = itemStack.getItemMeta();
+        meta.setCustomModelData(i);
+        itemStack.setItemMeta(meta);
+        return this;
     }
 
     public ItemBuilder name(String name) {

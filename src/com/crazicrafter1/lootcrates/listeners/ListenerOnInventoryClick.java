@@ -58,7 +58,7 @@ public class ListenerOnInventoryClick extends BaseListener {
 //
             //    int hotbar = e.getHotbarButton();
             //    if (hotbar != -1)
-            //        itemStack = p.getInventory().getItem(hotbar);
+            //        itemStack = p.getInventory().getCompatibleItem(hotbar);
 //
             //}
 //

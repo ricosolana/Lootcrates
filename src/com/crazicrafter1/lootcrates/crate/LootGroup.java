@@ -3,6 +3,7 @@ package com.crazicrafter1.lootcrates.crate;
 import com.crazicrafter1.lootcrates.util.ItemBuilder;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.loot.LootCrate;
+import com.crazicrafter1.lootcrates.util.Util;
 import org.bukkit.Material;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -55,7 +56,7 @@ public class LootGroup {
             List<String> lore = config.getStringList(tempPath + ".footer");
 
             //this.name = id;
-            item = ItemBuilder.builder(Material.valueOf(itemName)).name(name).lore(lore).toItem();
+            item = ItemBuilder.builder(Util.getCompatibleItem(itemName)).name(name).lore(lore).toItem();
 
             //g = new LootGroup()
         }

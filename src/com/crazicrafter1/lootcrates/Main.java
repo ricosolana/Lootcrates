@@ -3,6 +3,7 @@ package com.crazicrafter1.lootcrates;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Callable;
 
 import com.crazicrafter1.lootcrates.config.CommentYamlConfiguration;
 import com.crazicrafter1.lootcrates.crate.Crate;
@@ -13,6 +14,7 @@ import com.crazicrafter1.lootcrates.commands.CmdCrates;
 import com.crazicrafter1.lootcrates.listeners.*;
 import com.crazicrafter1.lootcrates.tracking.VersionChecker;
 import com.crazicrafter1.lootcrates.util.ItemBuilder;
+import com.crazicrafter1.lootcrates.util.ReflectionUtil;
 import com.crazicrafter1.lootcrates.util.Util;
 import org.bukkit.*;
 import org.bukkit.configuration.MemorySection;
@@ -103,7 +105,8 @@ public class Main extends JavaPlugin
             reloadConfigValues();
         } catch (Exception e) {
             error("Possible config issue around " + temp_path);
-            e.printStackTrace();
+            if (debug)
+                e.printStackTrace();
         }
 
 
@@ -120,11 +123,14 @@ public class Main extends JavaPlugin
                 }
 
             } catch (Exception e) {
-                error("Unable to check for updates!");
+                error("An error occurred while checking for updates");
+                if (debug)
+                    e.printStackTrace();
             }
-        } else {
+        } else if (!ReflectionUtil.isOldVersion()){
             GithubUpdater.autoUpdate(this, "PeriodicSeizures", "LootCrates", "LootCrates.jar");
-        }
+        } else
+            error("Unable to check for updates (nor update)");
 
 
 
@@ -136,16 +142,18 @@ public class Main extends JavaPlugin
 
 
 
+        try {
+            // bStats metrics
+            Metrics metrics = new Metrics(this, 10395);
+            metrics.addCustomChart(new Metrics.SimplePie("using_old_config_format", () -> String.valueOf(oldConfigFormat)));
+            info("Metrics was successfully enabled");
+        } catch (Exception e) {
+            error("An error occurred while enabling metrics");
+            if (debug)
+                e.printStackTrace();
+        }
 
-        // bStats metrics
-        Metrics metrics = new Metrics(this, 10395);
-        metrics.addCustomChart(
-                new Metrics.SimplePie("using_old_config_format", new java.util.concurrent.Callable<String>() {
-                    @Override
-                    public String call() throws Exception {
-                        return String.valueOf(oldConfigFormat);
-                    }
-                }));
+
 
         new CmdCrates();
         new TabCrates();
@@ -158,17 +166,20 @@ public class Main extends JavaPlugin
         new ListenerOnPlayerInteract();
         new ListenerOnPlayerQuit();
 
-        // the check every 1 hours
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (Crate crate : crates.values()) {
-                    crate.prepSeasonalVariant();
-                }
-            }
-        }.runTaskTimer(this, 0, 20*60*60*6); // 20 * 60 * 60 * 24
 
-        info("Everything was successfully loaded!");
+
+        if (!ReflectionUtil.isOldVersion()) {
+            // check every 1 hour
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    for (Crate crate : crates.values()) {
+                        crate.prepSeasonalVariant();
+                    }
+                }
+            }.runTaskTimer(this, 0, 20 * 60 * 60 * 6);
+        }
+
     }
 
     private boolean isOldConfigFormat() {
@@ -191,7 +202,8 @@ public class Main extends JavaPlugin
 
         debug = (boolean) a(old ? "debug-enabled" : "debug", false);
 
-        selectionSound = Sound.valueOf((String) a("selection-sound", Sound.ENTITY_EXPERIENCE_ORB_PICKUP.name()));
+        selectionSound = Sound.valueOf((String) a("selection-sound", "ENTITY_EXPERIENCE_ORB_PICKUP"));
+
         inventoryName = ChatColor.translateAlternateColorCodes('&',(String) a("inventory-name", "crate"));
         inventorySize = (int) a("inventory-size", 27);
         raffleSpeed = (int) a("raffle-speed", 4);
@@ -199,16 +211,16 @@ public class Main extends JavaPlugin
         selections = (int) a(old ? "max-selections" : "selections", selections);
 
         unSelectedItem = ItemBuilder.builder(
-                Material.matchMaterial((String) a(old ? "gui.unselected.item" : "gui.unselected.icon", null))).
-                name((String) a(old ? "gui.unselected.name" : "gui.unselected.title", null))
-                .lore((List<String>) b(old ? "gui.unselected.lore" : "gui.unselected.footer", new ArrayList<String>())).
-                        glow((boolean) b("gui.unselected.glow", false)).toItem();
+                Util.getCompatibleItem((String) a(old ? "gui.unselected.item" : "gui.unselected.icon", null)))
+                .name((String) a(old ? "gui.unselected.name" : "gui.unselected.title", null))
+                .lore((List<String>) b(old ? "gui.unselected.lore" : "gui.unselected.footer", new ArrayList<String>()))
+                        .glow((boolean) b("gui.unselected.glow", false)).toItem();
 
         selectedItem = ItemBuilder.builder(
-                Material.matchMaterial((String) a(old ? "gui.selected.item" : "gui.selected.icon", null))).
-                name((String) a(old ? "gui.selected.name" : "gui.selected.title", null))
-                .lore((List<String>) b(old ? "gui.selected.lore" : "gui.selected.footer", new ArrayList<String>())).
-                        glow((boolean) b("gui.selected.glow", false)).toItem();
+                Util.getCompatibleItem((String) a(old ? "gui.selected.item" : "gui.selected.icon", null)))
+                .name((String) a(old ? "gui.selected.name" : "gui.selected.title", null))
+                .lore((List<String>) b(old ? "gui.selected.lore" : "gui.selected.footer", new ArrayList<String>()))
+                        .glow((boolean) b("gui.selected.glow", false)).toItem();
 
         enableFirework = (boolean) a(old ? "firework-explosion" : "firework.enabled", enableFirework);
 

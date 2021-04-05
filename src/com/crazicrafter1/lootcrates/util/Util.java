@@ -24,31 +24,6 @@ public class Util {
         return (i <= max && i >= min);
     }
 
-    private static HashSet<String> dyes = new HashSet<>(Arrays.asList("BLACK", "BLUE", "BROWN", "CYAN", "GRAY", "GREEN", "LIGHT_GRAY", "LIME", "MAGENTA", "ORANGE", "PINK", "PURPLE", "RED", "WHITE", "YELLOW"));
-
-    public static ItemStack getDyeColoredItem(String name) {
-        for (String dye : dyes) {
-
-            if (name.contains(dye)) {
-
-                // then get
-                DyeColor dyeColor = DyeColor.valueOf(dye);
-
-                String itemName = name.replaceAll(dye, "");
-
-                if (itemName.startsWith("_")) itemName = itemName.replaceFirst("_", "");
-
-                Material material = Material.matchMaterial(itemName);
-
-                return new ItemStack(material, 1, dyeColor.getDyeData());
-
-            }
-
-        }
-
-        return null;
-    }
-
     public static void giveItemToPlayer(Player p, ItemStack item) {
         new BukkitRunnable() {
             @Override
@@ -79,44 +54,65 @@ public class Util {
         }.runTaskLater(Main.getInstance(), 1);
     }
 
-    @Deprecated
-    public static ItemStack getItem(String name, boolean useOldMethods) {
+    private static HashSet<String> dyes = new HashSet<>(Arrays.asList("BLACK", "BLUE", "BROWN", "CYAN", "GRAY", "GREEN", "LIGHT_GRAY", "LIME", "MAGENTA", "ORANGE", "PINK", "PURPLE", "RED", "WHITE", "YELLOW"));
 
-        if (!useOldMethods && name != null) {
-            Material mat = Material.matchMaterial(name);
-            if (mat != null)
-                return new ItemStack(mat);
-        } else {
+    private static ItemStack getDyeColoredItem(String name) {
+        for (String dye : dyes) {
 
-            ItemStack item = getDyeColoredItem(name);
+            if (name.contains(dye)) {
 
-            if (item != null) {
+                // then get
+                DyeColor dyeColor = DyeColor.valueOf(dye);
 
-                return item;
+                String itemName = name.replaceAll(dye, "");
 
-            } else {
+                if (itemName.startsWith("_")) itemName = itemName.replaceFirst("_", "");
 
-                switch (name.toUpperCase()) {
+                Material material = Material.matchMaterial(itemName);
 
-                    case "EXPERIENCE_BOTTLE": return new ItemStack(Material.EXPERIENCE_BOTTLE);
-                    case "GOLDEN_APPLE": return new ItemStack(Material.GOLDEN_APPLE, 1, (short) 0);
-                    case "ENCHANTED_GOLDEN_APPLE": return new ItemStack(Material.GOLDEN_APPLE, 1, (short) 1);
-                }
+                return new ItemStack(material, 1, dyeColor.getDyeData());
 
-                return new ItemStack(Material.matchMaterial(name));
             }
+
         }
 
-       return null;
-
+        return null;
     }
 
-    public static Color matchColor(String c)
+    public static ItemStack getCompatibleItem(String name) {
+
+        if (name == null)
+            return null;
+
+        name = name.toUpperCase();
+
+        // Modern
+        Material mat = Material.matchMaterial(name);
+        if (mat != null)
+            return new ItemStack(mat);
+
+        ItemStack item = getDyeColoredItem(name);
+
+        if (item != null)
+            return item;
+
+        switch (name) {
+            case "EXPERIENCE_BOTTLE":
+                return new ItemStack(Material.matchMaterial("EXP_BOTTLE"));
+            case "GOLDEN_APPLE":
+                return new ItemStack(Material.GOLDEN_APPLE, 1, (short) 0);
+            case "ENCHANTED_GOLDEN_APPLE":
+                return new ItemStack(Material.GOLDEN_APPLE, 1, (short) 1);
+        }
+
+        return null;
+    }
+
+    public static Color matchColor(String color)
     {
-        String color = c.toUpperCase().replaceAll(" ", "_");
         // BLUE, RED, WHITE, GRAY, GREEN, YELLOW, AQUA, BLACK, FUCHSIA, LIME, MAROON, NAVY, OLIVE
         // ORANGE, PURPLE, SILVER, TEAL
-        switch (color) {
+        switch (color.toUpperCase()) {
             case "BLUE":
                 return Color.BLUE;
             case "RED":

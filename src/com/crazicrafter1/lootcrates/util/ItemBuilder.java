@@ -144,7 +144,7 @@ public class ItemBuilder {
     }
 
     public ItemBuilder color(Color color) {
-        if (color == null)
+        if (color == null || ReflectionUtil.isOldVersion())
             return this;
 
         ItemMeta meta = itemStack.getItemMeta();

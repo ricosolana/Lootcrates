@@ -48,13 +48,12 @@ public abstract class AbstractLoot {
             min = Integer.parseInt(split[0]);
             max = Integer.parseInt(split[1]);
         }
-        Main.getInstance().debug("" + min + " " + max);
 
         if (instance.containsKey("item")) {
             result.code = Result.Code.INVALID_ITEM;
 
             String item = (String)instance.get("item");
-            ItemBuilder builder = ItemBuilder.builder(Material.matchMaterial(item));
+            ItemBuilder builder = ItemBuilder.builder(Util.getCompatibleItem(item));
 
 
             result.code = Result.Code.INVALID_NAME;
@@ -86,7 +85,6 @@ public abstract class AbstractLoot {
                 result.code = Result.Code.INVALID_COLOR;
                 if (instance.containsKey("color"))
                     builder.color(Util.matchColor((String) instance.get("color")));
-
 
                 result.code = Result.Code.INVALID_EFFECT_FORMAT;
                 LootPotionItem.QPotionEffect[] qEffects =

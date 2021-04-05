@@ -36,7 +36,11 @@ public class GithubUpdater {
                     if (main.updater.hasNewUpdate())
                         tagname = main.updater.getLatestVersion();
                 } catch (Exception e1) {
-                    e1.printStackTrace();
+                    main.error("An error occurred while updating");
+
+                    if (Main.debug)
+                        e1.printStackTrace();
+
                     return false;
                 }
 

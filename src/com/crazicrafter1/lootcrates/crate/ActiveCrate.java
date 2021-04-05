@@ -3,6 +3,7 @@ package com.crazicrafter1.lootcrates.crate;
 import java.util.*;
 
 import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.util.ReflectionUtil;
 import com.crazicrafter1.lootcrates.util.Util;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
 import org.bukkit.*;
@@ -109,6 +110,9 @@ public final class ActiveCrate {
                 {
                     ItemStack itemStack = getPlayer().getInventory().getItem(lockSlot);
                     itemStack.setAmount(itemStack.getAmount() - 1);
+                    if (ReflectionUtil.isOldVersion()) {
+                        getPlayer().getInventory().setItem(lockSlot, itemStack);
+                    }
                 }
 
                 // Invalidate lockslot, so that it may be reused for whatever (since crate was consumed)
@@ -221,7 +225,7 @@ public final class ActiveCrate {
                     //this.lootChances[slot].getRandomLoot().perform(this);
                 //    return;
                 //}
-                //Util.giveItemToPlayer(getPlayer(), inventory.getItem(slot));
+                //Util.giveItemToPlayer(getPlayer(), inventory.getCompatibleItem(slot));
             }
         //kill = true;
 

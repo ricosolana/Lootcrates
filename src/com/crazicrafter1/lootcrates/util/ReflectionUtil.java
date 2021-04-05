@@ -15,6 +15,16 @@ public final class ReflectionUtil {
     private final static String CRAFTBUKKIT = Bukkit.getServer().getClass().getPackage().getName();
     private final static String NMS = "net.minecraft.server." + CRAFTBUKKIT.substring(23);
 
+    public static boolean isOldVersion() {
+        String v = CRAFTBUKKIT.substring(23);
+        return v.contains("1_8") ||
+                v.contains("1_9") ||
+                v.contains("1_10") ||
+                v.contains("1_11") ||
+                v.contains("1_12") ||
+                v.contains("1_13");// 1.13 might be new enough
+    }
+
     // Not instantiable
     private ReflectionUtil() { }
 

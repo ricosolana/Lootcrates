@@ -2,7 +2,6 @@ package com.crazicrafter1.lootcrates.crate;
 
 import com.crazicrafter1.lootcrates.util.ItemBuilder;
 import com.crazicrafter1.lootcrates.Main;
-import com.crazicrafter1.lootcrates.Result;
 import com.crazicrafter1.lootcrates.crate.loot.LootCrate;
 import org.bukkit.Material;
 import org.bukkit.configuration.MemorySection;

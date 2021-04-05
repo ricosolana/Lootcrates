@@ -2,14 +2,12 @@ package com.crazicrafter1.lootcrates.crate;
 
 import com.crazicrafter1.lootcrates.util.ItemBuilder;
 import com.crazicrafter1.lootcrates.Main;
-import com.crazicrafter1.lootcrates.Result;
 import com.crazicrafter1.lootcrates.util.Util;
 import com.crazicrafter1.lootcrates.crate.loot.*;
 import org.bukkit.Material;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
@@ -67,6 +65,11 @@ public abstract class AbstractLoot {
             result.code = Result.Code.INVALID_LORE;
             if (instance.containsKey("lore"))
                 builder.lore((List<String>) instance.get("lore"));
+
+
+            result.code = Result.Code.INVALID_CUSTOMMODELDATA;
+            if (instance.containsKey("model"))
+                builder.customModelData((Integer) instance.get("model"));
 
 
             result.code = Result.Code.INVALID_COMMAND;

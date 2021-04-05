@@ -1,4 +1,4 @@
-package com.crazicrafter1.lootcrates;
+package com.crazicrafter1.lootcrates.crate;
 
 public class Result {
 
@@ -14,6 +14,7 @@ public class Result {
         INVALID_ITEM,
         INVALID_NAME,
         INVALID_LORE,
+        INVALID_CUSTOMMODELDATA,
         INVALID_COLOR,
         INVALID_GLOW,
         INVALID_EFFECT_FORMAT,

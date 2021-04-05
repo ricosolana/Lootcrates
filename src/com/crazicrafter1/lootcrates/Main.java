@@ -110,9 +110,6 @@ public class Main extends JavaPlugin
 
         autoUpdate = (boolean) a("auto-update", true);
 
-        //if (saveTheConfig)
-        //    this.saveConfig();
-
         if (!autoUpdate) {
             try {
                 if (updater.hasNewUpdate()) {
@@ -324,11 +321,6 @@ public class Main extends JavaPlugin
     public void debug(String s) {
         if (debug)
             Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.YELLOW + s);
-    }
-
-    @Override
-    public void onDisable() {
-
     }
 
     @Override

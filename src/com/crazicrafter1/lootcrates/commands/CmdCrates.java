@@ -37,15 +37,13 @@ public class CmdCrates extends CmdBase {
                 if (crate == null)
                     return error(sender, "That crate doesn't exist");
 
-                feedback(sender, crate.getId());
-
                 int count = 1;
 
                 // crates crate legendary crazicrafter1 5
                 if (args.length == 4) {
                     IntegerC wrapped = new IntegerC();
                     if (Util.toInt(args[3], wrapped)) {
-                        count = wrapped.value; //crateItem.setAmount(Util.toInt(args[3]));
+                        count = wrapped.value;
                         if (count <= 0) return error(sender, "Count must be greater than 0");
                     } else return error(sender, "Count must be numeric");
                 }

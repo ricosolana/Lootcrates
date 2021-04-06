@@ -156,9 +156,14 @@ public final class Crate {
         Object nmsStack = ReflectionUtil.invokeStaticMethod(asNMSCopyMethod, itemStack);
 
 
+        // if player was holding nothing i guess
+        if (nmsStack == null)
+            return null;
+
+
         //NBTTagCompound nbt = nmsStack.getOrCreateTag();
-        Method getOrCreateTagMethod = ReflectionUtil.getMethod(nmsStack.getClass(), "getTag");
-        Object nbt = ReflectionUtil.invokeMethod(getOrCreateTagMethod, nmsStack);
+        Method getTagMethod = ReflectionUtil.getMethod(nmsStack.getClass(), "getTag");
+        Object nbt = ReflectionUtil.invokeMethod(getTagMethod, nmsStack);
 
         if (nbt == null)
             return null;

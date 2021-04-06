@@ -67,7 +67,7 @@ public class CmdCrates extends CmdBase {
                 }
             } case "reload":
                 feedback(sender, "Reloading config...");
-                Main.getInstance().reloadConfigValues();
+                plugin.reloadConfigValues();
                 return feedback(sender, "Config was reloaded.");
             case "editor":
                 if (plugin.editor != null) {

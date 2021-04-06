@@ -5,6 +5,7 @@ import com.crazicrafter1.lootcrates.util.ItemBuilder;
 import com.crazicrafter1.lootcrates.util.ReflectionUtil;
 import com.crazicrafter1.lootcrates.util.Util;
 import com.sun.istack.internal.NotNull;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -150,6 +151,8 @@ public final class Crate {
         //String name = meta.getDisplayName();
         //return Main.crates.getOrDefault(Main.crateNameIds.getOrDefault(name, null), null);
 
+        if (itemStack.getType() == Material.AIR)
+            return null;
 
         //net.minecraft.server.v1_14_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
         Class<?> craftItemStackClass = ReflectionUtil.getCraftClass("inventory.CraftItemStack");

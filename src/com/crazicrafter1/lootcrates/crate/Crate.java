@@ -162,8 +162,8 @@ public final class Crate {
 
 
         // if player was holding nothing i guess
-        if (nmsStack == null)
-            return null;
+        //if (nmsStack == null)
+        //    return null;
 
 
         //NBTTagCompound nbt = nmsStack.getOrCreateTag();

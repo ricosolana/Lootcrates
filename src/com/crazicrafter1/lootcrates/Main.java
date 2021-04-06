@@ -43,7 +43,6 @@ public class Main extends JavaPlugin
     public static FireworkEffect fireworkEffect = null;
 
     public static HashMap<String, Crate> crates = new HashMap<>();
-    public static HashMap<String, String> crateNameIds = new HashMap<>();
     public static HashMap<String, LootGroup> lootGroups = new HashMap<>();
 
     VersionChecker updater = new VersionChecker(this, 68424);
@@ -186,6 +185,9 @@ public class Main extends JavaPlugin
             }
             reloadConfig();
 
+            crates.clear();
+            lootGroups.clear();
+
             boolean old = oldConfigFormat = isOldConfigFormat();
 
             if (old)
@@ -201,7 +203,11 @@ public class Main extends JavaPlugin
             selectionSound = Sound.valueOf((String) a("selection-sound", "ENTITY_EXPERIENCE_ORB_PICKUP"));
 
             inventoryName = ChatColor.translateAlternateColorCodes('&', (String) a("inventory-name", "crate"));
-            inventorySize = (int) a("inventory-size", 27);
+            inventorySize = (int) a("inventory-size", 3) * 9;
+
+            if (inventorySize < 0 || inventorySize > 6*9)
+                error("inventory-size is invalid (must be [1, 6])");
+
             raffleSpeed = (int) a("raffle-speed", 4);
 
             selections = (int) a(old ? "max-selections" : "selections", selections);
@@ -274,7 +280,6 @@ public class Main extends JavaPlugin
                 Crate crate = new Crate(id, builder.toItem());
 
                 Main.crates.put(id, crate);
-                Main.crateNameIds.put(builder.toItem().getItemMeta().getDisplayName(), id);
             }
 
             // 3rd: load all lootgroups, using basic crate data if needed

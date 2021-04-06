@@ -9,6 +9,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.FileOutputStream;
@@ -112,6 +113,7 @@ public class Util {
     {
         // BLUE, RED, WHITE, GRAY, GREEN, YELLOW, AQUA, BLACK, FUCHSIA, LIME, MAROON, NAVY, OLIVE
         // ORANGE, PURPLE, SILVER, TEAL
+
         switch (color.toUpperCase()) {
             case "BLUE":
                 return Color.BLUE;
@@ -299,6 +301,91 @@ public class Util {
             case "WATER_WORKER":
             case "AQUA_AFFINITY":
                 return Enchantment.WATER_WORKER;
+            default:
+                return null;
+        }
+    }
+
+    public static PotionEffectType matchPotionEffectType(String effect)
+    {
+        String e = effect.toUpperCase().replaceAll(" ", "_");
+
+        switch (e) {
+            case "ABSORPTION":
+                return PotionEffectType.ABSORPTION;
+            case "BAD_OMEN":
+                return PotionEffectType.BAD_OMEN;
+            case "BLINDNESS":
+                return PotionEffectType.BLINDNESS;
+            case "CONDUIT_POWER":
+                return PotionEffectType.CONDUIT_POWER;
+            case "CONFUSION":
+            case "NAUSEA":
+                return PotionEffectType.CONFUSION;
+            case "DAMAGE_RESISTANCE":
+            case "RESISTANCE":
+                return PotionEffectType.DAMAGE_RESISTANCE;
+            case "DOLPHINS_GRACE":
+                return PotionEffectType.DOLPHINS_GRACE;
+            case "FAST_DIGGING":
+            case "HASTE":
+                return PotionEffectType.FAST_DIGGING;
+            case "FIRE_RESISTANCE":
+                return PotionEffectType.FIRE_RESISTANCE;
+            case "GLOWING":
+                return PotionEffectType.GLOWING;
+            case "HARM":
+            case "INSTANT_DAMAGE":
+                return PotionEffectType.HARM;
+            case "HEAL":
+            case "INSTANT_HEALTH":
+                return PotionEffectType.HEAL;
+            case "HEALTH_BOOST":
+                return PotionEffectType.HEALTH_BOOST;
+            case "HERO_OF_THE_VILLAGE":
+                return PotionEffectType.HERO_OF_THE_VILLAGE;
+            case "HUNGER":
+                return PotionEffectType.HUNGER;
+            case "INCREASE_DAMAGE":
+            case "STRENGTH":
+                return PotionEffectType.INCREASE_DAMAGE;
+            case "INVISIBILITY":
+                return PotionEffectType.INVISIBILITY;
+            case "JUMP":
+            case "JUMP_BOOST":
+                return PotionEffectType.JUMP;
+            case "LEVITATION":
+                return PotionEffectType.LEVITATION;
+            case "LUCK":
+                return PotionEffectType.LUCK;
+            case "NIGHT_VISION":
+                return PotionEffectType.NIGHT_VISION;
+            case "POISON":
+                return PotionEffectType.POISON;
+            case "REGENERATION":
+                return PotionEffectType.REGENERATION;
+            case "SATURATION":
+                return PotionEffectType.SATURATION;
+            case "SLOW":
+            case "SLOWNESS":
+                return PotionEffectType.SLOW;
+            case "SLOW_DIGGING":
+            case "MINING_FATIGUE":
+                return PotionEffectType.SLOW_DIGGING;
+            case "SLOW_FALLING":
+                return PotionEffectType.SLOW_FALLING;
+            case "SPEED":
+            case "SWIFTNESS":
+                return PotionEffectType.SPEED;
+            case "UNLUCK":
+            case "BAD_LUCK":
+                return PotionEffectType.UNLUCK;
+            case "WATER_BREATHING":
+                return PotionEffectType.WATER_BREATHING;
+            case "WEAKNESS":
+                return PotionEffectType.WEAKNESS;
+            case "WITHER":
+                return PotionEffectType.WITHER;
             default:
                 return null;
         }

@@ -102,7 +102,7 @@ public abstract class AbstractLoot {
                     Map<String, Object> enchantMap = (Map<String, Object>) list.get(i);
 
                     result.code = Result.Code.INVALID_EFFECT;
-                    PotionEffectType effect = PotionEffectType.getByName(((String)enchantMap.get("effect")).toUpperCase());
+                    PotionEffectType effect = Util.matchPotionEffectType(((String)enchantMap.get("effect")));
                     if (effect == null)
                         throw new RuntimeException(new Exception());
 

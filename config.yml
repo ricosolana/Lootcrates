@@ -28,25 +28,23 @@
 # DEBUG MODE
 debug: false
 
-# scroll speed (multiples of 20)
-# if set to 0, will instantly reveal items
-# 2 = 1 item / 2 ticks
-# 5 = 1 item / 5 ticks
-# etc ...
+# crate reveal speed
+# 0 will instantly reveal items
+# measured in ticks/slot
+# should be a number that is a multiple of 20
 raffle-speed: 4
 
 # selection sound
-# do "none" for no sound
 # ENTITY_EXPERIENCE_ORB_PICKUP
 selection-sound: ENTITY_EXPERIENCE_ORB_PICKUP # ORB_PICKUP <for older versions> (includes: 1.8)
 
 # name of crate inventory
 inventory-name: "&8Opening supply crate"
 
-# size of crate (multiple of 9)
-inventory-size: 27
+# height of crate [1, 6]
+inventory-size: 3
 
-# selections that player can make
+# number of loot selections
 selections: 4
 
 # auto-update from Github
@@ -54,12 +52,6 @@ auto-update: true
 
 # seasonal crates?
 seasonal: true
-
-# create backups of this config.yml
-# when changes to crates are made ingame?
-# (might help with avoiding data loss after fatal crashes)
-# backup: true
-
 
 
 
@@ -71,6 +63,8 @@ seasonal: true
 #      / / / / / //  __// / / // /_/ /
 #     /_/ /_/ /_/ \___//_/ /_/ \__,_/
 #
+
+
 
 
 
@@ -233,6 +227,8 @@ crates:
 
 # Enchantable items and potions will ignore any 'count' key
 
+# Enchantment/potion levels/amplifiers are uncapped
+
 # Commands can added only to those with the key of `item`
 
 # Durations (duration) for potion effects follow the same above
@@ -260,11 +256,10 @@ loot:
       lore:
         - "&o&8become as fast as &elightning"
       effects:
-        # see https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/potion/PotionEffectType.html
         - effect: SPEED
           amp: 2
           duration: 3600
-        - effect: FAST_DIGGING
+        - effect: HASTE
           amp: 1
           duration: 24000
     - item: tnt

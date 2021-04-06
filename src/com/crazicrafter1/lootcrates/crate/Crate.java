@@ -61,9 +61,11 @@ public final class Crate {
     }
 
     public void prepSeasonalVariant() {
-        if (Main.seasonal)
-            seasonalVariant = ItemBuilder.builder(Crate.makeCrate(Seasonal.getSeasonalItem(), id)).mergeLexicals(this.itemStack).toItem();
-        else seasonalVariant = null;
+        ItemStack rawSeasonal = Seasonal.getSeasonalItem();
+        if (rawSeasonal == null)
+            seasonalVariant = null;
+        else
+            seasonalVariant = ItemBuilder.builder(Crate.makeCrate(rawSeasonal, id)).mergeLexicals(this.itemStack).toItem();
     }
 
     LootGroup getBasedRandom() {

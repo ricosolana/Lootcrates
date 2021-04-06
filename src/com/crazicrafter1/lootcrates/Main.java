@@ -164,9 +164,10 @@ public class Main extends JavaPlugin
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    for (Crate crate : crates.values()) {
-                        crate.prepSeasonalVariant();
-                    }
+                    if (Main.seasonal)
+                        for (Crate crate : crates.values()) {
+                            crate.prepSeasonalVariant();
+                        }
                 }
             }.runTaskTimer(this, 0, 20 * 60 * 60 * 6);
         }
@@ -205,8 +206,10 @@ public class Main extends JavaPlugin
             inventoryName = ChatColor.translateAlternateColorCodes('&', (String) a("inventory-name", "crate"));
             inventorySize = (int) a("inventory-size", 3) * 9;
 
-            if (inventorySize < 0 || inventorySize > 6*9)
+            if (inventorySize < 0 || inventorySize > 6*9) {
+                inventorySize = 27;
                 error("inventory-size is invalid (must be [1, 6])");
+            }
 
             raffleSpeed = (int) a("raffle-speed", 4);
 

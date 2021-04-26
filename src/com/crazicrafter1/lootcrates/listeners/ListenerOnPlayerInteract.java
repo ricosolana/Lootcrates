@@ -17,7 +17,7 @@ public class ListenerOnPlayerInteract extends BaseListener {
         plugin.debug("Player interact caught");
         Player p = e.getPlayer();
 
-        if (!p.hasPermission("crates.open"))
+        if (!p.hasPermission("lootcrates.open"))
             return;
 
         if (!Main.openCrates.containsKey(p.getUniqueId()))

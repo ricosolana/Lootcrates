@@ -1,6 +1,6 @@
 name: LootCrates
 main: com.crazicrafter1.lootcrates.Main
-version: 3.1.3 # 3.1.2 was previous
+version: 3.1.4 # 3.1.2 was previous
 api-version: 1.16
 author: crazicrafter1
 softdepend: [QualityArmory, GraphicalAPI]
@@ -11,12 +11,16 @@ commands:
     permission: lootcrates.admin
     aliases: [crates]
 permissions:
-  crates.open:
+  lootcrates.open:
     description: Allow for users to open crates
     default: true
-  crates.admin:
+  lootcrates.admin:
     description: Allows access to /crates command
     default: op
+
+# 3.1.4 (4/26/2021)
+# rename permissions
+
 
 # 3.1.3 (4/6/2021)
 # fixed an uncaught error when clicking

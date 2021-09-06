@@ -2,7 +2,6 @@ package com.crazicrafter1.lootcrates.listeners;
 
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
-import com.crazicrafter1.lootcrates.util.ReflectionUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
@@ -35,8 +34,10 @@ public class ListenerOnPlayerInteract extends BaseListener {
                 if (crate != null) {
                     plugin.debug("Successful crate validation");
 
-                    plugin.debug(p.getDisplayName() + " has just opened a " + crate.getId() + " crate");
-                    Crate.openCrate(p, crate.getId(), p.getInventory().getHeldItemSlot());
+
+
+                    plugin.debug(p.getDisplayName() + " has just opened a " + crate.getName() + " crate");
+                    Crate.openCrate(p, crate.getName(), p.getInventory().getHeldItemSlot());
 
                     e.setCancelled(true);
 

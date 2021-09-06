@@ -8,12 +8,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class GithubUpdater {
 
-    public static boolean autoUpdate(final Main main, String author, String githubProject, String jarname) {
+    public static boolean autoUpdate(final Main plugin, String author, String githubProject, String jarname) {
         try {
 
             String tagname;
             String s = "https://api.github.com/repos/" + author + "/" + githubProject + "/releases/latest";
-            main.debug("autoupdater url: " + s);
+            plugin.debug("autoupdater url: " + s);
             URL api = new URL(s);
             URLConnection con = api.openConnection();
             con.setConnectTimeout(15000);
@@ -33,10 +33,10 @@ public class GithubUpdater {
             } catch (Exception e) {
                 //e.printStackTrace();
                 try {
-                    if (main.updater.hasNewUpdate())
-                        tagname = main.updater.getLatestVersion();
+                    if (plugin.updater.hasNewUpdate())
+                        tagname = plugin.updater.getLatestVersion();
                 } catch (Exception e1) {
-                    main.error("An error occurred while updating");
+                    plugin.error("An error occurred while updating");
 
                     if (Main.debug)
                         e1.printStackTrace();
@@ -49,27 +49,25 @@ public class GithubUpdater {
 
             latestVersion = Integer.parseInt(tagname.replaceAll("\\.", ""));
 
-            final int myVersion = Integer.parseInt(main.getDescription().getVersion().replaceAll("\\.", ""));
+            final int myVersion = Integer.parseInt(plugin.getDescription().getVersion().replaceAll("\\.", ""));
 
             s = "https://github.com/" + author + "/" + githubProject + "/releases/download/"
                     + tagname + "/" + jarname;
-            main.debug("download url: " + s);
+            plugin.debug("download url: " + s);
             final URL download = new URL(s);
 
-            main.debug("latestVersion: " + latestVersion);
-            main.debug("myVersion: " + myVersion);
+            plugin.debug("latestVersion: " + latestVersion);
+            plugin.debug("myVersion: " + myVersion);
 
             if (latestVersion > myVersion) {
-                main.important(ChatColor.GREEN + "Found a new version of " + ChatColor.GOLD
-                                + main.getDescription().getName() + ": " + ChatColor.WHITE + tagname
+                plugin.important(ChatColor.GREEN + "Found a new version of " + ChatColor.GOLD
+                                + plugin.getDescription().getName() + ": " + ChatColor.WHITE + tagname
                                 + ChatColor.LIGHT_PURPLE + " downloading now!");
 
                 new BukkitRunnable() {
-
                     @Override
                     public void run() {
                         try {
-
                             InputStream in = download.openStream();
 
                             File pluginFile;
@@ -88,7 +86,7 @@ public class GithubUpdater {
                             // }
 
                             // Copy the current plugin to 'plugin-backup.jar'
-                            File tempInCaseSomethingGoesWrong = new File(main.getName() + "-backup.jar");
+                            File tempInCaseSomethingGoesWrong = new File(plugin.getName() + "-backup.jar");
                             copy(new FileInputStream(pluginFile), new FileOutputStream(tempInCaseSomethingGoesWrong));
 
 
@@ -108,6 +106,24 @@ public class GithubUpdater {
                                 // Plugin is valid, and we can delete the temp
                                 tempInCaseSomethingGoesWrong.delete();
                             }
+
+                            // create a daemon thread to run outside this
+
+                            //plugin.important("Disabling plugin, then restarting in 5 seconds");
+
+                            //new Thread(new Runnable() {
+                            //    @Override
+                            //    public void run() {
+                            //        try {
+                            //            this.wait(5000);
+                            //            Main.getInstance().important("This ran inside daemon!");
+                            //        } catch (Exception e) {
+                            //            e.printStackTrace();
+                            //        }
+                            //    }
+                            //}).setDaemon(true);
+
+
 
                             //main.debug("delaying new thread for reload");
 
@@ -142,13 +158,13 @@ public class GithubUpdater {
                             //main.debug("disabling lootcrates for githubupdater");
                             //Bukkit.getPluginManager().disablePlugin(main);
 
-                            main.info("Please restart the server to take advantages of the changes present in the update!");
+                            plugin.info("Please restart the server to take advantages of the changes present in the update!");
 
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
-                }.runTaskAsynchronously(main);
+                }.runTaskAsynchronously(plugin);
                 return true;
             }
         } catch (IOException e) {

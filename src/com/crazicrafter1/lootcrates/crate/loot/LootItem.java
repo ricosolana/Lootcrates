@@ -1,5 +1,7 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
+import com.crazicrafter1.lootcrates.crate.ActiveCrate;
+import com.crazicrafter1.lootcrates.util.Bool;
 import com.crazicrafter1.lootcrates.util.Util;
 import com.crazicrafter1.lootcrates.crate.AbstractLoot;
 import org.bukkit.inventory.ItemStack;
@@ -15,11 +17,18 @@ public class LootItem extends AbstractLoot {
     }
 
     @Override
-    public ItemStack getAccurateVisual() {
-        ItemStack itemStack = this.getBaseVisual();
+    public ItemStack getIcon() {
+        ItemStack itemStack = super.getIcon();
         itemStack.setAmount(Util.randomRange(min, max));
         return itemStack;
     }
 
-
+    @Override
+    public void execute(ActiveCrate activeCrate, boolean closed, Bool giveItem) {
+        // if inventory was closed, items must be automatically given
+        if (closed) {
+            Util.giveItemToPlayer(activeCrate.getPlayer(), getIcon());
+        } else
+            giveItem.value = true;
+    }
 }

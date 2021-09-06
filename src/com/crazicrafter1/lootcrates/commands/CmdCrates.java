@@ -1,8 +1,6 @@
 package com.crazicrafter1.lootcrates.commands;
 
-import com.crazicrafter1.guiapi.GraphicalAPI;
-import com.crazicrafter1.lootcrates.Main;
-import com.crazicrafter1.lootcrates.util.IntegerC;
+import com.crazicrafter1.lootcrates.util.Int;
 import com.crazicrafter1.lootcrates.util.Util;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import org.bukkit.Bukkit;
@@ -12,8 +10,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Collection;
 
 public class CmdCrates extends CmdBase {
 
@@ -32,7 +28,7 @@ public class CmdCrates extends CmdBase {
             case "crate": {
                 if (args.length < 3) return error(sender, "Input more arguments");
 
-                Crate crate = Crate.crateByID(args[1]);
+                Crate crate = Crate.crateByName(args[1]);
 
                 if (crate == null)
                     return error(sender, "That crate doesn't exist");
@@ -41,7 +37,7 @@ public class CmdCrates extends CmdBase {
 
                 // crates crate legendary crazicrafter1 5
                 if (args.length == 4) {
-                    IntegerC wrapped = new IntegerC();
+                    Int wrapped = new Int();
                     if (Util.toInt(args[3], wrapped)) {
                         count = wrapped.value;
                         if (count <= 0) return error(sender, "Count must be greater than 0");
@@ -65,11 +61,11 @@ public class CmdCrates extends CmdBase {
                     }
                     return feedback(sender, "Gave " + count + " " + args[1] + " crate to all players (" + ChatColor.LIGHT_PURPLE + players.size() + ChatColor.GRAY + " online)");
                 }
-            } case "reload":
+            } case "reload": {
                 feedback(sender, "Reloading config...");
                 plugin.reloadConfigValues();
                 return feedback(sender, "Config was reloaded.");
-            case "editor":
+            } /*case "editor": {
                 if (plugin.editor != null) {
                     if (sender instanceof Player) {
                         GraphicalAPI.openMenu((Player) sender, plugin.editor.MAIN_MENU);
@@ -78,19 +74,18 @@ public class CmdCrates extends CmdBase {
                     return error(sender, "Can only be executed by a player");
                 }
                 return error(sender, "GraphicalAPI was not found or MC version is not 1.14+");
-            case "version":
+            }*/ case "version":
                 return feedback(sender, "LootCrates version: " + plugin.getDescription().getVersion());
             case "flair":
                 return error(sender, "Unimplemented");
             case "detect": {
-                if (!(sender instanceof Player))
+                if (!(sender instanceof Player p))
                     return error(sender, "Only a player can execute this argument");
-                Player p = (Player) sender;
                 ItemStack itemStack = p.getInventory().getItemInMainHand();
                 if (itemStack.getType() != Material.AIR) {
                     Crate crate = Crate.crateByItem(itemStack);
                     if (crate != null) {
-                        return feedback(sender, "Item is a crate (" + crate.getId() + ")");
+                        return feedback(sender, "Item is a crate (" + crate.getName() + ")");
                     } else {
                         return feedback(sender, "Item is a not a crate");
                     }

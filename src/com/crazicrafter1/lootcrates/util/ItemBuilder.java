@@ -1,6 +1,7 @@
 package com.crazicrafter1.lootcrates.util;
 
 //import net.minecraft.server.v1_14_R1.*;
+import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.util.refl.GameProfileMirror;
 import com.crazicrafter1.lootcrates.util.refl.PropertyMirror;
 import org.bukkit.Bukkit;
@@ -186,11 +187,19 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder glow(boolean state){
-        if (!state) return this;
+    /**
+     * Doesn't work correctly in 1.17
+     */
+    @Deprecated
+    public ItemBuilder glow(boolean state) {
 
-        itemStack.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 0);
+        if (true)
+            return this;
+
+        if (!state) return this;
+        //itemStack.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1);
         ItemMeta meta = itemStack.getItemMeta();
+        meta.addEnchant(Enchantment.DAMAGE_ALL, 1, false);
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         itemStack.setItemMeta(meta);
         return this;

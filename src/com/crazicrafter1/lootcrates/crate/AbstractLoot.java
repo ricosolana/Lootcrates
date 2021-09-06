@@ -1,11 +1,10 @@
 package com.crazicrafter1.lootcrates.crate;
 
+import com.crazicrafter1.lootcrates.util.Bool;
 import com.crazicrafter1.lootcrates.util.ItemBuilder;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.util.Util;
 import com.crazicrafter1.lootcrates.crate.loot.*;
-import org.bukkit.Material;
-import org.bukkit.configuration.MemorySection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
@@ -14,31 +13,40 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * TODO
+ *  Abstract loot class is more or less abstracted config data
+ *
+ *  ActiveLoot is a loot that has calculated values upon being revealed
+ *      - what to show on reveal
+ *      - what to do on click
+ */
 public abstract class AbstractLoot {
 
-    private final ItemStack baseVisual;
+    private final ItemStack icon;
 
     public AbstractLoot(ItemStack baseVisual) {
-        this.baseVisual = baseVisual;
+        this.icon = baseVisual;
     }
 
-    protected final ItemStack getBaseVisual() {
-        return baseVisual.clone();
+    public ItemStack getIcon() {
+        return icon;
     }
 
-    public abstract ItemStack getAccurateVisual();
+    /*
+     * do nothing by default
+     */
+    public abstract void execute(ActiveCrate activeCrate, boolean closed, Bool giveItem);
 
-    public void perform(ActiveCrate activeCrate) {
-        Util.giveItemToPlayer(activeCrate.getPlayer(), getAccurateVisual());
-    }
+
 
     @SuppressWarnings({"unchecked"})
-    static AbstractLoot fromNewConfig(Map<String, Object> instance, Result result) {
+    static AbstractLoot fromNewConfig(Map<String, Object> instance, EnumParseResult result) {
 
         int min = 1, max = 1;
 
         Object _count = instance.getOrDefault("count", null);
-        result.code = Result.Code.INVALID_COUNT;
+        result.code = EnumParseResult.Code.INVALID_COUNT;
         if (instance.get("count") instanceof Integer) {
             min = (int)instance.get("count");
             max = min;
@@ -50,28 +58,28 @@ public abstract class AbstractLoot {
         }
 
         if (instance.containsKey("item")) {
-            result.code = Result.Code.INVALID_ITEM;
+            result.code = EnumParseResult.Code.INVALID_ITEM;
 
             String item = (String)instance.get("item");
             ItemBuilder builder = ItemBuilder.builder(Util.getCompatibleItem(item));
 
 
-            result.code = Result.Code.INVALID_NAME;
+            result.code = EnumParseResult.Code.INVALID_NAME;
             if (instance.containsKey("name"))
                 builder.name((String)instance.get("name"));
 
 
-            result.code = Result.Code.INVALID_LORE;
+            result.code = EnumParseResult.Code.INVALID_LORE;
             if (instance.containsKey("lore"))
                 builder.lore((List<String>) instance.get("lore"));
 
 
-            result.code = Result.Code.INVALID_CUSTOMMODELDATA;
+            result.code = EnumParseResult.Code.INVALID_CUSTOMMODELDATA;
             if (instance.containsKey("model"))
                 builder.customModelData((Integer) instance.get("model"));
 
 
-            result.code = Result.Code.INVALID_COMMAND;
+            result.code = EnumParseResult.Code.INVALID_COMMAND;
             if (instance.containsKey("command")) {
                 Main.getInstance().debug("Command type");
                 List<String> commands = (List<String>) instance.get("command");
@@ -82,13 +90,13 @@ public abstract class AbstractLoot {
             if (instance.containsKey("effects") && item.contains("potion")) {
 
 
-                result.code = Result.Code.INVALID_COLOR;
+                result.code = EnumParseResult.Code.INVALID_COLOR;
                 if (instance.containsKey("color"))
                     builder.color(Util.matchColor((String) instance.get("color")));
 
-                result.code = Result.Code.INVALID_EFFECT_FORMAT;
-                LootPotionItem.QPotionEffect[] qEffects =
-                        new LootPotionItem.QPotionEffect[((List)instance.get("effects")).size()];
+                result.code = EnumParseResult.Code.INVALID_EFFECT_FORMAT;
+                LootItemPotion.QPotionEffect[] qEffects =
+                        new LootItemPotion.QPotionEffect[((List)instance.get("effects")).size()];
 
                 // then read enchants
                 //noinspection unchecked
@@ -101,17 +109,17 @@ public abstract class AbstractLoot {
                     //noinspection unchecked
                     Map<String, Object> enchantMap = (Map<String, Object>) list.get(i);
 
-                    result.code = Result.Code.INVALID_EFFECT;
+                    result.code = EnumParseResult.Code.INVALID_EFFECT;
                     PotionEffectType effect = Util.matchPotionEffectType(((String)enchantMap.get("effect")));
                     if (effect == null)
                         throw new RuntimeException(new Exception());
 
-                    result.code = Result.Code.INVALID_EFFECT_AMPLIFIER;
+                    result.code = EnumParseResult.Code.INVALID_EFFECT_AMPLIFIER;
                     int amp = (int)enchantMap.get("amp");
 
                     int emin, emax;
 
-                    result.code = Result.Code.INVALID_DURATION;
+                    result.code = EnumParseResult.Code.INVALID_DURATION;
                     Object _duration = enchantMap.get("duration");
                     if (_duration instanceof Integer) {
                         emin = (int)_duration;
@@ -123,17 +131,17 @@ public abstract class AbstractLoot {
                         emax = Integer.parseInt(split[1]);
                     }
 
-                    qEffects[i] = new LootPotionItem.QPotionEffect(effect, emin, emax, amp);
+                    qEffects[i] = new LootItemPotion.QPotionEffect(effect, emin, emax, amp);
                 }
 
-                return new LootPotionItem(builder.toItem(), qEffects);
+                return new LootItemPotion(builder.toItem(), qEffects);
             }
 
 
-            result.code = Result.Code.INVALID_ENCHANT_FORMAT;
+            result.code = EnumParseResult.Code.INVALID_ENCHANT_FORMAT;
             if (instance.containsKey("enchantments")) {
-                LootEnchantableItem.QEnchantment[] qEnchantments =
-                        new LootEnchantableItem.QEnchantment[((List)instance.get("enchantments")).size()];
+                LootItemEnchantable.QEnchantment[] qEnchantments =
+                        new LootItemEnchantable.QEnchantment[((List)instance.get("enchantments")).size()];
 
                 // then read enchants
                 List list = ((List)instance.get("enchantments"));
@@ -143,7 +151,7 @@ public abstract class AbstractLoot {
 
                     Map<String, Object> enchantMap = (Map<String, Object>) list.get(i);
 
-                    result.code = Result.Code.INVALID_ENCHANT;
+                    result.code = EnumParseResult.Code.INVALID_ENCHANT;
                     Enchantment enchantment = Util.matchEnchant((String)enchantMap.get("enchant"));
 
                     if (enchantment == null)
@@ -151,7 +159,7 @@ public abstract class AbstractLoot {
 
                     int emin, emax;
 
-                    result.code = Result.Code.INVALID_LEVEL;
+                    result.code = EnumParseResult.Code.INVALID_LEVEL;
                     Object _level = enchantMap.get("level");
                     if (_level instanceof Integer) {
                         emin = (int)_level;
@@ -162,13 +170,13 @@ public abstract class AbstractLoot {
                         emax = Integer.parseInt(split[1]);
                     }
 
-                    qEnchantments[i] = new LootEnchantableItem.QEnchantment(enchantment, emin, emax);
+                    qEnchantments[i] = new LootItemEnchantable.QEnchantment(enchantment, emin, emax);
                 }
 
-                return new LootEnchantableItem(builder.toItem(), qEnchantments);
+                return new LootItemEnchantable(builder.toItem(), qEnchantments);
             }
 
-            result.code = Result.Code.INVALID_GLOW;
+            result.code = EnumParseResult.Code.INVALID_GLOW;
             if (instance.containsKey("glow"))
                 builder.glow(true);
 
@@ -176,103 +184,18 @@ public abstract class AbstractLoot {
 
         } else if (instance.containsKey("qa") && Main.supportQualityArmory) {
             // qa item
-            result.code = Result.Code.INVALID_QA;
-            return new LootQA((String)instance.get("qa"), min, max);
+            result.code = EnumParseResult.Code.INVALID_QA;
+            return new LootItemQA((String)instance.get("qa"), min, max);
         }  else if (instance.containsKey("crate")) {
             // crate
-            result.code = Result.Code.INVALID_CRATE;
+            result.code = EnumParseResult.Code.INVALID_CRATE;
             String _crate = (String) instance.get("crate");
             Crate crate = Main.crates.get(_crate);
-            return new LootCrate(crate, min, max);
+            return new LootItemCrate(crate, min, max);
         }
 
-        result.code = Result.Code.INVALID_LOOT;
+        result.code = EnumParseResult.Code.INVALID_LOOT;
 
         return null;
     }
-
-
-
-    @SuppressWarnings({"ConstantConditions", "unchecked"})
-    static AbstractLoot fromOldConfig(MemorySection instance, Result result) {
-        /*
-            Will hold the value of the current path being tested in the case
-            of an error, can print the path of issue
-         */
-
-        int min = 1, max = min;
-
-        result.code = Result.Code.INVALID_COUNT;
-        if (instance.contains("count")) {
-            min = (int)instance.get("count");
-            max = min;
-        } else if (instance.contains("range")) {
-            result.code = Result.Code.INVALID_RANGE;
-            String[] split = ((String)instance.get("range")).split(" ");
-            min = Integer.parseInt(split[0]);
-            max = Integer.parseInt(split[1]);
-        }
-
-        result.code = Result.Code.INVALID_ITEM;
-        if (instance.contains("item")) {
-
-            ItemBuilder builder = ItemBuilder.builder(Material.matchMaterial((String)instance.get("item")));
-
-
-            result.code = Result.Code.INVALID_NAME;
-            if (instance.contains("name"))
-                builder.name((String)instance.get("name"));
-
-
-            result.code = Result.Code.INVALID_LORE;
-            if (instance.contains("lore"))
-                builder.lore((List<String>) instance.get("lore"));
-
-
-            result.code = Result.Code.INVALID_COMMAND;
-            if (instance.contains("command")) {
-                Main.getInstance().debug(instance.get("command").getClass().getName());
-                ArrayList<String> commands = (ArrayList<String>) instance.get("command");
-
-                String[] arr = commands.toArray(new String[0]);
-                Main.getInstance().debug(arr[0]);
-                return new LootCommand(builder.toItem(), arr);
-            }
-
-
-
-            result.code = Result.Code.INVALID_ENCHANT_FORMAT;
-            if (instance.contains("enchantments")) {
-                ArrayList<LootEnchantableItem.QEnchantment> qEnchantments = new ArrayList<>();
-                MemorySection enchantSection = (MemorySection) instance.get("enchantments");
-
-                // iterate the entries
-                result.code = Result.Code.INVALID_ENCHANT;
-                for (String enchantKey : enchantSection.getKeys(false)) {
-                    int level = (int)((MemorySection)enchantSection.get(enchantKey)).get("level");
-                    Enchantment enchantment = Util.matchEnchant(enchantKey);
-
-                    qEnchantments.add(new LootEnchantableItem.QEnchantment(enchantment, level, level));
-                }
-
-                return new LootEnchantableItem(builder.toItem(), qEnchantments.toArray(
-                        new LootEnchantableItem.QEnchantment[0]));
-            }
-
-            return new LootItem(builder.toItem(), min, max);
-
-        } else if (instance.contains("qa-item") && Main.supportQualityArmory) {
-            // qa item
-            result.code = Result.Code.INVALID_QA;
-            String name = (String)instance.get("qa-item");
-            return new LootQA(name, min, max);
-
-        }
-
-        result.code = Result.Code.INVALID_LOOT;
-
-        return null;
-
-    }
-
 }

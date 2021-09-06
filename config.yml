@@ -28,27 +28,23 @@
 # DEBUG MODE
 debug: false
 
-# crate reveal speed
-# 0 will instantly reveal items
-# measured in ticks/slot
-# should be a number that is a multiple of 20
-raffle-speed: 4
-
-# selection sound
-# ENTITY_EXPERIENCE_ORB_PICKUP
-selection-sound: ENTITY_EXPERIENCE_ORB_PICKUP # ORB_PICKUP <for older versions> (includes: 1.8)
+# Github auto-update
+update: true
 
 # name of crate inventory
-inventory-name: "&8Opening supply crate"
+header: "&8Opening supply crate"
 
-# height of crate [1, 6]
-inventory-size: 3
+# default crate size
+size: 27
 
-# number of loot selections
-selections: 4
+# default crate loot picks
+picks: 4
 
-# auto-update from Github
-auto-update: true
+# speed at which to reveal items
+speed: 4
+
+# sound to play on click
+sound: ENTITY_EXPERIENCE_ORB_PICKUP # ORB_PICKUP <for older versions> (includes: 1.8)
 
 # seasonal crates?
 seasonal: true
@@ -136,6 +132,9 @@ crates:
     footer:
       - "&7Right click on this item to unlock"
       - "&7four pieces of loot!"
+    header: "Peasant crate..." # optional
+    size: 45 # optional
+    picks: 3 # optional
     chances:
       common: 70
       regular: 22
@@ -146,6 +145,7 @@ crates:
     footer:
       - "&7Right click on this item to unlock"
       - "&7four pieces of loot!"
+    columns: 2 # optional
     chances:
       common: 40
       regular: 35
@@ -229,10 +229,10 @@ crates:
 
 # Enchantment/potion levels/amplifiers are uncapped
 
-# Commands can added only to those with the key of `item`
+# Commands can be added only to those with the key of `item`
 
 # Durations (duration) for potion effects follow the same above
-# Amplifier (amp) for potion effects must an an integer, not a range.
+# Amplifier (amp) for potion effects must an integer, not a range.
 
 
 
@@ -279,13 +279,13 @@ loot:
       lore:
         - "&7Amount: &f500XP"
       command:
-        - "xp add {player} 500"
+        - "xp add %player% 500"
     - item: experience_bottle
       name: "&e&lExperience"
       lore:
         - "&7Amount: &f1000XP"
       command:
-        - "xp add {player} 1000"
+        - "xp add %player% 1000"
     - item: blaze_rod
       count: 1, 31
     - item: obsidian
@@ -322,7 +322,7 @@ loot:
       lore:
         - "&7Amount: &f1000XP"
       command:
-        - "xp add {player} 1000"
+        - "xp add %player% 1000"
     - item: hopper
       count: 1, 2
     - crate: folk
@@ -337,7 +337,7 @@ loot:
       lore:
         - "&7Amount: &f1000XP"
       command:
-        - "xp add {player} 1000"
+        - "xp add %player% 1000"
     - item: diamond_block
       count: 6
     - item: gold_block
@@ -374,7 +374,7 @@ loot:
       lore:
         - "&7Amount: &f1500XP"
       command:
-        - "xp add {player} 1500"
+        - "xp add %player% 1500"
     - item: diamond_helmet
       name: "&dRare Helmet"
       lore:

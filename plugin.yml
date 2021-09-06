@@ -1,15 +1,15 @@
 name: LootCrates
 main: com.crazicrafter1.lootcrates.Main
-version: 3.1.4 # 3.1.2 was previous
-api-version: 1.16
+version: 3.2.0 # 3.1.4 was previous
+api-version: 1.17
 author: crazicrafter1
 softdepend: [QualityArmory, GraphicalAPI]
 commands:
   lootcrates:
     description: Access the features of the loot crates plugin.
-    usage: /lootcrates <crate/detect/editor/flair/reload/version> <id> <player/*> [amount]
+    usage: /lootcrates <crate/detect/flair/reload/version> <id> <player/*> [amount]
     permission: lootcrates.admin
-    aliases: [crates]
+    aliases: [crates, lc]
 permissions:
   lootcrates.open:
     description: Allow for users to open crates
@@ -17,6 +17,13 @@ permissions:
   lootcrates.admin:
     description: Allows access to /crates command
     default: op
+
+# 3.2.0 (9/6/2021)
+# support 1.17
+# tidied codebase
+# removed WIP editor
+# great performance
+
 
 # 3.1.4 (4/26/2021)
 # rename permissions

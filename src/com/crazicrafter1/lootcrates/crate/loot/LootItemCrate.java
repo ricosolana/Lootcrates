@@ -5,19 +5,17 @@ import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.util.Util;
 import org.bukkit.inventory.ItemStack;
 
-public class LootCrate extends LootItem {
+public class LootItemCrate extends LootItem {
 
-    private Crate crate;
+    private final Crate crate;
 
-    public LootCrate(Crate crate, int min, int max) {
-        //super(crate.getItemStack(1), min, max);
+    public LootItemCrate(Crate crate, int min, int max) {
         super(null, min, max);
         this.crate = crate;
     }
 
     @Override
-    public ItemStack getAccurateVisual() {
-        // just return the crate item (since seasonal can change it)
+    public ItemStack getIcon() {
         return crate.getItemStack(Util.randomRange(min, max));
     }
 }

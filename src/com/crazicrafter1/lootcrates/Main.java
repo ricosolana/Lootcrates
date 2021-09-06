@@ -3,16 +3,13 @@ package com.crazicrafter1.lootcrates;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.Callable;
 
-import com.crazicrafter1.lootcrates.config.CommentYamlConfiguration;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import com.crazicrafter1.lootcrates.crate.LootGroup;
-import com.crazicrafter1.lootcrates.tabcompleters.TabCrates;
+import com.crazicrafter1.lootcrates.tabs.TabCrates;
 import com.crazicrafter1.lootcrates.commands.CmdCrates;
 import com.crazicrafter1.lootcrates.listeners.*;
-import com.crazicrafter1.lootcrates.tracking.VersionChecker;
 import com.crazicrafter1.lootcrates.util.ItemBuilder;
 import com.crazicrafter1.lootcrates.util.ReflectionUtil;
 import com.crazicrafter1.lootcrates.util.Util;
@@ -26,17 +23,18 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class Main extends JavaPlugin
 {
     public static HashMap<java.util.UUID, ActiveCrate> openCrates = new HashMap<>();
-    public static HashSet<UUID> crateFireWorks = new HashSet<>();
+    public static HashSet<UUID> crateFireworks = new HashSet<>();
 
-    public static boolean seasonal = false;
     public static boolean supportQualityArmory = false;
     public static boolean debug = false;
-    public static boolean autoUpdate = false;
-    public static String inventoryName = null;
-    public static int inventorySize = 36;
-    public static int selections = 4;
-    public static int raffleSpeed = 5;
-    public static Sound selectionSound = null;
+    public static boolean update = false;
+    public static int speed;
+    public static Sound sound = null;
+    public static String header = null;
+    public static int size;
+    public static int picks;
+    public static boolean seasonal = false;
+
     public static ItemStack unSelectedItem = null;
     public static ItemStack selectedItem = null;
     public static boolean enableFirework = false;
@@ -47,15 +45,12 @@ public class Main extends JavaPlugin
 
     VersionChecker updater = new VersionChecker(this, 68424);
 
-    //public ConfigWrapper configWrapper;
     private FileConfiguration config;
     private File configFile;
 
-    public static boolean oldConfigFormat = false;
-
     public String prefix = ChatColor.GRAY + "[" + ChatColor.AQUA + ChatColor.BOLD + "LootCrates" + ChatColor.GRAY + "] ";
 
-    public ClickEditGUI editor = null;
+    //public ClickEditGUI editor = null;
 
     private static Main main;
     public static Main getInstance() {
@@ -64,23 +59,33 @@ public class Main extends JavaPlugin
 
 
     private boolean saveTheConfig = false;
-    private static String temp_path;
+    private static String lastPath;
 
-    // set default if not present
+    /**
+     * Retrieve with defaults set
+     * @param path key
+     * @param def default
+     * @return value
+     */
     public Object a(String path, Object def) {
-        temp_path = path;
+        lastPath = path;
         if (getConfig().contains(path)) {
             return getConfig().get(path);
         }
-        info("Setting default for " + path + ": " + def.toString());
+        //debug("Setting default for " + path + ": " + def.toString());
         getConfig().set(path, def);
         saveTheConfig = true;
         return def;
     }
 
-    // retrieve if present
+    /**
+     * Retrieve without defaults set
+     * @param path key
+     * @param def default
+     * @return value
+     */
     public Object b(String path, Object def) {
-        temp_path = path;
+        lastPath = path;
         if (getConfig().contains(path)) {
             return getConfig().get(path);
         }
@@ -89,22 +94,26 @@ public class Main extends JavaPlugin
 
     @Override
     public void onEnable() {
+
+        /*
+         * 1.17 assert
+         */
+        if(ReflectionUtil.isOldVersion()) {
+            Main.getInstance().error("only MC 1.17+ is supported (Java 16)");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
         Main.main = this;
         if(!this.getDataFolder().exists()){
             this.getDataFolder().mkdirs();
         }
 
-
-
         supportQualityArmory = Bukkit.getPluginManager().isPluginEnabled("QualityArmory");
-
-
 
         reloadConfigValues();
 
-
-
-        if (!autoUpdate) {
+        if (!update) {
             try {
                 if (updater.hasNewUpdate()) {
                     important("New update : " + updater.getLatestVersion() + ChatColor.DARK_BLUE + " (" + updater.getResourceURL() + ")");
@@ -118,25 +127,20 @@ public class Main extends JavaPlugin
                 if (debug)
                     e.printStackTrace();
             }
-        } else if (!ReflectionUtil.isOldVersion()){
-            GithubUpdater.autoUpdate(this, "PeriodicSeizures", "LootCrates", "LootCrates.jar");
         } else
-            error("Unable to check for updates (nor update)");
+            GithubUpdater.autoUpdate(this, "PeriodicSeizures", "LootCrates", "LootCrates.jar");
 
+        //if (Bukkit.getPluginManager().isPluginEnabled("GraphicalAPI"))
+        //    editor = new ClickEditGUI();
+        //else {
+        //    info("GraphicalAPI was not found; gui crate editing is disabled");
+        //}
 
-
-        if (Bukkit.getPluginManager().isPluginEnabled("GraphicalAPI"))
-            editor = new ClickEditGUI();
-        else {
-            info("GraphicalAPI was not found; gui crate editing is disabled");
-        }
-
-
-
+        /*
+         * bStats metrics init
+         */
         try {
-            // bStats metrics
             Metrics metrics = new Metrics(this, 10395);
-            metrics.addCustomChart(new Metrics.SimplePie("using_old_config_format", () -> String.valueOf(oldConfigFormat)));
             info("Metrics was successfully enabled");
         } catch (Exception e) {
             error("An error occurred while enabling metrics");
@@ -144,12 +148,15 @@ public class Main extends JavaPlugin
                 e.printStackTrace();
         }
 
-
-
+        /*
+         * Command init
+         */
         new CmdCrates();
         new TabCrates();
 
-        new ListenerOnDeath();
+        /*
+         * Listener init
+         */
         new ListenerOnEntityDamageByEntity();
         new ListenerOnInventoryClick();
         new ListenerOnInventoryClose();
@@ -157,25 +164,16 @@ public class Main extends JavaPlugin
         new ListenerOnPlayerInteract();
         new ListenerOnPlayerQuit();
 
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (Main.seasonal)
+                    for (Crate crate : crates.values()) {
+                        crate.prepSeasonalVariant();
+                    }
+            }
+        }.runTaskTimer(this, 0, 20 * 60 * 60 * 6);
 
-
-        if (!ReflectionUtil.isOldVersion()) {
-            // check every 1 hour
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (Main.seasonal)
-                        for (Crate crate : crates.values()) {
-                            crate.prepSeasonalVariant();
-                        }
-                }
-            }.runTaskTimer(this, 0, 20 * 60 * 60 * 6);
-        }
-
-    }
-
-    private boolean isOldConfigFormat() {
-        return config.contains("gui.selected.item");
     }
 
     @SuppressWarnings("unchecked")
@@ -189,66 +187,59 @@ public class Main extends JavaPlugin
             crates.clear();
             lootGroups.clear();
 
-            boolean old = oldConfigFormat = isOldConfigFormat();
-
-            if (old)
-                important("Reading as old config format. \nI would recommend you using the new configuration file format (it supports a whole lot more, and is a lot less error prone!)");
-            else info("Reading as new config format");
-
-            autoUpdate = (boolean) a("auto-update", true);
-
+            /*
+             * Config reading
+             */
+            debug = (boolean) a("debug", false);
+            update = (boolean) a("update", true);
+            // Global crate defaults
+            header = ChatColor.translateAlternateColorCodes('&', (String) a("header", "opening crate"));
+            size = (int) a("size", 27);
+            picks = (int) a("picks", 4);
+            // .end of defaults
+            speed = (int) a("speed", 4);
+            sound = Sound.valueOf((String) a("sound", "ENTITY_EXPERIENCE_ORB_PICKUP"));
             seasonal = (boolean) a("seasonal", false);
 
-            debug = (boolean) a(old ? "debug-enabled" : "debug", false);
-
-            selectionSound = Sound.valueOf((String) a("selection-sound", "ENTITY_EXPERIENCE_ORB_PICKUP"));
-
-            inventoryName = ChatColor.translateAlternateColorCodes('&', (String) a("inventory-name", "crate"));
-            inventorySize = (int) a("inventory-size", 3) * 9;
-
-            if (inventorySize < 0 || inventorySize > 6*9) {
-                inventorySize = 27;
-                error("inventory-size is invalid (must be [1, 6])");
+            // assert size
+            if (!(size % 9 == 0 && size>=9 && size <= 54)) {
+                size = 27;
+                error("invalid size (must be a factor of 9, and 6 columns or less)");
             }
 
-            raffleSpeed = (int) a("raffle-speed", 4);
-
-            selections = (int) a(old ? "max-selections" : "selections", selections);
-
             unSelectedItem = ItemBuilder.builder(
-                    Util.getCompatibleItem((String) a(old ? "gui.unselected.item" : "gui.unselected.icon", null)))
-                    .name((String) a(old ? "gui.unselected.name" : "gui.unselected.title", null))
-                    .lore((List<String>) b(old ? "gui.unselected.lore" : "gui.unselected.footer", new ArrayList<String>()))
+                    Util.getCompatibleItem((String) a("gui.unselected.icon", null)))
+                    .name((String) a("gui.unselected.title", null))
+                    .lore((List<String>) b("gui.unselected.footer", new ArrayList<String>()))
                     .glow((boolean) b("gui.unselected.glow", false)).toItem();
 
             selectedItem = ItemBuilder.builder(
-                    Util.getCompatibleItem((String) a(old ? "gui.selected.item" : "gui.selected.icon", null)))
-                    .name((String) a(old ? "gui.selected.name" : "gui.selected.title", null))
-                    .lore((List<String>) b(old ? "gui.selected.lore" : "gui.selected.footer", new ArrayList<String>()))
+                    Util.getCompatibleItem((String) a("gui.selected.icon", null)))
+                    .name((String) a("gui.selected.title", null))
+                    .lore((List<String>) b("gui.selected.footer", new ArrayList<String>()))
                     .glow((boolean) b("gui.selected.glow", false)).toItem();
 
-            enableFirework = (boolean) a(old ? "firework-explosion" : "firework.enabled", enableFirework);
+            enableFirework = (boolean) a("firework.enabled", enableFirework);
 
             {
                 ArrayList<Color> colors = new ArrayList<>(), fade = new ArrayList<>();
                 boolean flicker;
 
-                List<String> _colors = (List<String>) a("firework.colors", null);
+                List<String> _colors = (List<String>) b("firework.colors", null);
                 if (_colors != null)
                     for (String c : _colors) {
                         Color color = Util.matchColor(c);
                         colors.add(color);
                     }
 
-                List<String> _fade = (List<String>) a(old ? "firework.fade-colors" : "firework.fade", null);
+                List<String> _fade = (List<String>) b("firework.fade", null);
                 if (_fade != null)
                     for (String s : _fade) {
                         Color color = Util.matchColor(s);
                         fade.add(color);
                     }
 
-
-                flicker = (boolean) a("firework.flicker", false);
+                flicker = (boolean) b("firework.flicker", false);
 
                 if (!fade.isEmpty())
                     fireworkEffect = FireworkEffect.builder().withColor(colors).flicker(flicker).with(FireworkEffect.Type.BURST).build();
@@ -257,45 +248,44 @@ public class Main extends JavaPlugin
 
             }
 
-        /* *\  /* *\  /* *\  /* *\  /* *\  /* *\
-        |                                      |
-        |        ORDER SPECIFIC LOADING:       |
-        |                                      |
-        /* *\  /* *\  /* *\  /* *\  /* *\  /* */
+            /* *\  /* *\  /* *\  /* *\  /* *\  /* *\
+            |                                      |
+            |        ORDER SPECIFIC LOADING:       |
+            |                                      |
+            /* *\  /* *\  /* *\  /* *\  /* *\  /* */
 
             // 1st: store lootgroup ids
-            for (String lootGroupKey : config.getConfigurationSection(old ? "gui.loot-group" : "gui.lootgroup").getKeys(false)) {
+            for (String lootGroupKey : config.getConfigurationSection("gui.lootgroup").getKeys(false)) {
                 lootGroups.put(lootGroupKey, null);
             }
 
             // 2nd: partially parse each crate
             for (String id : ((MemorySection) a("crates", null)).getKeys(false)) {
-                //Crate crate = Crate.fromConfig(s);
-
                 String path = "crates." + id;
 
                 ItemBuilder builder = ItemBuilder.
-                        builder(Material.matchMaterial((String) a(path + (old ? ".item" : ".icon"), null))).
-                        name((String) a(path + (old ? ".name" : ".title"), null)).
-                        lore((List<String>) b(path + (old ? ".lore" : ".footer"), null)).
+                        builder(Material.matchMaterial((String) a(path + ".icon", null))).
+                        name((String) a(path + ".title", null)).
+                        lore((List<String>) b(path + ".footer", null)).
                         customModelData((Integer) b(path + ".model", null));
+                //                      ^ ^ ^ ^ ^ Integer cast is intentional
 
-                Crate crate = new Crate(id, builder.toItem());
+                // Get this crates final size
+                int size = (int) b(path + ".size",
+                        (int) b(path + ".columns", Main.size / 9) * 9);
+
+                Crate crate = new Crate(id, builder.toItem(),
+                        (String) b(path + ".header", Main.header),
+                        size,
+                        (int) b(path + ".picks", Main.picks));
 
                 Main.crates.put(id, crate);
             }
 
             // 3rd: load all lootgroups, using basic crate data if needed
-            if (oldConfigFormat) {
-                for (String lootGroupKey : config.getConfigurationSection("gui.loot-group").getKeys(false)) {
-                    LootGroup lootGroup = LootGroup.fromOldConfig(lootGroupKey);
-                    lootGroups.put(lootGroupKey, lootGroup);
-                }
-            } else {
-                for (String lootGroupKey : config.getConfigurationSection("gui.lootgroup").getKeys(false)) {
-                    LootGroup lootGroup = LootGroup.fromNewConfig(lootGroupKey);
-                    lootGroups.put(lootGroupKey, lootGroup);
-                }
+            for (String lootGroupKey : config.getConfigurationSection("gui.lootgroup").getKeys(false)) {
+                LootGroup lootGroup = LootGroup.fromConfig(lootGroupKey);
+                lootGroups.put(lootGroupKey, lootGroup);
             }
 
             // 4th: full parse crates
@@ -320,8 +310,8 @@ public class Main extends JavaPlugin
             if (saveTheConfig)
                 this.saveConfig();
 
-        } catch (Exception e) {
-            error("Possible config issue around " + temp_path);
+        } catch (Exception e) {                                             // index 2 is special
+            error("Config issue around " + lastPath + e.getStackTrace()[2].getClass() + " L" + e.getStackTrace()[2].getLineNumber());
             if (debug)
                 e.printStackTrace();
         }
@@ -336,13 +326,22 @@ public class Main extends JavaPlugin
         Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.DARK_PURPLE + s);
     }
 
+    public void warn(String s) {
+        Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.RED + s);
+    }
+
+    /*
+     * TODO
+     *  should log errors/count and throw
+     */
     public void error(String s) {
         Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.DARK_RED + s);
+        //this.getPluginLoader().disablePlugin(this);
     }
 
     public void debug(String s) {
         if (debug)
-            Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.YELLOW + s);
+            Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.GOLD + s);
     }
 
     @Override
@@ -359,12 +358,8 @@ public class Main extends JavaPlugin
                 }
             }
         }
+
         config = CommentYamlConfiguration.loadConfiguration(configFile);
-		/*InputStream defConfigStream = this.getResource("config.yml");
-		if (defConfigStream != null) {
-			config.setDefaults(
-					YamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream, Charsets.UTF_8)));
-		}*/
     }
 
     @Override

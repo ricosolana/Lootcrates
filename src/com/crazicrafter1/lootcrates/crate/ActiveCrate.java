@@ -3,22 +3,19 @@ package com.crazicrafter1.lootcrates.crate;
 import java.util.*;
 
 import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.util.Bool;
 import com.crazicrafter1.lootcrates.util.ReflectionUtil;
-import com.crazicrafter1.lootcrates.util.Util;
-import com.crazicrafter1.lootcrates.crate.loot.LootItem;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public final class ActiveCrate {
 
-
-    private class QSlot {
+    private final class QSlot {
         boolean isSelected;
         AbstractLoot randomLoot;
 
@@ -28,91 +25,62 @@ public final class ActiveCrate {
         }
     }
 
-    //private boolean kill = false;
-
+    // Constants
     private final UUID owner;
-
-    //private HashSet<Integer> slotsSelected;
-    //private HashMap<Integer, AbstractLoot> slotLoot;
-    private HashMap<Integer, QSlot> slots;
-
-    private Inventory inventory;
+    private final int size;
+    private final int picks;
+    private int lockSlot;
     private final LootGroup[] lootChances;
 
-    //private HashMap<Integer, ArrayList<String>> commandEventSlots = new HashMap<>();
-
+    // Live variables
+    private Inventory inventory;
+    private HashMap<Integer, QSlot> slots = new HashMap<>();
     private boolean revealing = false;
     private boolean revealed = false;
-
-    private final Crate crate;
-
-    private int lockSlot;
-
-    //private int iterations = 0;
-    private final int SIZE;
-
     private int taskID = -1;
 
-    ActiveCrate(Player p, Crate crate, int lockSlot) { //}, Main pl) {
-        //this.slotsSelected = new HashSet<>();
-        this.slots = new HashMap<>();
-        this.SIZE = Main.inventorySize;
-        this.inventory = Bukkit.createInventory(p, SIZE, Main.inventoryName);
-        //this.lootChances = new String[s];
-        this.lootChances = new LootGroup[SIZE];
-
+    ActiveCrate(Player p, Crate crate, int lockSlot) {
         this.owner = p.getUniqueId();
-        this.crate = crate;
+        this.size = crate.getSize();
+        this.picks = crate.getPicks();
         this.lockSlot = lockSlot;
+        this.lootChances = new LootGroup[size];
 
-        this.populateRandoms();
+        this.inventory = Bukkit.createInventory(p, size, crate.getHeader());
+        this.populate(crate);
 
         this.fill();
-        getPlayer().openInventory(inventory);
+        p.openInventory(inventory);
     }
 
-    private void populateRandoms() {
-        for (int i = 0; i < SIZE; i++) {
+    private void populate(Crate crate) {
+        for (int i = 0; i < size; i++) {
             LootGroup lootGroup = crate.getBasedRandom();
-            Main.getInstance().debug(lootGroup.getName());
+            Main.getInstance().debug(lootGroup.name());
             this.lootChances[i] = lootGroup;
         }
     }
 
-    //private HashMap<Integer, ArrayList<String>> getCommandEventSlots() {
-    //    return commandEventSlots;
-    //}
+    private boolean selectSlot(int slot) {
 
-    private void selectSlot(int slot) {
-
-        if (!revealing && !revealed && slot >= 0 && slot < SIZE) {
-            //if (slotsSelected.contains(slot)) return;
-            if (slots.containsKey(slot)) return;
-
-            // 'select' the slot (changes the item)
+        if (!revealing && !revealed &&
+                !slots.containsKey(slot)) {
             inventory.setItem(slot, Main.selectedItem);
-
-
-
 
             AbstractLoot randomLoot = lootChances[slot].getRandomLoot();
             slots.put(slot, new QSlot(true, randomLoot));
-            //plugin.debug("Set to selected (SelectSlot) with loot " + item.getType().name());
             Main.getInstance().debug("abstractLoot: " + randomLoot.getClass().getSimpleName());
 
 
-            if (Main.selectionSound != null)
-                getPlayer().playSound(getPlayer().getLocation(), Main.selectionSound, 1, 1);
+            if (Main.sound != null)
+                getPlayer().playSound(getPlayer().getLocation(), Main.sound, 1, 1);
 
             // Player finished selecting
-            if (slots.size() == Main.selections) {
-                // Decrement crate (the COST)
+            if (slots.size() == picks) {
+                // Decrement held crate
                 {
                     ItemStack itemStack = getPlayer().getInventory().getItem(lockSlot);
                     itemStack.setAmount(itemStack.getAmount() - 1);
-                    if (ReflectionUtil.isOldVersion()) {
-                        getPlayer().getInventory().setItem(lockSlot, itemStack);
-                    }
                 }
 
                 // Invalidate lockslot, so that it may be reused for whatever (since crate was consumed)
@@ -120,7 +88,7 @@ public final class ActiveCrate {
 
                 revealing = true;
 
-                if (Main.raffleSpeed > 0) {
+                if (Main.speed > 0) {
 
                      taskID = new BukkitRunnable() {
                          int iterations = 0;
@@ -129,69 +97,71 @@ public final class ActiveCrate {
                         public void run() {
                             // Revealing each panel one by one
                             Main.getInstance().debug("iterations: " + iterations);
-                            if (iterations < SIZE) {
+                            if (iterations < size) {
                                 inventory.setItem(iterations, getPanel(iterations));
                                 Main.getInstance().debug("set loot tier (glass) " + iterations);
                             }
 
                             // POP!!!
-                            else if (iterations > SIZE + 10/Main.raffleSpeed) {
+                            else if (iterations > size + 10/Main.speed) {
                                 this.cancel();
                                 pop();
                             }
 
                             iterations++;
                         }
-                    }.runTaskTimer(Main.getInstance(), 20, Main.raffleSpeed).getTaskId();
+                    }.runTaskTimer(Main.getInstance(), 20, Main.speed).getTaskId();
 
                 } else {
                     pop();
                 }
             }
+            return true;
         }
+        return false;
     }
 
     private void pop() {
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < size; i++) {
             if (!slots.containsKey(i)) {
                 inventory.setItem(i, null);
             } else inventory.setItem(i, getPanel(i));
         }
 
-        if (Main.enableFirework) doExplosion();
+        if (Main.enableFirework) explosion();
 
         revealed = true;
         revealing = false;
     }
 
-    private void doExplosion() {
+    private void explosion() {
         Location loc = getPlayer().getLocation();
 
-        Firework fireWork = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
+        Firework firework = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
 
-        Main.crateFireWorks.add(fireWork.getUniqueId());
+        Main.crateFireworks.add(firework.getUniqueId());
 
-        FireworkMeta fwm = fireWork.getFireworkMeta();
+        FireworkMeta fwm = firework.getFireworkMeta();
         fwm.addEffects(Main.fireworkEffect);
-        fireWork.setFireworkMeta(fwm);
+        firework.setFireworkMeta(fwm);
 
-        fireWork.detonate();
+        firework.detonate();
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                Main.crateFireWorks.remove(fireWork.getUniqueId());
+                Main.crateFireworks.remove(firework.getUniqueId());
             }
-        }.runTaskLater(Main.getInstance(), 2);
+        }.runTaskLater(Main.getInstance(), 1);
     }
 
     /**
-     * Assumes that crate loot already revealed, and clicking a "QSlot"
+     * A panel was clicked, show it
      */
     private boolean flipSlot(int slot, QSlot qSlot) {
         if (!qSlot.isSelected) return false;
 
-        ItemStack visual = qSlot.randomLoot.getAccurateVisual(); //crate.lootGroups.g
+        ItemStack visual = qSlot.randomLoot.getIcon();
 
         inventory.setItem(slot, visual);
         qSlot.isSelected = false;
@@ -199,69 +169,42 @@ public final class ActiveCrate {
         return true;
     }
 
-    /*
-        TODO
-        test whether player is online,
-        whether is dead,
-        any sketch cases
-        etc...
-     */
     void close() {
-        //for (int slot : slotsSelected) {
-        if (revealing || revealed)
+        /*
+         * If point of no return is reached, give items
+         */
+        if (revealing || revealed) {
             for (int slot : slots.keySet()) {
-                // give player the loot they didnt get
-                // If is a pane still, give random item, else give the inventory item
-                //if (slots.get(slot).isSelected) {
-
-
-
-                if (slots.get(slot).isSelected || !(slots.get(slot).randomLoot instanceof LootItem)) {
-                    slots.get(slot).randomLoot.perform(this);
-                } else {
-                    Util.giveItemToPlayer(getPlayer(), inventory.getItem(slot));
-                }
-
-                    //this.lootChances[slot].getRandomLoot().perform(this);
-                //    return;
-                //}
-                //Util.giveItemToPlayer(getPlayer(), inventory.getCompatibleItem(slot));
+                slots.get(slot).randomLoot.execute(this,
+                        true, null);
             }
-        //kill = true;
+        }
 
         if (taskID != -1)
             Main.getInstance().getServer().getScheduler().cancelTask(taskID);
     }
 
     private void fill() {
-        for (int i = 0; i < SIZE; i++) inventory.setItem(i, Main.unSelectedItem);
+        for (int i = 0; i < size; i++) inventory.setItem(i, Main.unSelectedItem);
     }
 
     public Player getPlayer() {
         return Bukkit.getPlayer(this.owner);
     }
 
-    private ItemStack getPanel(int slot) // pane from slot
-    {
-        return this.lootChances[slot].getPanel();
+    private ItemStack getPanel(int slot) {
+        return this.lootChances[slot].itemStack();
     }
 
     public void onInventoryClick(InventoryClickEvent e) {
-        /*
-            Right clicks would break things:
-                - when a player right clicked a pane, the intent was to select it, which works fine
-                - the issue is that when any click occurs, that slot is removed from selected slots, and the player wouldnt get the item if they
-                  halved it with a right click
-         */
         if (!e.isShiftClick() && e.isLeftClick()) {
-            int slot = e.getRawSlot();
+            int slot = e.getSlot();
 
-            // If crate space was clicked on
-            if (Util.inRange(slot, 0, SIZE - 1)) {
+            // If crate GUI clicked on
+            if (e.getClickedInventory() == inventory) {
 
                 // Try to select a slot
-                if (!revealed && !revealing) {
-                    selectSlot(slot);
+                if (selectSlot(slot)) {
                     e.setCancelled(true);
                     return;
                 }
@@ -292,7 +235,7 @@ public final class ActiveCrate {
 
                 /*
                     Final case:
-                    player must have clicked a revealed, non paned item
+                    player must have clicked a revealed item
                  */
 
                 Main.getInstance().debug("Failed toggle pane --> item");
@@ -306,35 +249,20 @@ public final class ActiveCrate {
                     return;
                 }
 
+                // Execute the loot action
+                Bool giveItem = new Bool(true);
+                qSlot.randomLoot.execute(this, false, giveItem);
 
-                // If player explicitly removed an item (CLICKED)
-                // Let the player have freely have the item if it is a LootItem
-                // test instance of AbstractLoot
-                slots.remove(slot);
-
-
-
-                if (qSlot.randomLoot instanceof LootItem) {
-
-                    // do not cancel event, give them the item
-                    Main.getInstance().debug("Letting have loot! " + qSlot.randomLoot.getClass().getName());
-                    return;
+                if (!giveItem.value) {
+                    //Main.getInstance().info("Deleting item");
+                    inventory.setItem(slot, null);
+                    e.setCancelled(true);
                 }
 
-                Main.getInstance().debug("Performing action!");
+                slots.remove(slot);
 
-                // else, an event or command slot / macro etc ... was clicked
-                // do the thing, and cancel event
-                qSlot.randomLoot.perform(this);
-
-                inventory.setItem(slot, null);
-
-                e.setCancelled(true);
-
-            } else if (slot >= SIZE && slot < SIZE + 36) {
-                int offset = 27 + SIZE;
-
-                if (slot - offset == lockSlot) {
+            } else if (e.getClickedInventory() == e.getWhoClicked().getInventory()) {
+                if (slot == lockSlot) {
                     e.setCancelled(true);
                 }
             }

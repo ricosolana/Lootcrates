@@ -1,13 +1,13 @@
 package com.crazicrafter1.lootcrates.util;
 
-public class IntegerC {
+public class Int {
 
     public int value;
 
-    public IntegerC() {
+    public Int() {
     }
 
-    public IntegerC(int value) {
+    public Int(int value) {
         this.value = value;
     }
 

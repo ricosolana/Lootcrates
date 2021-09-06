@@ -1,10 +1,10 @@
 package com.crazicrafter1.lootcrates.crate;
 
-public class Result {
+public class EnumParseResult {
 
     public Code code;
 
-    public Result(Code code) {
+    public EnumParseResult(Code code) {
         this.code = code;
     }
 

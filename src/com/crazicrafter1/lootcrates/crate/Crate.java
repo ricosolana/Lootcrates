@@ -4,11 +4,9 @@ import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.lootcrates.util.ItemBuilder;
 import com.crazicrafter1.lootcrates.util.ReflectionUtil;
 import com.crazicrafter1.lootcrates.util.Util;
-import com.sun.istack.internal.NotNull;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -33,15 +31,21 @@ public final class Crate {
         return temp;
     }
 
-    private final String id;
+    private final String name;
     private final ItemStack itemStack;
+    private final String header;
+    private final int size;
+    private final int picks;
     private HashMap<LootGroup, Integer> lootGroups;
     private ItemStack seasonalVariant;
     private int chanceSum;
 
-    public Crate(String id, ItemStack itemStack) {
-        this.id = id;
-        this.itemStack = Crate.makeCrate(itemStack, id);
+    public Crate(String name, ItemStack itemStack, String header, int size, int picks) {
+        this.name = name;
+        this.itemStack = Crate.makeCrate(itemStack, name);
+        this.header = header;
+        this.size = size;
+        this.picks = picks;
     }
 
     public void setLootGroups(HashMap<LootGroup, Integer> lootGroups) {
@@ -57,8 +61,32 @@ public final class Crate {
         this.chanceSum = last;
     }
 
-    public String getId() {
-        return id;
+    /**
+     * @return Crate name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @return Inventory size
+     */
+    public int getSize() {
+        return size;
+    }
+
+    /**
+     * @return Loot selections
+     */
+    public int getPicks() {
+        return picks;
+    }
+
+    /**
+     * @return Inventory name
+     */
+    public String getHeader() {
+        return header;
     }
 
     public void prepSeasonalVariant() {
@@ -66,14 +94,14 @@ public final class Crate {
         if (rawSeasonal == null)
             seasonalVariant = null;
         else
-            seasonalVariant = ItemBuilder.builder(Crate.makeCrate(rawSeasonal, id)).mergeLexicals(this.itemStack).toItem();
+            seasonalVariant = ItemBuilder.builder(Crate.makeCrate(rawSeasonal, name)).mergeLexicals(this.itemStack).toItem();
     }
 
     LootGroup getBasedRandom() {
         int rand = Util.randomRange(0, chanceSum-1);
 
         for (Map.Entry<LootGroup, Integer> entry : this.lootGroups.entrySet()) {
-            if (lootGroups.get(entry.getKey()) > rand) return entry.getKey();
+            if (entry.getValue() > rand) return entry.getKey();
         }
 
         return null;
@@ -94,7 +122,7 @@ public final class Crate {
         return itemStack;
     }
 
-    private static ItemStack makeCrate(@NotNull ItemStack itemStack, final @NotNull String crate) {
+    private static ItemStack makeCrate(ItemStack itemStack, final String crate) {
 
         /*
             Back when I used CraftBukkit to 'easily' get and set NBT data, the comments below are the code
@@ -137,11 +165,11 @@ public final class Crate {
         return (ItemStack) ReflectionUtil.invokeStaticMethod(asCraftMirrorMethod, nmsStack);
     }
 
-    public static Crate crateByID(String id) {
+    public static Crate crateByName(String id) {
         return Main.crates.getOrDefault(id, null);
     }
 
-    public static Crate crateByItem(final @NotNull ItemStack itemStack) {
+    public static Crate crateByItem(final ItemStack itemStack) {
 
         /*
             Old code when custom name of the item was used to get crates
@@ -177,16 +205,17 @@ public final class Crate {
         Method getStringMethod = ReflectionUtil.getMethod(nbt.getClass(), "getString", String.class);
         String crateType = (String) ReflectionUtil.invokeMethod(getStringMethod, nbt, "Crate");
 
-        return Crate.crateByID(crateType);
+        return Crate.crateByName(crateType);
     }
 
     /**
      * Opens a crate by id to a player
      */
-    public static boolean openCrate(Player p, String id, int lock_slot) {
-        if (!Main.openCrates.containsKey(p.getUniqueId())) {
-            Crate crate = Main.crates.get(id);
-            Main.openCrates.put(p.getUniqueId(), new ActiveCrate(p, crate, lock_slot));
+    public static boolean openCrate(Player p, String name, int lock_slot) {
+        Crate crate = crateByName(name);
+        if (crate != null) {
+            Main.openCrates.put(p.getUniqueId(),
+                    new ActiveCrate(p, crate, lock_slot));
             return true;
         }
 
@@ -197,7 +226,6 @@ public final class Crate {
      * Close a crate to a player
      */
     public static void closeCrate(Player p) {
-        Main.openCrates.get(p.getUniqueId()).close();
-        Main.openCrates.remove(p.getUniqueId());
+        Main.openCrates.remove(p.getUniqueId()).close();
     }
 }

@@ -6,19 +6,19 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
-public class LootEnchantableItem extends LootItem {
+public class LootItemEnchantable extends LootItem {
 
     private final QEnchantment[] enchantments;
 
-    public LootEnchantableItem(ItemStack itemStack, QEnchantment[] enchantments) {
+    public LootItemEnchantable(ItemStack itemStack, QEnchantment[] enchantments) {
         super(itemStack, 1, 1);
         this.enchantments = enchantments;
     }
 
     @Override
-    public ItemStack getAccurateVisual() {
+    public ItemStack getIcon() {
 
-        ItemStack itemStack = super.getBaseVisual();
+        ItemStack itemStack = super.getIcon();
 
         if (itemStack.getType() == Material.ENCHANTED_BOOK) {
 

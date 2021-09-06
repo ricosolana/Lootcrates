@@ -1,14 +1,12 @@
 package com.crazicrafter1.lootcrates.util;
 
 import com.crazicrafter1.lootcrates.Main;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -20,7 +18,6 @@ import java.util.*;
 
 public class Util {
 
-
     public static boolean inRange(int i, int min, int max) {
         return (i <= max && i >= min);
     }
@@ -29,27 +26,15 @@ public class Util {
         new BukkitRunnable() {
             @Override
             public void run() {
-
-                Main.getInstance().debug("Gave item to player");
-
-                if (!p.isDead()) {
-                    HashMap<Integer, ItemStack> remaining = null;
+                if (p.isDead()) {
+                    p.getWorld().dropItem(p.getLocation(), item);
+                } else {
+                    HashMap<Integer, ItemStack> remaining;
                     if (!(remaining = p.getInventory().addItem(item)).isEmpty()) {
                         for (ItemStack itemStack : remaining.values()) {
-
-                            //getPlayer().getWorld().dropItem(getPlayer().getLocation(), itemStack);
                             p.getWorld().dropItem(p.getLocation(), itemStack);
-
                         }
-                        //ItemStack remaining =
                     }
-                } else {
-
-                    //getPlayer().getWorld().dropItem(getPlayer().getLocation(), itemStack);
-                    p.getWorld().dropItem(p.getLocation(), item);
-
-                    //ItemStack remaining =
-
                 }
             }
         }.runTaskLater(Main.getInstance(), 1);
@@ -97,91 +82,65 @@ public class Util {
         if (item != null)
             return item;
 
-        switch (name) {
-            case "EXPERIENCE_BOTTLE":
-                return new ItemStack(Material.matchMaterial("EXP_BOTTLE"));
-            case "GOLDEN_APPLE":
-                return new ItemStack(Material.GOLDEN_APPLE, 1, (short) 0);
-            case "ENCHANTED_GOLDEN_APPLE":
-                return new ItemStack(Material.GOLDEN_APPLE, 1, (short) 1);
-        }
+        return switch (name) {
+            case "EXPERIENCE_BOTTLE" -> new ItemStack(Material.matchMaterial("EXP_BOTTLE"));
+            case "GOLDEN_APPLE" -> new ItemStack(Material.GOLDEN_APPLE, 1, (short) 0);
+            case "ENCHANTED_GOLDEN_APPLE" -> new ItemStack(Material.GOLDEN_APPLE, 1, (short) 1);
+            default -> null;
+        };
 
-        return null;
     }
 
-    public static Color matchColor(String color)
-    {
-        // BLUE, RED, WHITE, GRAY, GREEN, YELLOW, AQUA, BLACK, FUCHSIA, LIME, MAROON, NAVY, OLIVE
-        // ORANGE, PURPLE, SILVER, TEAL
-
-        switch (color.toUpperCase()) {
-            case "BLUE":
-                return Color.BLUE;
-            case "RED":
-                return Color.RED;
-            case "WHITE":
-                return Color.WHITE;
-            case "GRAY":
-                return Color.GRAY;
-            case "GREEN":
-                return Color.GREEN;
-            case "YELLOW":
-                return Color.YELLOW;
-            case "AQUA":
-                return Color.AQUA;
-            case "BLACK":
-                return Color.BLACK;
-            case "FUCHSIA":
-                return Color.FUCHSIA;
-            case "LIME":
-                return Color.LIME;
-            case "MAROON":
-                return Color.MAROON;
-            case "NAVY":
-                return Color.NAVY;
-            case "OLIVE":
-                return Color.OLIVE;
-            case "ORANGE":
-                return Color.ORANGE;
-            case "PURPLE":
-                return Color.PURPLE;
-            case "SILVER":
-                return Color.SILVER;
-            case "TEAL":
-                return Color.TEAL;
-            default:
-                return null;
-        }
+    public static Color matchColor(String color) {
+        // Java 16 magic!
+        return switch (color.toUpperCase()) {
+            case "BLUE" -> Color.BLUE;
+            case "RED" -> Color.RED;
+            case "WHITE" -> Color.WHITE;
+            case "GRAY" -> Color.GRAY;
+            case "GREEN" -> Color.GREEN;
+            case "YELLOW" -> Color.YELLOW;
+            case "AQUA" -> Color.AQUA;
+            case "BLACK" -> Color.BLACK;
+            case "FUCHSIA" -> Color.FUCHSIA;
+            case "LIME" -> Color.LIME;
+            case "MAROON" -> Color.MAROON;
+            case "NAVY" -> Color.NAVY;
+            case "OLIVE" -> Color.OLIVE;
+            case "ORANGE" -> Color.ORANGE;
+            case "PURPLE" -> Color.PURPLE;
+            case "SILVER" -> Color.SILVER;
+            case "TEAL" -> Color.TEAL;
+            default -> null;
+        };
     }
 
-    public static int randomRange(int min, int max)
-    {
+    public static int randomRange(int min, int max) {
         return min + (int)(Math.random() * ((max - min) + 1));
     }
 
-    public static int randomRange(int min, int max, int min1, int max1)
-    {
+    public static int randomRange(int min, int max, int min1, int max1) {
         if ((int)(Math.random()*2) == 0)
             return min + (int)(Math.random() * ((max - min) + 1));
         return min1 + (int)(Math.random() * ((max1 - min1) + 1));
     }
 
-    //@Deprecated
     public static int randomRange(int min, int max, Random random)
     {
         return random.nextInt((max - min) + 1) + min;
     }
 
-    // argument: float 0 -> 1
-    @Deprecated
-    public static boolean randomChance(float i)
-    {
+    /**
+     * Returns a chance
+     * @param i [0, 1]
+     * @return whether 'i' exceeded a chance
+     */
+    public static boolean randomChance(float i) {
         return i >= Math.random();
     }
 
     @Deprecated
-    public static boolean randomChance(float i, Random random)
-    {
+    public static boolean randomChance(float i, Random random) {
         return i <= (float)randomRange(0, 100, random) / 100f;
     }
 
@@ -189,8 +148,7 @@ public class Util {
         return (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2);
     }
 
-    public static boolean toInt(String s, IntegerC wrapper)
-    {
+    public static boolean toInt(String s, Int wrapper) {
         try {
             wrapper.value = Integer.parseInt(s);
             return true;
@@ -199,201 +157,94 @@ public class Util {
         }
     }
 
-    public static Enchantment matchEnchant(String enchant)
-    {
+    public static Enchantment matchEnchant(String enchant) {
         String e = enchant.toUpperCase().replaceAll(" ", "_");
 
-        switch (e) {
-            case "ARROW_DAMAGE":
-            case "POWER":
-                return Enchantment.ARROW_DAMAGE;
-            case "ARROW_FIRE":
-            case "FLAME":
-                return Enchantment.ARROW_FIRE;
-            case "ARROW_INFINITE":
-            case "INFINITY":
-                return Enchantment.ARROW_INFINITE;
-            case "ARROW_KNOCKBACK":
-            case "PUNCH":
-                return Enchantment.ARROW_KNOCKBACK;
-            case "BINDING_CURSE":
-            case "CURSE_OF_BINDING":
-                return Enchantment.BINDING_CURSE;
-            case "CHANNELING":
-                return Enchantment.CHANNELING;
-            case "DAMAGE_ALL":
-            case "SHARPNESS":
-                return Enchantment.DAMAGE_ALL;
-            case "DAMAGE_ANTHROPODS":
-            case "BANE_OF_ANTHROPODS":
-                return Enchantment.DAMAGE_ARTHROPODS;
-            case "DAMAGE_UNDEAD":
-            case "SMITE":
-                return Enchantment.DAMAGE_UNDEAD;
-            case "DEPTH_STRIDER":
-                return Enchantment.DEPTH_STRIDER;
-            case "DIG_SPEED":
-            case "EFFICIENCY":
-                return Enchantment.DIG_SPEED;
-            case "DURABILITY":
-            case "UNBREAKING":
-                return Enchantment.DURABILITY;
-            case "FIRE_ASPECT":
-                return Enchantment.FIRE_ASPECT;
-            case "FROST_WALKER":
-                return Enchantment.FROST_WALKER;
-            case "IMPALING":
-                return Enchantment.IMPALING;
-            case "KNOCKBACK":
-                return Enchantment.KNOCKBACK;
-            case "LOOT_BONUS_BLOCKS":
-            case "FORTUNE":
-                return Enchantment.LOOT_BONUS_BLOCKS;
-            case "LOOT_BONUS_MOBS":
-            case "LOOTING":
-                return Enchantment.LOOT_BONUS_MOBS;
-            case "LOYALTY":
-                return Enchantment.LOYALTY;
-            case "LUCK":
-            case "LUCK_OF_THE_SEA":
-                return Enchantment.LUCK;
-            case "LURE":
-                return Enchantment.LURE;
-            case "MENDING":
-                return Enchantment.MENDING;
-            case "MULTISHOT":
-                return Enchantment.MULTISHOT;
-            case "OXYGEN":
-            case "RESPIRATION":
-                return Enchantment.OXYGEN;
-            case "PIERCING":
-                return Enchantment.PIERCING;
-            case "PROTECTION_ENVIRONMENTAL":
-            case "PROTECTION":
-                return Enchantment.PROTECTION_ENVIRONMENTAL;
-            case "PROTECTION_FIRE":
-            case "FIRE_PROTECTION":
-                return Enchantment.PROTECTION_FIRE;
-            case "PROTECTION_FALL":
-            case "FEATHER_FALLING":
-                return Enchantment.PROTECTION_FALL;
-            case "PROTECTION_EXPLOSIONS":
-            case "BLAST_PROTECTION":
-                return Enchantment.PROTECTION_EXPLOSIONS;
-            case "PROTECTION_PROJECTILE":
-            case "PROJECTILE_PROTECTION":
-                return Enchantment.PROTECTION_PROJECTILE;
-            case "QUICK_CHARGE":
-                return Enchantment.QUICK_CHARGE;
-            case "RIPTIDE":
-                return Enchantment.RIPTIDE;
-            case "SILK_TOUCH":
-                return Enchantment.SILK_TOUCH;
-            case "SOUL_SPEED":
-                return Enchantment.SOUL_SPEED;
-            case "SWEEPING_EDGE":
-                return Enchantment.SWEEPING_EDGE;
-            case "THORNS":
-                return Enchantment.THORNS;
-            case "VANISHING_CURSE":
-            case "CURSE_OF_VANISHING":
-                return Enchantment.VANISHING_CURSE;
-            case "WATER_WORKER":
-            case "AQUA_AFFINITY":
-                return Enchantment.WATER_WORKER;
-            default:
-                return null;
-        }
+        return switch (e) {
+            case "ARROW_DAMAGE", "POWER" -> Enchantment.ARROW_DAMAGE;
+            case "ARROW_FIRE", "FLAME" -> Enchantment.ARROW_FIRE;
+            case "ARROW_INFINITE", "INFINITY" -> Enchantment.ARROW_INFINITE;
+            case "ARROW_KNOCKBACK", "PUNCH" -> Enchantment.ARROW_KNOCKBACK;
+            case "BINDING_CURSE", "CURSE_OF_BINDING" -> Enchantment.BINDING_CURSE;
+            case "CHANNELING" -> Enchantment.CHANNELING;
+            case "DAMAGE_ALL", "SHARPNESS" -> Enchantment.DAMAGE_ALL;
+            case "DAMAGE_ANTHROPODS", "BANE_OF_ANTHROPODS" -> Enchantment.DAMAGE_ARTHROPODS;
+            case "DAMAGE_UNDEAD", "SMITE" -> Enchantment.DAMAGE_UNDEAD;
+            case "DEPTH_STRIDER" -> Enchantment.DEPTH_STRIDER;
+            case "DIG_SPEED", "EFFICIENCY" -> Enchantment.DIG_SPEED;
+            case "DURABILITY", "UNBREAKING" -> Enchantment.DURABILITY;
+            case "FIRE_ASPECT" -> Enchantment.FIRE_ASPECT;
+            case "FROST_WALKER" -> Enchantment.FROST_WALKER;
+            case "IMPALING" -> Enchantment.IMPALING;
+            case "KNOCKBACK" -> Enchantment.KNOCKBACK;
+            case "LOOT_BONUS_BLOCKS", "FORTUNE" -> Enchantment.LOOT_BONUS_BLOCKS;
+            case "LOOT_BONUS_MOBS", "LOOTING" -> Enchantment.LOOT_BONUS_MOBS;
+            case "LOYALTY" -> Enchantment.LOYALTY;
+            case "LUCK", "LUCK_OF_THE_SEA" -> Enchantment.LUCK;
+            case "LURE" -> Enchantment.LURE;
+            case "MENDING" -> Enchantment.MENDING;
+            case "MULTISHOT" -> Enchantment.MULTISHOT;
+            case "OXYGEN", "RESPIRATION" -> Enchantment.OXYGEN;
+            case "PIERCING" -> Enchantment.PIERCING;
+            case "PROTECTION_ENVIRONMENTAL", "PROTECTION" -> Enchantment.PROTECTION_ENVIRONMENTAL;
+            case "PROTECTION_FIRE", "FIRE_PROTECTION" -> Enchantment.PROTECTION_FIRE;
+            case "PROTECTION_FALL", "FEATHER_FALLING" -> Enchantment.PROTECTION_FALL;
+            case "PROTECTION_EXPLOSIONS", "BLAST_PROTECTION" -> Enchantment.PROTECTION_EXPLOSIONS;
+            case "PROTECTION_PROJECTILE", "PROJECTILE_PROTECTION" -> Enchantment.PROTECTION_PROJECTILE;
+            case "QUICK_CHARGE" -> Enchantment.QUICK_CHARGE;
+            case "RIPTIDE" -> Enchantment.RIPTIDE;
+            case "SILK_TOUCH" -> Enchantment.SILK_TOUCH;
+            case "SOUL_SPEED" -> Enchantment.SOUL_SPEED;
+            case "SWEEPING_EDGE" -> Enchantment.SWEEPING_EDGE;
+            case "THORNS" -> Enchantment.THORNS;
+            case "VANISHING_CURSE", "CURSE_OF_VANISHING" -> Enchantment.VANISHING_CURSE;
+            case "WATER_WORKER", "AQUA_AFFINITY" -> Enchantment.WATER_WORKER;
+            default -> null;
+        };
     }
 
-    public static PotionEffectType matchPotionEffectType(String effect)
-    {
+    public static PotionEffectType matchPotionEffectType(String effect) {
         String e = effect.toUpperCase().replaceAll(" ", "_");
 
-        switch (e) {
-            case "ABSORPTION":
-                return PotionEffectType.ABSORPTION;
-            case "BAD_OMEN":
-                return PotionEffectType.BAD_OMEN;
-            case "BLINDNESS":
-                return PotionEffectType.BLINDNESS;
-            case "CONDUIT_POWER":
-                return PotionEffectType.CONDUIT_POWER;
-            case "CONFUSION":
-            case "NAUSEA":
-                return PotionEffectType.CONFUSION;
-            case "DAMAGE_RESISTANCE":
-            case "RESISTANCE":
-                return PotionEffectType.DAMAGE_RESISTANCE;
-            case "DOLPHINS_GRACE":
-                return PotionEffectType.DOLPHINS_GRACE;
-            case "FAST_DIGGING":
-            case "HASTE":
-                return PotionEffectType.FAST_DIGGING;
-            case "FIRE_RESISTANCE":
-                return PotionEffectType.FIRE_RESISTANCE;
-            case "GLOWING":
-                return PotionEffectType.GLOWING;
-            case "HARM":
-            case "INSTANT_DAMAGE":
-                return PotionEffectType.HARM;
-            case "HEAL":
-            case "INSTANT_HEALTH":
-                return PotionEffectType.HEAL;
-            case "HEALTH_BOOST":
-                return PotionEffectType.HEALTH_BOOST;
-            case "HERO_OF_THE_VILLAGE":
-                return PotionEffectType.HERO_OF_THE_VILLAGE;
-            case "HUNGER":
-                return PotionEffectType.HUNGER;
-            case "INCREASE_DAMAGE":
-            case "STRENGTH":
-                return PotionEffectType.INCREASE_DAMAGE;
-            case "INVISIBILITY":
-                return PotionEffectType.INVISIBILITY;
-            case "JUMP":
-            case "JUMP_BOOST":
-                return PotionEffectType.JUMP;
-            case "LEVITATION":
-                return PotionEffectType.LEVITATION;
-            case "LUCK":
-                return PotionEffectType.LUCK;
-            case "NIGHT_VISION":
-                return PotionEffectType.NIGHT_VISION;
-            case "POISON":
-                return PotionEffectType.POISON;
-            case "REGENERATION":
-                return PotionEffectType.REGENERATION;
-            case "SATURATION":
-                return PotionEffectType.SATURATION;
-            case "SLOW":
-            case "SLOWNESS":
-                return PotionEffectType.SLOW;
-            case "SLOW_DIGGING":
-            case "MINING_FATIGUE":
-                return PotionEffectType.SLOW_DIGGING;
-            case "SLOW_FALLING":
-                return PotionEffectType.SLOW_FALLING;
-            case "SPEED":
-            case "SWIFTNESS":
-                return PotionEffectType.SPEED;
-            case "UNLUCK":
-            case "BAD_LUCK":
-                return PotionEffectType.UNLUCK;
-            case "WATER_BREATHING":
-                return PotionEffectType.WATER_BREATHING;
-            case "WEAKNESS":
-                return PotionEffectType.WEAKNESS;
-            case "WITHER":
-                return PotionEffectType.WITHER;
-            default:
-                return null;
-        }
+        return switch (e) {
+            case "ABSORPTION" -> PotionEffectType.ABSORPTION;
+            case "BAD_OMEN" -> PotionEffectType.BAD_OMEN;
+            case "BLINDNESS" -> PotionEffectType.BLINDNESS;
+            case "CONDUIT_POWER" -> PotionEffectType.CONDUIT_POWER;
+            case "CONFUSION", "NAUSEA" -> PotionEffectType.CONFUSION;
+            case "DAMAGE_RESISTANCE", "RESISTANCE" -> PotionEffectType.DAMAGE_RESISTANCE;
+            case "DOLPHINS_GRACE" -> PotionEffectType.DOLPHINS_GRACE;
+            case "FAST_DIGGING", "HASTE" -> PotionEffectType.FAST_DIGGING;
+            case "FIRE_RESISTANCE" -> PotionEffectType.FIRE_RESISTANCE;
+            case "GLOWING" -> PotionEffectType.GLOWING;
+            case "HARM", "INSTANT_DAMAGE" -> PotionEffectType.HARM;
+            case "HEAL", "INSTANT_HEALTH" -> PotionEffectType.HEAL;
+            case "HEALTH_BOOST" -> PotionEffectType.HEALTH_BOOST;
+            case "HERO_OF_THE_VILLAGE" -> PotionEffectType.HERO_OF_THE_VILLAGE;
+            case "HUNGER" -> PotionEffectType.HUNGER;
+            case "INCREASE_DAMAGE", "STRENGTH" -> PotionEffectType.INCREASE_DAMAGE;
+            case "INVISIBILITY" -> PotionEffectType.INVISIBILITY;
+            case "JUMP", "JUMP_BOOST" -> PotionEffectType.JUMP;
+            case "LEVITATION" -> PotionEffectType.LEVITATION;
+            case "LUCK" -> PotionEffectType.LUCK;
+            case "NIGHT_VISION" -> PotionEffectType.NIGHT_VISION;
+            case "POISON" -> PotionEffectType.POISON;
+            case "REGENERATION" -> PotionEffectType.REGENERATION;
+            case "SATURATION" -> PotionEffectType.SATURATION;
+            case "SLOW", "SLOWNESS" -> PotionEffectType.SLOW;
+            case "SLOW_DIGGING", "MINING_FATIGUE" -> PotionEffectType.SLOW_DIGGING;
+            case "SLOW_FALLING" -> PotionEffectType.SLOW_FALLING;
+            case "SPEED", "SWIFTNESS" -> PotionEffectType.SPEED;
+            case "UNLUCK", "BAD_LUCK" -> PotionEffectType.UNLUCK;
+            case "WATER_BREATHING" -> PotionEffectType.WATER_BREATHING;
+            case "WEAKNESS" -> PotionEffectType.WEAKNESS;
+            case "WITHER" -> PotionEffectType.WITHER;
+            default -> null;
+        };
     }
 
-    /*
-        can this be trusted?
-     */
+    // Needs further testing
+    @Deprecated
     static void downloadURLAsFile(String link, String out) {
         try {
             URL website = new URL(link);

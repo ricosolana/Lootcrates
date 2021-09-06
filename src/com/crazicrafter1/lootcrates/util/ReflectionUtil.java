@@ -1,8 +1,6 @@
 package com.crazicrafter1.lootcrates.util;
 
 import com.crazicrafter1.lootcrates.Main;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 import org.bukkit.Bukkit;
 
 import java.lang.reflect.Constructor;
@@ -17,19 +15,14 @@ public final class ReflectionUtil {
 
     public static boolean isOldVersion() {
         String v = CRAFTBUKKIT.substring(23);
-        return v.contains("1_8") ||
-                v.contains("1_9") ||
-                v.contains("1_10") ||
-                v.contains("1_11") ||
-                v.contains("1_12") ||
-                v.contains("1_13");// 1.13 might be new enough
+        return !v.contains("1_17");
     }
 
     // Not instantiable
     private ReflectionUtil() { }
 
     // get class by package dir
-    public static @NotNull Class getCanonicalClass(final @NotNull String canonicalName) {
+    public static Class getCanonicalClass(final String canonicalName) {
         try {
             return Class.forName(canonicalName);
         } catch (ClassNotFoundException e) {

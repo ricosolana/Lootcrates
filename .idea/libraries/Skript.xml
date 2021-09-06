@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Skript">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Documents/MinecraftDev/api/spigot-api-1.17.1-R0.1-SNAPSHOT-shaded.jar!/" />
+      <root url="jar://$USER_HOME$/Documents/MinecraftDev/api/QualityArmory.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/Documents/MinecraftDev/api/QualityArmory.jar!/src/main/java" />
+    </SOURCES>
+  </library>
+</component>

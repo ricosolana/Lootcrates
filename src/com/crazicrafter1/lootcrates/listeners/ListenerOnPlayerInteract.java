@@ -28,7 +28,7 @@ public class ListenerOnPlayerInteract extends BaseListener {
 
                 plugin.debug("Passed click validation");
 
-                ItemStack item = p.getInventory().getItemInHand();
+                ItemStack item = p.getInventory().getItemInMainHand();
 
                 Crate crate = Crate.crateByItem(item);
                 if (crate != null) {

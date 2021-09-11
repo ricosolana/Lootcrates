@@ -1,10 +1,11 @@
 package com.crazicrafter1.lootcrates.crate;
 
-import com.crazicrafter1.lootcrates.util.Bool;
-import com.crazicrafter1.lootcrates.util.ItemBuilder;
+import com.crazicrafter1.crutils.Bool;
+import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.lootcrates.Main;
-import com.crazicrafter1.lootcrates.util.Util;
+import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.crate.loot.*;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
@@ -61,7 +62,7 @@ public abstract class AbstractLoot {
             result.code = EnumParseResult.Code.INVALID_ITEM;
 
             String item = (String)instance.get("item");
-            ItemBuilder builder = ItemBuilder.builder(Util.getCompatibleItem(item));
+            ItemBuilder builder = new ItemBuilder(Material.matchMaterial(item));
 
 
             result.code = EnumParseResult.Code.INVALID_NAME;
@@ -81,15 +82,12 @@ public abstract class AbstractLoot {
 
             result.code = EnumParseResult.Code.INVALID_COMMAND;
             if (instance.containsKey("command")) {
-                Main.getInstance().debug("Command type");
                 List<String> commands = (List<String>) instance.get("command");
                 return new LootCommand(builder.toItem(), commands.toArray(new String[0]));
             }
 
 
             if (instance.containsKey("effects") && item.contains("potion")) {
-
-
                 result.code = EnumParseResult.Code.INVALID_COLOR;
                 if (instance.containsKey("color"))
                     builder.color(Util.matchColor((String) instance.get("color")));

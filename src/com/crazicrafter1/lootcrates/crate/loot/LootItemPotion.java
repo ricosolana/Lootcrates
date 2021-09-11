@@ -1,6 +1,6 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
-import com.crazicrafter1.lootcrates.util.Util;
+import com.crazicrafter1.crutils.Util;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
@@ -16,14 +16,6 @@ public class LootItemPotion extends LootItem {
 
         this.potionEffects = potionEffects;
     }
-
-
-    //public LootPotion(Color color, boolean splash, QPotionEffect[] potionEffects) {
-    //    super(null, 0);
-    //    this.color = color;
-    //    this.splash = splash;
-    //    this.potionEffects = potionEffects;
-    //}
 
     @Override
     public ItemStack getIcon() {

@@ -1,8 +1,8 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
+import com.crazicrafter1.crutils.Bool;
 import com.crazicrafter1.lootcrates.crate.AbstractLoot;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
-import com.crazicrafter1.lootcrates.util.Bool;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

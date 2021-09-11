@@ -1,8 +1,10 @@
 package com.crazicrafter1.lootcrates.commands;
 
-import com.crazicrafter1.lootcrates.util.Int;
-import com.crazicrafter1.lootcrates.util.Util;
+import com.crazicrafter1.crutils.Int;
+import com.crazicrafter1.crutils.ItemBuilder;
+import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.crate.Crate;
+import com.crazicrafter1.lootcrates.editor.MainMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -65,20 +67,23 @@ public class CmdCrates extends CmdBase {
                 feedback(sender, "Reloading config...");
                 plugin.reloadConfigValues();
                 return feedback(sender, "Config was reloaded.");
-            } /*case "editor": {
-                if (plugin.editor != null) {
-                    if (sender instanceof Player) {
-                        GraphicalAPI.openMenu((Player) sender, plugin.editor.MAIN_MENU);
-                        return true;
-                    }
-                    return error(sender, "Can only be executed by a player");
+            } case "editor": {
+                if (sender instanceof Player p) {
+                    new MainMenu().show(p);
+                    return true;
                 }
-                return error(sender, "GraphicalAPI was not found or MC version is not 1.14+");
-            }*/ case "version":
+                return error(sender, "Can only be executed by a player");
+            } case "version":
                 return feedback(sender, "LootCrates version: " + plugin.getDescription().getVersion());
-            case "flair":
-                return error(sender, "Unimplemented");
-            case "detect": {
+            case "flair": {
+                if (!(sender instanceof Player p)) return error(sender, "Only a player can execute this argument");
+
+                Util.giveItemToPlayer(p, new ItemBuilder(Material.CHEST).
+                        name("&c&lLootcrates").lore(new String[]{ChatColor.ITALIC + "&8The way to reward players",
+                                ChatColor.ITALIC + "&8in an awesome fashion"}).toItem());
+
+                return feedback(sender, "You received 1 signature crate");
+            } case "detect": {
                 if (!(sender instanceof Player p))
                     return error(sender, "Only a player can execute this argument");
                 ItemStack itemStack = p.getInventory().getItemInMainHand();

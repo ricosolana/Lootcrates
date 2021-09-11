@@ -4,15 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+import com.crazicrafter1.crutils.*;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import com.crazicrafter1.lootcrates.crate.LootGroup;
 import com.crazicrafter1.lootcrates.tabs.TabCrates;
 import com.crazicrafter1.lootcrates.commands.CmdCrates;
 import com.crazicrafter1.lootcrates.listeners.*;
-import com.crazicrafter1.lootcrates.util.ItemBuilder;
-import com.crazicrafter1.lootcrates.util.ReflectionUtil;
-import com.crazicrafter1.lootcrates.util.Util;
 import org.bukkit.*;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -26,13 +24,10 @@ public class Main extends JavaPlugin
     public static HashSet<UUID> crateFireworks = new HashSet<>();
 
     public static boolean supportQualityArmory = false;
+    public static boolean supportGapi = false;
     public static boolean debug = false;
     public static boolean update = false;
     public static int speed;
-    public static Sound sound = null;
-    public static String header = null;
-    public static int size;
-    public static int picks;
     public static boolean seasonal = false;
 
     public static ItemStack unSelectedItem = null;
@@ -49,8 +44,6 @@ public class Main extends JavaPlugin
     private File configFile;
 
     public String prefix = ChatColor.GRAY + "[" + ChatColor.AQUA + ChatColor.BOLD + "LootCrates" + ChatColor.GRAY + "] ";
-
-    //public ClickEditGUI editor = null;
 
     private static Main main;
     public static Main getInstance() {
@@ -72,7 +65,7 @@ public class Main extends JavaPlugin
         if (getConfig().contains(path)) {
             return getConfig().get(path);
         }
-        //debug("Setting default for " + path + ": " + def.toString());
+        info("Setting default for " + path + ": " + def.toString());
         getConfig().set(path, def);
         saveTheConfig = true;
         return def;
@@ -99,7 +92,10 @@ public class Main extends JavaPlugin
          * 1.17 assert
          */
         if(ReflectionUtil.isOldVersion()) {
-            Main.getInstance().error("only MC 1.17+ is supported (Java 16)");
+            Main.getInstance().error(
+                    "only MC 1.17+ is supported (Java 16)\n" +
+                    "please use LootCrates 3.1.4 and disable auto-update for legacy versions");
+
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -110,6 +106,8 @@ public class Main extends JavaPlugin
         }
 
         supportQualityArmory = Bukkit.getPluginManager().isPluginEnabled("QualityArmory");
+
+
 
         reloadConfigValues();
 
@@ -128,19 +126,18 @@ public class Main extends JavaPlugin
                     e.printStackTrace();
             }
         } else
-            GithubUpdater.autoUpdate(this, "PeriodicSeizures", "LootCrates", "LootCrates.jar");
-
-        //if (Bukkit.getPluginManager().isPluginEnabled("GraphicalAPI"))
-        //    editor = new ClickEditGUI();
-        //else {
-        //    info("GraphicalAPI was not found; gui crate editing is disabled");
-        //}
+            GithubUpdater.autoUpdate(this, updater, "PeriodicSeizures", "LootCrates", "LootCrates.jar");
 
         /*
          * bStats metrics init
+         *  - key changes that should be recorded:
+         *      ghyyuuu854
          */
         try {
             Metrics metrics = new Metrics(this, 10395);
+            metrics.addCustomChart(new Metrics.SimplePie("updater", // what to record
+                    () -> "" + Main.update));
+
             info("Metrics was successfully enabled");
         } catch (Exception e) {
             error("An error occurred while enabling metrics");
@@ -192,29 +189,30 @@ public class Main extends JavaPlugin
              */
             debug = (boolean) a("debug", false);
             update = (boolean) a("update", true);
-            // Global crate defaults
-            header = ChatColor.translateAlternateColorCodes('&', (String) a("header", "opening crate"));
-            size = (int) a("size", 27);
-            picks = (int) a("picks", 4);
-            // .end of defaults
-            speed = (int) a("speed", 4);
-            sound = Sound.valueOf((String) a("sound", "ENTITY_EXPERIENCE_ORB_PICKUP"));
-            seasonal = (boolean) a("seasonal", false);
+            // <defaults>
+            String header = ChatColor.translateAlternateColorCodes('&', (String) a("header", "opening crate"));
+            int columns = (int) a("columns", 3);
+            int picks = (int) a("picks", 4);
+            String soundName = (String)
+                    b("sound", null);
+            // </defaults>
+            speed = (int) b("speed", 4);
+            seasonal = (boolean) b("seasonal", false);
 
             // assert size
-            if (!(size % 9 == 0 && size>=9 && size <= 54)) {
-                size = 27;
-                error("invalid size (must be a factor of 9, and 6 columns or less)");
+            if (!(columns >= 1 && columns <= 6)) {
+                columns = 27;
+                error("invalid size [1,6]");
             }
 
-            unSelectedItem = ItemBuilder.builder(
-                    Util.getCompatibleItem((String) a("gui.unselected.icon", null)))
+            unSelectedItem = new ItemBuilder(
+                    Material.matchMaterial((String) a("gui.unselected.icon", null)))
                     .name((String) a("gui.unselected.title", null))
                     .lore((List<String>) b("gui.unselected.footer", new ArrayList<String>()))
                     .glow((boolean) b("gui.unselected.glow", false)).toItem();
 
-            selectedItem = ItemBuilder.builder(
-                    Util.getCompatibleItem((String) a("gui.selected.icon", null)))
+            selectedItem = new ItemBuilder(
+                    Material.matchMaterial((String) a("gui.selected.icon", null)))
                     .name((String) a("gui.selected.title", null))
                     .lore((List<String>) b("gui.selected.footer", new ArrayList<String>()))
                     .glow((boolean) b("gui.selected.glow", false)).toItem();
@@ -263,21 +261,25 @@ public class Main extends JavaPlugin
             for (String id : ((MemorySection) a("crates", null)).getKeys(false)) {
                 String path = "crates." + id;
 
-                ItemBuilder builder = ItemBuilder.
-                        builder(Material.matchMaterial((String) a(path + ".icon", null))).
+                ItemBuilder builder = new ItemBuilder(Material.matchMaterial((String) a(path + ".icon", null))).
                         name((String) a(path + ".title", null)).
                         lore((List<String>) b(path + ".footer", null)).
                         customModelData((Integer) b(path + ".model", null));
                 //                      ^ ^ ^ ^ ^ Integer cast is intentional
 
                 // Get this crates final size
-                int size = (int) b(path + ".size",
-                        (int) b(path + ".columns", Main.size / 9) * 9);
+                int currentSize = (int) b(path + ".columns", columns) * 9;
+
+                Sound currentSound = null;
+                if (soundName != null)
+                    currentSound = Sound.valueOf(
+                        (String) b(path + ".sound", soundName));
 
                 Crate crate = new Crate(id, builder.toItem(),
-                        (String) b(path + ".header", Main.header),
-                        size,
-                        (int) b(path + ".picks", Main.picks));
+                        (String) b(path + ".header", header),
+                        currentSize,
+                        (int) b(path + ".picks", picks),
+                        currentSound);
 
                 Main.crates.put(id, crate);
             }
@@ -310,8 +312,8 @@ public class Main extends JavaPlugin
             if (saveTheConfig)
                 this.saveConfig();
 
-        } catch (Exception e) {                                             // index 2 is special
-            error("Config issue around " + lastPath + e.getStackTrace()[2].getClass() + " L" + e.getStackTrace()[2].getLineNumber());
+        } catch (Exception e) {
+            error("Config issue around " + lastPath);
             if (debug)
                 e.printStackTrace();
         }
@@ -330,13 +332,8 @@ public class Main extends JavaPlugin
         Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.RED + s);
     }
 
-    /*
-     * TODO
-     *  should log errors/count and throw
-     */
     public void error(String s) {
         Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.DARK_RED + s);
-        //this.getPluginLoader().disablePlugin(this);
     }
 
     public void debug(String s) {
@@ -360,6 +357,7 @@ public class Main extends JavaPlugin
         }
 
         config = CommentYamlConfiguration.loadConfiguration(configFile);
+        //config = this.getConfig();
     }
 
     @Override
@@ -376,6 +374,7 @@ public class Main extends JavaPlugin
             this.reloadConfig();
         }
         try {
+            Main.getInstance().info("Saving config");
             this.config.save(configFile);
         } catch (IOException e) {
             e.printStackTrace();

@@ -1,8 +1,8 @@
 package com.crazicrafter1.lootcrates.crate;
 
 import com.crazicrafter1.lootcrates.Main;
-import com.crazicrafter1.lootcrates.util.ItemBuilder;
-import com.crazicrafter1.lootcrates.util.ReflectionUtil;
+import com.crazicrafter1.crutils.ItemBuilder;
+import com.crazicrafter1.crutils.ReflectionUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -62,12 +62,7 @@ public enum Seasonal {
         this.startTime = startTime;
         this.endTime = endTime;
 
-        if (!ReflectionUtil.isOldVersion())
-            this.itemStack = ItemBuilder.builder(Material.PLAYER_HEAD).skull(base64HeadTexture).toItem();
-        else {
-            this.itemStack = null;
-            Main.getInstance().debug("Using old version compatability for seasonal");
-        }
+        this.itemStack = new ItemBuilder(Material.PLAYER_HEAD).skull(base64HeadTexture).toItem();
     }
 
     private boolean isToday() {

@@ -1,10 +1,11 @@
 package com.crazicrafter1.lootcrates.crate;
 
 import com.crazicrafter1.lootcrates.*;
-import com.crazicrafter1.lootcrates.util.ItemBuilder;
-import com.crazicrafter1.lootcrates.util.ReflectionUtil;
-import com.crazicrafter1.lootcrates.util.Util;
+import com.crazicrafter1.crutils.ItemBuilder;
+import com.crazicrafter1.crutils.ReflectionUtil;
+import com.crazicrafter1.crutils.Util;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -36,20 +37,24 @@ public final class Crate {
     private final String header;
     private final int size;
     private final int picks;
-    private HashMap<LootGroup, Integer> lootGroups;
+    private final Sound sound;
+    private HashMap<LootGroup, Integer> lootGroups; // with partial summed weights
+    private HashMap<LootGroup, Integer> originalWeights; // each individual original weight
     private ItemStack seasonalVariant;
-    private int chanceSum;
+    private int totalWeights;
 
-    public Crate(String name, ItemStack itemStack, String header, int size, int picks) {
+    public Crate(String name, ItemStack itemStack, String header, int size, int picks, Sound sound) {
         this.name = name;
         this.itemStack = Crate.makeCrate(itemStack, name);
         this.header = header;
         this.size = size;
         this.picks = picks;
+        this.sound = sound;
     }
 
     public void setLootGroups(HashMap<LootGroup, Integer> lootGroups) {
         lootGroups = sortByValue(lootGroups);
+        this.originalWeights = (HashMap<LootGroup, Integer>) lootGroups.clone();
 
         int last = 0;
         for (Map.Entry<LootGroup, Integer> entry : lootGroups.entrySet()) {
@@ -58,7 +63,7 @@ public final class Crate {
         }
 
         this.lootGroups = lootGroups;
-        this.chanceSum = last;
+        this.totalWeights = last;
     }
 
     /**
@@ -66,6 +71,24 @@ public final class Crate {
      */
     public String getName() {
         return name;
+    }
+
+    public ItemStack getItemStack(int count) {
+        if (Main.seasonal && this.seasonalVariant != null) {
+            seasonalVariant.setAmount(count);
+            return seasonalVariant;
+        }
+        ItemStack itemStack = new ItemStack(this.itemStack);
+
+        itemStack.setAmount(count);
+        return itemStack;
+    }
+
+    /**
+     * @return Inventory name
+     */
+    public String getHeader() {
+        return header;
     }
 
     /**
@@ -83,10 +106,10 @@ public final class Crate {
     }
 
     /**
-     * @return Inventory name
+     * @return Click sound
      */
-    public String getHeader() {
-        return header;
+    public Sound getSound() {
+        return sound;
     }
 
     public void prepSeasonalVariant() {
@@ -94,11 +117,11 @@ public final class Crate {
         if (rawSeasonal == null)
             seasonalVariant = null;
         else
-            seasonalVariant = ItemBuilder.builder(Crate.makeCrate(rawSeasonal, name)).mergeLexicals(this.itemStack).toItem();
+            seasonalVariant = new ItemBuilder(Crate.makeCrate(rawSeasonal, name)).mergeLexicals(this.itemStack).toItem();
     }
 
     LootGroup getBasedRandom() {
-        int rand = Util.randomRange(0, chanceSum-1);
+        int rand = Util.randomRange(0, totalWeights-1);
 
         for (Map.Entry<LootGroup, Integer> entry : this.lootGroups.entrySet()) {
             if (entry.getValue() > rand) return entry.getKey();
@@ -110,16 +133,8 @@ public final class Crate {
     public HashMap<LootGroup, Integer> getLootGroups() {
         return lootGroups;
     }
-
-    public ItemStack getItemStack(int count) {
-        if (Main.seasonal && this.seasonalVariant != null) {
-            seasonalVariant.setAmount(count);
-            return seasonalVariant;
-        }
-        ItemStack itemStack = new ItemStack(this.itemStack);
-
-        itemStack.setAmount(count);
-        return itemStack;
+    public HashMap<LootGroup, Integer> getOriginalWeights() {
+        return originalWeights;
     }
 
     private static ItemStack makeCrate(ItemStack itemStack, final String crate) {
@@ -227,5 +242,9 @@ public final class Crate {
      */
     public static void closeCrate(Player p) {
         Main.openCrates.remove(p.getUniqueId()).close();
+    }
+
+    public int getTotalWeights() {
+        return totalWeights;
     }
 }

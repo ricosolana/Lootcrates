@@ -2,7 +2,7 @@ package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import com.crazicrafter1.lootcrates.crate.Crate;
-import com.crazicrafter1.lootcrates.util.Util;
+import com.crazicrafter1.crutils.Util;
 import org.bukkit.inventory.ItemStack;
 
 public class LootItemCrate extends LootItem {

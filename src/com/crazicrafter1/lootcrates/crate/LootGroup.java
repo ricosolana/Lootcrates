@@ -1,8 +1,9 @@
 package com.crazicrafter1.lootcrates.crate;
 
-import com.crazicrafter1.lootcrates.util.ItemBuilder;
+import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.lootcrates.Main;
-import com.crazicrafter1.lootcrates.util.Util;
+import com.crazicrafter1.crutils.Util;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
@@ -28,7 +29,7 @@ public record LootGroup(String name, ItemStack itemStack,
             String name = config.getString(tempPath + ".title");
             List<String> lore = config.getStringList(tempPath + ".footer");
 
-            item = ItemBuilder.builder(Util.getCompatibleItem(itemName)).name(name).lore(lore).toItem();
+            item = new ItemBuilder(Material.matchMaterial(itemName)).name(name).lore(lore).toItem();
         }
 
         /*
@@ -46,25 +47,15 @@ public record LootGroup(String name, ItemStack itemStack,
         List<Map<?, ?>> maplist = config.getMapList(tempPath);
         int i = 0;
         for (Map<?, ?> map : maplist) {
-
             EnumParseResult result = new EnumParseResult(null);
-            try {
 
-                AbstractLoot abstractLoot = AbstractLoot.fromNewConfig(((Map<String, Object>) map), result);
+            AbstractLoot abstractLoot = AbstractLoot.fromNewConfig(((Map<String, Object>) map), result);
 
-                if (abstractLoot == null) {
-                    Main.getInstance().error("Lootgroup: " + id + "@index: " + i + " (" + result.code.name() + ")");
-                    continue;
-                }
-
+            if (abstractLoot == null) {
+                Main.getInstance().error("Loot: " + id + "@index: " + i + " (" + result.code.name() + ")");
+            } else
                 abstractLoots.add(abstractLoot);
 
-            } catch (Exception e) {
-
-                Main.getInstance().error("Lootgroup: " + id + "@index: " + i + " (" + result.code.name() + ")");
-
-                e.printStackTrace();
-            }
             i++;
         }
 

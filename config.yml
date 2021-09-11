@@ -25,26 +25,30 @@
 
 
 
-# DEBUG MODE
+#
+# *** ... *** : required
+#
+
+# *** enable debug ***
 debug: false
 
-# Github auto-update
+# *** auto-updater ***
 update: true
 
-# name of crate inventory
+# *** default inventory name ***
 header: "&8Opening supply crate"
 
-# default crate size
-size: 27
+# *** default crate size ***
+columns: 27
 
-# default crate loot picks
+# *** default crate loot picks ***
 picks: 4
 
-# speed at which to reveal items
-speed: 4
-
 # sound to play on click
-sound: ENTITY_EXPERIENCE_ORB_PICKUP # ORB_PICKUP <for older versions> (includes: 1.8)
+sound: ENTITY_EXPERIENCE_ORB_PICKUP
+
+# speed to reveal items
+speed: 4
 
 # seasonal crates?
 seasonal: true
@@ -125,6 +129,21 @@ gui:
 
 
 
+
+# *** icon *** : itemstack for crate
+# *** title *** : name of itemstack
+# footer : lore of itemstack
+# model: for resource pack
+# columns: of crate gui
+# sound: sound on click
+# header: name of inventory
+# picks: number of loot selections
+
+#######     any optional omitted entry defaults     #######
+#     #     accordingly,  either to a hardcoded     #     #
+#######     default, or to this config defaults     #######
+
+
 crates:
   peasant:
     icon: "chest"
@@ -133,8 +152,8 @@ crates:
       - "&7Right click on this item to unlock"
       - "&7four pieces of loot!"
     header: "Peasant crate..." # optional
-    size: 45 # optional
-    picks: 3 # optional
+    columns: 5
+    picks: 3
     chances:
       common: 70
       regular: 22
@@ -145,7 +164,7 @@ crates:
     footer:
       - "&7Right click on this item to unlock"
       - "&7four pieces of loot!"
-    columns: 2 # optional
+    columns: 2
     chances:
       common: 40
       regular: 35
@@ -214,7 +233,7 @@ crates:
 # - 'crate' key is a specific crate (by id)
 
 # Using both a combination of 'qa' key or 'potion' or 'crate' key might
-# result in undefined bahaviour. Do not do this.
+# result in undefined behaviour. Do not do this.
 
 # All loot must have an associated count, with specific rules:
 

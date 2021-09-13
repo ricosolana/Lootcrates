@@ -29,7 +29,8 @@ public class LootCommand extends AbstractLoot {
 
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
         }
-        giveItem.value = false;
+        if (giveItem != null)
+            giveItem.value = false;
     }
 
 }

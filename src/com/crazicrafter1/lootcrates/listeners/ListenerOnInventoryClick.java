@@ -17,16 +17,6 @@ import java.util.HashSet;
 
 public class ListenerOnInventoryClick extends BaseListener {
 
-    private static HashSet<String> preventTypes = new HashSet<>();
-    static {
-        preventTypes.addAll(Arrays.asList(
-                "FURNACE",
-                "WORKBENCH",
-                "SMOKER",
-                "BLAST_FURNACE"
-                ));
-    }
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent e)
     {
@@ -36,43 +26,14 @@ public class ListenerOnInventoryClick extends BaseListener {
         if (Main.openCrates.containsKey(p.getUniqueId()))
         {
             Main.openCrates.get(p.getUniqueId()).onInventoryClick(e);
-        } else {
-            /*
-                TODO
-                somehow prevent crates from being used as fuel or crafting recipes
-             */
-
-            //Main.getInstance().debug("hotbarbutton: " + e.getHotbarButton());
-            //Main.getInstance().debug("slot: " + e.getSlot());
-//
-            //if (e.getClickedInventory() instanceof PlayerInventory)
-            //    return;
-//
-            //Inventory clicked = e.getClickedInventory();
-//
-            //if (clicked == null || !preventTypes.contains(clicked.getType().name())) return;
-//
-            //ItemStack itemStack = e.getCurrentItem();
-//
-            //if (itemStack == null) {
-//
-            //    int hotbar = e.getHotbarButton();
-            //    if (hotbar != -1)
-            //        itemStack = p.getInventory().getCompatibleItem(hotbar);
-//
-            //}
-//
-//
-//
-            //// If an item was PLACED INTO
-            //if (itemStack != null && itemStack.getType() != Material.AIR) {
-            //    // test that item
-            //    if (Crate.crateByItem(itemStack) != null) {
-            //        e.setCancelled(true);
-            //    }
-            //}
-
-        }
+        } else if (e.getClickedInventory() != null) {
+            if (Crate.crateByItem(e.getCursor()) != null)
+                switch (e.getClickedInventory().getType()) {
+                    case ANVIL, SMOKER, BREWING, FURNACE, CRAFTING, MERCHANT, WORKBENCH, ENCHANTING, GRINDSTONE, STONECUTTER, BLAST_FURNACE -> {
+                        e.setCancelled(true);
+                    }
+                }
+        } //else if (e.getCurrentItem())
 
     }
 

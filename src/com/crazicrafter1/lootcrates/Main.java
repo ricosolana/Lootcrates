@@ -40,8 +40,8 @@ public class Main extends JavaPlugin
 
     VersionChecker updater = new VersionChecker(this, 68424);
 
-    private FileConfiguration config;
-    private File configFile;
+    public FileConfiguration config;
+    //private File configFile;
 
     public String prefix = ChatColor.GRAY + "[" + ChatColor.AQUA + ChatColor.BOLD + "LootCrates" + ChatColor.GRAY + "] ";
 
@@ -101,9 +101,9 @@ public class Main extends JavaPlugin
         }
 
         Main.main = this;
-        if(!this.getDataFolder().exists()){
-            this.getDataFolder().mkdirs();
-        }
+        //if(!this.getDataFolder().exists()){
+        //    this.getDataFolder().mkdirs();
+        //}
 
         supportQualityArmory = Bukkit.getPluginManager().isPluginEnabled("QualityArmory");
 
@@ -173,13 +173,20 @@ public class Main extends JavaPlugin
 
     }
 
+    /**
+     * Will not save current loaded config to file
+     */
     @SuppressWarnings("unchecked")
     public void reloadConfigValues() {
         try {
             if (!new File(getDataFolder(), "config.yml").exists()) {
                 saveDefaultConfig();
             }
-            reloadConfig();
+
+            //reloadConfig();
+
+            this.config = this.getConfig();
+
 
             crates.clear();
             lootGroups.clear();
@@ -202,7 +209,7 @@ public class Main extends JavaPlugin
             // assert size
             if (!(columns >= 1 && columns <= 6)) {
                 columns = 27;
-                error("invalid size [1,6]");
+                error("invalid columns [1,6]");
             }
 
             unSelectedItem = new ItemBuilder(
@@ -341,6 +348,7 @@ public class Main extends JavaPlugin
             Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.GOLD + s);
     }
 
+    /*
     @Override
     public void reloadConfig() {
         if (configFile == null) {
@@ -380,5 +388,6 @@ public class Main extends JavaPlugin
             e.printStackTrace();
         }
     }
+     */
 
 }

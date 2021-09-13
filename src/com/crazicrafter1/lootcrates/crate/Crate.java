@@ -137,6 +137,12 @@ public final class Crate {
         return originalWeights;
     }
 
+    public int getTotalWeights() {
+        return totalWeights;
+    }
+
+
+
     private static ItemStack makeCrate(ItemStack itemStack, final String crate) {
 
         /*
@@ -181,7 +187,7 @@ public final class Crate {
     }
 
     public static Crate crateByName(String id) {
-        return Main.crates.getOrDefault(id, null);
+        return Main.crates.get(id);
     }
 
     public static Crate crateByItem(final ItemStack itemStack) {
@@ -190,11 +196,7 @@ public final class Crate {
             Old code when custom name of the item was used to get crates
          */
 
-        //ItemMeta meta = item.getItemMeta();
-        //String name = meta.getDisplayName();
-        //return Main.crates.getOrDefault(Main.crateNameIds.getOrDefault(name, null), null);
-
-        if (itemStack.getType() == Material.AIR)
+        if (itemStack == null || itemStack.getType() == Material.AIR)
             return null;
 
         //net.minecraft.server.v1_14_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
@@ -244,7 +246,4 @@ public final class Crate {
         Main.openCrates.remove(p.getUniqueId()).close();
     }
 
-    public int getTotalWeights() {
-        return totalWeights;
-    }
 }

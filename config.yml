@@ -39,7 +39,7 @@ update: true
 header: "&8Opening supply crate"
 
 # *** default crate size ***
-columns: 27
+columns: 3
 
 # *** default crate loot picks ***
 picks: 4
@@ -253,7 +253,7 @@ crates:
 # Durations (duration) for potion effects follow the same above
 # Amplifier (amp) for potion effects must an integer, not a range.
 
-
+# flag durable items with unbreakable: true
 
 # / \ / \ / \ / \ / \ / \ / \ / \ / \ / \ \ / \ / \ / \ / \ \ / \ / \ / \ #
 #                The already filled out loot below is just for example.   #

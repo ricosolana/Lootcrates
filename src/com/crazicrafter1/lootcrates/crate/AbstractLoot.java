@@ -80,6 +80,10 @@ public abstract class AbstractLoot {
                 builder.customModelData((Integer) instance.get("model"));
 
 
+            if (instance.containsKey("unbreakable"))
+                builder.unbreakable();
+
+
             result.code = EnumParseResult.Code.INVALID_COMMAND;
             if (instance.containsKey("command")) {
                 List<String> commands = (List<String>) instance.get("command");

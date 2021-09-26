@@ -15,12 +15,13 @@ public class LootMenu extends ParallaxMenu {
     public LootMenu() {
         super("&6Loot");
 
-        for (Map.Entry<String, LootGroup> entry : Main.lootGroups.entrySet()) {
+        for (Map.Entry<String, LootGroup> entry : Main.DAT.lootGroups.entrySet()) {
 
             addItem(new TriggerComponent() {
                 @Override
                 public void onLeftClick(Player p) {
-
+                    // open the loot
+                    new SingleLootMenu(entry.getValue()).show(p);
                 }
 
                 @Override

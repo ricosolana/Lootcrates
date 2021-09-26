@@ -17,11 +17,11 @@ public class CrateMenu extends ParallaxMenu {
     public CrateMenu() {
         super("&8Crates");
 
-        for (Map.Entry<String, Crate> entry : Main.crates.entrySet()) {
+        for (Map.Entry<String, Crate> entry : Main.DAT.crates.entrySet()) {
 
             Crate crate = entry.getValue();
 
-            ItemStack itemStack = new ItemBuilder(crate.getItemStack(1)).resetLore().toItem();
+            ItemStack itemStack = new ItemBuilder(crate.itemStack).resetLore().toItem();
 
             addItem(new TriggerComponent() {
                 @Override

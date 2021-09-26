@@ -42,6 +42,11 @@ public class LootItemEnchantable extends LootItem {
         return itemStack;
     }
 
+    @Override
+    public String toString() {
+        return null;
+    }
+
     public static class QEnchantment {
 
         private final Enchantment enchantment;

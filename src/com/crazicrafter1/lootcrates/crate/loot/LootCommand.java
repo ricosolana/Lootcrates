@@ -33,4 +33,14 @@ public class LootCommand extends AbstractLoot {
             giveItem.value = false;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("executes: \n");
+
+        for (String cmd : commands)
+            sb.append(" ").append(cmd).append("\n");
+
+        return sb.toString();
+    }
+
 }

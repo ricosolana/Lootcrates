@@ -12,6 +12,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class CmdCrates extends CmdBase {
 
@@ -35,43 +36,42 @@ public class CmdCrates extends CmdBase {
                 if (crate == null)
                     return error(sender, "That crate doesn't exist");
 
-                int count = 1;
-
-                // crates crate legendary crazicrafter1 5
-                if (args.length == 4) {
-                    Int wrapped = new Int();
-                    if (Util.toInt(args[3], wrapped)) {
-                        count = wrapped.value;
-                        if (count <= 0) return error(sender, "Count must be greater than 0");
-                    } else return error(sender, "Count must be numeric");
-                }
-
                 if (!args[2].equals("*")) {
                     Player p = Bukkit.getServer().getPlayer(args[2]);
 
                     if (p == null)
                         return error(sender, "That player cannot be found");
 
-                    p.getInventory().addItem(crate.getItemStack(count));
+                    p.getInventory().addItem(crate.itemStack);
 
-                    //crate.crateByItem(crate.getItemStack(1));
-
-                    return feedback(sender, "Gave " + count + " " + args[1] + " crate to " + ChatColor.GOLD + p.getName());
+                    return feedback(sender, "Gave a " + args[1] + " crate to " + ChatColor.GOLD + p.getName());
                 } else {
                     for (Player p : players) {
-                        p.getInventory().addItem(crate.getItemStack(count));
+                        p.getInventory().addItem(crate.itemStack);
                     }
-                    return feedback(sender, "Gave " + count + " " + args[1] + " crate to all players (" + ChatColor.LIGHT_PURPLE + players.size() + ChatColor.GRAY + " online)");
+                    return feedback(sender, "Gave a " + args[1] + " crate to all players (" + ChatColor.LIGHT_PURPLE + players.size() + ChatColor.GRAY + " online)");
                 }
             } case "reload": {
                 feedback(sender, "Reloading config...");
-                plugin.reloadConfigValues();
+                //plugin.reloadConfigValues();
+                // save config somehow
                 return feedback(sender, "Config was reloaded.");
             } case "editor": {
                 if (sender instanceof Player p) {
-                    new MainMenu().show(p);
+                    feedback(sender, "opening in 3s...");
+                    feedback(sender, "The editor is not fully implemented, so if");
+                    feedback(sender, "a button does nothing, it does nothing!");
+                    // coroutine
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            new MainMenu().show(p);
+                        }
+                    }.runTaskLater(plugin, 2*20);
+
                     return true;
                 }
+
                 return error(sender, "Can only be executed by a player");
             } case "version":
                 return feedback(sender, "LootCrates version: " + plugin.getDescription().getVersion());
@@ -90,7 +90,7 @@ public class CmdCrates extends CmdBase {
                 if (itemStack.getType() != Material.AIR) {
                     Crate crate = Crate.crateByItem(itemStack);
                     if (crate != null) {
-                        return feedback(sender, "Item is a crate (" + crate.getName() + ")");
+                        return feedback(sender, "Item is a crate (" + crate.name + ")");
                     } else {
                         return feedback(sender, "Item is a not a crate");
                     }

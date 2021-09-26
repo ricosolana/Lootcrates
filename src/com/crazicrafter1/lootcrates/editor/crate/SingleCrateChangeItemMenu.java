@@ -31,12 +31,12 @@ public class SingleCrateChangeItemMenu extends SimplexMenu {
         setComponent(1, 1, new Component() {
             @Override
             public ItemStack getIcon() {
-                return crate.getItemStack(1);
+                return crate.itemStack;
             }
         });
 
         // Change to
-        RemovableComponent rem = new RemovableComponent();
+        RemovableComponent rem = new RemovableComponent(null);
         setComponent(4, 1, rem);
 
         // Confirm
@@ -46,15 +46,7 @@ public class SingleCrateChangeItemMenu extends SimplexMenu {
                 Main.getInstance().info("Applying changes here!");
                 ItemStack item = rem.getIcon();
                 if (item != null) {
-                    Main.getInstance().info(item.getType().name());
-                    String path = "crates." + crate.getName() + ".";
-                    Main.getInstance().config.set(path + "icon", item.getType().name());
-                    ItemMeta meta = item.getItemMeta();
-                    if (meta != null) {
-                        Main.getInstance().config.set(path + "title", Util.toAlternateColorCodes('&', meta.getDisplayName()));
-                        if (meta.getLore() != null)
-                            Main.getInstance().config.set(path + "footer", Util.toAlternateColorCodes('&', meta.getLore()));
-                    }
+                    crate.itemStack = new ItemBuilder(item.getType()).mergeLexicals(item).toItem();
                 }
             }
 

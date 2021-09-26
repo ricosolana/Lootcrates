@@ -4,7 +4,12 @@ import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import com.crazicrafter1.crutils.Bool;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.crate.AbstractLoot;
+import com.crazicrafter1.lootcrates.crate.LootGroup;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 public class LootItem extends AbstractLoot {
     protected final int min;
@@ -31,4 +36,15 @@ public class LootItem extends AbstractLoot {
         } else
             giveItem.value = true;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        if (min == max)
+            sb.append("count: ").append(min);
+        else sb.append("range: [").append(min).append(", ").append(max).append("]");
+
+        return sb.toString();
+    }
+
 }

@@ -15,7 +15,6 @@ public class LootMenu extends ParallaxMenu {
     public LootMenu() {
         super("&6Loot");
 
-<<<<<<< HEAD
         //for (Map.Entry<String, LootGroup> entry : Main.DAT.lootGroups.entrySet()) {
 
         //    addItem(new TriggerComponent() {
@@ -31,23 +30,6 @@ public class LootMenu extends ParallaxMenu {
         //        }
         //    });
         //}
-=======
-        for (Map.Entry<String, LootGroup> entry : Main.DAT.lootGroups.entrySet()) {
-
-            addItem(new TriggerComponent() {
-                @Override
-                public void onLeftClick(Player p) {
-                    // open the loot
-                    new SingleLootMenu(entry.getValue()).show(p);
-                }
-
-                @Override
-                public ItemStack getIcon() {
-                    return entry.getValue().itemStack();
-                }
-            });
-        }
->>>>>>> 2325e3569993e0402afc754541d97cb10307c109
 
         backButton(4, 5, BACK_1, MainMenu.class);
     }

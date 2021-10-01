@@ -32,18 +32,11 @@ public class SingleCrateLootMenu extends ParallaxMenu {
 
                         @Override
                         public ItemStack getIcon() {
-<<<<<<< HEAD
                             //if (crate.lootGroups.containsKey(entry.getKey())) {
                             //    return new ItemBuilder(entry.getValue().itemStack()).glow(true).toItem();
                             //}
                             //return entry.getValue().itemStack();
                             return null;
-=======
-                            if (crate.lootGroups.containsKey(entry.getKey())) {
-                                return new ItemBuilder(entry.getValue().itemStack()).glow(true).toItem();
-                            }
-                            return entry.getValue().itemStack();
->>>>>>> 2325e3569993e0402afc754541d97cb10307c109
                         }
                     });
         }

@@ -1,6 +1,5 @@
 package com.crazicrafter1.lootcrates;
 
-<<<<<<< HEAD
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.crate.Crate;
@@ -46,27 +45,10 @@ public class Data implements ConfigurationSerializable {
 
         fireworkEffect = (FireworkEffect) args.get("fireworkEffect");
     }
-=======
-import com.crazicrafter1.lootcrates.crate.Crate;
-import com.crazicrafter1.lootcrates.crate.LootGroup;
-import org.bukkit.FireworkEffect;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.inventory.ItemStack;
-
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-public class Data implements Serializable {
->>>>>>> 2325e3569993e0402afc754541d97cb10307c109
 
     /*
      * Serializable stuff
      */
-<<<<<<< HEAD
     public boolean debug;// = false;
     public boolean update;// = true;
     public int speed;// = 4;
@@ -96,17 +78,4 @@ public class Data implements Serializable {
 
         return result;
     }
-=======
-    public boolean debug = false;
-    public boolean update = false;
-    public int speed;
-
-    public ItemStack unSelectedItem = null;
-    public ItemStack selectedItem = null;
-    public FireworkEffect fireworkEffect = null;
-
-    public HashMap<String, Crate> crates = new HashMap<>();
-    public HashMap<String, LootGroup> lootGroups = new HashMap<>();
-
->>>>>>> 2325e3569993e0402afc754541d97cb10307c109
 }

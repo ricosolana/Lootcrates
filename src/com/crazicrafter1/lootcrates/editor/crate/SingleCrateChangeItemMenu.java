@@ -45,10 +45,7 @@ public class SingleCrateChangeItemMenu extends SimplexMenu {
             public void onLeftClick(Player p) {
                 ItemStack item = rem.getIcon();
                 if (item != null) {
-<<<<<<< HEAD
                     Main.getInstance().info("Applying changes here!");
-=======
->>>>>>> 2325e3569993e0402afc754541d97cb10307c109
                     crate.itemStack = new ItemBuilder(item.getType()).mergeLexicals(item).toItem();
                 }
             }

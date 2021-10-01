@@ -1,4 +1,4 @@
-package com.crazicrafter1.lootcrates.crate.loot;
+package com.crazicrafter1.lootcrates.DEPRECATED;
 
 import com.crazicrafter1.crutils.Bool;
 import com.crazicrafter1.lootcrates.crate.AbstractLoot;
@@ -31,6 +31,16 @@ public class LootCommand extends AbstractLoot {
         }
         if (giveItem != null)
             giveItem.value = false;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("executes: \n");
+
+        for (String cmd : commands)
+            sb.append(" ").append(cmd).append("\n");
+
+        return sb.toString();
     }
 
 }

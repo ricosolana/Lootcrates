@@ -16,14 +16,12 @@ import java.util.Map;
 
 public class SingleCrateMenu extends SimplexMenu {
 
+
+
     public SingleCrateMenu(Crate crate) {
-        super("Crate: " + crate.getName(), 5,
+        super("Crate: " + crate.name, 5,
                 new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).name("").toItem());
 
-        final FileConfiguration config = Main.getInstance().config;
-        final String path = "crates." + crate.getName() + ".";
-
-        ItemStack c = crate.getItemStack(1);
         setComponent(1, 1, new TriggerComponent() {
             @Override
             public void onLeftClick(Player p) {
@@ -33,7 +31,7 @@ public class SingleCrateMenu extends SimplexMenu {
 
             @Override
             public ItemStack getIcon() {
-                return new ItemBuilder(c.getType()).name("&b&lChange Item").resetLore().toItem();
+                return new ItemBuilder(crate.itemStack.getType()).name("&b&lChange Item").resetLore().toItem();
             }
         });
 
@@ -41,41 +39,37 @@ public class SingleCrateMenu extends SimplexMenu {
             @Override
             public void onLeftClick(Player p) {
                 // when clicking on this specific crate
-
+                // openanvilgui
             }
 
             @Override
             public ItemStack getIcon() {
-                return new ItemBuilder(Material.PAPER).name("&e&lChange Title").lore("&8Current: &r" + crate.getHeader()).toItem();
+                return new ItemBuilder(Material.PAPER).name("&e&lChange Title").
+                        lore("&8Current: &r" + crate.header).toItem();
             }
         });
 
         setComponent(5, 1, new TriggerComponent() {
 
-            int col = crate.getSize() / 9;
+            final int col = crate.size / 9;
 
             @Override
             public void onLeftClick(Player p) {
                 // decrement
                 if (col != 1) {
-                    config.set(path + "columns", --col);
-                    show(p);
+                    crate.size -= 9;
+                    if (crate.picks > crate.size)
+                        crate.picks = crate.size;
+                    new SingleCrateMenu(crate).show(p);
                 }
-            }
-
-            @Override
-            public void onMiddleClick(Player p) {
-                // default
-                config.set(path + "columns", null);
-                show(p);
             }
 
             @Override
             public void onRightClick(Player p) {
                 // increment
                 if (col != 6) {
-                    config.set(path + "columns", ++col);
-                    show(p);
+                    crate.size += 9;
+                    new SingleCrateMenu(crate).show(p);
                 }
             }
 
@@ -88,39 +82,46 @@ public class SingleCrateMenu extends SimplexMenu {
 
         setComponent(7, 1,  new TriggerComponent() {
 
-            int picks = crate.getPicks();
+            final int picks = crate.picks;
 
             @Override
             public void onLeftClick(Player p) {
                 // decrement
-                if (picks != 1) {
-                    config.set(path + "picks", --picks);
+                if (picks > 1) {
+                    crate.picks--;
+                    new SingleCrateMenu(crate).show(p);
                 }
-            }
-
-            @Override
-            public void onMiddleClick(Player p) {
-                // set to default reliance
-                config.set(path + "picks", null);
             }
 
             @Override
             public void onRightClick(Player p) {
                 // increment
-                if (picks != crate.getSize()/9) {
-                    config.set(path + "picks", ++picks);
+                if (picks < crate.size) {
+                    crate.picks++;
+                    new SingleCrateMenu(crate).show(p);
                 }
             }
 
             @Override
             public ItemStack getIcon() {
-                return new ItemBuilder(Material.END_CRYSTAL).name("&a&lChange Picks").count(picks).lore("&8Current: " + picks).toItem();
+                return new ItemBuilder(Material.END_CRYSTAL).
+                        name("&a&lChange Picks").count(picks).lore(" - left click to decrement\n - right click to increment").toItem();
+
+
+                //return new ItemBuilder(Material.END_CRYSTAL).name("&a&lChange Picks").count(picks).lore("&8Current: " + picks).toItem();
             }
         });
 
         StringBuilder builder = new StringBuilder("&8Current: \n");
-        for (Map.Entry<LootGroup, Integer> entry : crate.getOriginalWeights().entrySet()) {
-            builder.append(" - ").append(entry.getKey().name()).append(" : ").append(entry.getValue()).append("\n");
+        int prevSum = 0;
+        for (Map.Entry<String, Integer> entry : crate.lootGroups.entrySet()) {
+
+            int weight = entry.getValue() - prevSum;
+            float percent = 100.f * ((float) weight / (float) crate.totalWeights);
+
+            builder.append(String.format("&8 - %s  |  %d/%d  |  %.02f%%\n", entry.getKey(), weight, crate.totalWeights, percent));
+
+            prevSum = entry.getValue();
         }
         setComponent(2, 3, new TriggerComponent() {
             @Override
@@ -138,7 +139,7 @@ public class SingleCrateMenu extends SimplexMenu {
         setComponent(6, 3, new Component() {
             @Override
             public ItemStack getIcon() {
-                return new ItemBuilder(Material.ANVIL).name("&7&lWeights").lore("&8Total weights: " + crate.getTotalWeights()).toItem();
+                return new ItemBuilder(Material.ANVIL).name("&7&lWeights").lore("&8Total weights: " + crate.totalWeights).toItem();
             }
         });
 

@@ -8,6 +8,7 @@ import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.editor.crate.CrateMenu;
 import com.crazicrafter1.lootcrates.editor.fireworks.FireworksMenu;
 import com.crazicrafter1.lootcrates.editor.loot.LootMenu;
+import com.crazicrafter1.lootcrates.editor.misc.MiscMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -17,8 +18,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import static com.crazicrafter1.crutils.Util.copy;
 
 public class MainMenu extends SimplexMenu {
 
@@ -58,7 +57,7 @@ public class MainMenu extends SimplexMenu {
         setComponent(5, 1, new TriggerComponent() {
             @Override
             public void onLeftClick(Player p) {
-                //new FireworksMenu().show(p);
+                new FireworksMenu().show(p);
             }
 
             @Override
@@ -71,7 +70,7 @@ public class MainMenu extends SimplexMenu {
         setComponent(7, 1, new TriggerComponent() {
             @Override
             public void onLeftClick(Player p) {
-
+                new MiscMenu().show(p);
             }
 
             @Override
@@ -101,9 +100,7 @@ public class MainMenu extends SimplexMenu {
                     e.printStackTrace();
                 }
 
-                // save the new config
                 Main.getInstance().saveConfig();
-                Main.getInstance().reloadConfigValues();
             }
 
             @Override

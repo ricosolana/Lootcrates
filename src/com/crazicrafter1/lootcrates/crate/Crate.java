@@ -4,8 +4,11 @@ import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.ReflectionUtil;
 import com.crazicrafter1.crutils.Util;
+import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -13,7 +16,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.*;
 
-public final class Crate {
+public class Crate implements ConfigurationSerializable {
 
     private static <T> HashMap<T, Integer> sortByValue(HashMap<T, Integer> hm)
     {
@@ -32,16 +35,14 @@ public final class Crate {
         return temp;
     }
 
-    private final String name;
-    private final ItemStack itemStack;
-    private final String header;
-    private final int size;
-    private final int picks;
-    private final Sound sound;
-    private HashMap<LootGroup, Integer> lootGroups; // with partial summed weights
-    private HashMap<LootGroup, Integer> originalWeights; // each individual original weight
-    private ItemStack seasonalVariant;
-    private int totalWeights;
+    public String name;
+    public ItemStack itemStack; // = Crate.makeCrate(itemStack, name);
+    public String header;
+    public int size;
+    public int picks;
+    public Sound sound;
+    public LinkedHashMap<String, Integer> lootGroups; // sorted cumulative weights
+    public int totalWeights;
 
     public Crate(String name, ItemStack itemStack, String header, int size, int picks, Sound sound) {
         this.name = name;
@@ -52,98 +53,55 @@ public final class Crate {
         this.sound = sound;
     }
 
-    public void setLootGroups(HashMap<LootGroup, Integer> lootGroups) {
-        lootGroups = sortByValue(lootGroups);
-        this.originalWeights = (HashMap<LootGroup, Integer>) lootGroups.clone();
-
-        int last = 0;
-        for (Map.Entry<LootGroup, Integer> entry : lootGroups.entrySet()) {
-            entry.setValue(last + entry.getValue());
-            last = entry.getValue();
+    public Crate(Map<String, Object> args) {
+        //name = (String) args.get("name");
+        //itemStack = Crate.makeCrate((ItemStack) args.get("itemStack"), name);
+        itemStack = (ItemStack) args.get("itemStack");
+        header = (String) args.get("header");
+        size = (int) args.get("size");
+        picks = (int) args.get("picks");
+        sound = Sound.valueOf((String) args.get("sound"));
+        lootGroups = (LinkedHashMap<String, Integer>) args.get("lootGroups");
+        for (Map.Entry<String, Integer> entry : lootGroups.entrySet()) {
+            Main.getInstance().info("<" + entry.getKey() + ", " + entry.getValue() + ">");
         }
+        Main.getInstance().info("");
 
-        this.lootGroups = lootGroups;
-        this.totalWeights = last;
+        for (int weight : lootGroups.values())
+            totalWeights = weight; // to force set to last one eventually
+        Main.getInstance().info("totalWeights: " + totalWeights);
+        //totalWeights = (int) args.get("totalWeights");
     }
 
     /**
-     * @return Crate name
+     * Assumes that the map is cumulative-weight sorted in config
+     * unknown whether config map retains original order
      */
-    public String getName() {
-        return name;
-    }
-
-    public ItemStack getItemStack(int count) {
-        if (Main.seasonal && this.seasonalVariant != null) {
-            seasonalVariant.setAmount(count);
-            return seasonalVariant;
-        }
-        ItemStack itemStack = new ItemStack(this.itemStack);
-
-        itemStack.setAmount(count);
-        return itemStack;
-    }
-
-    /**
-     * @return Inventory name
-     */
-    public String getHeader() {
-        return header;
-    }
-
-    /**
-     * @return Inventory size
-     */
-    public int getSize() {
-        return size;
-    }
-
-    /**
-     * @return Loot selections
-     */
-    public int getPicks() {
-        return picks;
-    }
-
-    /**
-     * @return Click sound
-     */
-    public Sound getSound() {
-        return sound;
-    }
-
-    public void prepSeasonalVariant() {
-        ItemStack rawSeasonal = Seasonal.getSeasonalItem();
-        if (rawSeasonal == null)
-            seasonalVariant = null;
-        else
-            seasonalVariant = new ItemBuilder(Crate.makeCrate(rawSeasonal, name)).mergeLexicals(this.itemStack).toItem();
-    }
-
     LootGroup getBasedRandom() {
+        //  |     |     |  *  |
+        //        markers
+        // rand is an offset to look for in the
+
+        //Main.getInstance().info("totalWeights: " + (totalWeights-1));
+
         int rand = Util.randomRange(0, totalWeights-1);
 
-        for (Map.Entry<LootGroup, Integer> entry : this.lootGroups.entrySet()) {
-            if (entry.getValue() > rand) return entry.getKey();
+        Main.getInstance().info("rand: " + (rand));
+
+
+
+        for (Map.Entry<String, Integer> entry : this.lootGroups.entrySet()) {
+            //Main.getInstance().info("weight: " + (entry.getValue()));
+            //Main.getInstance().info("s: " + entry.getKey());
+            if (entry.getValue() > rand) return Main.DAT.lootGroups.get(entry.getKey());
         }
+
+        Main.getInstance().info("returning null");
 
         return null;
     }
 
-    public HashMap<LootGroup, Integer> getLootGroups() {
-        return lootGroups;
-    }
-    public HashMap<LootGroup, Integer> getOriginalWeights() {
-        return originalWeights;
-    }
-
-    public int getTotalWeights() {
-        return totalWeights;
-    }
-
-
-
-    private static ItemStack makeCrate(ItemStack itemStack, final String crate) {
+    public static ItemStack makeCrate(final ItemStack itemStack, final String crate) {
 
         /*
             Back when I used CraftBukkit to 'easily' get and set NBT data, the comments below are the code
@@ -165,7 +123,7 @@ public final class Crate {
 
 
         if (nbt == null) {
-            Class nbtTagCompoundClass = ReflectionUtil.getNMSClass("NBTTagCompound");
+            Class nbtTagCompoundClass = ReflectionUtil.getNMClass("nbt.NBTTagCompound");
             Constructor nbtTagCompoundConstructor = ReflectionUtil.getConstructor(nbtTagCompoundClass);
             nbt = ReflectionUtil.invokeConstructor(nbtTagCompoundConstructor);
         }
@@ -187,7 +145,7 @@ public final class Crate {
     }
 
     public static Crate crateByName(String id) {
-        return Main.crates.get(id);
+        return Main.DAT.crates.get(id);
     }
 
     public static Crate crateByItem(final ItemStack itemStack) {
@@ -246,4 +204,29 @@ public final class Crate {
         Main.openCrates.remove(p.getUniqueId()).close();
     }
 
+    @Override
+    public String toString() {
+        return "itemStack: " + itemStack + "\n" +
+                "header: " + header + "\n" +
+                "size: " + header + "\n" +
+                "picks: " + picks + "\n" +
+                "sound: " + sound + "\n" +
+                "lootGroups: " + lootGroups + "\n";
+    }
+
+    @Override
+    public Map<String, Object> serialize() {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        //result.put("name", name);
+        result.put("itemStack", itemStack);
+        result.put("header", header);
+        result.put("size", size);
+        result.put("picks", picks);
+        result.put("sound", sound.name());
+        result.put("lootGroups", lootGroups);
+        //result.put("totalWeights", totalWeights);
+
+        return result;
+    }
 }

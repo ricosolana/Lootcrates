@@ -1,514 +1,247 @@
-#
-#
-#
-#
-#           ___       ___           ___           ___           ___           ___           ___           ___           ___           ___
-#          /\__\     /\  \         /\  \         /\  \         /\  \         /\  \         /\  \         /\  \         /\  \         /\  \
-#         /:/  /    /::\  \       /::\  \        \:\  \       /::\  \       /::\  \       /::\  \        \:\  \       /::\  \       /::\  \
-#        /:/  /    /:/\:\  \     /:/\:\  \        \:\  \     /:/\:\  \     /:/\:\  \     /:/\:\  \        \:\  \     /:/\:\  \     /:/\ \  \
-#       /:/  /    /:/  \:\  \   /:/  \:\  \       /::\  \   /:/  \:\  \   /::\~\:\  \   /::\~\:\  \       /::\  \   /::\~\:\  \   _\:\~\ \  \
-#      /:/__/    /:/__/ \:\__\ /:/__/ \:\__\     /:/\:\__\ /:/__/ \:\__\ /:/\:\ \:\__\ /:/\:\ \:\__\     /:/\:\__\ /:/\:\ \:\__\ /\ \:\ \ \__\
-#      \:\  \    \:\  \ /:/  / \:\  \ /:/  /    /:/  \/__/ \:\  \  \/__/ \/_|::\/:/  / \/__\:\/:/  /    /:/  \/__/ \:\~\:\ \/__/ \:\ \:\ \/__/
-#       \:\  \    \:\  /:/  /   \:\  /:/  /    /:/  /       \:\  \          |:|::/  /       \::/  /    /:/  /       \:\ \:\__\    \:\ \:\__\
-#        \:\  \    \:\/:/  /     \:\/:/  /     \/__/         \:\  \         |:|\/__/        /:/  /     \/__/         \:\ \/__/     \:\/:/  /
-#         \:\__\    \::/  /       \::/  /                     \:\__\        |:|  |         /:/  /                     \:\__\        \::/  /
-#          \/__/     \/__/         \/__/                       \/__/         \|__|         \/__/                       \/__/         \/__/
-#
-#
-#
-#
-#
-#
+dat:
+  ==: com.crazicrafter1.lootcrates.Data
+  # This config is not user-friendly,
+  # Some values are pre-computed in here
+  # Don't mess with stuff unless you know what you're doing!
+  debug: false
 
 
 
+  update: true
 
 
 
-#
-# *** ... *** : required
-#
-
-# *** enable debug ***
-debug: false
-
-# *** auto-updater ***
-update: true
-
-# *** default inventory name ***
-header: "&8Opening supply crate"
-
-# *** default crate size ***
-columns: 3
-
-# *** default crate loot picks ***
-picks: 4
-
-# sound to play on click
-sound: ENTITY_EXPERIENCE_ORB_PICKUP
-
-# speed to reveal items
-speed: 4
-
-# seasonal crates?
-seasonal: true
+  speed: 4
 
 
 
+  unSelectedItem:
+    ==: org.bukkit.inventory.ItemStack
+    v: 2730
+    type: CHEST
+    meta:
+      ==: ItemMeta
+      meta-type: TILE_ENTITY
+      display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"white","text":"???"}],"text":""}'
+      lore:
+        - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"Choose
+        4 mystery chests, and"}],"text":""}'
+        - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"your
+        loot will be revealed!"}],"text":""}'
+      blockMaterial: CHEST
 
 
 
-#        ____ ___   ___   ____   __  __
-#       / __ `__ \ / _ \ / __ \ / / / /
-#      / / / / / //  __// / / // /_/ /
-#     /_/ /_/ /_/ \___//_/ /_/ \__,_/
-#
+  selectedItem:
+    ==: org.bukkit.inventory.ItemStack
+    v: 2730
+    type: WHITE_STAINED_GLASS_PANE
+    meta:
+      ==: ItemMeta
+      meta-type: UNSPECIFIC
+      display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"white","text":"???"}],"text":""}'
+      lore:
+        - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"You
+        have selected this mystery chest"}],"text":""}'
 
 
 
-
-
-
-# 'icon', 'title', and 'footer' are respectively 'item', 'name', and 'lore'
-gui:
-  selected:
-    icon: "WHITE_STAINED_GLASS_PANE"
-    title: "&f&l???"
-    footer:
-      - "&7You have selected this mystery chest"
-  unselected:
-    icon: "chest"
-    title: "&f&l???"
-    footer:
-      - "&7Choose 4 mystery chests, and"
-      - "&7your loot will be revealed!"
-  lootgroup:
+  lootGroups:
     common:
-      icon: "WHITE_STAINED_GLASS_PANE"
-      title: "&f&lCommon Reward"
-      footer:
-        - "&7Click to redeem!"
-    regular:
-      icon: "YELLOW_STAINED_GLASS_PANE"
-      title: "&e&lRegular Reward"
-      footer:
-        - "&7Click to redeem!"
+      ==: com.crazicrafter1.lootcrates.crate.LootGroup
+      itemStack:
+        ==: org.bukkit.inventory.ItemStack
+        v: 2730
+        type: WHITE_STAINED_GLASS_PANE
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"Common Reward"}],"text":""}'
+      loot:
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootOrdinateItem
+          item:
+            ==: org.bukkit.inventory.ItemStack
+            v: 2730
+            type: TNT
+          min: 1
+          max: 31
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootOrdinateItem
+          item:
+            ==: org.bukkit.inventory.ItemStack
+            v: 2730
+            type: DIAMOND
+          min: 16
+          max: 16
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootOrdinateItem
+          item:
+            ==: org.bukkit.inventory.ItemStack
+            v: 2730
+            type: CACTUS
+          min: 1
+          max: 31
+
     ultra:
-      icon: "BLUE_STAINED_GLASS_PANE"
-      title: "&b&lUltra Reward"
-      footer:
-        - "&7Click to redeem!"
-    rare:
-      icon: "PURPLE_STAINED_GLASS_PANE"
-      title: "&5&lRare Reward"
-      footer:
-        - "&7Click to redeem!"
+      ==: com.crazicrafter1.lootcrates.crate.LootGroup
+      itemStack:
+        ==: org.bukkit.inventory.ItemStack
+        v: 2730
+        type: BLUE_STAINED_GLASS_PANE
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"Ultra Reward"}],"text":""}'
+      loot:
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootOrdinateItem
+          item:
+            ==: org.bukkit.inventory.ItemStack
+            v: 2730
+            type: DIAMOND_BLOCK
+          min: 6
+          max: 6
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootOrdinateItem
+          item:
+            ==: org.bukkit.inventory.ItemStack
+            v: 2730
+            type: OBSIDIAN
+          min: 64
+          max: 64
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootOrdinateItem
+          item:
+            ==: org.bukkit.inventory.ItemStack
+            v: 2730
+            type: DIAMOND_CHESTPLATE
+            # test enchantments meta
+          min: 1
+          max: 1
+
     legendary:
-      icon: "RED_STAINED_GLASS_PANE"
-      title: "&c&lLegendary Reward"
-      footer:
-        - "&7Click to redeem!"
-    laser:
-      icon: "ORANGE_STAINED_GLASS_PANE"
-      title: "&6&lWeapon Reward"
-      footer:
-        - "&7Click to redeem!"
+      ==: com.crazicrafter1.lootcrates.crate.LootGroup
+      itemStack:
+        ==: org.bukkit.inventory.ItemStack
+        v: 2730
+        type: RED_STAINED_GLASS_PANE
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"Legendary Reward"}],"text":""}'
+      loot:
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootOrdinateItem
+          item:
+            ==: org.bukkit.inventory.ItemStack
+            v: 2730
+            type: DIAMOND_LEGGINGS
+          min: 1
+          max: 1
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootOrdinateItem
+          item:
+            ==: org.bukkit.inventory.ItemStack
+            v: 2730
+            type: DIAMOND_HELMET
+          min: 1
+          max: 1
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootOrdinateItem
+          item:
+            ==: org.bukkit.inventory.ItemStack
+            v: 2730
+            type: GOLDEN_APPLE
+            # test enchantments meta
+          min: 8
+          max: 8
+
+    #laser:
+    #  ==: com.crazicrafter1.lootcrates.crate.LootGroup
+    #  name: laser
+    #  itemStack:
+    #    ==: org.bukkit.inventory.ItemStack
+    #    v: 2730
+    #    type: ORANGE_STAINED_GLASS_PANE
+    #    meta:
+    #      ==: ItemMeta
+    #      meta-type: UNSPECIFIC
+    #      display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"Laser Reward"}],"text":""}'
+    #   loot:
+    #     - ==: com.crazicrafter1.lootcrates.crate.loot.LootItemQA
+    #       name: fusion_cell
+    #       min: 5
+    #       max: 5
+    #     - ==: com.crazicrafter1.lootcrates.crate.loot.LootItemQA
+    #       name: lazerrifle
+    #       min: 1
+    #       max: 1
 
 
 
-
-
-#              __
-#       _____ / /_   ____ _ ____   _____ ___
-#      / ___// __ \ / __ `// __ \ / ___// _ \
-#     / /__ / / / // /_/ // / / // /__ /  __/
-#     \___//_/ /_/ \__,_//_/ /_/ \___/ \___/
-#
-
-
-
-
-
-
-# *** icon *** : itemstack for crate
-# *** title *** : name of itemstack
-# footer : lore of itemstack
-# model: for resource pack
-# columns: of crate gui
-# sound: sound on click
-# header: name of inventory
-# picks: number of loot selections
-
-#######     any optional omitted entry defaults     #######
-#     #     accordingly,  either to a hardcoded     #     #
-#######     default, or to this config defaults     #######
-
-
-crates:
-  peasant:
-    icon: "chest"
-    title: "&f&lPeasant Loot &r&7(Tier 1)"
-    footer:
-      - "&7Right click on this item to unlock"
-      - "&7four pieces of loot!"
-    header: "Peasant crate..." # optional
-    columns: 5
-    picks: 3
-    chances:
-      common: 70
-      regular: 22
-      ultra: 8
-  folk:
-    icon: "chest"
-    title: "&e&lFolk Barrel &r&7(Tier 2)"
-    footer:
-      - "&7Right click on this item to unlock"
-      - "&7four pieces of loot!"
-    columns: 2
-    chances:
-      common: 40
-      regular: 35
-      ultra: 17
-      rare: 8
-  knight:
-    icon: "chest"
-    title: "&b&lKnight Spoils &r&7(Tier 3)"
-    footer:
-      - "&7Right click on this item to unlock"
-      - "&7four pieces of loot!"
-    chances:
-      common: 11
-      regular: 29
-      ultra: 35
-      rare: 17
-      legendary: 8
-  pope:
-    icon: "chest"
-    title: "&5&lPope Fortunes &r&7(Tier 4)"
-    footer:
-      - "&7Right click on this item to unlock"
-      - "&7four pieces of loot!"
-    chances:
-      regular: 13
-      ultra: 28
-      rare: 39
-      legendary: 20
-  king:
-    icon: "chest"
-    title: "&c&lKing treasure &r&7(Tier 5)"
-    footer:
-      - "&7Right click on this item to unlock"
-      - "&7four pieces of loot!"
-    chances:
-      ultra: 28
-      rare: 32
-      legendary: 40
-  laser:
-    icon: "chest"
-    title: "&6&lPowPow Box"
-    footer:
-      - "&7Right click on this item to unlock"
-      - "&7four Quality Armory items!"
-    chances:
-      laser: 100
+  crates:
+    peasant:
+      ==: com.crazicrafter1.lootcrates.crate.Crate
+      itemStack:
+        ==: org.bukkit.inventory.ItemStack
+        v: 2730
+        type: CHEST
+        meta:
+          ==: ItemMeta
+          meta-type: TILE_ENTITY
+          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"white","text":"Peasant Loot"}],"text":""}'
+          lore:
+            - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"Choose
+            4 mystery chests, and"}],"text":""}'
+            - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"your
+            loot will be revealed!"}],"text":""}'
+          blockMaterial: CHEST
+      header: Peasant crate...
+      size: 45
+      picks: 3
+      sound: ENTITY_EXPERIENCE_ORB_PICKUP
+      lootGroups:
+        ultra: 8
+        common: 60
+    knight:
+      ==: com.crazicrafter1.lootcrates.crate.Crate
+      itemStack:
+        ==: org.bukkit.inventory.ItemStack
+        v: 2730
+        type: CHEST
+        meta:
+          ==: ItemMeta
+          meta-type: TILE_ENTITY
+          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"white","text":"Knight Loot"}],"text":""}'
+          lore:
+            - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"Choose
+            4 mystery chests, and"}],"text":""}'
+            - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"your
+            loot will be revealed!"}],"text":""}'
+          blockMaterial: CHEST
+      header: Knight crate...
+      size: 45
+      picks: 3
+      sound: ENTITY_EXPERIENCE_ORB_PICKUP
+      lootGroups:
+        legendary: 10
+        ultra: 35
+        common: 80
 
 
 
-
-
-#         __               __
-#        / /____   ____   / /_
-#       / // __ \ / __ \ / __/
-#      / // /_/ // /_/ // /_
-#     /_/ \____/ \____/ \__/
-#
-
-
-
-
-
-# Keys:
-# - 'item' key is a material
-# - 'qa' key is a QualityArmory item by its name
-# - 'crate' key is a specific crate (by id)
-
-# Using both a combination of 'qa' key or 'potion' or 'crate' key might
-# result in undefined behaviour. Do not do this.
-
-# All loot must have an associated count, with specific rules:
-
-# All 'counts' can safely be an int, or a ranged int. Example:
-#   count: 1      <-- valid
-#   count: 3,5    <-- valid [3, 5]
-#   count: 3, 7   <-- valid [3, 7]
-#   count: 4 ,8   <-- valid [4, 8]
-#   count: 3,     <-- ERROR
-
-# Enchantable items and potions will ignore any 'count' key
-
-# Enchantment/potion levels/amplifiers are uncapped
-
-# Commands can be added only to those with the key of `item`
-
-# Durations (duration) for potion effects follow the same above
-# Amplifier (amp) for potion effects must an integer, not a range.
-
-# flag durable items with unbreakable: true
-
-# / \ / \ / \ / \ / \ / \ / \ / \ / \ / \ \ / \ / \ / \ / \ \ / \ / \ / \ #
-#                The already filled out loot below is just for example.   #
-#          However, it does fully function. Feel free to change           #
-#   anything and everything to your hearts content :>                     #
-# \ / \ / \ / \ / \ / \ / \ / \ / \ / \ \ / \ / \ / \ / \ \ / \ / \ / \ / #
-
-
-
-loot:
-  laser:
-    - qa: fusion_cell
-      count: 5
-    - qa: lazerrifle
-  common:
-    - item: potion
-      name: "&6&lPotion of Agility"
-      color: ORANGE
-      lore:
-        - "&o&8become as fast as &elightning"
-      effects:
-        - effect: SPEED
-          amp: 2
-          duration: 3600
-        - effect: HASTE
-          amp: 1
-          duration: 24000
-    - item: tnt
-      count: 1, 31
-    - item: tnt
-      count: 32
-    - item: diamond
-      count: 16
-    - item: cactus
-      count: 1, 31
-    - item: cactus
-      count: 64
-    - item: coal
-      count: 1, 31
-    - item: experience_bottle
-      name: "&e&lExperience"
-      lore:
-        - "&7Amount: &f500XP"
-      command:
-        - "xp add %player% 500"
-    - item: experience_bottle
-      name: "&e&lExperience"
-      lore:
-        - "&7Amount: &f1000XP"
-      command:
-        - "xp add %player% 1000"
-    - item: blaze_rod
-      count: 1, 31
-    - item: obsidian
-      count: 32
-    - item: diamond_block
-      count: 4
-    - item: potato
-      count: 1, 15
-    - item: iron_block
-      count: 2
-    - item: sugar_cane
-      count: 1, 31
-    - item: cooked_beef
-      count: 1, 32
-    - item: diamond
-      count: 1, 15
-    - crate: folk
-      count: 1
-  regular:
-    - item: gold_block
-      count: 8
-    - item: obsidian
-      count: 1, 31
-    - item: obsidian
-      count: 32
-    - item: sponge
-      count: 10
-    - item: sponge
-      count: 32
-    - item: diamond_block
-      count: 4
-    - item: experience_bottle
-      name: "&e&lExperience"
-      lore:
-        - "&7Amount: &f1000XP"
-      command:
-        - "xp add %player% 1000"
-    - item: hopper
-      count: 1, 2
-    - crate: folk
-      count: 1
-    - crate: knight
-      count: 1
-  ultra:
-    - item: cooked_beef
-      count: 1, 31
-    - item: experience_bottle
-      name: "&e&lExperience"
-      lore:
-        - "&7Amount: &f1000XP"
-      command:
-        - "xp add %player% 1000"
-    - item: diamond_block
-      count: 6
-    - item: gold_block
-      count: 16
-    - item: iron_block
-      count: 16
-    - item: obsidian
-      count: 64
-    - item: hopper
-      count: 1, 5
-    - item: diamond_helmet
-      enchantments:
-        - enchant: protection
-          level: 3
-    - item: diamond_chestplate
-      enchantments:
-        - enchant: protection
-          level: 3
-    - crate: folk
-      count: 1
-    - crate: knight
-      count: 1
-    - crate: pope
-      count: 1
-  rare:
-    - item: emerald_block
-      count: 12
-    - item: tnt
-      count: 32
-    - item: gold_block
-      count: 32
-    - item: experience_bottle
-      name: "&e&lExperience"
-      lore:
-        - "&7Amount: &f1500XP"
-      command:
-        - "xp add %player% 1500"
-    - item: diamond_helmet
-      name: "&dRare Helmet"
-      lore:
-        - "&d&oAn armor piece exclusively"
-        - "&d&olooted from a supply crate"
-      enchantments:
-        - enchant: protection
-          level: 4
-        - enchant: unbreaking
-          level: 3
-        - enchant: respiration
-          level: 3
-        - enchant: aqua_affinity
-          level: 1
-    - item: diamond_pickaxe
-      name: "&dRare Pickaxe"
-      lore:
-        - "&d&oA tool piece exclusively"
-        - "&d&olooted from a supply crate"
-      enchantments:
-        - enchant: efficiency
-          level: 5
-        - enchant: unbreaking
-          level: 3
-        - enchant: fortune
-          level: 3
-    - item: diamond_sword
-      name: "&dRare Slayer"
-      lore:
-        - "&d&oA weapon exclusively looted"
-        - "&d&ofrom a supply crate"
-      enchantments:
-        - enchant: sharpness
-          level: 5
-        - enchant: smite
-          level: 5
-        - enchant: bane_of_anthropods
-          level: 4
-        - enchant: fire_aspect
-          level: 2
-        - enchant: looting
-          level: 3
-    - item: diamond_sword
-      name: "&dRare Wrecker"
-      lore:
-        - "&d&oA weapon exclusively looted"
-        - "&d&ofrom a supply crate"
-      enchantments:
-        - enchant: sharpness
-          level: 5
-        - enchant: unbreaking
-          level: 3
-        - enchant: fire_aspect
-          level: 2
-    - item: diamond_axe
-      name: "&dRare Axe"
-      lore:
-        - "&d&oA tool exclusively looted"
-        - "&d&ofrom a supply crate"
-      enchantments:
-        - enchant: efficiency
-          level: 5
-        - enchant: unbreaking
-          level: 3
-    - crate: king
-      count: 1
-  legendary:
-    - item: diamond_leggings
-      name: "&bFabled Leggings"
-      lore:
-        - "&b&oAn armor piece exclusively looted"
-        - "&b&ofrom a supply crate"
-      enchantments:
-        - enchant: protection
-          level: 4
-        - enchant: fire_protection
-          level: 1
-        - enchant: unbreaking
-          level: 3
-        - enchant: blast_protection
-          level: 1
-    - item: diamond_helmet
-      name: "&bFabled Helmet"
-      lore:
-        - "&b&oAn armor piece exclusively looted"
-        - "&b&ofrom a supply crate"
-      enchantments:
-        - enchant: protection
-          level: 4
-        - enchant: respiration
-          level: 3
-        - enchant: unbreaking
-          level: 3
-        - enchant: blast_protection
-          level: 1
-    - item: hopper
-      count: 6
-    - item: golden_apple
-      count: 8
-    - item: diamond_sword
-      enchantments:
-        - enchant: sharpness
-          level: 5
-        - enchant: looting
-          level: 5
-    - item: enchanted_golden_apple
-
-# firework explosion on scroll end?
-
-firework:
-  enabled: true
-  colors:
-    - blue
-    - red
-    - white
-  fade:
-    - green
-  flicker: true
+  fireworkEffect:
+    ==: Firework
+    flicker: false
+    trail: false
+    colors:
+      - ==: Color
+        RED: 0
+        BLUE: 255
+        GREEN: 0
+      - ==: Color
+        RED: 255
+        BLUE: 0
+        GREEN: 0
+      - ==: Color
+        RED: 255
+        BLUE: 255
+        GREEN: 255
+    fade-colors:
+      - ==: Color
+        RED: 0
+        BLUE: 0
+        GREEN: 128
+    type: BURST

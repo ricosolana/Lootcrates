@@ -21,26 +21,43 @@ public class SingleCrateLootMenu extends ParallaxMenu {
         super("Loot ...");
         // on instantiate, draw
 
-        final FileConfiguration config = Main.getInstance().config;
-        final String path = "crates." + crate.getName() + ".";
-
-        for (Map.Entry<LootGroup, Integer> entry : crate.getOriginalWeights().entrySet()) {
+        for (Map.Entry<String, LootGroup> entry : Main.DAT.lootGroups.entrySet()) {
             super.addItem(
-                new TriggerComponent() {
-                    @Override
-                    public void onLeftClick(Player p) {
-                        // do something on click, weight, ?
+                    new TriggerComponent() {
+                        @Override
+                        public void onLeftClick(Player p) {
+                            // do something on click, weight, ?
+                            //config.set("");
+                        }
 
-                    }
-
-                    @Override
-                    public ItemStack getIcon() {
-                        return entry.getKey().itemStack();
-                    }
-                });
+                        @Override
+                        public ItemStack getIcon() {
+                            //if (crate.lootGroups.containsKey(entry.getKey())) {
+                            //    return new ItemBuilder(entry.getValue().itemStack()).glow(true).toItem();
+                            //}
+                            //return entry.getValue().itemStack();
+                            return null;
+                        }
+                    });
         }
 
-        //add lootgroup
+        //for (Map.Entry<LootGroup, Integer> entry : ) {
+        //    super.addItem(
+        //        new TriggerComponent() {
+        //            @Override
+        //            public void onLeftClick(Player p) {
+        //                // do something on click, weight, ?
+
+        //            }
+
+        //            @Override
+        //            public ItemStack getIcon() {
+        //                return entry.getKey().itemStack();
+        //            }
+        //        });
+        //}
+
+        //remove lootgroup
         setComponent(5, 5, new TriggerComponent() {
             @Override
             public void onLeftClick(Player p) {
@@ -69,8 +86,6 @@ public class SingleCrateLootMenu extends ParallaxMenu {
                 return new ItemBuilder(Material.GREEN_DYE).name("+").toItem();
             }
         });
-
-        //remove lootgroup
 
         backButton(3, 5, BACK_1, SingleCrateMenu.class, crate);
     }

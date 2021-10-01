@@ -36,8 +36,8 @@ public class ListenerOnPlayerInteract extends BaseListener {
 
 
 
-                    plugin.debug(p.getDisplayName() + " has just opened a " + crate.getName() + " crate");
-                    Crate.openCrate(p, crate.getName(), p.getInventory().getHeldItemSlot());
+                    plugin.debug(p.getDisplayName() + " has just opened a " + crate.name + " crate");
+                    Crate.openCrate(p, crate.name, p.getInventory().getHeldItemSlot());
 
                     e.setCancelled(true);
 

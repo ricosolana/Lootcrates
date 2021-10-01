@@ -32,26 +32,26 @@ public class FireworksMenu extends SimplexMenu {
         setComponent(2 + 3, 1, inputPerimeter);
         setComponent(1 + 3, 2, inputPerimeter);
 
-        // Original crate
+        // Original firework
         setComponent(1, 1, new Component() {
             @Override
             public ItemStack getIcon() {
-                ItemStack star = new ItemBuilder(Material.FIREWORK_STAR).name("&eCurrent Effect").toItem();
-                FireworkEffectMeta fm = (FireworkEffectMeta) star.getItemMeta();
-                fm.setEffect(Main.fireworkEffect);
-                star.setItemMeta(fm);
-                return star;
+                return new FireworkWrapper(Main.DAT.fireworkEffect).getStar();
             }
         });
 
         // Change to
-        RemovableComponent rem = new RemovableComponent();
+        RemovableComponent rem = new RemovableComponent(null);
         setComponent(4, 1, rem);
 
         // Confirm
         setComponent(7, 1, new TriggerComponent() {
             @Override
             public void onLeftClick(Player p) {
+
+                if (true)
+                    return;
+
                 Main.getInstance().info("Applying changes here!");
                 ItemStack item = rem.getIcon();
                 if (item != null) {

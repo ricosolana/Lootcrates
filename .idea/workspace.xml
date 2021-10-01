@@ -7,6 +7,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="134da130-6214-4649-b404-39079de75eca" name="Changes" comment="editor backup">
+<<<<<<< HEAD
       <change afterPath="$PROJECT_DIR$/legacy_config.yml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/DEPRECATED/LootItemPotion.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Data.java" afterDir="false" />
@@ -41,6 +42,12 @@
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/loot/LootMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/loot/LootMenu.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/listeners/ListenerOnPlayerInteract.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/listeners/ListenerOnPlayerInteract.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/tabs/TabCrates.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/tabs/TabCrates.java" afterDir="false" />
+=======
+      <change afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/serial/SItemStack.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Data.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Data.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java" afterDir="false" />
+>>>>>>> 2325e3569993e0402afc754541d97cb10307c109
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

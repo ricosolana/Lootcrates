@@ -53,11 +53,19 @@ public class CmdCrates extends CmdBase {
                 }
             } case "reload": {
                 feedback(sender, "Reloading config...");
+<<<<<<< HEAD
                 plugin.reloadConfig();
+=======
+                //plugin.reloadConfigValues();
+>>>>>>> 2325e3569993e0402afc754541d97cb10307c109
                 // save config somehow
                 return feedback(sender, "Config was reloaded.");
             } case "editor": {
                 if (sender instanceof Player p) {
+<<<<<<< HEAD
+=======
+                    feedback(sender, "opening in 3s...");
+>>>>>>> 2325e3569993e0402afc754541d97cb10307c109
                     feedback(sender, "The editor is not fully implemented, so if");
                     feedback(sender, "a button does nothing, it does nothing!");
                     // coroutine
@@ -66,7 +74,11 @@ public class CmdCrates extends CmdBase {
                         public void run() {
                             new MainMenu().show(p);
                         }
+<<<<<<< HEAD
                     }.runTaskLater(plugin, 30);
+=======
+                    }.runTaskLater(plugin, 2*20);
+>>>>>>> 2325e3569993e0402afc754541d97cb10307c109
 
                     return true;
                 }

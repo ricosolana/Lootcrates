@@ -16,10 +16,17 @@ public class SingleLootMenu extends ParallaxMenu {
     //private boolean byIcon = true;
 
     public SingleLootMenu(LootGroup lootGroup) {
+<<<<<<< HEAD
         super("Loot " + lootGroup.name);
 
         // list all loots
         for (AbstractLoot a : lootGroup.loot) {
+=======
+        super("Loot " + lootGroup.name());
+
+        // list all loots
+        for (AbstractLoot a : lootGroup.loot()) {
+>>>>>>> 2325e3569993e0402afc754541d97cb10307c109
             addItem(new TriggerComponent() {
                 @Override
                 public ItemStack getIcon() {

@@ -22,6 +22,12 @@ public class SingleCrateMenu extends SimplexMenu {
         super("Crate: " + crate.name, 5,
                 new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).name("").toItem());
 
+<<<<<<< HEAD
+=======
+        final FileConfiguration config = Main.getInstance().config;
+        final String path = "crates." + crate.name + ".";
+
+>>>>>>> 2325e3569993e0402afc754541d97cb10307c109
         setComponent(1, 1, new TriggerComponent() {
             @Override
             public void onLeftClick(Player p) {
@@ -35,6 +41,7 @@ public class SingleCrateMenu extends SimplexMenu {
             }
         });
 
+        /*
         setComponent(3, 1, new TriggerComponent() {
             @Override
             public void onLeftClick(Player p) {
@@ -48,28 +55,50 @@ public class SingleCrateMenu extends SimplexMenu {
                         lore("&8Current: &r" + crate.header).toItem();
             }
         });
+         */
 
         setComponent(5, 1, new TriggerComponent() {
 
+<<<<<<< HEAD
             final int col = crate.size / 9;
+=======
+            int col = crate.size / 9;
+>>>>>>> 2325e3569993e0402afc754541d97cb10307c109
 
             @Override
             public void onLeftClick(Player p) {
                 // decrement
                 if (col != 1) {
+<<<<<<< HEAD
                     crate.size -= 9;
                     if (crate.picks > crate.size)
                         crate.picks = crate.size;
                     new SingleCrateMenu(crate).show(p);
+=======
+                    config.set(path + "columns", --col);
+>>>>>>> 2325e3569993e0402afc754541d97cb10307c109
                 }
+            }
+
+            @Override
+<<<<<<< HEAD
+            public void onRightClick(Player p) {
+                // increment
+                if (col != 6) {
+                    crate.size += 9;
+                    new SingleCrateMenu(crate).show(p);
+=======
+            public void onMiddleClick(Player p) {
+                // default
+                config.set(path + "columns", null);
             }
 
             @Override
             public void onRightClick(Player p) {
                 // increment
                 if (col != 6) {
-                    crate.size += 9;
-                    new SingleCrateMenu(crate).show(p);
+                    config.set(path + "columns", ++col);
+>>>>>>> 2325e3569993e0402afc754541d97cb10307c109
                 }
             }
 
@@ -82,22 +111,45 @@ public class SingleCrateMenu extends SimplexMenu {
 
         setComponent(7, 1,  new TriggerComponent() {
 
+<<<<<<< HEAD
             final int picks = crate.picks;
+=======
+            int picks = crate.picks;
+>>>>>>> 2325e3569993e0402afc754541d97cb10307c109
 
             @Override
             public void onLeftClick(Player p) {
                 // decrement
+<<<<<<< HEAD
                 if (picks > 1) {
                     crate.picks--;
+=======
+                if (picks != 1) {
+                    config.set(path + "picks", --picks);
+>>>>>>> 2325e3569993e0402afc754541d97cb10307c109
                     new SingleCrateMenu(crate).show(p);
                 }
             }
 
             @Override
+<<<<<<< HEAD
             public void onRightClick(Player p) {
                 // increment
                 if (picks < crate.size) {
                     crate.picks++;
+=======
+            public void onMiddleClick(Player p) {
+                // set to default reliance
+                config.set(path + "picks", null);
+                new SingleCrateMenu(crate).show(p);
+            }
+
+            @Override
+            public void onRightClick(Player p) {
+                // increment
+                if (picks != crate.size/9) {
+                    config.set(path + "picks", ++picks);
+>>>>>>> 2325e3569993e0402afc754541d97cb10307c109
                     new SingleCrateMenu(crate).show(p);
                 }
             }
@@ -113,6 +165,7 @@ public class SingleCrateMenu extends SimplexMenu {
         });
 
         StringBuilder builder = new StringBuilder("&8Current: \n");
+<<<<<<< HEAD
         int prevSum = 0;
         for (Map.Entry<String, Integer> entry : crate.lootGroups.entrySet()) {
 
@@ -122,6 +175,10 @@ public class SingleCrateMenu extends SimplexMenu {
             builder.append(String.format("&8 - %s  |  %d/%d  |  %.02f%%\n", entry.getKey(), weight, crate.totalWeights, percent));
 
             prevSum = entry.getValue();
+=======
+        for (Map.Entry<String, Integer> entry : crate.lootGroups.entrySet()) {
+            builder.append(" - ").append(entry.getKey()).append(" : ").append(entry.getValue()).append("\n");
+>>>>>>> 2325e3569993e0402afc754541d97cb10307c109
         }
         setComponent(2, 3, new TriggerComponent() {
             @Override

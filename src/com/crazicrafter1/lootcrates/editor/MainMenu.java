@@ -100,7 +100,14 @@ public class MainMenu extends SimplexMenu {
                     e.printStackTrace();
                 }
 
+<<<<<<< HEAD
                 Main.getInstance().saveConfig();
+=======
+                // Serialize = save as bytes
+                // Deserialize = load from bytes
+                //Main.getInstance().reloadConfigValues();
+                //Main.DAT.
+>>>>>>> 2325e3569993e0402afc754541d97cb10307c109
             }
 
             @Override

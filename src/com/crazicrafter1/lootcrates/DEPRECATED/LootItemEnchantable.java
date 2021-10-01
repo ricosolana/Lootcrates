@@ -61,7 +61,11 @@ public class LootItemEnchantable extends LootItem {
         return null;
     }
 
+<<<<<<< HEAD:src/com/crazicrafter1/lootcrates/DEPRECATED/LootItemEnchantable.java
     public static class QEnchantment implements ConfigurationSerializable {
+=======
+    public static class QEnchantment {
+>>>>>>> 2325e3569993e0402afc754541d97cb10307c109:src/com/crazicrafter1/lootcrates/crate/loot/LootItemEnchantable.java
 
         private final Enchantment enchantment;
         private final int min;

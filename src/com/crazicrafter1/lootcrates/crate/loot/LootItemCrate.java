@@ -1,6 +1,7 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.crutils.ItemBuilder;
+import com.crazicrafter1.lootcrates.Data;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.AbstractLoot;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
@@ -20,8 +21,8 @@ public class LootItemCrate extends LootOrdinateItem {
     private final Crate crate;
 
     public LootItemCrate(Map<String, Object> args) {
-        super(Main.DAT.crates.get((String)args.get("crate")).itemStack, args);
-        crate = Main.DAT.crates.get((String)args.get("crate"));
+        super(Data.crates.get((String)args.get("crate")).itemStack, args);
+        crate = Data.crates.get((String)args.get("crate"));
     }
 
     public LootItemCrate(Crate crate) {

@@ -14,10 +14,12 @@ import java.util.*;
 
 public class Data implements ConfigurationSerializable {
 
+    public Data() {}
+
     public Data(Map<String, Object> args) {
-        debug = (boolean) args.get("debug");
-        update = (boolean) args.get("update");
-        speed = (int) args.get("speed");
+        debug = (boolean) args.getOrDefault("debug", false);
+        update = (boolean) args.getOrDefault("update", true);
+        speed = (int) args.getOrDefault("speed", 4);
 
         unSelectedItem = (ItemStack) args.get("unSelectedItem");
         selectedItem = (ItemStack) args.get("selectedItem");
@@ -27,38 +29,42 @@ public class Data implements ConfigurationSerializable {
         for (Map.Entry<String, LootGroup> entry : lootGroups.entrySet()) {
             entry.getValue().name = entry.getKey();
         }
+
+        Main.getInstance().info(Data.lootGroups.toString());
+
         crates = (LinkedHashMap<String, Crate>) args.get("crates");
-        //System.out.println(crates);
-        System.out.println(args);
         for (Map.Entry<String, Crate> entry : crates.entrySet()) {
             String name = entry.getKey();
             Crate crate = entry.getValue();
 
-
-            //ItemStack itemStack = Crate.makeCrate((ItemStack) args.get("itemStack"), entry.getKey());
-
             crate.name = name;
             crate.itemStack = Crate.makeCrate(crate.itemStack, name);
 
-            //Main.getInstance().info("itemStack: " + args.get("itemStack"));
+            for (Map.Entry<String, Integer> entry1 : crate.lootGroupsByName.entrySet()) {
+                crate.lootGroups.put(Data.lootGroups.get(entry1.getKey()), entry1.getValue());
+            }
         }
 
         fireworkEffect = (FireworkEffect) args.get("fireworkEffect");
+
+        totalOpens = (int) args.getOrDefault("totalOpens", 0);
     }
 
     /*
      * Serializable stuff
      */
-    public boolean debug;// = false;
-    public boolean update;// = true;
-    public int speed;// = 4;
+    public static boolean debug;
+    public static boolean update;
+    public static int speed;
 
-    public ItemStack unSelectedItem;// = new ItemBuilder(Material.CHEST).name("&f&l???").lore("");
-    public ItemStack selectedItem;
-    public FireworkEffect fireworkEffect;
+    public static ItemStack unSelectedItem;
+    public static ItemStack selectedItem;
+    public static FireworkEffect fireworkEffect;
 
-    public HashMap<String, Crate> crates;
-    public HashMap<String, LootGroup> lootGroups;
+    public static HashMap<String, Crate> crates;
+    public static HashMap<String, LootGroup> lootGroups;
+
+    public static int totalOpens = 0;
 
     @Override
     public Map<String, Object> serialize() {
@@ -75,6 +81,8 @@ public class Data implements ConfigurationSerializable {
         result.put("crates", crates);
 
         result.put("fireworkEffect", fireworkEffect);
+
+        result.put("totalOpens", totalOpens);
 
         return result;
     }

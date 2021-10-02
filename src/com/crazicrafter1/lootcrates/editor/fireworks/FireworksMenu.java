@@ -3,6 +3,7 @@ package com.crazicrafter1.lootcrates.editor.fireworks;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.gapi.*;
+import com.crazicrafter1.lootcrates.Data;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.editor.MainMenu;
 import com.crazicrafter1.lootcrates.editor.crate.CrateMenu;
@@ -36,7 +37,7 @@ public class FireworksMenu extends SimplexMenu {
         setComponent(1, 1, new Component() {
             @Override
             public ItemStack getIcon() {
-                return new FireworkWrapper(Main.DAT.fireworkEffect).getStar();
+                return new FireworkWrapper(Data.fireworkEffect).getStar();
             }
         });
 

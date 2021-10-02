@@ -36,7 +36,6 @@ public class Main extends JavaPlugin
     /*
      * Serializable stuff
      */
-    public static Data DAT = null;
 
     private static Main main;
     public static Main getInstance() {
@@ -76,7 +75,7 @@ public class Main extends JavaPlugin
 
         reloadConfig();
 
-        if (!DAT.update) {
+        if (!Data.update) {
             try {
                 if (updater.hasNewUpdate()) {
                     important("New update : " + updater.getLatestVersion() + ChatColor.DARK_BLUE + " (" + updater.getResourceURL() + ")");
@@ -87,7 +86,7 @@ public class Main extends JavaPlugin
 
             } catch (Exception e) {
                 error("An error occurred while checking for updates");
-                if (DAT.debug)
+                if (Data.debug)
                     e.printStackTrace();
             }
         } else
@@ -100,13 +99,20 @@ public class Main extends JavaPlugin
          */
         try {
             Metrics metrics = new Metrics(this, 10395);
+
             metrics.addCustomChart(new Metrics.SimplePie("updater", // what to record
-                    () -> "" + DAT.update));
+                    () -> "" + Data.update));
+
+            metrics.addCustomChart(new Metrics.SimplePie("crates", // what to record
+                    () -> "" + Data.crates.size()));
+
+            metrics.addCustomChart(new Metrics.SingleLineChart("opened", // what to record
+                    () -> Data.totalOpens));
 
             info("Metrics was successfully enabled");
         } catch (Exception e) {
             error("An error occurred while enabling metrics");
-            if (DAT.debug)
+            if (Data.debug)
                 e.printStackTrace();
         }
 
@@ -132,12 +138,13 @@ public class Main extends JavaPlugin
         super.reloadConfig();
         this.config = this.getConfig();
 
-        DAT = (Data) config.get("dat");
+        // Will impliticly call Data constructor, initializing values
+        config.get("dat");
     }
 
     @Override
     public void saveConfig() {
-        config.set("dat", DAT);
+        config.set("dat", new Data());
         super.saveConfig();
     }
 
@@ -158,7 +165,7 @@ public class Main extends JavaPlugin
     }
 
     public void debug(String s) {
-        if (DAT.debug)
+        if (Data.debug)
             Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.GOLD + s);
     }
 

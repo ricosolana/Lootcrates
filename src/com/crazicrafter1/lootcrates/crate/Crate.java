@@ -1,5 +1,6 @@
 package com.crazicrafter1.lootcrates.crate;
 
+import com.crazicrafter1.crutils.Int;
 import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.ReflectionUtil;
@@ -18,22 +19,22 @@ import java.util.*;
 
 public class Crate implements ConfigurationSerializable {
 
-    private static <T> HashMap<T, Integer> sortByValue(HashMap<T, Integer> hm)
-    {
-        // Create a list from elements of HashMap
-        List<Map.Entry<T, Integer> > list =
-                new LinkedList<>(hm.entrySet());
+    //private static <T> HashMap<T, Integer> sortByValue(HashMap<T, Integer> hm)
+    //{
+    //    // Create a list from elements of HashMap
+    //    List<Map.Entry<T, Integer> > list =
+    //            new LinkedList<>(hm.entrySet());
 
-        // Sort the list
-        list.sort(Comparator.comparing(Map.Entry::getValue));
+    //    // Sort the list
+    //    list.sort(Comparator.comparing(Map.Entry::getValue));
 
-        // put data from sorted list to hashmap
-        HashMap<T, Integer> temp = new LinkedHashMap<>();
-        for (Map.Entry<T, Integer> aa : list) {
-            temp.put(aa.getKey(), aa.getValue());
-        }
-        return temp;
-    }
+    //    // put data from sorted list to hashmap
+    //    HashMap<T, Integer> temp = new LinkedHashMap<>();
+    //    for (Map.Entry<T, Integer> aa : list) {
+    //        temp.put(aa.getKey(), aa.getValue());
+    //    }
+    //    return temp;
+    //}
 
     public String name;
     public ItemStack itemStack; // = Crate.makeCrate(itemStack, name);
@@ -41,7 +42,8 @@ public class Crate implements ConfigurationSerializable {
     public int size;
     public int picks;
     public Sound sound;
-    public LinkedHashMap<String, Integer> lootGroups; // sorted cumulative weights
+    public LinkedHashMap<String, Integer> lootGroupsByName; // sorted cumulative weights
+    public LinkedHashMap<LootGroup, Integer> lootGroups = new LinkedHashMap<>();
     public int totalWeights;
 
     public Crate(String name, ItemStack itemStack, String header, int size, int picks, Sound sound) {
@@ -61,16 +63,16 @@ public class Crate implements ConfigurationSerializable {
         size = (int) args.get("size");
         picks = (int) args.get("picks");
         sound = Sound.valueOf((String) args.get("sound"));
-        lootGroups = (LinkedHashMap<String, Integer>) args.get("lootGroups");
-        for (Map.Entry<String, Integer> entry : lootGroups.entrySet()) {
-            Main.getInstance().info("<" + entry.getKey() + ", " + entry.getValue() + ">");
-        }
-        Main.getInstance().info("");
+        lootGroupsByName = (LinkedHashMap<String, Integer>) args.get("lootGroups");
 
-        for (int weight : lootGroups.values())
-            totalWeights = weight; // to force set to last one eventually
-        Main.getInstance().info("totalWeights: " + totalWeights);
-        //totalWeights = (int) args.get("totalWeights");
+        for (int weight : lootGroupsByName.values())
+            totalWeights = weight;
+
+        //Main.getInstance().info(Data.lootGroups.toString());
+
+        //for (Map.Entry<String, Integer> entry : lootGroupsByName.entrySet()) {
+        //    lootGroups.put(Data.lootGroups.get(entry.getKey()), entry.getValue());
+        //}
     }
 
     /**
@@ -90,10 +92,10 @@ public class Crate implements ConfigurationSerializable {
 
 
 
-        for (Map.Entry<String, Integer> entry : this.lootGroups.entrySet()) {
+        for (Map.Entry<LootGroup, Integer> entry : this.lootGroups.entrySet()) {
             //Main.getInstance().info("weight: " + (entry.getValue()));
             //Main.getInstance().info("s: " + entry.getKey());
-            if (entry.getValue() > rand) return Main.DAT.lootGroups.get(entry.getKey());
+            if (entry.getValue() > rand) return entry.getKey();
         }
 
         Main.getInstance().info("returning null");
@@ -145,7 +147,7 @@ public class Crate implements ConfigurationSerializable {
     }
 
     public static Crate crateByName(String id) {
-        return Main.DAT.crates.get(id);
+        return Data.crates.get(id);
     }
 
     public static Crate crateByItem(final ItemStack itemStack) {

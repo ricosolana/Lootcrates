@@ -2,6 +2,7 @@ package com.crazicrafter1.lootcrates.crate;
 
 import java.util.*;
 
+import com.crazicrafter1.lootcrates.Data;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.crutils.Bool;
 import org.bukkit.*;
@@ -67,7 +68,7 @@ public final class ActiveCrate {
         if (slots.containsKey(slot))
             return;
 
-        inventory.setItem(slot, Main.DAT.selectedItem);
+        inventory.setItem(slot, Data.selectedItem);
 
         AbstractLoot randomLoot = lootChances[slot].getRandomLoot();
         slots.put(slot, new QSlot(true, randomLoot));
@@ -91,7 +92,7 @@ public final class ActiveCrate {
 
             state = State.REVEALING;
 
-            if (Main.DAT.speed > 0) {
+            if (Data.speed > 0) {
 
                  taskID = new BukkitRunnable() {
                      int iterations = 0;
@@ -102,14 +103,14 @@ public final class ActiveCrate {
                         if (iterations < size) {
                             inventory.setItem(iterations, getPanel(iterations));
                         }
-                        else if (iterations > size + 10/Main.DAT.speed) {
+                        else if (iterations > size + 10/Data.speed) {
                             this.cancel();
                             pop();
                         }
 
                         iterations++;
                     }
-                }.runTaskTimer(Main.getInstance(), 20, Main.DAT.speed).getTaskId();
+                }.runTaskTimer(Main.getInstance(), 20, Data.speed).getTaskId();
 
             } else {
                 pop();
@@ -124,7 +125,7 @@ public final class ActiveCrate {
             } else inventory.setItem(i, getPanel(i));
         }
 
-        if (Main.DAT.fireworkEffect != null) explosion();
+        if (Data.fireworkEffect != null) explosion();
 
         state = State.REVEALED;
     }
@@ -138,7 +139,7 @@ public final class ActiveCrate {
         Main.crateFireworks.add(firework.getUniqueId());
 
         FireworkMeta fwm = firework.getFireworkMeta();
-        fwm.addEffects(Main.DAT.fireworkEffect);
+        fwm.addEffects(Data.fireworkEffect);
         firework.setFireworkMeta(fwm);
 
         firework.detonate();
@@ -172,6 +173,7 @@ public final class ActiveCrate {
                 slots.get(slot).randomLoot.execute(this,
                         true, null);
             }
+            Data.totalOpens++;
         }
 
         if (taskID != -1)
@@ -179,7 +181,7 @@ public final class ActiveCrate {
     }
 
     private void fill() {
-        for (int i = 0; i < size; i++) inventory.setItem(i, Main.DAT.unSelectedItem);
+        for (int i = 0; i < size; i++) inventory.setItem(i, Data.unSelectedItem);
     }
 
     public Player getPlayer() {

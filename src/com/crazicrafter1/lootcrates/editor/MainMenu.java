@@ -21,7 +21,14 @@ import java.io.IOException;
 
 public class MainMenu extends SimplexMenu {
 
+    enum Likeness {
+        TERRIBLE,
+        ADEQUATE,
+        PERFECT,
+        NO_COMMENT
+    }
 
+    public Likeness likeness = Likeness.NO_COMMENT;
 
     public MainMenu() {
         super(ChatColor.DARK_GRAY + "LootCrates", 5, BACKGROUND_1);

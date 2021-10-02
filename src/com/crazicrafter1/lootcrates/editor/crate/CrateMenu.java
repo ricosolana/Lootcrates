@@ -3,6 +3,7 @@ package com.crazicrafter1.lootcrates.editor.crate;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.gapi.ParallaxMenu;
 import com.crazicrafter1.gapi.TriggerComponent;
+import com.crazicrafter1.lootcrates.Data;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.editor.MainMenu;
@@ -17,7 +18,7 @@ public class CrateMenu extends ParallaxMenu {
     public CrateMenu() {
         super("&8Crates");
 
-        for (Map.Entry<String, Crate> entry : Main.DAT.crates.entrySet()) {
+        for (Map.Entry<String, Crate> entry : Data.crates.entrySet()) {
 
             Crate crate = entry.getValue();
 

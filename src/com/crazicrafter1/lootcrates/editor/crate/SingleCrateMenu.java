@@ -104,8 +104,9 @@ public class SingleCrateMenu extends SimplexMenu {
 
             @Override
             public ItemStack getIcon() {
-                return new ItemBuilder(Material.END_CRYSTAL).
-                        name("&a&lChange Picks").count(picks).lore(" - left click to decrement\n - right click to increment").toItem();
+                return new ItemBuilder(Material.END_CRYSTAL)
+                        .name("&a&lChange Picks").count(picks)
+                        .lore(" - left click to decrement\n - right click to increment").toItem();
 
 
                 //return new ItemBuilder(Material.END_CRYSTAL).name("&a&lChange Picks").count(picks).lore("&8Current: " + picks).toItem();
@@ -114,12 +115,12 @@ public class SingleCrateMenu extends SimplexMenu {
 
         StringBuilder builder = new StringBuilder("&8Current: \n");
         int prevSum = 0;
-        for (Map.Entry<String, Integer> entry : crate.lootGroups.entrySet()) {
+        for (Map.Entry<LootGroup, Integer> entry : crate.lootGroups.entrySet()) {
 
             int weight = entry.getValue() - prevSum;
             float percent = 100.f * ((float) weight / (float) crate.totalWeights);
 
-            builder.append(String.format("&8 - %s  |  %d/%d  |  %.02f%%\n", entry.getKey(), weight, crate.totalWeights, percent));
+            builder.append(String.format("&8 - %s  |  %d/%d  |  %.02f%%\n", entry.getKey().name, weight, crate.totalWeights, percent));
 
             prevSum = entry.getValue();
         }
@@ -127,7 +128,7 @@ public class SingleCrateMenu extends SimplexMenu {
             @Override
             public void onLeftClick(Player p) {
                 // when clicking on this specific crate
-                new SingleCrateLootMenu(crate).show(p);
+                new SingleCrateLootMenu(crate, false).show(p);
             }
 
             @Override

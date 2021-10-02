@@ -26,7 +26,7 @@ public class CrateMenu extends ParallaxMenu {
 
             addItem(new TriggerComponent() {
                 @Override
-                public void onLeftClick(Player p) {
+                public void onLeftClick(Player p, boolean shift) {
                     // when clicking on this specific crate
                     new SingleCrateMenu(crate).show(p);
                 }

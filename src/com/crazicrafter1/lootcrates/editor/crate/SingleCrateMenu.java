@@ -22,7 +22,7 @@ public class SingleCrateMenu extends SimplexMenu {
 
         setComponent(1, 1, new TriggerComponent() {
             @Override
-            public void onLeftClick(Player p) {
+            public void onLeftClick(Player p, boolean shift) {
                 // when clicking on this specific crate
                 new SingleCrateChangeItemMenu(crate).show(p);
             }
@@ -35,7 +35,7 @@ public class SingleCrateMenu extends SimplexMenu {
 
         setComponent(3, 1, new TriggerComponent() {
             @Override
-            public void onLeftClick(Player p) {
+            public void onLeftClick(Player p, boolean shift) {
                 // when clicking on this specific crate
                 // openanvilgui
             }
@@ -52,7 +52,7 @@ public class SingleCrateMenu extends SimplexMenu {
             final int col = crate.size / 9;
 
             @Override
-            public void onLeftClick(Player p) {
+            public void onLeftClick(Player p, boolean shift) {
                 // decrement
                 if (col != 1) {
                     crate.size -= 9;
@@ -63,7 +63,7 @@ public class SingleCrateMenu extends SimplexMenu {
             }
 
             @Override
-            public void onRightClick(Player p) {
+            public void onRightClick(Player p, boolean shift) {
                 // increment
                 if (col != 6) {
                     crate.size += 9;
@@ -74,7 +74,7 @@ public class SingleCrateMenu extends SimplexMenu {
             @Override
             public ItemStack getIcon() {
                 return new ItemBuilder(Material.SCAFFOLDING).
-                        name("&e&lChange Columns").count(col).lore(" - left click to decrement\n - right click to increment").toItem();
+                        name("&e&lChange Columns").count(col).lore("\n&8LMB: -\n&8RMB: +").toItem();
             }
         });
 
@@ -83,7 +83,7 @@ public class SingleCrateMenu extends SimplexMenu {
             final int picks = crate.picks;
 
             @Override
-            public void onLeftClick(Player p) {
+            public void onLeftClick(Player p, boolean shift) {
                 // decrement
                 if (picks > 1) {
                     crate.picks--;
@@ -92,7 +92,7 @@ public class SingleCrateMenu extends SimplexMenu {
             }
 
             @Override
-            public void onRightClick(Player p) {
+            public void onRightClick(Player p, boolean shift) {
                 // increment
                 if (picks < crate.size) {
                     crate.picks++;
@@ -104,7 +104,7 @@ public class SingleCrateMenu extends SimplexMenu {
             public ItemStack getIcon() {
                 return new ItemBuilder(Material.END_CRYSTAL)
                         .name("&a&lChange Picks").count(picks)
-                        .lore(" - left click to decrement\n - right click to increment").toItem();
+                        .lore("\n&8LMB: -\n&8RMB: +").toItem();
 
 
                 //return new ItemBuilder(Material.END_CRYSTAL).name("&a&lChange Picks").count(picks).lore("&8Current: " + picks).toItem();
@@ -119,7 +119,7 @@ public class SingleCrateMenu extends SimplexMenu {
         }
         setComponent(2, 3, new TriggerComponent() {
             @Override
-            public void onLeftClick(Player p) {
+            public void onLeftClick(Player p, boolean shift) {
                 // when clicking on this specific crate
                 new SingleCrateLootMenu(crate, SingleCrateLootMenu.Mode.SELECT_EDIT).show(p);
             }

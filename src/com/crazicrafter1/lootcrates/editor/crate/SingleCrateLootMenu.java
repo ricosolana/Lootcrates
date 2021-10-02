@@ -1,6 +1,7 @@
 package com.crazicrafter1.lootcrates.editor.crate;
 
 import com.crazicrafter1.crutils.ItemBuilder;
+import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.gapi.ParallaxMenu;
 import com.crazicrafter1.gapi.TriggerComponent;
 import com.crazicrafter1.lootcrates.Data;
@@ -25,75 +26,106 @@ public class SingleCrateLootMenu extends ParallaxMenu {
          * Depending on mode, either:
          * SELECT crate or CHANGE WEIGHT
          */
-        for (LootGroup lootGroup : Data.lootGroups.values()) {
-            addItem(new TriggerComponent() {
-                @Override
-                public void onLeftClick(Player p) {
-                    if (mode == Mode.WEIGHT_EDIT) {
-                        // DECREMENT
-                        if (crate.lootGroupsByWeight.containsKey(lootGroup)) {
-                            int weight = crate.lootGroupsByWeight.get(lootGroup);
+        if (mode == Mode.SELECT_EDIT) {
+            for (LootGroup lootGroup : Data.lootGroups.values()) {
 
-                            // Min clamp at 1
-                            if (weight > 1) {
-                                crate.lootGroupsByWeight.put(lootGroup, weight - 1);
-                                // reweigh
-                                crate.weightsToSums();
-                            }
-                        }
-                    } else {
+                addItem(new TriggerComponent() {
+                    @Override
+                    public void onLeftClick(Player p, boolean shift) {
                         // TOGGLE
                         if (crate.lootGroupsByWeight.containsKey(lootGroup)) {
                             crate.lootGroupsByWeight.remove(lootGroup);
                         } else crate.lootGroupsByWeight.put(lootGroup, 1);
                         crate.weightsToSums();
+
+                        // REFRESH
+                        new SingleCrateLootMenu(crate, mode).show(p);
                     }
 
-                    // REFRESH
-                    new SingleCrateLootMenu(crate, mode).show(p);
-                }
+                    @Override
+                    public void onRightClick(Player p, boolean shift) {
+                        // REFRESH
+                        new SingleCrateLootMenu(crate, mode).show(p);
+                    }
 
-                @Override
-                public void onRightClick(Player p) {
-                    if (mode == Mode.WEIGHT_EDIT) {
-                        // increment
+                    @Override
+                    public ItemStack getIcon() {
+                        if (crate.lootGroupsByWeight.containsKey(lootGroup)) {
+                            return new ItemBuilder(lootGroup.itemStack)
+                                    .glow(true)
+                                    .lore("&2Included").toItem();
+                        } else
+                            return new ItemBuilder(lootGroup.itemStack)
+                                    .glow(false)
+                                    .lore("&cOmitted").toItem();
+                    }
+                });
+            }
+
+        } else {
+
+
+            for (LootGroup lootGroup : crate.lootGroupsByWeight.keySet()) {
+                addItem(new TriggerComponent() {
+                    @Override
+                    public void onLeftClick(Player p, boolean shift) {
+                        // DECREMENT
                         if (crate.lootGroupsByWeight.containsKey(lootGroup)) {
                             int weight = crate.lootGroupsByWeight.get(lootGroup);
 
-                            // Weights of zero will never be fired off
-                            if (weight < 64) {
-                                crate.lootGroupsByWeight.put(lootGroup, weight + 1);
+                            final int change = shift ? 5 : 1;
+
+                            // Min clamp at 1
+                            if (weight > change) {
+                                crate.lootGroupsByWeight.put(lootGroup, weight - change);
+                                // reweigh
                                 crate.weightsToSums();
                             }
                         }
 
-                        //new SingleCrateLootMenu(crate, true).show(p);
-                    } else {
-                        // no action
+                        // REFRESH
+                        new SingleCrateLootMenu(crate, mode).show(p);
                     }
 
-                    // REFRESH
-                    new SingleCrateLootMenu(crate, mode).show(p);
-                }
+                    @Override
+                    public void onRightClick(Player p, boolean shift) {
+                        // increment
+                        if (crate.lootGroupsByWeight.containsKey(lootGroup)) {
+                            int weight = crate.lootGroupsByWeight.get(lootGroup);
 
-                @Override
-                public ItemStack getIcon() {
-                    if (crate.lootGroupsByWeight.containsKey(lootGroup)) {
+                            final int change = shift ? 5 : 1;
+
+                            // Weights of zero will never be fired off
+                            crate.lootGroupsByWeight.put(lootGroup, weight + change);
+                            crate.weightsToSums();
+
+                        }
+
+                        // REFRESH
+                        new SingleCrateLootMenu(crate, mode).show(p);
+                    }
+
+                    @Override
+                    public ItemStack getIcon() {
+                        int count = crate.lootGroupsByWeight.get(lootGroup);
                         return new ItemBuilder(lootGroup.itemStack)
-                                .glow(true).count(crate.lootGroupsByWeight.get(lootGroup))
-                                .lore(crate.getFormattedPercent(lootGroup)).toItem();
-                    } else
-                        return new ItemBuilder(lootGroup.itemStack)
-                                .glow(false).count(1).toItem();
-                }
-            });
+                                .count(Util.clamp(count, 1, 64))
+                                .lore(String.format("&2%s  |  %s\n&8LMB: -\n&8RMB: +\n&8SHIFT: x5", crate.getFormattedFraction(lootGroup), crate.getFormattedPercent(lootGroup))).toItem();
+                    }
+                });
+            }
+
+
         }
+
+
+
 
         // toggle mode
         //              8 doesn't work correctly for some reason
         setComponent(7, 5, new TriggerComponent() {
             @Override
-            public void onLeftClick(Player p) {
+            public void onLeftClick(Player p, boolean shift) {
 
                 new SingleCrateLootMenu(crate, mode == Mode.WEIGHT_EDIT ? Mode.SELECT_EDIT : Mode.WEIGHT_EDIT).show(p);
                 //Main.getInstance().info("I was clicked!");

@@ -19,7 +19,7 @@ public class LootMenu extends ParallaxMenu {
         for (Map.Entry<String, LootGroup> entry : Data.lootGroups.entrySet()) {
             addItem(new TriggerComponent() {
                 @Override
-                public void onLeftClick(Player p) {
+                public void onLeftClick(Player p, boolean shift) {
                     // open the loot
                     new SingleLootMenu(entry.getValue()).show(p);
                 }

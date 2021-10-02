@@ -36,7 +36,7 @@ public class MainMenu extends SimplexMenu {
         // Crates
         setComponent(1, 1, new TriggerComponent() {
             @Override
-            public void onLeftClick(Player p) {
+            public void onLeftClick(Player p, boolean shift) {
                 // open another menu
                 new CrateMenu().show(p);
             }
@@ -50,7 +50,7 @@ public class MainMenu extends SimplexMenu {
         // LootGroup
         setComponent(3, 1, new TriggerComponent() {
             @Override
-            public void onLeftClick(Player p) {
+            public void onLeftClick(Player p, boolean shift) {
                 new LootMenu().show(p);
             }
 
@@ -63,7 +63,7 @@ public class MainMenu extends SimplexMenu {
         // Fireworks
         setComponent(5, 1, new TriggerComponent() {
             @Override
-            public void onLeftClick(Player p) {
+            public void onLeftClick(Player p, boolean shift) {
                 new FireworksMenu().show(p);
             }
 
@@ -76,7 +76,7 @@ public class MainMenu extends SimplexMenu {
         // Misc
         setComponent(7, 1, new TriggerComponent() {
             @Override
-            public void onLeftClick(Player p) {
+            public void onLeftClick(Player p, boolean shift) {
                 new MiscMenu().show(p);
             }
 
@@ -89,7 +89,7 @@ public class MainMenu extends SimplexMenu {
         // save config to disk
         setComponent(4, 3, new TriggerComponent() {
             @Override
-            public void onLeftClick(Player p) {
+            public void onLeftClick(Player p, boolean shift) {
                 // configs / backups
                 File configFile = new File(Main.getInstance().getDataFolder(), "config.yml");
                 File backupFile = new File(Main.getInstance().getDataFolder(),"backup/" + System.currentTimeMillis() + "_config.yml");

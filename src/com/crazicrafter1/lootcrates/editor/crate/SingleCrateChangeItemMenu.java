@@ -42,7 +42,7 @@ public class SingleCrateChangeItemMenu extends SimplexMenu {
         // Confirm
         setComponent(7, 1, new TriggerComponent() {
             @Override
-            public void onLeftClick(Player p) {
+            public void onLeftClick(Player p, boolean shift) {
                 ItemStack item = rem.getIcon();
                 if (item != null) {
                     Main.getInstance().info("Applying changes here!");

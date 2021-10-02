@@ -18,7 +18,7 @@ public class MiscMenu extends SimplexMenu {
         // toggle debug
         this.setComponent(1, 1, new TriggerComponent() {
             @Override
-            public void onLeftClick(Player p) {
+            public void onLeftClick(Player p, boolean shift) {
                 Data.debug = !Data.debug;
                 new MiscMenu().show(p);
             }
@@ -35,7 +35,7 @@ public class MiscMenu extends SimplexMenu {
         // toggle update
         this.setComponent(4, 1, new TriggerComponent() {
             @Override
-            public void onLeftClick(Player p) {
+            public void onLeftClick(Player p, boolean shift) {
                 Data.update = !Data.update;
                 new MiscMenu().show(p);
             }
@@ -52,7 +52,7 @@ public class MiscMenu extends SimplexMenu {
         // speed
         this.setComponent(7, 1, new TriggerComponent() {
             @Override
-            public void onLeftClick(Player p) {
+            public void onLeftClick(Player p, boolean shift) {
                 // decrement
                 if (Data.speed != 0) {
                     Data.speed--;
@@ -61,7 +61,7 @@ public class MiscMenu extends SimplexMenu {
             }
 
             @Override
-            public void onRightClick(Player p) {
+            public void onRightClick(Player p, boolean shift) {
                 if (Data.speed != 20) {
                     Data.speed++;
                     new MiscMenu().show(p);
@@ -83,7 +83,7 @@ public class MiscMenu extends SimplexMenu {
         // unselected item
         setComponent(2, 3, new TriggerComponent() {
             @Override
-            public void onLeftClick(Player p) {
+            public void onLeftClick(Player p, boolean shift) {
 
             }
 
@@ -97,7 +97,7 @@ public class MiscMenu extends SimplexMenu {
         // selected item
         setComponent(6, 3, new TriggerComponent() {
             @Override
-            public void onLeftClick(Player p) {
+            public void onLeftClick(Player p, boolean shift) {
 
             }
 

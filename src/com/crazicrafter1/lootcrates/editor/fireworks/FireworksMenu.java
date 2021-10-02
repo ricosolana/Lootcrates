@@ -48,7 +48,7 @@ public class FireworksMenu extends SimplexMenu {
         // Confirm
         setComponent(7, 1, new TriggerComponent() {
             @Override
-            public void onLeftClick(Player p) {
+            public void onLeftClick(Player p, boolean shift) {
 
                 if (true)
                     return;

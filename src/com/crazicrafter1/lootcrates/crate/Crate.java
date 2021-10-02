@@ -1,14 +1,10 @@
 package com.crazicrafter1.lootcrates.crate;
 
-import com.crazicrafter1.crutils.Int;
 import com.crazicrafter1.lootcrates.*;
-import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.ReflectionUtil;
 import com.crazicrafter1.crutils.Util;
-import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -19,32 +15,78 @@ import java.util.*;
 
 public class Crate implements ConfigurationSerializable {
 
-    //private static <T> HashMap<T, Integer> sortByValue(HashMap<T, Integer> hm)
-    //{
-    //    // Create a list from elements of HashMap
-    //    List<Map.Entry<T, Integer> > list =
-    //            new LinkedList<>(hm.entrySet());
+    // can be used to sort any given lootgroup map
+    private static <T> LinkedHashMap<T, Integer> sortByValue(HashMap<T, Integer> hm) {
+        // Create a list from elements of HashMap
+        List<Map.Entry<T, Integer> > list =
+                new LinkedList<>(hm.entrySet());
 
-    //    // Sort the list
-    //    list.sort(Comparator.comparing(Map.Entry::getValue));
+        // Sort the list
+        list.sort(Comparator.comparing(Map.Entry::getValue));
 
-    //    // put data from sorted list to hashmap
-    //    HashMap<T, Integer> temp = new LinkedHashMap<>();
-    //    for (Map.Entry<T, Integer> aa : list) {
-    //        temp.put(aa.getKey(), aa.getValue());
-    //    }
-    //    return temp;
-    //}
+        // put data from sorted list to hashmap
+        LinkedHashMap<T, Integer> temp = new LinkedHashMap<>();
+        for (Map.Entry<T, Integer> aa : list) {
+            temp.put(aa.getKey(), aa.getValue());
+        }
+        return temp;
+    }
+
+    // takes the weighted lootgroups and assigns the summed/cumulative weight lootgroups
+
+    /**
+     * Takes in the (unsorted) weights
+     * Sorts the unsorted weights, and assigns the sum weights
+     * [[[weights -> cumulative sums]]]
+     */
+    public void weightsToSums() {
+        // so first sort
+
+        lootGroupsBySumWeight = new LinkedHashMap<>();
+
+        lootGroupsByWeight = sortByValue(lootGroupsByWeight);
+        lootGroupsBySumWeight = (LinkedHashMap<LootGroup, Integer>) lootGroupsByWeight.clone();
+
+        int last = 0;
+        for (Map.Entry<LootGroup, Integer> entry : lootGroupsBySumWeight.entrySet()) {
+            entry.setValue(last + entry.getValue());
+            last = entry.getValue();
+        }
+
+        this.totalWeights = last;
+    }
+
+    /**
+     * Takes in the sorted cumulative/sum weights
+     * Generates a weighted map from values
+     * [[[cumulative sums -> weights]]]
+     */
+    public void sumsToWeights() {
+        lootGroupsByWeight = new LinkedHashMap<>();
+
+        int prevSum = 0;
+        for (Map.Entry<LootGroup, Integer> entry : lootGroupsBySumWeight.entrySet()) {
+            int weight = entry.getValue() - prevSum;
+
+            lootGroupsByWeight.put(entry.getKey(), weight);
+
+            prevSum = entry.getValue();
+        }
+
+        this.totalWeights = prevSum;
+    }
 
     public String name;
-    public ItemStack itemStack; // = Crate.makeCrate(itemStack, name);
+    public ItemStack itemStack;
     public String header;
     public int size;
     public int picks;
     public Sound sound;
-    public LinkedHashMap<String, Integer> lootGroupsByName; // sorted cumulative weights
-    public LinkedHashMap<LootGroup, Integer> lootGroups = new LinkedHashMap<>();
+    public LinkedHashMap<String, Integer> lootGroupsByName;         // this will never be used beyond initialization
+    public LinkedHashMap<LootGroup, Integer> lootGroupsBySumWeight = new LinkedHashMap<>();
     public int totalWeights;
+
+    public LinkedHashMap<LootGroup, Integer> lootGroupsByWeight = null;
 
     public Crate(String name, ItemStack itemStack, String header, int size, int picks, Sound sound) {
         this.name = name;
@@ -63,16 +105,15 @@ public class Crate implements ConfigurationSerializable {
         size = (int) args.get("size");
         picks = (int) args.get("picks");
         sound = Sound.valueOf((String) args.get("sound"));
-        lootGroupsByName = (LinkedHashMap<String, Integer>) args.get("lootGroups");
+        // go ahead and sort to make sure no weirdness occurs
+        lootGroupsByName = sortByValue((LinkedHashMap<String, Integer>) args.get("lootGroups"));
 
+        // brute force lazy to set total weight
+        // assumes that the last element in the LinkedList is the largest for largest weight
         for (int weight : lootGroupsByName.values())
             totalWeights = weight;
 
-        //Main.getInstance().info(Data.lootGroups.toString());
 
-        //for (Map.Entry<String, Integer> entry : lootGroupsByName.entrySet()) {
-        //    lootGroups.put(Data.lootGroups.get(entry.getKey()), entry.getValue());
-        //}
     }
 
     /**
@@ -92,7 +133,7 @@ public class Crate implements ConfigurationSerializable {
 
 
 
-        for (Map.Entry<LootGroup, Integer> entry : this.lootGroups.entrySet()) {
+        for (Map.Entry<LootGroup, Integer> entry : this.lootGroupsBySumWeight.entrySet()) {
             //Main.getInstance().info("weight: " + (entry.getValue()));
             //Main.getInstance().info("s: " + entry.getKey());
             if (entry.getValue() > rand) return entry.getKey();
@@ -101,6 +142,14 @@ public class Crate implements ConfigurationSerializable {
         Main.getInstance().info("returning null");
 
         return null;
+    }
+
+    public String getFormattedPercent(LootGroup lootGroup) {
+        return String.format("%.02f%%", 100.f * ((float)lootGroupsByWeight.get(lootGroup)/(float)totalWeights));
+    }
+
+    public String getFormattedFraction(LootGroup lootGroup) {
+        return String.format("%d/%d", lootGroupsByWeight.get(lootGroup), totalWeights);
     }
 
     public static ItemStack makeCrate(final ItemStack itemStack, final String crate) {
@@ -213,7 +262,7 @@ public class Crate implements ConfigurationSerializable {
                 "size: " + header + "\n" +
                 "picks: " + picks + "\n" +
                 "sound: " + sound + "\n" +
-                "lootGroups: " + lootGroups + "\n";
+                "lootGroups: " + lootGroupsBySumWeight + "\n";
     }
 
     @Override
@@ -226,7 +275,7 @@ public class Crate implements ConfigurationSerializable {
         result.put("size", size);
         result.put("picks", picks);
         result.put("sound", sound.name());
-        result.put("lootGroups", lootGroups);
+        result.put("lootGroups", lootGroupsBySumWeight);
         //result.put("totalWeights", totalWeights);
 
         return result;

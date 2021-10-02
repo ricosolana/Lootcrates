@@ -1,12 +1,8 @@
 package com.crazicrafter1.lootcrates;
 
-import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootGroup;
 import org.bukkit.*;
-import org.bukkit.configuration.MemorySection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 
@@ -41,7 +37,11 @@ public class Data implements ConfigurationSerializable {
             crate.itemStack = Crate.makeCrate(crate.itemStack, name);
 
             for (Map.Entry<String, Integer> entry1 : crate.lootGroupsByName.entrySet()) {
-                crate.lootGroups.put(Data.lootGroups.get(entry1.getKey()), entry1.getValue());
+                // initialize sums
+                crate.lootGroupsBySumWeight.put(Data.lootGroups.get(entry1.getKey()), entry1.getValue());
+
+                // initialize weights
+                crate.sumsToWeights();
             }
         }
 

@@ -4,11 +4,9 @@ import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.gapi.Component;
 import com.crazicrafter1.gapi.SimplexMenu;
 import com.crazicrafter1.gapi.TriggerComponent;
-import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootGroup;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -114,21 +112,16 @@ public class SingleCrateMenu extends SimplexMenu {
         });
 
         StringBuilder builder = new StringBuilder("&8Current: \n");
-        int prevSum = 0;
-        for (Map.Entry<LootGroup, Integer> entry : crate.lootGroups.entrySet()) {
-
-            int weight = entry.getValue() - prevSum;
-            float percent = 100.f * ((float) weight / (float) crate.totalWeights);
-
-            builder.append(String.format("&8 - %s  |  %d/%d  |  %.02f%%\n", entry.getKey().name, weight, crate.totalWeights, percent));
-
-            prevSum = entry.getValue();
+        for (Map.Entry<LootGroup, Integer> entry : crate.lootGroupsByWeight.entrySet()) {
+            LootGroup lootGroup = entry.getKey();
+            builder.append(String.format("&8 - %s  |  %s  |  %s\n",
+                    entry.getKey().name, crate.getFormattedFraction(lootGroup), crate.getFormattedPercent(lootGroup)));
         }
         setComponent(2, 3, new TriggerComponent() {
             @Override
             public void onLeftClick(Player p) {
                 // when clicking on this specific crate
-                new SingleCrateLootMenu(crate, false).show(p);
+                new SingleCrateLootMenu(crate, SingleCrateLootMenu.Mode.SELECT_EDIT).show(p);
             }
 
             @Override

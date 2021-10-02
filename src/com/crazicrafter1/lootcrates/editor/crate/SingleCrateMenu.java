@@ -73,8 +73,9 @@ public class SingleCrateMenu extends SimplexMenu {
 
             @Override
             public ItemStack getIcon() {
-                return new ItemBuilder(Material.SCAFFOLDING).
-                        name("&e&lChange Columns").count(col).lore("\n&8LMB: -\n&8RMB: +").toItem();
+                return new ItemBuilder(Material.SCAFFOLDING)
+                        .name("&e&lChange Columns").count(col)
+                        .lore("&8LMB: &c-\n&8RMB: &2+").toItem();
             }
         });
 
@@ -104,15 +105,15 @@ public class SingleCrateMenu extends SimplexMenu {
             public ItemStack getIcon() {
                 return new ItemBuilder(Material.END_CRYSTAL)
                         .name("&a&lChange Picks").count(picks)
-                        .lore("\n&8LMB: -\n&8RMB: +").toItem();
+                        .lore("&8LMB: &c-\n&8RMB: &2+").toItem();
 
 
                 //return new ItemBuilder(Material.END_CRYSTAL).name("&a&lChange Picks").count(picks).lore("&8Current: " + picks).toItem();
             }
         });
 
-        StringBuilder builder = new StringBuilder("&8Current: \n");
-        for (Map.Entry<LootGroup, Integer> entry : crate.lootGroupsByWeight.entrySet()) {
+        StringBuilder builder = new StringBuilder();
+        for (Map.Entry<LootGroup, Integer> entry : crate.lootByWeight.entrySet()) {
             LootGroup lootGroup = entry.getKey();
             builder.append(String.format("&8 - %s  |  %s  |  %s\n",
                     entry.getKey().name, crate.getFormattedFraction(lootGroup), crate.getFormattedPercent(lootGroup)));
@@ -126,7 +127,7 @@ public class SingleCrateMenu extends SimplexMenu {
 
             @Override
             public ItemStack getIcon() {
-                return new ItemBuilder(Material.EXPERIENCE_BOTTLE).name("&a&lChange Loot").lore(builder.toString()).toItem();
+                return new ItemBuilder(Material.EXPERIENCE_BOTTLE).name("&a&lEdit Loot").lore(builder.toString()).toItem();
             }
         });
 

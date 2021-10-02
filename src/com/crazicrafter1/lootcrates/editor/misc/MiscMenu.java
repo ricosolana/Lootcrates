@@ -70,11 +70,12 @@ public class MiscMenu extends SimplexMenu {
 
             @Override
             public ItemStack getIcon() {
-                return new ItemBuilder(Material.FEATHER).count(Data.speed).name("&2&lReveal Speed")
+                return new ItemBuilder(Material.FEATHER).count(Data.speed)
+                        .name("&2&lReveal Speed")
                         .lore("""
-                                 &8- left click to decrement
-                                 &8- right click to increment
-                                 &8Set to 0 to disable
+                                &8LMB: &c-
+                                &8RMB: &2+
+                                &8Setting to 0 will disable
                                 """
                         ).toItem();
             }

@@ -31,6 +31,10 @@ public abstract class AbstractLoot implements ConfigurationSerializable {
     private final ItemStack icon;
 
     public AbstractLoot(ItemStack baseVisual) {
+
+        if (baseVisual == null)
+            throw new RuntimeException("Item must not be null!");
+
         this.icon = baseVisual;
     }
 
@@ -43,5 +47,13 @@ public abstract class AbstractLoot implements ConfigurationSerializable {
      */
     public abstract void execute(ActiveCrate activeCrate, boolean closed, Bool giveItem);
 
+    @Override
+    public String toString() {
+        return "icon: " + getIcon().getType() + "\n";
+    }
 
+    @Override
+    public Map<String, Object> serialize() {
+        throw new RuntimeException("I must be overridden!");
+    }
 }

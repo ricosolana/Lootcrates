@@ -1,6 +1,7 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.crutils.Bool;
+import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.crate.AbstractLoot;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
@@ -43,14 +44,13 @@ public class LootOrdinateItem extends AbstractLoot {
 
     @Override
     public ItemStack getIcon() {
-        ItemStack itemStack = super.getIcon();
-        itemStack.setAmount(Util.randomRange(min, max));
-        return itemStack;
+        return new ItemBuilder(super.getIcon())
+                .count(Util.randomRange(min, max)).toItem();
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(super.toString());
         if (min == max)
             sb.append("count: ").append(min);
         else sb.append("range: [").append(min).append(", ").append(max).append("]");
@@ -62,10 +62,13 @@ public class LootOrdinateItem extends AbstractLoot {
     public Map<String, Object> serialize() {
         Map<String, Object> result = new LinkedHashMap<>();
 
+        result.put("item", super.getIcon());
+
         result.put("min", min);
         result.put("max", max);
 
         // then other impls...
+
 
         return result;
     }

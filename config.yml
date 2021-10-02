@@ -1,20 +1,8 @@
 dat:
   ==: com.crazicrafter1.lootcrates.Data
-  # This config is not user-friendly,
-  # Some values are pre-computed in here
-  # Don't mess with stuff unless you know what you're doing!
   debug: false
-
-
-
   update: true
-
-
-
   speed: 4
-
-
-
   unSelectedItem:
     ==: org.bukkit.inventory.ItemStack
     v: 2730
@@ -29,9 +17,6 @@ dat:
         - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"your
         loot will be revealed!"}],"text":""}'
       blockMaterial: CHEST
-
-
-
   selectedItem:
     ==: org.bukkit.inventory.ItemStack
     v: 2730
@@ -43,11 +28,8 @@ dat:
       lore:
         - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"You
         have selected this mystery chest"}],"text":""}'
-
-
-
   lootGroups:
-    common:
+    common: &id008
       ==: com.crazicrafter1.lootcrates.crate.LootGroup
       itemStack:
         ==: org.bukkit.inventory.ItemStack
@@ -56,7 +38,8 @@ dat:
         meta:
           ==: ItemMeta
           meta-type: UNSPECIFIC
-          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"Common Reward"}],"text":""}'
+          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"Common
+            Reward"}],"text":""}'
       loot:
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootOrdinateItem
           item:
@@ -79,8 +62,7 @@ dat:
             type: CACTUS
           min: 1
           max: 31
-
-    ultra:
+    ultra: &id007
       ==: com.crazicrafter1.lootcrates.crate.LootGroup
       itemStack:
         ==: org.bukkit.inventory.ItemStack
@@ -89,7 +71,8 @@ dat:
         meta:
           ==: ItemMeta
           meta-type: UNSPECIFIC
-          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"Ultra Reward"}],"text":""}'
+          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"Ultra
+            Reward"}],"text":""}'
       loot:
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootOrdinateItem
           item:
@@ -113,8 +96,7 @@ dat:
             # test enchantments meta
           min: 1
           max: 1
-
-    legendary:
+    legendary: &id009
       ==: com.crazicrafter1.lootcrates.crate.LootGroup
       itemStack:
         ==: org.bukkit.inventory.ItemStack
@@ -123,7 +105,8 @@ dat:
         meta:
           ==: ItemMeta
           meta-type: UNSPECIFIC
-          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"Legendary Reward"}],"text":""}'
+          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"Legendary
+            Reward"}],"text":""}'
       loot:
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootOrdinateItem
           item:
@@ -147,30 +130,6 @@ dat:
             # test enchantments meta
           min: 8
           max: 8
-
-    #laser:
-    #  ==: com.crazicrafter1.lootcrates.crate.LootGroup
-    #  name: laser
-    #  itemStack:
-    #    ==: org.bukkit.inventory.ItemStack
-    #    v: 2730
-    #    type: ORANGE_STAINED_GLASS_PANE
-    #    meta:
-    #      ==: ItemMeta
-    #      meta-type: UNSPECIFIC
-    #      display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"text":"Laser Reward"}],"text":""}'
-    #   loot:
-    #     - ==: com.crazicrafter1.lootcrates.crate.loot.LootItemQA
-    #       name: fusion_cell
-    #       min: 5
-    #       max: 5
-    #     - ==: com.crazicrafter1.lootcrates.crate.loot.LootItemQA
-    #       name: lazerrifle
-    #       min: 1
-    #       max: 1
-
-
-
   crates:
     peasant:
       ==: com.crazicrafter1.lootcrates.crate.Crate
@@ -181,20 +140,22 @@ dat:
         meta:
           ==: ItemMeta
           meta-type: TILE_ENTITY
-          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"white","text":"Peasant Loot"}],"text":""}'
+          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"white","text":"Peasant
+            Loot"}],"text":""}'
           lore:
             - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"Choose
             4 mystery chests, and"}],"text":""}'
             - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"your
             loot will be revealed!"}],"text":""}'
+          internal: H4sIAAAAAAAA/+NiYOBgYHUuSixJZWAvSE0sTswrYQAAGUjyDhUAAAA=
           blockMaterial: CHEST
       header: Peasant crate...
       size: 45
       picks: 3
       sound: ENTITY_EXPERIENCE_ORB_PICKUP
       lootGroups:
-        ultra: 8
-        common: 60
+        *id007: 10
+        *id008: 45
     knight:
       ==: com.crazicrafter1.lootcrates.crate.Crate
       itemStack:
@@ -204,24 +165,22 @@ dat:
         meta:
           ==: ItemMeta
           meta-type: TILE_ENTITY
-          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"white","text":"Knight Loot"}],"text":""}'
+          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"white","text":"Knight
+            Loot"}],"text":""}'
           lore:
             - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"Choose
             4 mystery chests, and"}],"text":""}'
             - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"your
             loot will be revealed!"}],"text":""}'
+          internal: H4sIAAAAAAAA/+NiYOBgYHUuSixJZWDLzstMzyhhAAA/nIHiFAAAAA==
           blockMaterial: CHEST
       header: Knight crate...
       size: 45
       picks: 3
       sound: ENTITY_EXPERIENCE_ORB_PICKUP
       lootGroups:
-        legendary: 10
-        ultra: 35
-        common: 80
-
-
-
+        *id009: 15
+        *id007: 50
   fireworkEffect:
     ==: Firework
     flicker: false
@@ -245,3 +204,4 @@ dat:
         BLUE: 0
         GREEN: 128
     type: BURST
+  totalOpens: 0

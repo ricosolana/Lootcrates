@@ -90,6 +90,12 @@ public class MainMenu extends SimplexMenu {
         setComponent(4, 3, new TriggerComponent() {
             @Override
             public void onLeftClick(Player p, boolean shift) {
+
+                Main.getInstance().saveConfig();
+
+                if (true)
+                    return;
+
                 // configs / backups
                 File configFile = new File(Main.getInstance().getDataFolder(), "config.yml");
                 File backupFile = new File(Main.getInstance().getDataFolder(),"backup/" + System.currentTimeMillis() + "_config.yml");

@@ -33,9 +33,9 @@ public class SingleCrateLootMenu extends ParallaxMenu {
                     @Override
                     public void onLeftClick(Player p, boolean shift) {
                         // TOGGLE
-                        if (crate.lootGroupsByWeight.containsKey(lootGroup)) {
-                            crate.lootGroupsByWeight.remove(lootGroup);
-                        } else crate.lootGroupsByWeight.put(lootGroup, 1);
+                        if (crate.lootByWeight.containsKey(lootGroup)) {
+                            crate.lootByWeight.remove(lootGroup);
+                        } else crate.lootByWeight.put(lootGroup, 1);
                         crate.weightsToSums();
 
                         // REFRESH
@@ -50,7 +50,7 @@ public class SingleCrateLootMenu extends ParallaxMenu {
 
                     @Override
                     public ItemStack getIcon() {
-                        if (crate.lootGroupsByWeight.containsKey(lootGroup)) {
+                        if (crate.lootByWeight.containsKey(lootGroup)) {
                             return new ItemBuilder(lootGroup.itemStack)
                                     .glow(true)
                                     .lore("&2Included").toItem();
@@ -65,19 +65,19 @@ public class SingleCrateLootMenu extends ParallaxMenu {
         } else {
 
 
-            for (LootGroup lootGroup : crate.lootGroupsByWeight.keySet()) {
+            for (LootGroup lootGroup : crate.lootByWeight.keySet()) {
                 addItem(new TriggerComponent() {
                     @Override
                     public void onLeftClick(Player p, boolean shift) {
                         // DECREMENT
-                        if (crate.lootGroupsByWeight.containsKey(lootGroup)) {
-                            int weight = crate.lootGroupsByWeight.get(lootGroup);
+                        if (crate.lootByWeight.containsKey(lootGroup)) {
+                            int weight = crate.lootByWeight.get(lootGroup);
 
                             final int change = shift ? 5 : 1;
 
                             // Min clamp at 1
                             if (weight > change) {
-                                crate.lootGroupsByWeight.put(lootGroup, weight - change);
+                                crate.lootByWeight.put(lootGroup, weight - change);
                                 // reweigh
                                 crate.weightsToSums();
                             }
@@ -90,13 +90,13 @@ public class SingleCrateLootMenu extends ParallaxMenu {
                     @Override
                     public void onRightClick(Player p, boolean shift) {
                         // increment
-                        if (crate.lootGroupsByWeight.containsKey(lootGroup)) {
-                            int weight = crate.lootGroupsByWeight.get(lootGroup);
+                        if (crate.lootByWeight.containsKey(lootGroup)) {
+                            int weight = crate.lootByWeight.get(lootGroup);
 
                             final int change = shift ? 5 : 1;
 
                             // Weights of zero will never be fired off
-                            crate.lootGroupsByWeight.put(lootGroup, weight + change);
+                            crate.lootByWeight.put(lootGroup, weight + change);
                             crate.weightsToSums();
 
                         }
@@ -107,10 +107,15 @@ public class SingleCrateLootMenu extends ParallaxMenu {
 
                     @Override
                     public ItemStack getIcon() {
-                        int count = crate.lootGroupsByWeight.get(lootGroup);
+                        int count = crate.lootByWeight.get(lootGroup);
+                        String prob = String.format("&2%s  =  %s\n", crate.getFormattedFraction(lootGroup), crate.getFormattedPercent(lootGroup));
                         return new ItemBuilder(lootGroup.itemStack)
                                 .count(Util.clamp(count, 1, 64))
-                                .lore(String.format("&2%s  |  %s\n&8LMB: -\n&8RMB: +\n&8SHIFT: x5", crate.getFormattedFraction(lootGroup), crate.getFormattedPercent(lootGroup))).toItem();
+                                .lore(prob +    """
+                                                &8LMB: &c-   &8SHIFT: x5
+                                                &8RMB: &2+
+                                                """
+                                ).toItem();
                     }
                 });
             }

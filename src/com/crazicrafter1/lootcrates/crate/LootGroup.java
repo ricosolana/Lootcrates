@@ -28,6 +28,8 @@ public class LootGroup implements ConfigurationSerializable {
         //name = (String) args.get("name");
         itemStack = (ItemStack) args.get("itemStack");
         loot = (ArrayList<AbstractLoot>) args.get("loot");
+
+        Main.getInstance().info(loot.toString());
     }
 
     public AbstractLoot getRandomLoot() {
@@ -43,5 +45,14 @@ public class LootGroup implements ConfigurationSerializable {
         result.put("loot", loot);
 
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "LootGroup{" +
+                "name='" + name + '\'' +
+                ", itemStack=" + itemStack.getType() +
+                ", loot=" + loot.size() +
+                '}';
     }
 }

@@ -30,4 +30,6 @@ public class LootItemQA extends LootOrdinateItem {
 
         return super.serialize();
     }
+
+
 }

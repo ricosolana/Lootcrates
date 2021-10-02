@@ -32,7 +32,7 @@ public class LootItemCrate extends LootOrdinateItem {
 
     @Override
     public String toString() {
-        return "crate: " + crate;
+        return super.toString() + "crate: " + crate;
     }
 
     @Override

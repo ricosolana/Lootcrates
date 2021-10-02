@@ -1,6 +1,7 @@
 package com.crazicrafter1.lootcrates.editor.fireworks;
 
 import com.crazicrafter1.crutils.ItemBuilder;
+import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
@@ -17,93 +18,93 @@ public class FireworkWrapper {
     public ItemStack getStar() {
         StringBuilder lore = new StringBuilder();
         if (effect != null) {
-            lore.append("Colors: \n");
+            lore.append("&8Colors: \n");
             for (Color c : effect.getColors()) {
-                lore.append(" - ");
+                lore.append(" &8- ");
                 if (c.equals(Color.WHITE)) {
-                    lore.append("white");
+                    lore.append("&fwhite");
                 } else if (c.equals(Color.SILVER)) {
-                    lore.append("silver");
+                    lore.append("&7silver");
                 } else if (c.equals(Color.GRAY)) {
-                    lore.append("gray");
+                    lore.append("&8gray");
                 } else if (c.equals(Color.BLACK)) {
-                    lore.append("black");
+                    lore.append("&0black");
                 } else if (c.equals(Color.RED)) {
-                    lore.append("red");
+                    lore.append("&cred");
                 } else if (c.equals(Color.MAROON)) {
-                    lore.append("maroon");
+                    lore.append("&4maroon");
                 } else if (c.equals(Color.YELLOW)) {
-                    lore.append("yellow");
+                    lore.append("&eyellow");
                 } else if (c.equals(Color.OLIVE)) {
-                    lore.append("olive");
+                    lore.append("&2olive");
                 } else if (c.equals(Color.LIME)) {
-                    lore.append("lime");
+                    lore.append("&alime");
                 } else if (c.equals(Color.GREEN)) {
-                    lore.append("green");
+                    lore.append("&agreen");
                 } else if (c.equals(Color.AQUA)) {
-                    lore.append("aqua");
+                    lore.append("&baqua");
                 } else if (c.equals(Color.TEAL)) {
-                    lore.append("teal");
+                    lore.append("&3teal");
                 } else if (c.equals(Color.BLUE)) {
-                    lore.append("blue");
+                    lore.append("&9blue");
                 } else if (c.equals(Color.NAVY)) {
-                    lore.append("navy");
+                    lore.append("&1navy");
                 } else if (c.equals(Color.FUCHSIA)) {
-                    lore.append("fuchsia");
+                    lore.append("&dfuchsia");
                 } else if (c.equals(Color.PURPLE)) {
-                    lore.append("purple");
+                    lore.append("&5purple");
                 } else if (c.equals(Color.ORANGE)) {
-                    lore.append("orange");
+                    lore.append("&6orange");
                 } else {
                     lore.append(c.asRGB());
                 }
                 lore.append("\n");
             }
 
-            lore.append("Fade colors: \n");
+            lore.append("&8Fade colors: \n");
             for (Color c : effect.getFadeColors()) {
-                lore.append(" - ");
+                lore.append(" &8- ");
                 if (c.equals(Color.WHITE)) {
-                    lore.append("white");
+                    lore.append("&fwhite");
                 } else if (c.equals(Color.SILVER)) {
-                    lore.append("silver");
+                    lore.append("&7silver");
                 } else if (c.equals(Color.GRAY)) {
-                    lore.append("gray");
+                    lore.append("&8gray");
                 } else if (c.equals(Color.BLACK)) {
-                    lore.append("black");
+                    lore.append("&0black");
                 } else if (c.equals(Color.RED)) {
-                    lore.append("red");
+                    lore.append("&cred");
                 } else if (c.equals(Color.MAROON)) {
-                    lore.append("maroon");
+                    lore.append("&4maroon");
                 } else if (c.equals(Color.YELLOW)) {
-                    lore.append("yellow");
+                    lore.append("&eyellow");
                 } else if (c.equals(Color.OLIVE)) {
-                    lore.append("olive");
+                    lore.append("&2olive");
                 } else if (c.equals(Color.LIME)) {
-                    lore.append("lime");
+                    lore.append("&alime");
                 } else if (c.equals(Color.GREEN)) {
-                    lore.append("green");
+                    lore.append("&agreen");
                 } else if (c.equals(Color.AQUA)) {
-                    lore.append("aqua");
+                    lore.append("&baqua");
                 } else if (c.equals(Color.TEAL)) {
-                    lore.append("teal");
+                    lore.append("&3teal");
                 } else if (c.equals(Color.BLUE)) {
-                    lore.append("blue");
+                    lore.append("&9blue");
                 } else if (c.equals(Color.NAVY)) {
-                    lore.append("navy");
+                    lore.append("&1navy");
                 } else if (c.equals(Color.FUCHSIA)) {
-                    lore.append("fuchsia");
+                    lore.append("&dfuchsia");
                 } else if (c.equals(Color.PURPLE)) {
-                    lore.append("purple");
+                    lore.append("&5purple");
                 } else if (c.equals(Color.ORANGE)) {
-                    lore.append("orange");
+                    lore.append("&6orange");
                 } else {
                     lore.append(c.asRGB());
                 }
                 lore.append("\n");
             }
 
-            lore.append("Flicker: ").append(effect.hasFlicker());
+            lore.append("&8Flicker: ").append(effect.hasFlicker() ? "&2enabled" : "&cdisabled");
         }
 
         return new ItemBuilder(Material.FIREWORK_STAR).name("&eCurrent Effect").lore(lore.toString()).toItem();

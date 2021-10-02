@@ -47,6 +47,8 @@ public class Main extends JavaPlugin
 
         Main.main = this;
 
+        info("onEnable called!");
+
         /*
          * 1.17 assert
          */
@@ -69,11 +71,14 @@ public class Main extends JavaPlugin
         ConfigurationSerialization.registerClass(LootItemQA.class);
         ConfigurationSerialization.registerClass(Crate.class);
 
-        if (!new File(getDataFolder(), "config.yml").exists()) {
+        // check is redundant
+        //if (!new File(getDataFolder(), "config.yml").exists()) {
+        //    info("Creating config");
             saveDefaultConfig();
-        }
+        //}
 
-        reloadConfig();
+        //super.reloadConfig();
+        config = getConfig();
 
         if (!Data.update) {
             try {
@@ -133,18 +138,18 @@ public class Main extends JavaPlugin
         new ListenerOnPlayerQuit();
     }
 
-    @Override
-    public void reloadConfig() {
-        super.reloadConfig();
-        this.config = this.getConfig();
+    //@Override
+    //public void reloadConfig() {
+    //    super.reloadConfig();
+    //    this.config = this.getConfig();
 
-        // Will impliticly call Data constructor, initializing values
-        config.get("dat");
-    }
+    //    // Will impliticly call Data constructor, initializing values
+    //    //this.config.get("dat");
+    //}
 
     @Override
     public void saveConfig() {
-        config.set("dat", new Data());
+        this.config.set("dat", new Data());
         super.saveConfig();
     }
 

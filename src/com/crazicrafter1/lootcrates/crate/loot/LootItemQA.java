@@ -7,7 +7,14 @@ import java.util.Map;
 
 public class LootItemQA extends LootOrdinateItem {
 
-    private final String name;
+    public String name;
+
+    /*
+     * Default constructor
+     */
+    public LootItemQA() {
+        super();
+    }
 
     public LootItemQA(Map<String, Object> args) {
         super(

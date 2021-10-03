@@ -8,6 +8,7 @@ import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.crate.LootGroup;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -19,6 +20,13 @@ public class LootItemCrate extends LootOrdinateItem {
 
     //private final String crate;
     private final Crate crate;
+
+    /*
+     * Default constructor
+     */
+    public LootItemCrate() {
+        crate = null;
+    }
 
     public LootItemCrate(Map<String, Object> args) {
         super(Data.crates.get((String)args.get("crate")).itemStack, args);

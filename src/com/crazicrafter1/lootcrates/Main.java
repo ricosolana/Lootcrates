@@ -1,6 +1,5 @@
 package com.crazicrafter1.lootcrates;
 
-import java.io.File;
 import java.util.*;
 
 import com.crazicrafter1.crutils.*;
@@ -10,15 +9,14 @@ import com.crazicrafter1.lootcrates.crate.LootGroup;
 import com.crazicrafter1.lootcrates.crate.loot.LootItemCrate;
 import com.crazicrafter1.lootcrates.crate.loot.LootItemQA;
 import com.crazicrafter1.lootcrates.crate.loot.LootOrdinateItem;
-import com.crazicrafter1.lootcrates.editor.loot.unique.RegItemCrateMenu;
-import com.crazicrafter1.lootcrates.editor.loot.unique.RegItemQAMenu;
-import com.crazicrafter1.lootcrates.editor.loot.unique.RegOrdinateItemMenu;
+import com.crazicrafter1.lootcrates.editor.loot.unique.EditItemCrateMenu;
+import com.crazicrafter1.lootcrates.editor.loot.unique.EditItemQAMenu;
+import com.crazicrafter1.lootcrates.editor.loot.unique.EditOrdinateItemMenu;
 import com.crazicrafter1.lootcrates.tabs.TabCrates;
 import com.crazicrafter1.lootcrates.commands.CmdCrates;
 import com.crazicrafter1.lootcrates.listeners.*;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -71,9 +69,9 @@ public class Main extends JavaPlugin
         ConfigurationSerialization.registerClass(LootGroup.class);
         ConfigurationSerialization.registerClass(Crate.class);
 
-        LootCratesAPI.registerLoot(LootItemCrate.class, RegItemCrateMenu.class);
-        LootCratesAPI.registerLoot(LootOrdinateItem.class, RegOrdinateItemMenu.class);
-        LootCratesAPI.registerLoot(LootItemQA.class, RegItemQAMenu.class);
+        LootCratesAPI.registerLoot(LootItemCrate.class, EditItemCrateMenu.class);
+        LootCratesAPI.registerLoot(LootOrdinateItem.class, EditOrdinateItemMenu.class);
+        LootCratesAPI.registerLoot(LootItemQA.class, EditItemQAMenu.class);
 
         // check is redundant
         //if (!new File(getDataFolder(), "config.yml").exists()) {

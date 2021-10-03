@@ -16,15 +16,24 @@ public class LootCratesAPI {
     /**
      *
      * @param lootClass Register a ? extends AbstractLoot
-     * @param menuClass Handler menu for instantiating the Loot
+     * @param menuClass Handler menu for instantiating the Loot (required constructor args: AbstractLoot, LootGroup)
      */
     public static void registerLoot(Class<? extends AbstractLoot> lootClass, Class<? extends Menu> menuClass) {
         behaviourMenus.put(lootClass, menuClass);
         ConfigurationSerialization.registerClass(lootClass);
     }
 
-    public static void invokeMenu(Class<? extends AbstractLoot> lootClass, LootGroup lootGroup, Player p) {
-        ((Menu)ReflectionUtil.invokeConstructor(behaviourMenus.get(lootClass), lootGroup)).show(p);
+    public static void invokeMenu(AbstractLoot abstractLoot, LootGroup lootGroup, Player p, Class<? extends Menu> prevMenuClass) {
+        try {
+            Class<? extends AbstractLoot> clazz = abstractLoot.getClass();
+
+            ((Menu) ReflectionUtil.invokeConstructor(behaviourMenus.get(clazz),
+                    clazz.cast(abstractLoot), lootGroup, prevMenuClass)).show(p);
+        } catch (Exception e) {
+            Main.getInstance().error("Couldn't create AbstractLoot edit menu");
+            if (Data.debug)
+                e.printStackTrace();
+        }
     }
 
 

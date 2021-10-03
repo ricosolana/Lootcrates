@@ -7,19 +7,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="134da130-6214-4649-b404-39079de75eca" name="Changes" comment="editor backup">
-      <change afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/LootCratesAPI.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/loot/SingleAddLootMenu.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/loot/unique/RegItemCrateMenu.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/loot/unique/RegItemQAMenu.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/loot/unique/RegOrdinateItemMenu.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/loot/unique/EditOrdinateItemMenu.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/LootCratesAPI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/LootCratesAPI.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/commands/CmdCrates.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/commands/CmdCrates.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/AbstractLoot.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/AbstractLoot.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/MainMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/MainMenu.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/crate/SingleCrateLootMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/crate/SingleCrateLootMenu.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/loot/LootMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/loot/LootMenu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItemCrate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItemCrate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItemQA.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItemQA.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootOrdinateItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootOrdinateItem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/loot/SingleAddLootMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/loot/SingleAddLootMenu.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/loot/SingleLootMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/loot/SingleLootMenu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/loot/unique/RegItemCrateMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/loot/unique/EditItemCrateMenu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/loot/unique/RegItemQAMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/loot/unique/EditItemQAMenu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/editor/loot/unique/RegOrdinateItemMenu.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

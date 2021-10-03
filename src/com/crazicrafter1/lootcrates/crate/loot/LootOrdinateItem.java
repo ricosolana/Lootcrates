@@ -5,6 +5,7 @@ import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.crate.AbstractLoot;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.LinkedHashMap;
@@ -12,8 +13,17 @@ import java.util.Map;
 
 public class LootOrdinateItem extends AbstractLoot {
 
-    protected final int min;
-    protected final int max;
+    public int min;
+    public int max;
+
+    /*
+     * Default constructor
+     */
+    public LootOrdinateItem() {
+        super(new ItemStack(Material.AIR));
+        min = 1;
+        max = 1;
+    }
 
     public LootOrdinateItem(Map<String, Object> args) {
         super((ItemStack) args.get("item"));

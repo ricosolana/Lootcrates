@@ -5,6 +5,7 @@ import com.crazicrafter1.crutils.ReflectionUtil;
 import com.crazicrafter1.gapi.Menu;
 import com.crazicrafter1.gapi.ParallaxMenu;
 import com.crazicrafter1.gapi.TriggerComponent;
+import com.crazicrafter1.lootcrates.Data;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.AbstractLoot;
@@ -44,7 +45,17 @@ public class SingleAddLootMenu extends ParallaxMenu {
                 public void onLeftClick(Player p, boolean shift) {
                     // add this type
 
-                    LootCratesAPI.invokeMenu(clazz, lootGroup, p);
+                    /*
+                     * Will invoke the default constructor which is required for this to work
+                     */
+                    try {
+                        LootCratesAPI.invokeMenu(
+                                (AbstractLoot) ReflectionUtil.invokeConstructor(clazz), lootGroup, p, SingleAddLootMenu.class);
+                    } catch (Exception e) {
+                        Main.getInstance().error("Failed to invoke default loot menu");
+                        if (Data.debug)
+                            e.printStackTrace();
+                    }
                 }
 
                 @Override

@@ -10,6 +10,9 @@ import com.crazicrafter1.lootcrates.crate.LootGroup;
 import com.crazicrafter1.lootcrates.crate.loot.LootItemCrate;
 import com.crazicrafter1.lootcrates.crate.loot.LootItemQA;
 import com.crazicrafter1.lootcrates.crate.loot.LootOrdinateItem;
+import com.crazicrafter1.lootcrates.editor.loot.unique.RegItemCrateMenu;
+import com.crazicrafter1.lootcrates.editor.loot.unique.RegItemQAMenu;
+import com.crazicrafter1.lootcrates.editor.loot.unique.RegOrdinateItemMenu;
 import com.crazicrafter1.lootcrates.tabs.TabCrates;
 import com.crazicrafter1.lootcrates.commands.CmdCrates;
 import com.crazicrafter1.lootcrates.listeners.*;
@@ -66,10 +69,11 @@ public class Main extends JavaPlugin
         // register serializable objects
         ConfigurationSerialization.registerClass(Data.class);
         ConfigurationSerialization.registerClass(LootGroup.class);
-        ConfigurationSerialization.registerClass(LootItemCrate.class);
-        ConfigurationSerialization.registerClass(LootOrdinateItem.class);
-        ConfigurationSerialization.registerClass(LootItemQA.class);
         ConfigurationSerialization.registerClass(Crate.class);
+
+        LootCratesAPI.registerLoot(LootItemCrate.class, RegItemCrateMenu.class);
+        LootCratesAPI.registerLoot(LootOrdinateItem.class, RegOrdinateItemMenu.class);
+        LootCratesAPI.registerLoot(LootItemQA.class, RegItemQAMenu.class);
 
         // check is redundant
         //if (!new File(getDataFolder(), "config.yml").exists()) {
@@ -77,8 +81,8 @@ public class Main extends JavaPlugin
             saveDefaultConfig();
         //}
 
-        //super.reloadConfig();
-        config = getConfig();
+        this.reloadConfig();
+        //config = getConfig();
 
         if (!Data.update) {
             try {
@@ -138,14 +142,13 @@ public class Main extends JavaPlugin
         new ListenerOnPlayerQuit();
     }
 
-    //@Override
-    //public void reloadConfig() {
-    //    super.reloadConfig();
-    //    this.config = this.getConfig();
-
-    //    // Will impliticly call Data constructor, initializing values
-    //    //this.config.get("dat");
-    //}
+    @Override
+    public void reloadConfig() {
+        super.reloadConfig();
+        this.config = this.getConfig();
+        // Will impliticly call Data constructor, initializing values
+        //this.config.get("dat");
+    }
 
     @Override
     public void saveConfig() {

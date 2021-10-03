@@ -66,7 +66,7 @@ public class CmdCrates extends CmdBase {
                         public void run() {
                             new MainMenu().show(p);
                         }
-                    }.runTaskLater(plugin, 30);
+                    }.runTaskLater(plugin, 20);
 
                     return true;
                 }

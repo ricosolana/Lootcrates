@@ -118,7 +118,9 @@ public class MainMenu extends SimplexMenu {
 
             @Override
             public ItemStack getIcon() {
-                return new ItemBuilder(Material.MAP).name("&6&lSave config to disk").toItem();
+                return new ItemBuilder(Material.MAP)
+                        .name("&6&lSave config to disk")
+                        .lore("will block until saved (not async)").toItem();
             }
         });
 

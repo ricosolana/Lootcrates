@@ -24,29 +24,23 @@ public class SingleLootMenu extends ParallaxMenu {
                 @Override
                 public ItemStack getIcon() {
                     return new ItemBuilder(a.getIcon()).lore(a.toString()).toItem();
-                    //if (a instanceof LootCommand) {
-                    //    return new ItemBuilder(a.getIcon()
-                    //}else if (a instanceof LootItemCrate) {
-
-                    //} else if (a instanceof LootItemEnchantable) {
-
-                    //} else if (a instanceof LootItemPotion) {
-                    //
-                    //} else if (a instanceof LootItemQA) {
-                    //
-                    //} else if (a instanceof LootItem) {
-
-                    //}
                 }
             });
         }
 
-        //this.setComponent(2, 5, new TriggerComponent() {
-        //    @Override
-        //    public void onLeftClick(Player p) {
-        //        //
-        //    }
-        //});
+        setComponent(6, 5, new TriggerComponent() {
+            @Override
+            public void onLeftClick(Player p, boolean shift) {
+                // when clicked, open a new menu which goes over serializable types that
+                // are valid
+                new SingleAddLootMenu(lootGroup).show(p);
+            }
+
+            @Override
+            public ItemStack getIcon() {
+                return new ItemBuilder(Material.SPYGLASS).name("&2Add...").toItem();
+            }
+        });
 
         backButton(4, 5, BACK_1, LootMenu.class);
     }

@@ -127,8 +127,8 @@ public class SingleCrateLootMenu extends ParallaxMenu {
 
 
         // toggle mode
-        //              8 doesn't work correctly for some reason
-        setComponent(7, 5, new TriggerComponent() {
+        //              x slot 8 and 0 do not work because of next/prev page
+        setComponent(6, 5, new TriggerComponent() {
             @Override
             public void onLeftClick(Player p, boolean shift) {
 

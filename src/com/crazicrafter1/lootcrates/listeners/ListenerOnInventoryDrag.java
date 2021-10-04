@@ -11,7 +11,7 @@ public class ListenerOnInventoryDrag extends BaseListener {
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent e) {
         Player p = (Player)e.getWhoClicked();
-        if (Main.openCrates.containsKey(p.getUniqueId())) {
+        if (Main.get().openCrates.containsKey(p.getUniqueId())) {
             e.setCancelled(true);
         } else {
             if (Crate.crateByItem(e.getCursor()) != null)

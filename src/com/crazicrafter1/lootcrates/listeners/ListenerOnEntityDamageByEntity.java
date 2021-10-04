@@ -10,7 +10,7 @@ public class ListenerOnEntityDamageByEntity extends BaseListener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
 
-        if (Main.crateFireworks.contains(e.getDamager().getUniqueId())) {
+        if (Main.get().crateFireworks.contains(e.getDamager().getUniqueId())) {
             e.setCancelled(true);
         }
 

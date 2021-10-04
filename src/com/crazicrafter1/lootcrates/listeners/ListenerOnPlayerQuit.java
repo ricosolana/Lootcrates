@@ -13,7 +13,7 @@ public class ListenerOnPlayerQuit extends BaseListener {
     {
         Player p = e.getPlayer();
 
-        if (Main.openCrates.containsKey(p.getUniqueId())) {
+        if (Main.get().openCrates.containsKey(p.getUniqueId())) {
             //plugin.openCrates.get(p.getUniqueId()).giveAndCancel(); //.onPlayerQuit(e);
             Crate.closeCrate(p);
             //plugin.openCrates.remove(p.getUniqueId());

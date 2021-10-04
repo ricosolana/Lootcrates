@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class FireworkWrapper {
 
-    private FireworkEffect effect;
+    private final FireworkEffect effect;
 
     public FireworkWrapper(FireworkEffect effect) {
         this.effect = effect;

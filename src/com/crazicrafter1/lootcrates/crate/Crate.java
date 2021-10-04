@@ -75,7 +75,7 @@ public class Crate implements ConfigurationSerializable {
     public int picks;
     public Sound sound;
     //public LinkedHashMap<String, Integer> lootByName;         // this will never be used beyond initialization
-    public LinkedHashMap<LootGroup, Integer> lootBySum = new LinkedHashMap<>();
+    public LinkedHashMap<LootGroup, Integer> lootBySum;
     public HashMap<LootGroup, Integer> lootByWeight;
     public int totalWeights;
 
@@ -170,7 +170,7 @@ public class Crate implements ConfigurationSerializable {
     }
 
     public static Crate crateByName(String id) {
-        return Data.crates.get(id);
+        return Main.get().data.crates.get(id);
     }
 
     public static Crate crateByItem(final ItemStack itemStack) {
@@ -214,7 +214,7 @@ public class Crate implements ConfigurationSerializable {
     public static boolean openCrate(Player p, String name, int lock_slot) {
         Crate crate = crateByName(name);
         if (crate != null) {
-            Main.openCrates.put(p.getUniqueId(),
+            Main.get().openCrates.put(p.getUniqueId(),
                     new ActiveCrate(p, crate, lock_slot));
             return true;
         }
@@ -226,7 +226,7 @@ public class Crate implements ConfigurationSerializable {
      * Close a crate to a player
      */
     public static void closeCrate(Player p) {
-        Main.openCrates.remove(p.getUniqueId()).close();
+        Main.get().openCrates.remove(p.getUniqueId()).close();
     }
 
     @Override

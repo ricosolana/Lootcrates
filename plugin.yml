@@ -19,11 +19,11 @@ permissions:
     description: Allows access to /crates command
     default: op
 
-# 3.2.0 (9/10/2021)
-# support 1.17
-# tidied codebase
+# 3.2.0 (10/3/2021)
+# 1.17 only
 # in game editor
-# great performance
+# config is completely serialized with bukkit, so stay away!
+# no more glitches when placing item from guis into inventory
 
 
 # 3.1.4 (4/26/2021)

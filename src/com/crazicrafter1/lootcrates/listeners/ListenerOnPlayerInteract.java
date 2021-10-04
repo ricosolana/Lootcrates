@@ -19,7 +19,7 @@ public class ListenerOnPlayerInteract extends BaseListener {
         if (!p.hasPermission("lootcrates.open"))
             return;
 
-        if (!Main.openCrates.containsKey(p.getUniqueId()))
+        if (!Main.get().openCrates.containsKey(p.getUniqueId()))
         {
             plugin.debug("Passed unopened crate validation");
 

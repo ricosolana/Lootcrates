@@ -1,14 +1,12 @@
 package com.crazicrafter1.lootcrates.editor.crate;
 
 import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.gapi.*;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 public class SingleCrateChangeItemMenu extends SimplexMenu {
 
@@ -45,7 +43,7 @@ public class SingleCrateChangeItemMenu extends SimplexMenu {
             public void onLeftClick(Player p, boolean shift) {
                 ItemStack item = rem.getIcon();
                 if (item != null) {
-                    Main.getInstance().info("Applying changes here!");
+                    Main.get().info("Applying changes here!");
                     crate.itemStack = new ItemBuilder(item.getType()).mergeLexicals(item).toItem();
                 }
             }

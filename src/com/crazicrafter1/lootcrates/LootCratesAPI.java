@@ -23,6 +23,19 @@ public class LootCratesAPI {
         ConfigurationSerialization.registerClass(lootClass);
     }
 
+    public static void invokeMenu(AbstractLoot abstractLoot, LootGroup lootGroup, Player p) {
+        try {
+            Class<? extends AbstractLoot> clazz = abstractLoot.getClass();
+
+            ((Menu) ReflectionUtil.invokeConstructor(behaviourMenus.get(clazz),
+                    clazz.cast(abstractLoot), lootGroup)).show(p);
+        } catch (Exception e) {
+            Main.get().error("Couldn't create AbstractLoot edit menu");
+            if (Main.get().data.debug)
+                e.printStackTrace();
+        }
+    }
+
     public static void invokeMenu(AbstractLoot abstractLoot, LootGroup lootGroup, Player p, Class<? extends Menu> prevMenuClass) {
         try {
             Class<? extends AbstractLoot> clazz = abstractLoot.getClass();
@@ -30,8 +43,8 @@ public class LootCratesAPI {
             ((Menu) ReflectionUtil.invokeConstructor(behaviourMenus.get(clazz),
                     clazz.cast(abstractLoot), lootGroup, prevMenuClass)).show(p);
         } catch (Exception e) {
-            Main.getInstance().error("Couldn't create AbstractLoot edit menu");
-            if (Data.debug)
+            Main.get().error("Couldn't create AbstractLoot edit menu");
+            if (Main.get().data.debug)
                 e.printStackTrace();
         }
     }

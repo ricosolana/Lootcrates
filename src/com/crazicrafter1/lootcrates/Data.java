@@ -10,7 +10,7 @@ import java.util.*;
 
 public class Data implements ConfigurationSerializable {
 
-    public Data() {}
+    //public Data() {}
 
     public Data(Map<String, Object> args) {
         debug = (boolean) args.getOrDefault("debug", false);
@@ -24,10 +24,7 @@ public class Data implements ConfigurationSerializable {
         lootGroups = (LinkedHashMap<String, LootGroup>) args.get("lootGroups");
         for (Map.Entry<String, LootGroup> entry : lootGroups.entrySet()) {
             entry.getValue().name = entry.getKey();
-            Main.getInstance().info("Name: " + entry.getKey());
         }
-
-        //Main.getInstance().info(Data.lootGroups.toString());
 
         crates = (LinkedHashMap<String, Crate>) args.get("crates");
         for (Map.Entry<String, Crate> entry : crates.entrySet()) {
@@ -37,54 +34,37 @@ public class Data implements ConfigurationSerializable {
             crate.name = name;
             crate.itemStack = Crate.makeCrate(crate.itemStack, name);
 
-            //for (Map.Entry<String, Integer> entry1 : crate.lootByName.entrySet()) {
-            //    // initialize sums
-            //    crate.lootBySum.put(Data.lootGroups.get(entry1.getKey()), entry1.getValue());
-            //}
             // initialize weights
             crate.sumsToWeights();
         }
 
-
-        /* PRINT
-         *
-         */
-
-        Main.getInstance().info("---\n");
-        //StackTraceElement[] stes = Thread.currentThread().getStackTrace();
-        //for (int i=24; i < 34; i++) {
-        //    Main.getInstance().info(stes[i].toString());
-        //}
-
-        for (Map.Entry<String, LootGroup> entry : lootGroups.entrySet()) {
-            Main.getInstance().info("Name: " + entry.getValue().name);
-        }
-
-        Main.getInstance().info("---\n");
-
-        //Main.getInstance().info("final: ");
-        //Main.getInstance().info(Data.lootGroups.toString());
-
         fireworkEffect = (FireworkEffect) args.get("fireworkEffect");
 
         totalOpens = (int) args.getOrDefault("totalOpens", 0);
+
+        for (String str : (HashSet<String>) args.getOrDefault("alertedPlayers", new HashSet<>())) {
+            alertedPlayers.add(UUID.fromString(str));
+        }
+        //alertedPlayers = (HashSet<UUID>) args.getOrDefault("alertedPlayers", new HashSet<>());
     }
 
     /*
      * Serializable stuff
      */
-    public static boolean debug;
-    public static boolean update;
-    public static int speed;
+    public boolean debug;
+    public boolean update;
+    public int speed;
 
-    public static ItemStack unSelectedItem;
-    public static ItemStack selectedItem;
-    public static FireworkEffect fireworkEffect;
+    public ItemStack unSelectedItem;
+    public ItemStack selectedItem;
+    public FireworkEffect fireworkEffect;
 
-    public static HashMap<String, Crate> crates;
-    public static HashMap<String, LootGroup> lootGroups;
+    public HashMap<String, Crate> crates;
+    public HashMap<String, LootGroup> lootGroups;
 
-    public static int totalOpens = 0;
+    public int totalOpens;
+
+    public HashSet<UUID> alertedPlayers = new HashSet<>();
 
     @Override
     public Map<String, Object> serialize() {
@@ -98,11 +78,20 @@ public class Data implements ConfigurationSerializable {
         result.put("selectedItem", selectedItem);
 
         result.put("lootGroups", lootGroups);
+        Main.get().info(lootGroups.toString());
+
         result.put("crates", crates);
 
         result.put("fireworkEffect", fireworkEffect);
 
         result.put("totalOpens", totalOpens);
+
+        //result.put("alertedPlayers", alertedPlayers);
+        HashSet<String> uuids = new HashSet<>();
+        for (UUID uuid : alertedPlayers) {
+            uuids.add(uuid.toString());
+        }
+        result.put("alertedPlayers", uuids);
 
         return result;
     }

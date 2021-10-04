@@ -1,7 +1,6 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
 import me.zombie_striker.qg.api.QualityArmory;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
 
@@ -27,6 +26,12 @@ public class LootItemQA extends LootOrdinateItem {
     public LootItemQA(String name, int min, int max) {
         super(QualityArmory.getCustomItemAsItemStack(name), min, max);
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "&8qa: " + name + "\n" +
+                super.toString();
     }
 
     @Override

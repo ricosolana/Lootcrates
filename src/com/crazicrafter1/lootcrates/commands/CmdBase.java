@@ -11,7 +11,7 @@ import java.util.List;
 
 public abstract class CmdBase implements CommandExecutor {
 
-    protected static Main plugin = Main.getInstance();
+    protected static Main plugin = Main.get();
     protected static List<Player> players = (List<Player>) Bukkit.getOnlinePlayers();
 
     public CmdBase(String name) {

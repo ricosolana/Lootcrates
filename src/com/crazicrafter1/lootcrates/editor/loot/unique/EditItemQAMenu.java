@@ -4,7 +4,6 @@ import com.crazicrafter1.gapi.Menu;
 import com.crazicrafter1.gapi.SimplexMenu;
 import com.crazicrafter1.lootcrates.crate.LootGroup;
 import com.crazicrafter1.lootcrates.crate.loot.LootItemQA;
-import com.crazicrafter1.lootcrates.editor.loot.SingleAddLootMenu;
 
 public class EditItemQAMenu extends SimplexMenu {
 

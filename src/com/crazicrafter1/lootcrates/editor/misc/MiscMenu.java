@@ -15,17 +15,19 @@ public class MiscMenu extends SimplexMenu {
     public MiscMenu() {
         super("&8Misc", 5, BACKGROUND_1);
 
+        Data data = Main.get().data;
+
         // toggle debug
         this.setComponent(1, 1, new TriggerComponent() {
             @Override
             public void onLeftClick(Player p, boolean shift) {
-                Data.debug = !Data.debug;
+                data.debug = !data.debug;
                 new MiscMenu().show(p);
             }
 
             @Override
             public ItemStack getIcon() {
-                String s = Data.debug ? "&2enabled" : "&cdisabled";
+                String s = data.debug ? "&2enabled" : "&cdisabled";
                 return new ItemBuilder(Material.COMMAND_BLOCK)
                         .name("&e&lToggle Debug")
                         .lore(s).toItem();
@@ -36,13 +38,13 @@ public class MiscMenu extends SimplexMenu {
         this.setComponent(4, 1, new TriggerComponent() {
             @Override
             public void onLeftClick(Player p, boolean shift) {
-                Data.update = !Data.update;
+                data.update = !data.update;
                 new MiscMenu().show(p);
             }
 
             @Override
             public ItemStack getIcon() {
-                String s = Data.update ? "&2enabled" : "&cdisabled";
+                String s = data.update ? "&2enabled" : "&cdisabled";
                 return new ItemBuilder(Material.CLOCK)
                         .name("&b&lToggle Auto-Update")
                         .lore(s).toItem();
@@ -54,23 +56,23 @@ public class MiscMenu extends SimplexMenu {
             @Override
             public void onLeftClick(Player p, boolean shift) {
                 // decrement
-                if (Data.speed != 0) {
-                    Data.speed--;
+                if (data.speed != 0) {
+                    data.speed--;
                     new MiscMenu().show(p);
                 }
             }
 
             @Override
             public void onRightClick(Player p, boolean shift) {
-                if (Data.speed != 20) {
-                    Data.speed++;
+                if (data.speed != 20) {
+                    data.speed++;
                     new MiscMenu().show(p);
                 }
             }
 
             @Override
             public ItemStack getIcon() {
-                return new ItemBuilder(Material.FEATHER).count(Data.speed)
+                return new ItemBuilder(Material.FEATHER).count(data.speed)
                         .name("&2&lReveal Speed")
                         .lore("""
                                 &8LMB: &c-

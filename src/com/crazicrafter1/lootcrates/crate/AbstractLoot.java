@@ -1,22 +1,8 @@
 package com.crazicrafter1.lootcrates.crate;
 
-import com.crazicrafter1.crutils.Bool;
-import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.crutils.Util;
-import com.crazicrafter1.lootcrates.Main;
-import com.crazicrafter1.lootcrates.crate.loot.LootItemCrate;
-import com.crazicrafter1.lootcrates.crate.loot.LootItemQA;
-import com.crazicrafter1.lootcrates.crate.loot.LootOrdinateItem;
-import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,7 +15,7 @@ import java.util.Map;
  */
 public abstract class AbstractLoot implements ConfigurationSerializable {
 
-    private final ItemStack icon;
+    public ItemStack icon;
 
     public AbstractLoot(ItemStack baseVisual) {
 
@@ -43,14 +29,11 @@ public abstract class AbstractLoot implements ConfigurationSerializable {
         return icon;
     }
 
-    /*
-     * do nothing by default
-     */
-    public abstract void execute(ActiveCrate activeCrate, boolean closed, Bool giveItem);
+    public abstract void execute(ActiveCrate activeCrate, boolean closed, boolean[] giveItem);
 
     @Override
     public String toString() {
-        return "icon: " + getIcon().getType() + "\n";
+        return "icon: &7" + getIcon() + "\n";
     }
 
     @Override

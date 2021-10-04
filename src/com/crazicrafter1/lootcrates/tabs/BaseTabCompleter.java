@@ -10,7 +10,7 @@ import java.util.List;
 
 public abstract class BaseTabCompleter implements TabCompleter {
 
-    protected static Main plugin = Main.getInstance();
+    protected static Main plugin = Main.get();
 
     BaseTabCompleter(String name) {
         plugin.getCommand(name).setTabCompleter(this);

@@ -91,17 +91,17 @@ public class MainMenu extends SimplexMenu {
             @Override
             public void onLeftClick(Player p, boolean shift) {
 
-                Main.getInstance().saveConfig();
+                //Main.get().saveConfig();
 
-                if (true)
-                    return;
+                //if (true)
+                //    return;
 
                 // configs / backups
-                File configFile = new File(Main.getInstance().getDataFolder(), "config.yml");
-                File backupFile = new File(Main.getInstance().getDataFolder(),"backup/" + System.currentTimeMillis() + "_config.yml");
+                File configFile = new File(Main.get().getDataFolder(), "config.yml");
+                File backupFile = new File(Main.get().getDataFolder(),"backup/" + System.currentTimeMillis() + "_config.yml");
 
                 // create the backup path
-                new File(Main.getInstance().getDataFolder(),"backup/").mkdirs();
+                new File(Main.get().getDataFolder(),"backup/").mkdirs();
 
                 try {
                     // try to create the backup
@@ -113,7 +113,7 @@ public class MainMenu extends SimplexMenu {
                     e.printStackTrace();
                 }
 
-                Main.getInstance().saveConfig();
+                Main.get().saveConfig();
             }
 
             @Override

@@ -1,17 +1,21 @@
 package com.crazicrafter1.lootcrates.crate;
 
-import java.util.*;
-
 import com.crazicrafter1.lootcrates.Data;
 import com.crazicrafter1.lootcrates.Main;
-import com.crazicrafter1.crutils.Bool;
-import org.bukkit.*;
-import org.bukkit.entity.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.HashMap;
 
 public final class ActiveCrate {
 
@@ -39,6 +43,8 @@ public final class ActiveCrate {
     private int taskID = -1;
     private int lockSlot;
 
+    private static Data data = Main.get().data;
+
     ActiveCrate(Player p, Crate crate, int lockSlot) {
         this.player = p;
         this.size = crate.size;
@@ -59,7 +65,6 @@ public final class ActiveCrate {
         for (int i = 0; i < size; i++) {
             LootGroup lootGroup = crate.getBasedRandom();
             this.lootChances[i] = lootGroup;
-            Main.getInstance().info("lootgroup is null: " + (lootGroup == null));
         }
     }
 
@@ -68,7 +73,7 @@ public final class ActiveCrate {
         if (slots.containsKey(slot))
             return;
 
-        inventory.setItem(slot, Data.selectedItem);
+        inventory.setItem(slot, data.selectedItem);
 
         AbstractLoot randomLoot = lootChances[slot].getRandomLoot();
         slots.put(slot, new QSlot(true, randomLoot));
@@ -92,7 +97,7 @@ public final class ActiveCrate {
 
             state = State.REVEALING;
 
-            if (Data.speed > 0) {
+            if (data.speed > 0) {
 
                  taskID = new BukkitRunnable() {
                      int iterations = 0;
@@ -103,14 +108,14 @@ public final class ActiveCrate {
                         if (iterations < size) {
                             inventory.setItem(iterations, getPanel(iterations));
                         }
-                        else if (iterations > size + 10/Data.speed) {
+                        else if (iterations > size + 10/data.speed) {
                             this.cancel();
                             pop();
                         }
 
                         iterations++;
                     }
-                }.runTaskTimer(Main.getInstance(), 20, Data.speed).getTaskId();
+                }.runTaskTimer(Main.get(), 20, data.speed).getTaskId();
 
             } else {
                 pop();
@@ -125,7 +130,7 @@ public final class ActiveCrate {
             } else inventory.setItem(i, getPanel(i));
         }
 
-        if (Data.fireworkEffect != null) explosion();
+        if (data.fireworkEffect != null) explosion();
 
         state = State.REVEALED;
     }
@@ -136,10 +141,10 @@ public final class ActiveCrate {
         //noinspection ConstantConditions
         Firework firework = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
 
-        Main.crateFireworks.add(firework.getUniqueId());
+        Main.get().crateFireworks.add(firework.getUniqueId());
 
         FireworkMeta fwm = firework.getFireworkMeta();
-        fwm.addEffects(Data.fireworkEffect);
+        fwm.addEffects(data.fireworkEffect);
         firework.setFireworkMeta(fwm);
 
         firework.detonate();
@@ -147,9 +152,9 @@ public final class ActiveCrate {
         new BukkitRunnable() {
             @Override
             public void run() {
-                Main.crateFireworks.remove(firework.getUniqueId());
+                Main.get().crateFireworks.remove(firework.getUniqueId());
             }
-        }.runTaskLater(Main.getInstance(), 1);
+        }.runTaskLater(Main.get(), 1);
     }
 
     /**
@@ -173,15 +178,16 @@ public final class ActiveCrate {
                 slots.get(slot).randomLoot.execute(this,
                         true, null);
             }
-            Data.totalOpens++;
+            data.totalOpens++;
         }
 
         if (taskID != -1)
-            Main.getInstance().getServer().getScheduler().cancelTask(taskID);
+            Main.get().getServer().getScheduler().cancelTask(taskID);
     }
 
     private void fill() {
-        for (int i = 0; i < size; i++) inventory.setItem(i, Data.unSelectedItem);
+        for (int i = 0; i < size; i++)
+            inventory.setItem(i, data.unSelectedItem);
     }
 
     public Player getPlayer() {
@@ -214,10 +220,12 @@ public final class ActiveCrate {
                         }
 
                         // Execute the loot action
-                        Bool giveItem = new Bool(true); // Encapsulated boolean (bool ptr)
+                        // tacky
+                        //Bool giveItem = new Bool(true); // Encapsulated boolean (bool ptr)
+                        boolean[] giveItem = new boolean[] {true};
                         qSlot.randomLoot.execute(this, false, giveItem);
 
-                        if (!giveItem.value) {
+                        if (!giveItem[0]) {
                             inventory.setItem(slot, null);
                         } else
                             e.setCancelled(false);
@@ -231,5 +239,11 @@ public final class ActiveCrate {
                 }
             }
         }
+    }
+
+    public enum State {
+        SELECTING,
+        REVEALING,
+        REVEALED
     }
 }

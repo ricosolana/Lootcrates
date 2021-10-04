@@ -1,8 +1,9 @@
 package com.crazicrafter1.lootcrates.commands;
 
-import com.crazicrafter1.crutils.Int;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
+import com.crazicrafter1.lootcrates.Data;
+import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.editor.MainMenu;
 import org.bukkit.Bukkit;
@@ -15,6 +16,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class CmdCrates extends CmdBase {
+
+    private Data data = Main.get().data;
 
     public CmdCrates() {
         super("lootcrates");
@@ -58,15 +61,24 @@ public class CmdCrates extends CmdBase {
                 return feedback(sender, "Config was reloaded.");
             } case "editor": {
                 if (sender instanceof Player p) {
-                    feedback(sender, "The editor is not fully implemented, so if");
-                    feedback(sender, "a button does nothing, it does nothing!");
-                    // coroutine
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            new MainMenu().show(p);
-                        }
-                    }.runTaskLater(plugin, 20);
+                    // title, subtitle, fadein, stay, fadeout
+                    if (!data.alertedPlayers.contains(p.getUniqueId())) {
+                        p.sendTitle(ChatColor.RED + "Warning",
+                                ChatColor.YELLOW + "Editor might have issues, be wary.",
+                                10, 60, 10);
+                        //feedback(sender, "The editor is not fully implemented, so if");
+                        //feedback(sender, "a button does nothing, it does nothing!");
+                        // coroutine
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                new MainMenu().show(p);
+                            }
+                        }.runTaskLater(plugin, 60);
+                        data.alertedPlayers.add(p.getUniqueId());
+                    } else {
+                        new MainMenu().show(p);
+                    }
 
                     return true;
                 }

@@ -1,6 +1,5 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
-import com.crazicrafter1.crutils.Bool;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.crate.AbstractLoot;
@@ -20,7 +19,7 @@ public class LootOrdinateItem extends AbstractLoot {
      * Default constructor
      */
     public LootOrdinateItem() {
-        super(new ItemStack(Material.AIR));
+        super(new ItemStack(Material.STONE));
         min = 1;
         max = 1;
     }
@@ -44,12 +43,12 @@ public class LootOrdinateItem extends AbstractLoot {
     }
 
     @Override
-    public final void execute(ActiveCrate activeCrate, boolean closed, Bool giveItem) {
+    public final void execute(ActiveCrate activeCrate, boolean closed, boolean[] giveItem) {
         // if inventory was closed, items must be automatically given
         if (closed) {
             Util.giveItemToPlayer(activeCrate.getPlayer(), getIcon());
         } else
-            giveItem.value = true;
+            giveItem[0] = true;
     }
 
     @Override
@@ -60,10 +59,10 @@ public class LootOrdinateItem extends AbstractLoot {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(super.toString());
+        StringBuilder sb = new StringBuilder();
         if (min == max)
-            sb.append("count: ").append(min);
-        else sb.append("range: [").append(min).append(", ").append(max).append("]");
+            sb.append("&8count: &7").append(min);
+        else sb.append("&8range: &7[").append(min).append(", ").append(max).append("]");
 
         return sb.toString();
     }

@@ -1,4 +1,4 @@
-dat:
+data:
   ==: com.crazicrafter1.lootcrates.Data
   debug: false
   update: true
@@ -204,4 +204,3 @@ dat:
         BLUE: 0
         GREEN: 128
     type: BURST
-  totalOpens: 0

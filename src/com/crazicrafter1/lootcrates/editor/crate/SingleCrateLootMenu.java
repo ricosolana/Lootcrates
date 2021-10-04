@@ -4,7 +4,7 @@ import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.gapi.ParallaxMenu;
 import com.crazicrafter1.gapi.TriggerComponent;
-import com.crazicrafter1.lootcrates.Data;
+import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootGroup;
 import org.bukkit.Material;
@@ -27,7 +27,7 @@ public class SingleCrateLootMenu extends ParallaxMenu {
          * SELECT crate or CHANGE WEIGHT
          */
         if (mode == Mode.SELECT_EDIT) {
-            for (LootGroup lootGroup : Data.lootGroups.values()) {
+            for (LootGroup lootGroup : Main.get().data.lootGroups.values()) {
 
                 addItem(new TriggerComponent() {
                     @Override

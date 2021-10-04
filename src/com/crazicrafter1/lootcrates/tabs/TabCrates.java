@@ -24,7 +24,7 @@ public class TabCrates extends BaseTabCompleter {
             }
             if (args[0].equals("crate")) {
                 if (args.length == 2) {
-                    return BaseTabCompleter.getMatches(args[1], Data.crates.keySet().toArray(new String[0]));
+                    return BaseTabCompleter.getMatches(args[1], Main.get().data.crates.keySet().toArray(new String[0]));
                 }
                 if (args.length == 3) {
                     for (Player p : Bukkit.getServer().getOnlinePlayers()) {

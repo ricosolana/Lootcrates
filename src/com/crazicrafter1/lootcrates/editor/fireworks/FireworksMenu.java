@@ -1,20 +1,17 @@
 package com.crazicrafter1.lootcrates.editor.fireworks;
 
 import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.crutils.Util;
-import com.crazicrafter1.gapi.*;
-import com.crazicrafter1.lootcrates.Data;
+import com.crazicrafter1.gapi.Component;
+import com.crazicrafter1.gapi.RemovableComponent;
+import com.crazicrafter1.gapi.SimplexMenu;
+import com.crazicrafter1.gapi.TriggerComponent;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.editor.MainMenu;
-import com.crazicrafter1.lootcrates.editor.crate.CrateMenu;
-import com.crazicrafter1.lootcrates.editor.crate.SingleCrateMenu;
 import org.bukkit.ChatColor;
-import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class FireworksMenu extends SimplexMenu {
@@ -37,7 +34,7 @@ public class FireworksMenu extends SimplexMenu {
         setComponent(1, 1, new Component() {
             @Override
             public ItemStack getIcon() {
-                return new FireworkWrapper(Data.fireworkEffect).getStar();
+                return new FireworkWrapper(Main.get().data.fireworkEffect).getStar();
             }
         });
 
@@ -53,19 +50,14 @@ public class FireworksMenu extends SimplexMenu {
                 if (true)
                     return;
 
-                Main.getInstance().info("Applying changes here!");
+                Main.get().info("Applying changes here!");
                 ItemStack item = rem.getIcon();
                 if (item != null) {
-                    Main.getInstance().info(item.getType().name());
+                    Main.get().info(item.getType().name());
                     ItemMeta meta = item.getItemMeta();
                     if (meta instanceof FireworkEffectMeta fm) {
                         if (fm.hasEffect()) {
-                            FireworkEffect effect = fm.getEffect();
-
-                            Main.getInstance().config.set("firework.enabled", true);
-                            Main.getInstance().config.set("firework.colors", effect.getColors());
-                            Main.getInstance().config.set("firework.fade", effect.getFadeColors());
-                            Main.getInstance().config.set("firework.flicker", effect.hasFlicker());
+                            Main.get().data.fireworkEffect = fm.getEffect();
                         } else {
                             p.sendMessage(ChatColor.YELLOW + "");
                         }

@@ -1,11 +1,11 @@
 package com.crazicrafter1.lootcrates.editor.loot.unique;
 
 import com.crazicrafter1.crutils.ItemBuilder;
+import com.crazicrafter1.crutils.ReflectionUtil;
 import com.crazicrafter1.gapi.*;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.LootGroup;
 import com.crazicrafter1.lootcrates.crate.loot.LootOrdinateItem;
-import com.crazicrafter1.lootcrates.editor.loot.SingleAddLootMenu;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -28,7 +28,7 @@ public class EditOrdinateItemMenu extends SimplexMenu {
         setComponent(1 + 1, 2, inputPerimeter);
 
         // Change to
-        RemovableComponent rem = new RemovableComponent(null);
+        RemovableComponent rem = new RemovableComponent(loot.getIcon());
         setComponent(2, 1, rem);
 
         // Confirm
@@ -37,11 +37,15 @@ public class EditOrdinateItemMenu extends SimplexMenu {
             public void onLeftClick(Player p, boolean shift) {
                 ItemStack item = rem.getIcon();
                 if (item != null) {
-                    Main.getInstance().info("Applying changes here!");
+                    Main.get().info("Applying changes here!");
 
                     // add ordinate item with <item, min, max>
                     // somehow
-                    lootGroup.loot.add(loot);
+                    //lootGroup.loot.add(loot);
+                    loot.icon = new ItemStack(item);
+
+                    // then go back to prev menu
+                    ((Menu) ReflectionUtil.invokeConstructor(prevMenuClass, lootGroup)).show(p);
                 }
             }
 
@@ -58,6 +62,10 @@ public class EditOrdinateItemMenu extends SimplexMenu {
                 // DECREMENT
                 int change = shift ? 5 : 1;
                 if (loot.min > change) {
+                    // need to pass the rem icon if it is not null
+                    //if (rem.getIcon() != null) {
+                    //    loot.icon = rem.getIcon();
+                    //}
                     loot.min -= change;
                     new EditOrdinateItemMenu(loot, lootGroup, prevMenuClass).show(p);
                 }
@@ -68,6 +76,9 @@ public class EditOrdinateItemMenu extends SimplexMenu {
                 //INCREMENT
                 int change = shift ? 5 : 1;
                 if (loot.min+change <= loot.max) {
+                    //if (rem.getIcon() != null) {
+                    //    loot.icon = rem.getIcon();
+                    //}
                     loot.min += change;
                     new EditOrdinateItemMenu(loot, lootGroup, prevMenuClass).show(p);
                 }
@@ -92,6 +103,9 @@ public class EditOrdinateItemMenu extends SimplexMenu {
                 // DECREMENT
                 int change = shift ? 5 : 1;
                 if (loot.max >= loot.min + change) {
+                    //if (rem.getIcon() != null) {
+                    //    loot.icon = rem.getIcon();
+                    //}
                     loot.max -= change;
                     new EditOrdinateItemMenu(loot, lootGroup, prevMenuClass).show(p);
                 }
@@ -102,6 +116,9 @@ public class EditOrdinateItemMenu extends SimplexMenu {
                 //INCREMENT
                 int change = shift ? 5 : 1;
                 if (loot.max+change <= 64) {
+                    //if (rem.getIcon() != null) {
+                    //    loot.icon = rem.getIcon();
+                    //}
                     loot.max += change;
                     new EditOrdinateItemMenu(loot, lootGroup, prevMenuClass).show(p);
                 }

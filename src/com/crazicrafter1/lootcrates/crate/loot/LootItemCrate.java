@@ -1,19 +1,9 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
-import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.lootcrates.Data;
 import com.crazicrafter1.lootcrates.Main;
-import com.crazicrafter1.lootcrates.crate.AbstractLoot;
-import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import com.crazicrafter1.lootcrates.crate.Crate;
-import com.crazicrafter1.crutils.Util;
-import com.crazicrafter1.lootcrates.crate.LootGroup;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class LootItemCrate extends LootOrdinateItem {
@@ -29,8 +19,8 @@ public class LootItemCrate extends LootOrdinateItem {
     }
 
     public LootItemCrate(Map<String, Object> args) {
-        super(Data.crates.get((String)args.get("crate")).itemStack, args);
-        crate = Data.crates.get((String)args.get("crate"));
+        super(Main.get().data.crates.get((String)args.get("crate")).itemStack, args);
+        crate = Main.get().data.crates.get((String)args.get("crate"));
     }
 
     public LootItemCrate(Crate crate) {
@@ -40,7 +30,8 @@ public class LootItemCrate extends LootOrdinateItem {
 
     @Override
     public String toString() {
-        return super.toString() + "crate: " + crate;
+        return "crate: &7" + crate + "\n" +
+                super.toString();
     }
 
     @Override

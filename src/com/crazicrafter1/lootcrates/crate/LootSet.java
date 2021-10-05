@@ -1,5 +1,6 @@
 package com.crazicrafter1.lootcrates.crate;
 
+import com.crazicrafter1.lootcrates.crate.loot.AbstractLoot;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 
@@ -7,19 +8,19 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class LootGroup implements ConfigurationSerializable {
+public class LootSet implements ConfigurationSerializable {
 
-    public String name;
+    public String id;
     public ItemStack itemStack;
     public ArrayList<AbstractLoot> loot;
 
-    public LootGroup(String id, ItemStack itemStack, ArrayList<AbstractLoot> loot) {
-        this.name = id;
+    public LootSet(String id, ItemStack itemStack, ArrayList<AbstractLoot> loot) {
+        this.id = id;
         this.itemStack = itemStack;
         this.loot = loot;
     }
 
-    public LootGroup(Map<String, Object> args) {
+    public LootSet(Map<String, Object> args) {
         itemStack = (ItemStack) args.get("itemStack");
         loot = (ArrayList<AbstractLoot>) args.get("loot");
     }
@@ -41,7 +42,7 @@ public class LootGroup implements ConfigurationSerializable {
     @Override
     public String toString() {
         return "LootGroup{" +
-                "name='" + name + '\'' +
+                "id='" + id + '\'' +
                 ", itemStack=" + itemStack.getType() +
                 ", loot=" + loot +
                 '}';

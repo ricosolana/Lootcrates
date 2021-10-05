@@ -1,7 +1,7 @@
 package com.crazicrafter1.lootcrates;
 
 import com.crazicrafter1.lootcrates.crate.Crate;
-import com.crazicrafter1.lootcrates.crate.LootGroup;
+import com.crazicrafter1.lootcrates.crate.LootSet;
 import org.bukkit.*;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
@@ -21,18 +21,18 @@ public class Data implements ConfigurationSerializable {
         selectedItem = (ItemStack) args.get("selectedItem");
 
         // load in the same way, but need to pass name somehow
-        lootGroups = (LinkedHashMap<String, LootGroup>) args.get("lootGroups");
-        for (Map.Entry<String, LootGroup> entry : lootGroups.entrySet()) {
-            entry.getValue().name = entry.getKey();
+        lootGroups = (LinkedHashMap<String, LootSet>) args.get("lootSets");
+        for (Map.Entry<String, LootSet> entry : lootGroups.entrySet()) {
+            entry.getValue().id = entry.getKey();
         }
 
         crates = (LinkedHashMap<String, Crate>) args.get("crates");
         for (Map.Entry<String, Crate> entry : crates.entrySet()) {
-            String name = entry.getKey();
+            String id = entry.getKey();
             Crate crate = entry.getValue();
 
-            crate.name = name;
-            crate.itemStack = Crate.makeCrate(crate.itemStack, name);
+            crate.id = id;
+            crate.itemStack = Crate.makeCrate(crate.itemStack, id);
 
             // initialize weights
             crate.sumsToWeights();
@@ -60,7 +60,7 @@ public class Data implements ConfigurationSerializable {
     public FireworkEffect fireworkEffect;
 
     public HashMap<String, Crate> crates;
-    public HashMap<String, LootGroup> lootGroups;
+    public HashMap<String, LootSet> lootGroups;
 
     public int totalOpens;
 
@@ -77,7 +77,7 @@ public class Data implements ConfigurationSerializable {
         result.put("unSelectedItem", unSelectedItem);
         result.put("selectedItem", selectedItem);
 
-        result.put("lootGroups", lootGroups);
+        result.put("lootSets", lootGroups);
         Main.get().info(lootGroups.toString());
 
         result.put("crates", crates);

@@ -1,4 +1,4 @@
-package com.crazicrafter1.lootcrates.editor.fireworks;
+package com.crazicrafter1.lootcrates.editor.loot;
 
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.gapi.Component;
@@ -6,18 +6,16 @@ import com.crazicrafter1.gapi.RemovableComponent;
 import com.crazicrafter1.gapi.SimplexMenu;
 import com.crazicrafter1.gapi.TriggerComponent;
 import com.crazicrafter1.lootcrates.Main;
-import com.crazicrafter1.lootcrates.editor.MainMenu;
-import org.bukkit.ChatColor;
+import com.crazicrafter1.lootcrates.crate.LootSet;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.FireworkEffectMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 
-public class FireworksMenu extends SimplexMenu {
+public class SingleLootGroupItemEditMenu extends SimplexMenu {
 
-    public FireworksMenu() {
-        super("Firework", 5, BACKGROUND_1);
+    public SingleLootGroupItemEditMenu(LootSet lootSet) {
+        super("edit " + lootSet.id + " icon", 5, BACKGROUND_1);
+
         Component inputPerimeter = new Component() {
             @Override
             public ItemStack getIcon() {
@@ -30,12 +28,11 @@ public class FireworksMenu extends SimplexMenu {
         setComponent(2 + 3, 1, inputPerimeter);
         setComponent(1 + 3, 2, inputPerimeter);
 
-        // Original firework
+        // Original crate
         setComponent(1, 1, new Component() {
             @Override
             public ItemStack getIcon() {
-                return new ItemBuilder(Material.FIREWORK_STAR)
-                        .fireworkEffect(Main.get().data.fireworkEffect).toItem();
+                return lootSet.itemStack;
             }
         });
 
@@ -49,17 +46,8 @@ public class FireworksMenu extends SimplexMenu {
             public void onLeftClick(Player p, boolean shift) {
                 ItemStack item = rem.getIcon();
                 if (item != null) {
-                    ItemMeta meta = item.getItemMeta();
-                    if (meta instanceof FireworkEffectMeta fm) {
-                        if (fm.hasEffect()) {
-                            Main.get().data.fireworkEffect = fm.getEffect();
-                            new FireworksMenu().show(p);
-                        } else {
-                            p.sendMessage(ChatColor.YELLOW + "must have effects");
-                        }
-                    } else {
-                        p.sendMessage(ChatColor.YELLOW + "Not a firework");
-                    }
+                    Main.get().info("Applying changes here!");
+                    lootSet.itemStack = new ItemBuilder(item.getType()).mergeLexicals(item).toItem();
                 }
             }
 
@@ -70,6 +58,6 @@ public class FireworksMenu extends SimplexMenu {
         });
 
         // back
-        backButton(4, 4, BACK_1, MainMenu.class);
+        backButton(4, 4, BACK_1, SingleLootGroupMenu.class, lootSet);
     }
 }

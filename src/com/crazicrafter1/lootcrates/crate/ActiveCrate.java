@@ -2,6 +2,7 @@ package com.crazicrafter1.lootcrates.crate;
 
 import com.crazicrafter1.lootcrates.Data;
 import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.crate.loot.AbstractLoot;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -34,7 +35,7 @@ public final class ActiveCrate {
     private final int size;
     private final int picks;
     private final Sound sound;
-    private final LootGroup[] lootChances;
+    private final LootSet[] lootChances;
     private final Inventory inventory;
 
     // Live variables
@@ -45,14 +46,14 @@ public final class ActiveCrate {
 
     private static Data data = Main.get().data;
 
-    ActiveCrate(Player p, Crate crate, int lockSlot) {
+    public ActiveCrate(Player p, Crate crate, int lockSlot) {
         this.player = p;
         this.size = crate.size;
         this.picks = crate.picks;
         this.sound = crate.sound;
-        this.lootChances = new LootGroup[size];
+        this.lootChances = new LootSet[size];
 
-        this.inventory = Bukkit.createInventory(p, size, crate.header);
+        this.inventory = Bukkit.createInventory(p, size, crate.title);
         this.lockSlot = lockSlot;
 
         this.populate(crate);
@@ -63,7 +64,7 @@ public final class ActiveCrate {
 
     private void populate(Crate crate) {
         for (int i = 0; i < size; i++) {
-            LootGroup lootGroup = crate.getBasedRandom();
+            LootSet lootGroup = crate.getBasedRandom();
             this.lootChances[i] = lootGroup;
         }
     }
@@ -171,7 +172,7 @@ public final class ActiveCrate {
         return true;
     }
 
-    void close() {
+    public void close() {
         // Give items if still making selecting
         if (state != State.SELECTING) {
             for (int slot : slots.keySet()) {

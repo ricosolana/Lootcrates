@@ -2,43 +2,46 @@ package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
+import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
 import java.util.Map;
 
-public class LootItemCrate extends LootOrdinateItem {
+public class LootItemCrate extends AbstractLootItem {
 
-    //private final String crate;
-    private final Crate crate;
+    // Important to use id, because a referenced Crate object is sort of an
+    // small leak
+    private String id;
 
-    /*
-     * Default constructor
+    /**
+     * Default ctor
      */
-    public LootItemCrate() {
-        crate = null;
-    }
+    public LootItemCrate() {}
 
     public LootItemCrate(Map<String, Object> args) {
-        super(Main.get().data.crates.get((String)args.get("crate")).itemStack, args);
-        crate = Main.get().data.crates.get((String)args.get("crate"));
+        super(args);
+        id = (String) args.get("crate");
     }
 
     public LootItemCrate(Crate crate) {
-        super(crate.itemStack, 1, 1);
-        this.crate = crate;
+        this.id = crate.id;
+    }
+
+    @Override
+    public ItemStack getIcon() {
+        return Main.get().data.crates.get(id).itemStack;
     }
 
     @Override
     public String toString() {
-        return "crate: &7" + crate + "\n" +
+        return "crate: &7" + id + "\n" +
                 super.toString();
     }
 
     @Override
     public Map<String, Object> serialize() {
-        Map<String, Object> result = new HashMap<>(); // = super.serialize();
+        Map<String, Object> result = super.serialize(); // = super.serialize();
 
-        result.put("crate", crate.name);
+        result.put("crate", id);
 
         return result;
     }

@@ -1,7 +1,6 @@
-package com.crazicrafter1.lootcrates.editor.fireworks;
+package com.crazicrafter1.lootcrates.DEPRECATED;
 
 import com.crazicrafter1.crutils.ItemBuilder;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Material;

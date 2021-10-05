@@ -4,8 +4,12 @@ import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.gapi.Component;
 import com.crazicrafter1.gapi.SimplexMenu;
 import com.crazicrafter1.gapi.TriggerComponent;
+import com.crazicrafter1.gapi.anvil.AnvilGUI;
+import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
-import com.crazicrafter1.lootcrates.crate.LootGroup;
+import com.crazicrafter1.lootcrates.crate.LootSet;
+import com.crazicrafter1.lootcrates.editor.loot.LootMenu;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -17,7 +21,7 @@ public class SingleCrateMenu extends SimplexMenu {
 
 
     public SingleCrateMenu(Crate crate) {
-        super("Crate: " + crate.name, 5,
+        super("Crate: " + crate.id, 5,
                 new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).name("").toItem());
 
         setComponent(1, 1, new TriggerComponent() {
@@ -38,12 +42,30 @@ public class SingleCrateMenu extends SimplexMenu {
             public void onLeftClick(Player p, boolean shift) {
                 // when clicking on this specific crate
                 // openanvilgui
+                new AnvilGUI.Builder()
+                    .onClose(player -> new LootMenu().show(p))
+                    .itemLeft(new ItemBuilder(Material.FEATHER).name("Use '&' for color codes").toItem())
+                    .title("Edit title")
+                    .onComplete((player, text) -> {
+                        // invalid
+                        //Main.get().info(text);
+                        if (text.isEmpty()) {
+                            return AnvilGUI.Response.text("Invalid.");
+                        } else {
+                            // add that lootgroup
+                            crate.title = ChatColor.translateAlternateColorCodes('&', text);
+
+                            return AnvilGUI.Response.close();
+                        }
+                    })
+                    .plugin(Main.get())
+                    .open(p);
             }
 
             @Override
             public ItemStack getIcon() {
                 return new ItemBuilder(Material.PAPER).name("&e&lChange Title").
-                        lore("&8Current: &r" + crate.header).toItem();
+                        lore("&8Current: &r" + crate.title).toItem();
             }
         });
 
@@ -113,10 +135,10 @@ public class SingleCrateMenu extends SimplexMenu {
         });
 
         StringBuilder builder = new StringBuilder();
-        for (Map.Entry<LootGroup, Integer> entry : crate.lootByWeight.entrySet()) {
-            LootGroup lootGroup = entry.getKey();
+        for (Map.Entry<LootSet, Integer> entry : crate.lootByWeight.entrySet()) {
+            LootSet lootGroup = entry.getKey();
             builder.append(String.format("&8 - %s  |  %s  |  %s\n",
-                    entry.getKey().name, crate.getFormattedFraction(lootGroup), crate.getFormattedPercent(lootGroup)));
+                    entry.getKey().id, crate.getFormattedFraction(lootGroup), crate.getFormattedPercent(lootGroup)));
         }
         setComponent(2, 3, new TriggerComponent() {
             @Override

@@ -1,5 +1,6 @@
 package com.crazicrafter1.lootcrates.listeners;
 
+import com.crazicrafter1.lootcrates.LootCratesAPI;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import org.bukkit.entity.Player;
@@ -30,14 +31,14 @@ public class ListenerOnPlayerInteract extends BaseListener {
 
                 ItemStack item = p.getInventory().getItemInMainHand();
 
-                Crate crate = Crate.crateByItem(item);
+                Crate crate = LootCratesAPI.extractCrateFromItem(item);
                 if (crate != null) {
                     plugin.debug("Successful crate validation");
 
 
 
-                    plugin.debug(p.getDisplayName() + " has just opened a " + crate.name + " crate");
-                    Crate.openCrate(p, crate.name, p.getInventory().getHeldItemSlot());
+                    plugin.debug(p.getDisplayName() + " has just opened a " + crate.id + " crate");
+                    LootCratesAPI.openCrate(p, crate.id, p.getInventory().getHeldItemSlot());
 
                     e.setCancelled(true);
 

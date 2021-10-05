@@ -1,23 +1,23 @@
 package com.crazicrafter1.lootcrates;
 
 import com.crazicrafter1.crutils.Metrics;
-import com.crazicrafter1.crutils.ReflectionUtil;
 import com.crazicrafter1.crutils.Updater;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.commands.CmdCrates;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import com.crazicrafter1.lootcrates.crate.Crate;
-import com.crazicrafter1.lootcrates.crate.LootGroup;
+import com.crazicrafter1.lootcrates.crate.LootSet;
+import com.crazicrafter1.lootcrates.crate.loot.LootItem;
 import com.crazicrafter1.lootcrates.crate.loot.LootItemCrate;
 import com.crazicrafter1.lootcrates.crate.loot.LootItemQA;
-import com.crazicrafter1.lootcrates.crate.loot.LootOrdinateItem;
-import com.crazicrafter1.lootcrates.editor.loot.unique.EditItemCrateMenu;
-import com.crazicrafter1.lootcrates.editor.loot.unique.EditItemQAMenu;
-import com.crazicrafter1.lootcrates.editor.loot.unique.EditOrdinateItemMenu;
+import com.crazicrafter1.lootcrates.editor.loot.impl.EditLootItemMenu;
 import com.crazicrafter1.lootcrates.listeners.*;
 import com.crazicrafter1.lootcrates.tabs.TabCrates;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -48,6 +48,8 @@ public class Main extends JavaPlugin
 
     public Data data;
 
+    private FileConfiguration config = null;
+
     @Override
     public void onEnable() {
 
@@ -56,31 +58,29 @@ public class Main extends JavaPlugin
         /*
          * 1.17 assert
          */
-        if(ReflectionUtil.isOldVersion()) {
-            error(
-                    "only MC 1.17+ is supported (Java 16)\n" +
-                    "please use LootCrates 3.1.4 and disable auto-update for legacy versions");
+        //if(ReflectionUtil.isOldVersion()) {
+        //    error(
+        //            "only MC 1.17+ is supported (Java 16)\n" +
+        //            "please use LootCrates 3.1.4 and disable auto-update for legacy versions");
 
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
+        //    getServer().getPluginManager().disablePlugin(this);
+        //    return;
+        //}
 
         supportQualityArmory = Bukkit.getPluginManager().isPluginEnabled("QualityArmory");
 
         // register serializable objects
         ConfigurationSerialization.registerClass(Data.class);
-        ConfigurationSerialization.registerClass(LootGroup.class);
+        ConfigurationSerialization.registerClass(LootSet.class);
         ConfigurationSerialization.registerClass(Crate.class);
 
         // api for easy
-        LootCratesAPI.registerLoot(LootItemCrate.class, EditItemCrateMenu.class);
-        LootCratesAPI.registerLoot(LootOrdinateItem.class, EditOrdinateItemMenu.class);
-        LootCratesAPI.registerLoot(LootItemQA.class, EditItemQAMenu.class);
+        LootCratesAPI.registerLoot(LootItemCrate.class/*, EditItemCrateMenu.class*/);
+        LootCratesAPI.registerLoot(LootItem.class, EditLootItemMenu.class);
+        LootCratesAPI.registerLoot(LootItemQA.class/*, EditItemQAMenu.class*/);
 
         // Save the config if it does not exist
-        saveDefaultConfig();
 
-        // Overridden to load config and assign this.config
         this.reloadConfig();
 
         new Updater(this, "PeriodicSeizures", "LootCrates", data.update);
@@ -125,41 +125,105 @@ public class Main extends JavaPlugin
 
     @Override
     public void onDisable() {
-        // configs / backups
+        this.saveConfig();
+    }
+
+    public void saveDefaultConfig(boolean replace) {
+        backupConfig();
+
+        // If replacing, save
+        // If file does not exist, save
+        if (replace || !new File(this.getDataFolder(), "config.yml").exists())
+            this.saveResource("config.yml", true);
+    }
+
+    int crashNext = 2;
+    @Override
+    public void reloadConfig() {
+        if (crashNext-- == 0) {
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+        // Load file from jar if it doesnt exist
+        saveDefaultConfig(false);
+
+        if (this.config == null) {
+            // Ready to parse
+            this.config = new YamlConfiguration();
+        }
+
+        // Parse
+        try {
+            config.load(new File(this.getDataFolder(), "config.yml"));
+            data = (Data) config.get("data");
+
+            if (data == null) {
+                error("Failed to serialize Main.get().data");
+                // throw or something
+                throw new NullDataException();
+            }
+            crashNext = 2;
+        } catch (IOException | StackOverflowError e) {
+            e.printStackTrace();
+            Bukkit.getPluginManager().disablePlugin(this);
+        } catch (InvalidConfigurationException e) {
+            error("Malformed config.yml (falling back ...)");
+            e.printStackTrace();
+
+            // then try loading again
+            saveDefaultConfig(true);
+            this.reloadConfig();
+        } catch (NullDataException e) {
+            error("Couldn't load Main.get().data (falling back ...)");
+
+            e.printStackTrace();
+
+            // then try loading again
+            saveDefaultConfig(true);
+            this.reloadConfig();
+        }
+    }
+
+    public void backupConfig() {
         File configFile = new File(Main.get().getDataFolder(), "config.yml");
-        File backupFile = new File(Main.get().getDataFolder(),"backup/" + System.currentTimeMillis() + "_config.yml");
+        File backupFile = new File(Main.get().getDataFolder(),"backup/broken" + System.currentTimeMillis() + "_config.yml");
 
         // create the backup path
         new File(Main.get().getDataFolder(),"backup/").mkdirs();
 
         try {
             // try to create the backup
-            backupFile.createNewFile();
+            if (configFile.exists()) {
+                backupFile.createNewFile();
 
-            // copy the old to the new
-            Util.copy(new FileInputStream(configFile), new FileOutputStream(backupFile));
+                // copy the old to the new
+                Util.copy(new FileInputStream(configFile), new FileOutputStream(backupFile));
+            }
         } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Main.get().saveConfig();
-    }
-
-    @Override
-    public void reloadConfig() {
-        try {
-            super.reloadConfig();
-            data = (Data) getConfig().get("data");
-        } catch (Exception e) {
-            error("Couldn't load config (you modified it, didn't you?!?)");
             e.printStackTrace();
         }
     }
 
     @Override
     public void saveConfig() {
+        // anytime config is saved, make a backup
+        backupConfig();
+
         this.getConfig().set("data", data);
-        super.saveConfig();
+
+        try {
+            this.getConfig().save(new File(this.getDataFolder(), "config.yml"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public FileConfiguration getConfig() {
+        if (this.config == null) {
+            this.reloadConfig();
+        }
+        return this.config;
     }
 
     public void info(String s) {

@@ -1,9 +1,8 @@
-package com.crazicrafter1.lootcrates.crate;
+package com.crazicrafter1.lootcrates.crate.loot;
 
+import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Map;
 
 /**
  * TODO
@@ -15,19 +14,9 @@ import java.util.Map;
  */
 public abstract class AbstractLoot implements ConfigurationSerializable {
 
-    public ItemStack icon;
+    public AbstractLoot() {}
 
-    public AbstractLoot(ItemStack baseVisual) {
-
-        if (baseVisual == null)
-            throw new RuntimeException("Item must not be null!");
-
-        this.icon = baseVisual;
-    }
-
-    public ItemStack getIcon() {
-        return icon;
-    }
+    public abstract ItemStack getIcon();
 
     public abstract void execute(ActiveCrate activeCrate, boolean closed, boolean[] giveItem);
 
@@ -35,11 +24,5 @@ public abstract class AbstractLoot implements ConfigurationSerializable {
     public String toString() {
         return "icon: &7" + getIcon() + "\n";
     }
-
-    @Override
-    public Map<String, Object> serialize() {
-        throw new RuntimeException("I must be overridden!");
-    }
-
 
 }

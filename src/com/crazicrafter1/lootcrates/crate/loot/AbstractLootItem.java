@@ -2,44 +2,36 @@ package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
-import com.crazicrafter1.lootcrates.crate.AbstractLoot;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class LootOrdinateItem extends AbstractLoot {
+public abstract class AbstractLootItem extends AbstractLoot {
 
     public int min;
     public int max;
 
-    /*
-     * Default constructor
-     */
-    public LootOrdinateItem() {
-        super(new ItemStack(Material.STONE));
+    public AbstractLootItem() {
         min = 1;
         max = 1;
     }
 
-    public LootOrdinateItem(Map<String, Object> args) {
-        super((ItemStack) args.get("item"));
-        min = (int)args.get("min");
-        max = (int)args.get("max");
-    }
-
-    public LootOrdinateItem(ItemStack itemStack, int min, int max) {
-        super(itemStack);
+    public AbstractLootItem(int min, int max) {
         this.min = min;
         this.max = max;
     }
 
-    public LootOrdinateItem(ItemStack itemStack, Map<String, Object> args) {
-        super(itemStack);
-        min = (int)args.get("min");
-        max = (int)args.get("max");
+    public AbstractLootItem(Map<String, Object> args) {
+        this((int)args.get("min"), (int)args.get("max"));
+
+        if (min > max)
+            throw new IndexOutOfBoundsException("failed to assert: min <= max");
+    }
+
+    protected ItemStack ofRange(ItemStack itemStack) {
+        return new ItemBuilder(itemStack).count(Util.randomRange(min, max)).toItem();
     }
 
     @Override
@@ -49,12 +41,6 @@ public class LootOrdinateItem extends AbstractLoot {
             Util.giveItemToPlayer(activeCrate.getPlayer(), getIcon());
         } else
             giveItem[0] = true;
-    }
-
-    @Override
-    public ItemStack getIcon() {
-        return new ItemBuilder(super.getIcon())
-                .count(Util.randomRange(min, max)).toItem();
     }
 
     @Override
@@ -71,13 +57,8 @@ public class LootOrdinateItem extends AbstractLoot {
     public Map<String, Object> serialize() {
         Map<String, Object> result = new LinkedHashMap<>();
 
-        result.put("item", super.getIcon());
-
         result.put("min", min);
         result.put("max", max);
-
-        // then other impls...
-
 
         return result;
     }

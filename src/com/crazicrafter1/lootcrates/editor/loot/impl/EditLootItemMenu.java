@@ -1,18 +1,18 @@
-package com.crazicrafter1.lootcrates.editor.loot.unique;
+package com.crazicrafter1.lootcrates.editor.loot.impl;
 
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.ReflectionUtil;
 import com.crazicrafter1.gapi.*;
 import com.crazicrafter1.lootcrates.Main;
-import com.crazicrafter1.lootcrates.crate.LootGroup;
-import com.crazicrafter1.lootcrates.crate.loot.LootOrdinateItem;
+import com.crazicrafter1.lootcrates.crate.LootSet;
+import com.crazicrafter1.lootcrates.crate.loot.LootItem;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class EditOrdinateItemMenu extends SimplexMenu {
+public class EditLootItemMenu extends SimplexMenu {
 
-    public EditOrdinateItemMenu(LootOrdinateItem loot, LootGroup lootGroup, Class<? extends Menu> prevMenuClass) {
+    public EditLootItemMenu(LootItem loot, LootSet lootSet, Class<? extends Menu> prevMenuClass) {
         super("Loot add: Item", 5, BACKGROUND_1);
 
         Component inputPerimeter = new Component() {
@@ -42,10 +42,10 @@ public class EditOrdinateItemMenu extends SimplexMenu {
                     // add ordinate item with <item, min, max>
                     // somehow
                     //lootGroup.loot.add(loot);
-                    loot.icon = new ItemStack(item);
+                    loot.itemStack = new ItemStack(item);
 
                     // then go back to prev menu
-                    ((Menu) ReflectionUtil.invokeConstructor(prevMenuClass, lootGroup)).show(p);
+                    ((Menu) ReflectionUtil.invokeConstructor(prevMenuClass, lootSet)).show(p);
                 }
             }
 
@@ -67,7 +67,7 @@ public class EditOrdinateItemMenu extends SimplexMenu {
                     //    loot.icon = rem.getIcon();
                     //}
                     loot.min -= change;
-                    new EditOrdinateItemMenu(loot, lootGroup, prevMenuClass).show(p);
+                    new EditLootItemMenu(loot, lootSet, prevMenuClass).show(p);
                 }
             }
 
@@ -80,7 +80,7 @@ public class EditOrdinateItemMenu extends SimplexMenu {
                     //    loot.icon = rem.getIcon();
                     //}
                     loot.min += change;
-                    new EditOrdinateItemMenu(loot, lootGroup, prevMenuClass).show(p);
+                    new EditLootItemMenu(loot, lootSet, prevMenuClass).show(p);
                 }
             }
 
@@ -107,7 +107,7 @@ public class EditOrdinateItemMenu extends SimplexMenu {
                     //    loot.icon = rem.getIcon();
                     //}
                     loot.max -= change;
-                    new EditOrdinateItemMenu(loot, lootGroup, prevMenuClass).show(p);
+                    new EditLootItemMenu(loot, lootSet, prevMenuClass).show(p);
                 }
             }
 
@@ -120,7 +120,7 @@ public class EditOrdinateItemMenu extends SimplexMenu {
                     //    loot.icon = rem.getIcon();
                     //}
                     loot.max += change;
-                    new EditOrdinateItemMenu(loot, lootGroup, prevMenuClass).show(p);
+                    new EditLootItemMenu(loot, lootSet, prevMenuClass).show(p);
                 }
             }
 
@@ -137,6 +137,6 @@ public class EditOrdinateItemMenu extends SimplexMenu {
         });
 
         // back
-        backButton(4, 4, BACK_1, prevMenuClass, lootGroup);
+        backButton(4, 4, BACK_1, prevMenuClass, lootSet);
     }
 }

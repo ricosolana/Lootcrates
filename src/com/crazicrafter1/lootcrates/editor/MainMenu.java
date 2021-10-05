@@ -1,7 +1,6 @@
 package com.crazicrafter1.lootcrates.editor;
 
 import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.gapi.SimplexMenu;
 import com.crazicrafter1.gapi.TriggerComponent;
 import com.crazicrafter1.lootcrates.Main;
@@ -13,11 +12,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 public class MainMenu extends SimplexMenu {
 
@@ -86,44 +80,34 @@ public class MainMenu extends SimplexMenu {
             }
         });
 
-        // save config to disk
+        // save
         setComponent(4, 3, new TriggerComponent() {
             @Override
             public void onLeftClick(Player p, boolean shift) {
-
-                //Main.get().saveConfig();
-
-                //if (true)
-                //    return;
-
-                // configs / backups
-                File configFile = new File(Main.get().getDataFolder(), "config.yml");
-                File backupFile = new File(Main.get().getDataFolder(),"backup/" + System.currentTimeMillis() + "_config.yml");
-
-                // create the backup path
-                new File(Main.get().getDataFolder(),"backup/").mkdirs();
-
-                try {
-                    // try to create the backup
-                    backupFile.createNewFile();
-
-                    // copy the old to the new
-                    Util.copy(new FileInputStream(configFile), new FileOutputStream(backupFile));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
                 Main.get().saveConfig();
             }
 
             @Override
             public ItemStack getIcon() {
                 return new ItemBuilder(Material.MAP)
-                        .name("&6&lSave config to disk")
-                        .lore("will block until saved (not async)").toItem();
+                        .name("&6&lSave config")
+                        .lore("&8not async").toItem();
             }
         });
 
-        //this.onClose();
+        // discard
+        setComponent(8, 4, new TriggerComponent() {
+            @Override
+            public void onLeftClick(Player p, boolean shift) {
+                Main.get().reloadConfig();
+            }
+
+            @Override
+            public ItemStack getIcon() {
+                return new ItemBuilder(Material.BARRIER)
+                        .name("&c&lDiscard changes")
+                        .lore("&8undo changes since last save").toItem();
+            }
+        });
     }
 }

@@ -7,8 +7,8 @@ import com.crazicrafter1.gapi.ParallaxMenu;
 import com.crazicrafter1.gapi.TriggerComponent;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
 import com.crazicrafter1.lootcrates.Main;
-import com.crazicrafter1.lootcrates.crate.AbstractLoot;
-import com.crazicrafter1.lootcrates.crate.LootGroup;
+import com.crazicrafter1.lootcrates.crate.loot.AbstractLoot;
+import com.crazicrafter1.lootcrates.crate.LootSet;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -25,7 +25,7 @@ public class SingleAddTypeMenu extends ParallaxMenu {
     // A unique menu class is registered to handle each kind of abstract loot
     //public static HashMap<Class<? extends AbstractLoot>, Class<? extends Menu>> behaviourMenus = new HashMap<>();
 
-    public SingleAddTypeMenu(LootGroup lootGroup) {
+    public SingleAddTypeMenu(LootSet lootGroup) {
         super("add loot");
 
         //for (Map.Entry<String, Class<? extends ConfigurationSerializable>> entry : aliases.entrySet()) {

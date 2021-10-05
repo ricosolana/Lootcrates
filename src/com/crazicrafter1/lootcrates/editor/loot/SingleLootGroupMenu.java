@@ -4,8 +4,8 @@ import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.gapi.ParallaxMenu;
 import com.crazicrafter1.gapi.TriggerComponent;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
-import com.crazicrafter1.lootcrates.crate.AbstractLoot;
-import com.crazicrafter1.lootcrates.crate.LootGroup;
+import com.crazicrafter1.lootcrates.crate.loot.AbstractLoot;
+import com.crazicrafter1.lootcrates.crate.LootSet;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -14,24 +14,24 @@ public class SingleLootGroupMenu extends ParallaxMenu {
 
     //private boolean byIcon = true;
 
-    public SingleLootGroupMenu(LootGroup lootGroup) {
-        super("Loot " + lootGroup.name);
+    public SingleLootGroupMenu(LootSet lootSet) {
+        super("Loot " + lootSet.id);
 
         // list all loots
-        for (AbstractLoot a : lootGroup.loot) {
+        for (AbstractLoot a : lootSet.loot) {
             addItem(new TriggerComponent() {
 
                 @Override
                 public void onLeftClick(Player p, boolean shift) {
-                    LootCratesAPI.invokeMenu(a, lootGroup, p, SingleLootGroupMenu.class);
+                    LootCratesAPI.invokeMenu(a, lootSet, p, SingleLootGroupMenu.class);
                 }
 
                 @Override
                 public void onRightClick(Player p, boolean shift) {
                     // delete
-                    if (!lootGroup.loot.isEmpty()) {
-                        lootGroup.loot.remove(a);
-                        new SingleLootGroupMenu(lootGroup).show(p);
+                    if (!lootSet.loot.isEmpty()) {
+                        lootSet.loot.remove(a);
+                        new SingleLootGroupMenu(lootSet).show(p);
                     }
                 }
 
@@ -43,17 +43,34 @@ public class SingleLootGroupMenu extends ParallaxMenu {
             });
         }
 
+        // Add AbstractLoot prompt
         setComponent(6, 5, new TriggerComponent() {
             @Override
             public void onLeftClick(Player p, boolean shift) {
                 // when clicked, open a new menu which goes over serializable types that
                 // are valid
-                new SingleAddTypeMenu(lootGroup).show(p);
+                new SingleAddTypeMenu(lootSet).show(p);
             }
 
             @Override
             public ItemStack getIcon() {
-                return new ItemBuilder(Material.SPYGLASS).name("&2Add...").toItem();
+                return new ItemBuilder(Material.SPYGLASS).name("&aAdd...").toItem();
+            }
+        });
+
+        // Edit LootGroup icon
+        setComponent(2, 5, new TriggerComponent() {
+            @Override
+            public void onLeftClick(Player p, boolean shift) {
+                // when clicked, open a new menu which goes over serializable types that
+                // are valid
+
+                new SingleLootGroupItemEditMenu(lootSet).show(p);
+            }
+
+            @Override
+            public ItemStack getIcon() {
+                return new ItemBuilder(lootSet.itemStack).name("&6Edit item").resetLore().toItem();
             }
         });
 

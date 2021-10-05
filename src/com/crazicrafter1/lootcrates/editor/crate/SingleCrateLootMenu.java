@@ -6,7 +6,7 @@ import com.crazicrafter1.gapi.ParallaxMenu;
 import com.crazicrafter1.gapi.TriggerComponent;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
-import com.crazicrafter1.lootcrates.crate.LootGroup;
+import com.crazicrafter1.lootcrates.crate.LootSet;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -27,15 +27,16 @@ public class SingleCrateLootMenu extends ParallaxMenu {
          * SELECT crate or CHANGE WEIGHT
          */
         if (mode == Mode.SELECT_EDIT) {
-            for (LootGroup lootGroup : Main.get().data.lootGroups.values()) {
+            for (LootSet lootSet : Main.get().data.lootGroups.values()) {
 
                 addItem(new TriggerComponent() {
                     @Override
                     public void onLeftClick(Player p, boolean shift) {
                         // TOGGLE
-                        if (crate.lootByWeight.containsKey(lootGroup)) {
-                            crate.lootByWeight.remove(lootGroup);
-                        } else crate.lootByWeight.put(lootGroup, 1);
+                        if (crate.lootByWeight.containsKey(lootSet)) {
+                            crate.lootByWeight.remove(lootSet);
+                        } else crate.lootByWeight.put(lootSet, 1);
+
                         crate.weightsToSums();
 
                         // REFRESH
@@ -50,14 +51,14 @@ public class SingleCrateLootMenu extends ParallaxMenu {
 
                     @Override
                     public ItemStack getIcon() {
-                        if (crate.lootByWeight.containsKey(lootGroup)) {
-                            return new ItemBuilder(lootGroup.itemStack)
+                        if (crate.lootByWeight.containsKey(lootSet)) {
+                            return new ItemBuilder(lootSet.itemStack)
                                     .glow(true)
-                                    .lore("&2Included").toItem();
+                                    .lore("&8id: " + lootSet.id + "\n&aIncluded").toItem();
                         } else
-                            return new ItemBuilder(lootGroup.itemStack)
+                            return new ItemBuilder(lootSet.itemStack)
                                     .glow(false)
-                                    .lore("&cOmitted").toItem();
+                                    .lore("&8id: " + lootSet.id + "\n&cExcluded").toItem();
                     }
                 });
             }
@@ -65,19 +66,19 @@ public class SingleCrateLootMenu extends ParallaxMenu {
         } else {
 
 
-            for (LootGroup lootGroup : crate.lootByWeight.keySet()) {
+            for (LootSet lootSet : crate.lootByWeight.keySet()) {
                 addItem(new TriggerComponent() {
                     @Override
                     public void onLeftClick(Player p, boolean shift) {
                         // DECREMENT
-                        if (crate.lootByWeight.containsKey(lootGroup)) {
-                            int weight = crate.lootByWeight.get(lootGroup);
+                        if (crate.lootByWeight.containsKey(lootSet)) {
+                            int weight = crate.lootByWeight.get(lootSet);
 
                             final int change = shift ? 5 : 1;
 
                             // Min clamp at 1
                             if (weight > change) {
-                                crate.lootByWeight.put(lootGroup, weight - change);
+                                crate.lootByWeight.put(lootSet, weight - change);
                                 // reweigh
                                 crate.weightsToSums();
                             }
@@ -90,13 +91,13 @@ public class SingleCrateLootMenu extends ParallaxMenu {
                     @Override
                     public void onRightClick(Player p, boolean shift) {
                         // increment
-                        if (crate.lootByWeight.containsKey(lootGroup)) {
-                            int weight = crate.lootByWeight.get(lootGroup);
+                        if (crate.lootByWeight.containsKey(lootSet)) {
+                            int weight = crate.lootByWeight.get(lootSet);
 
                             final int change = shift ? 5 : 1;
 
                             // Weights of zero will never be fired off
-                            crate.lootByWeight.put(lootGroup, weight + change);
+                            crate.lootByWeight.put(lootSet, weight + change);
                             crate.weightsToSums();
 
                         }
@@ -107,9 +108,9 @@ public class SingleCrateLootMenu extends ParallaxMenu {
 
                     @Override
                     public ItemStack getIcon() {
-                        int count = crate.lootByWeight.get(lootGroup);
-                        String prob = String.format("&2%s  =  %s\n", crate.getFormattedFraction(lootGroup), crate.getFormattedPercent(lootGroup));
-                        return new ItemBuilder(lootGroup.itemStack)
+                        int count = crate.lootByWeight.get(lootSet);
+                        String prob = String.format("&2%s  =  %s\n", crate.getFormattedFraction(lootSet), crate.getFormattedPercent(lootSet));
+                        return new ItemBuilder(lootSet.itemStack)
                                 .count(Util.clamp(count, 1, 64))
                                 .lore(prob +    """
                                                 &8LMB: &c-   &8SHIFT: x5

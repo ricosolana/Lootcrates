@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class EditLootItemMenu extends SimplexMenu {
 
+
     public EditLootItemMenu(LootItem loot, LootSet lootSet, Class<? extends Menu> prevMenuClass) {
         super("Loot add: Item", 5, BACKGROUND_1);
 

@@ -37,35 +37,22 @@ public class Main extends JavaPlugin
     /*
      * Runtime modifiable stuff
      */
-    public HashMap<java.util.UUID, ActiveCrate> openCrates = new HashMap<>();
+    public HashMap<UUID, ActiveCrate> openCrates = new HashMap<>();
     public HashSet<UUID> crateFireworks = new HashSet<>();
     public boolean supportQualityArmory = false;
+
+    public Data data;
+    private FileConfiguration config = null;
+    private final File configFile = new File(getDataFolder(), "config.yml");
 
     private static Main instance;
     public static Main get() {
         return instance;
     }
 
-    public Data data;
-
-    private FileConfiguration config = null;
-
     @Override
     public void onEnable() {
-
         Main.instance = this;
-
-        /*
-         * 1.17 assert
-         */
-        //if(ReflectionUtil.isOldVersion()) {
-        //    error(
-        //            "only MC 1.17+ is supported (Java 16)\n" +
-        //            "please use LootCrates 3.1.4 and disable auto-update for legacy versions");
-
-        //    getServer().getPluginManager().disablePlugin(this);
-        //    return;
-        //}
 
         supportQualityArmory = Bukkit.getPluginManager().isPluginEnabled("QualityArmory");
 
@@ -78,8 +65,6 @@ public class Main extends JavaPlugin
         LootCratesAPI.registerLoot(LootItemCrate.class/*, EditItemCrateMenu.class*/);
         LootCratesAPI.registerLoot(LootItem.class, EditLootItemMenu.class);
         LootCratesAPI.registerLoot(LootItemQA.class/*, EditItemQAMenu.class*/);
-
-        // Save the config if it does not exist
 
         this.reloadConfig();
 
@@ -102,8 +87,7 @@ public class Main extends JavaPlugin
 
         } catch (Exception e) {
             error("An error occurred while enabling metrics");
-            if (data.debug)
-                e.printStackTrace();
+            debug(e);
         }
 
         /*
@@ -129,52 +113,48 @@ public class Main extends JavaPlugin
     }
 
     public void saveDefaultConfig(boolean replace) {
-        backupConfig();
-
-        // If replacing, save
-        // If file does not exist, save
-        if (replace || !new File(this.getDataFolder(), "config.yml").exists())
+        // If replacing, then save
+        // If back up failed, then save
+        if (replace || backupConfig()) {
             this.saveResource("config.yml", true);
+        }
     }
 
     int crashNext = 2;
     @Override
     public void reloadConfig() {
         if (crashNext-- == 0) {
-            Bukkit.getPluginManager().disablePlugin(this);
+            crash();
             return;
         }
-        // Load file from jar if it doesnt exist
+        // Load file from jar if it doesn't exist
         saveDefaultConfig(false);
 
         if (this.config == null) {
-            // Ready to parse
             this.config = new YamlConfiguration();
         }
 
         // Parse
         try {
-            config.load(new File(this.getDataFolder(), "config.yml"));
+            config.load(configFile);
             data = (Data) config.get("data");
 
             if (data == null) {
-                error("Failed to serialize Main.get().data");
-                // throw or something
                 throw new NullDataException();
             }
             crashNext = 2;
         } catch (IOException | StackOverflowError e) {
             e.printStackTrace();
-            Bukkit.getPluginManager().disablePlugin(this);
+            crash();
         } catch (InvalidConfigurationException e) {
-            error("Malformed config.yml (falling back ...)");
+            error("Malformed config.yml (saving default config...)");
             e.printStackTrace();
 
             // then try loading again
             saveDefaultConfig(true);
             this.reloadConfig();
         } catch (NullDataException e) {
-            error("Couldn't load Main.get().data (falling back ...)");
+            error("Failed to serialize Main.get().data (saving default config...)");
 
             e.printStackTrace();
 
@@ -184,37 +164,39 @@ public class Main extends JavaPlugin
         }
     }
 
-    public void backupConfig() {
-        File configFile = new File(Main.get().getDataFolder(), "config.yml");
+    public boolean backupConfig() {
         File backupFile = new File(Main.get().getDataFolder(),"backup/broken" + System.currentTimeMillis() + "_config.yml");
 
         // create the backup path
-        new File(Main.get().getDataFolder(),"backup/").mkdirs();
-
+        //new File(Main.get().getDataFolder(),"backup/").mkdirs();
         try {
+            backupFile.getParentFile().mkdirs();
             // try to create the backup
             if (configFile.exists()) {
                 backupFile.createNewFile();
 
                 // copy the old to the new
                 Util.copy(new FileInputStream(configFile), new FileOutputStream(backupFile));
+                return true;
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     @Override
     public void saveConfig() {
-        // anytime config is saved, make a backup
-        backupConfig();
+        // if a backup was successfully made, then save
+        if (backupConfig()) {
+            this.getConfig().set("data", data);
 
-        this.getConfig().set("data", data);
-
-        try {
-            this.getConfig().save(new File(this.getDataFolder(), "config.yml"));
-        } catch (Exception e) {
-            e.printStackTrace();
+            try {
+                this.getConfig().save(configFile);
+            } catch (Exception e) {
+                error("Failed to save config");
+                debug(e);
+            }
         }
     }
 
@@ -226,6 +208,10 @@ public class Main extends JavaPlugin
         return this.config;
     }
 
+    public void crash() {
+        Bukkit.getPluginManager().disablePlugin(this);
+    }
+
     public void info(String s) {
         Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.DARK_GRAY + s);
     }
@@ -234,17 +220,18 @@ public class Main extends JavaPlugin
         Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.DARK_PURPLE + s);
     }
 
-    public void warn(String s) {
-        Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.RED + s);
-    }
-
     public void error(String s) {
-        Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.DARK_RED + s);
+        Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.RED + s);
     }
 
     public void debug(String s) {
         if (data.debug)
             Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.GOLD + s);
+    }
+
+    public void debug(Exception e) {
+        if (data.debug)
+            e.printStackTrace();
     }
 
 }

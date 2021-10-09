@@ -1,11 +1,12 @@
 package com.crazicrafter1.lootcrates;
 
 import com.crazicrafter1.crutils.ReflectionUtil;
-import com.crazicrafter1.gapi.Menu;
+import com.crazicrafter1.gapi.AbstractMenu;
 import com.crazicrafter1.lootcrates.crate.loot.AbstractLoot;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootSet;
+import com.crazicrafter1.lootcrates.lootwrapper.LMWrapper;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
@@ -16,46 +17,33 @@ import java.util.HashMap;
 
 public class LootCratesAPI {
 
-    public static HashMap<Class<? extends AbstractLoot>, Class<? extends Menu>> behaviourMenus = new HashMap<>();
+    public static HashMap<Class<? extends AbstractLoot>, Class<? extends LMWrapper>> behaviourMenus = new HashMap<>();
 
     public static void registerLoot(Class<? extends AbstractLoot> lootClass) {
         ConfigurationSerialization.registerClass(lootClass);
     }
 
-    /**
-     *
-     * @param lootClass Register a ? extends AbstractLoot
-     * @param menuClass Handler menu for instantiating the Loot (required constructor args: AbstractLoot, LootGroup)
-     */
-    public static void registerLoot(Class<? extends AbstractLoot> lootClass, Class<? extends Menu> menuClass) {
-        behaviourMenus.put(lootClass, menuClass);
+    public static void registerLoot(Class<? extends AbstractLoot> lootClass, Class<? extends LMWrapper> wrapperClazz) {
+        behaviourMenus.put(lootClass, wrapperClazz);
         ConfigurationSerialization.registerClass(lootClass);
     }
 
-    public static void invokeMenu(AbstractLoot abstractLoot, LootSet lootGroup, Player p) {
+    public static AbstractMenu.Builder getWrapperMenu(Player player, AbstractLoot abstractLoot, LootSet lootSet, AbstractMenu.Builder parentMenu) {
         try {
-            Class<? extends AbstractLoot> clazz = abstractLoot.getClass();
+            Class<? extends AbstractLoot> lootClazz = abstractLoot.getClass();
+            Class<? extends LMWrapper> wrapperClazz = behaviourMenus.get(lootClazz);
 
-            ((Menu) ReflectionUtil.invokeConstructor(behaviourMenus.get(clazz),
-                    clazz.cast(abstractLoot), lootGroup)).show(p);
+            //return ((LMWrapper)ReflectionUtil.invokeConstructor(wrapperClazz)).getMenu(
+            //        lootClazz.cast(abstractLoot), lootSet); //.menu.parent(parentMenu); //.open(player);
+
+            return ((LMWrapper)ReflectionUtil.invokeConstructor(wrapperClazz,
+                    lootClazz.cast(abstractLoot), lootSet)).menu; //.parent(parentMenu); //.open(player);
+
         } catch (Exception e) {
             Main.get().error("Couldn't create AbstractLoot edit menu");
-            if (Main.get().data.debug)
-                e.printStackTrace();
+            Main.get().debug(e);
         }
-    }
-
-    public static void invokeMenu(AbstractLoot abstractLoot, LootSet lootGroup, Player p, Class<? extends Menu> prevMenuClass) {
-        try {
-            Class<? extends AbstractLoot> clazz = abstractLoot.getClass();
-
-            ((Menu) ReflectionUtil.invokeConstructor(behaviourMenus.get(clazz),
-                    clazz.cast(abstractLoot), lootGroup, prevMenuClass)).show(p);
-        } catch (Exception e) {
-            Main.get().error("Couldn't create AbstractLoot edit menu");
-            if (Main.get().data.debug)
-                e.printStackTrace();
-        }
+        return null;
     }
 
     public static Crate getCrateByID(String id) {

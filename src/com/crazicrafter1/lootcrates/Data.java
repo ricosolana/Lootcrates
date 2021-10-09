@@ -42,7 +42,7 @@ public class Data implements ConfigurationSerializable {
 
         totalOpens = (int) args.getOrDefault("totalOpens", 0);
 
-        for (String str : (HashSet<String>) args.getOrDefault("alertedPlayers", new HashSet<>())) {
+        for (String str : (List<String>) args.getOrDefault("alertedPlayers", new ArrayList<>())) {
             alertedPlayers.add(UUID.fromString(str));
         }
         //alertedPlayers = (HashSet<UUID>) args.getOrDefault("alertedPlayers", new HashSet<>());
@@ -86,12 +86,11 @@ public class Data implements ConfigurationSerializable {
 
         result.put("totalOpens", totalOpens);
 
-        //result.put("alertedPlayers", alertedPlayers);
-        HashSet<String> uuids = new HashSet<>();
-        for (UUID uuid : alertedPlayers) {
-            uuids.add(uuid.toString());
-        }
-        result.put("alertedPlayers", uuids);
+        List<String> uuids = new ArrayList<>();
+        for (UUID uuid : alertedPlayers) uuids.add(uuid.toString());
+
+        result.put("alertedPlayers", new ArrayList<>(uuids));
+        Main.get().debug(alertedPlayers.toString());
 
         return result;
     }

@@ -10,8 +10,9 @@ import com.crazicrafter1.lootcrates.crate.LootSet;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
 import com.crazicrafter1.lootcrates.crate.loot.LootItemCrate;
 import com.crazicrafter1.lootcrates.crate.loot.LootItemQA;
-import com.crazicrafter1.lootcrates.editor.loot.impl.EditLootItemMenu;
 import com.crazicrafter1.lootcrates.listeners.*;
+import com.crazicrafter1.lootcrates.lootwrapper.LMItem;
+import com.crazicrafter1.lootcrates.lootwrapper.LMItemCrate;
 import com.crazicrafter1.lootcrates.tabs.TabCrates;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -62,11 +63,13 @@ public class Main extends JavaPlugin
         ConfigurationSerialization.registerClass(Crate.class);
 
         // api for easy
-        LootCratesAPI.registerLoot(LootItemCrate.class/*, EditItemCrateMenu.class*/);
-        LootCratesAPI.registerLoot(LootItem.class, EditLootItemMenu.class);
+        LootCratesAPI.registerLoot(LootItemCrate.class, LMItemCrate.class);
+        LootCratesAPI.registerLoot(LootItem.class, LMItem.class);
         LootCratesAPI.registerLoot(LootItemQA.class/*, EditItemQAMenu.class*/);
 
         this.reloadConfig();
+
+        info("keyset: " + data.crates.keySet());
 
         new Updater(this, "PeriodicSeizures", "LootCrates", data.update);
 
@@ -115,7 +118,8 @@ public class Main extends JavaPlugin
     public void saveDefaultConfig(boolean replace) {
         // If replacing, then save
         // If back up failed, then save
-        if (replace || backupConfig()) {
+        if ((replace && backupConfig()) || !configFile.exists()) {
+            info("Saving default config");
             this.saveResource("config.yml", true);
         }
     }
@@ -130,9 +134,7 @@ public class Main extends JavaPlugin
         // Load file from jar if it doesn't exist
         saveDefaultConfig(false);
 
-        if (this.config == null) {
-            this.config = new YamlConfiguration();
-        }
+        this.config = new YamlConfiguration();
 
         // Parse
         try {
@@ -173,6 +175,7 @@ public class Main extends JavaPlugin
             backupFile.getParentFile().mkdirs();
             // try to create the backup
             if (configFile.exists()) {
+                info("Backing up config");
                 backupFile.createNewFile();
 
                 // copy the old to the new

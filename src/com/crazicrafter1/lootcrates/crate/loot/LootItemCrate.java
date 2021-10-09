@@ -10,7 +10,7 @@ public class LootItemCrate extends AbstractLootItem {
 
     // Important to use id, because a referenced Crate object is sort of an
     // small leak
-    private String id;
+    public String id;
 
     /**
      * Default ctor

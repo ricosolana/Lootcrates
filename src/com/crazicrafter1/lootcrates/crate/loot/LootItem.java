@@ -1,5 +1,6 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
+import com.crazicrafter1.lootcrates.Main;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
@@ -20,6 +21,10 @@ public final class LootItem extends AbstractLootItem {
     public LootItem(Map<String, Object> args) {
         super(args);
         this.itemStack = (ItemStack) args.get("itemStack");
+        if (itemStack == null) {
+            Main.get().error(args.toString());
+            throw new NullPointerException("Item must not be null");
+        }
     }
 
     @Override
@@ -30,7 +35,7 @@ public final class LootItem extends AbstractLootItem {
     @Override
     public Map<String, Object> serialize() {
         Map<String, Object> result = super.serialize();
-        result.put("item", itemStack);
+        result.put("itemStack", itemStack);
         return result;
     }
 }

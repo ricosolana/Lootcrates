@@ -42,6 +42,7 @@ public class SingleCrateMenu extends SimplexMenu {
             public void onLeftClick(Player p, boolean shift) {
                 // when clicking on this specific crate
                 // openanvilgui
+
                 new AnvilGUI.Builder()
                     .onClose(player -> new LootMenu().show(p))
                     .itemLeft(new ItemBuilder(Material.FEATHER).name("Use '&' for color codes").toItem())

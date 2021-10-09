@@ -73,6 +73,8 @@ public class Crate implements ConfigurationSerializable {
     public int picks;
     public Sound sound;
     //public LinkedHashMap<String, Integer> lootByName;         // this will never be used beyond initialization
+    // lootSet could be weakly referenced, basically WeakReference
+    // or a c++ std::weak_ptr to Main.get().data.lootSets
     public LinkedHashMap<LootSet, Integer> lootBySum;
     public HashMap<LootSet, Integer> lootByWeight;
     public int totalWeights;

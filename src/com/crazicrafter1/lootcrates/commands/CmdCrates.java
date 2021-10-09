@@ -3,10 +3,10 @@ package com.crazicrafter1.lootcrates.commands;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.Data;
+import com.crazicrafter1.lootcrates.Editor;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
-import com.crazicrafter1.lootcrates.editor.MainMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -83,6 +83,8 @@ public class CmdCrates extends CmdBase {
                                     @Override
                                     public void run() {
 
+
+
                                         p.resetTitle();
                                         p.sendTitle(" ",
                                                 ChatColor.GOLD + "Constructive feedback is also appreciated!",
@@ -91,7 +93,8 @@ public class CmdCrates extends CmdBase {
                                         new BukkitRunnable() {
                                             @Override
                                             public void run() {
-                                                new MainMenu().show(p);
+                                                //new MainMenu().show(p);
+                                                Editor.open(p);
                                             }
                                         }.runTaskLater(plugin, 3 * 20 + 20 + 1);
 
@@ -104,11 +107,11 @@ public class CmdCrates extends CmdBase {
                             }
                         }.runTaskLater(plugin, 20 * 3 + 20 + 1);
 
-
-                        data.alertedPlayers.add(p.getUniqueId());
                     } else {
-                        new MainMenu().show(p);
+                        Editor.open(p);
                     }
+
+                    data.alertedPlayers.add(p.getUniqueId());
 
                     return true;
                 }

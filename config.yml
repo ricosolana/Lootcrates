@@ -29,7 +29,7 @@ data:
         - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"You
         have selected this mystery chest"}],"text":""}'
   lootSets:
-    common: &group_common
+    common: &id003
       ==: com.crazicrafter1.lootcrates.crate.LootSet
       itemStack:
         ==: org.bukkit.inventory.ItemStack
@@ -38,83 +38,76 @@ data:
         meta:
           ==: ItemMeta
           meta-type: UNSPECIFIC
-          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"white","text":"Common Reward"}],"text":""}'
+          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"white","text":"Common
+            Reward"}],"text":""}'
           lore:
-            - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"Click to redeem!"}],"text":""}'
-
+            - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"Click
+            to redeem!"}],"text":""}'
       loot:
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 2730
-            type: TNT
           min: 1
           max: 31
-        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: TNT
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 32
           max: 32
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 2730
+            type: TNT
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
+          min: 16
+          max: 16
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: DIAMOND
-          min: 16
-          max: 16
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
-          item:
-            ==: org.bukkit.inventory.ItemStack
-            v: 2730
-            type: CACTUS
-          min: 1
-          max: 31
-        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
+          min: 64
+          max: 64
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: CACTUS
-          min: 64
-          max: 64
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
+          min: 1
+          max: 31
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: COAL
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 1
           max: 31
-        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: BLAZE_ROD
-          min: 1
-          max: 31
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
+          min: 32
+          max: 32
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: OBSIDIAN
-          min: 32
-          max: 32
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
+          min: 4
+          max: 4
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: DIAMOND_BLOCK
-          min: 4
-          max: 4
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
+          min: 1
+          max: 15
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: POTATO
-          min: 1
-          max: 15
-
-    regular: &group_regular
+    regular: &id002
       ==: com.crazicrafter1.lootcrates.crate.LootSet
       itemStack:
         ==: org.bukkit.inventory.ItemStack
@@ -123,45 +116,45 @@ data:
         meta:
           ==: ItemMeta
           meta-type: UNSPECIFIC
-          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"yellow","text":"Regular Reward"}],"text":""}'
+          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"yellow","text":"Regular
+            Reward"}],"text":""}'
           lore:
-            - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"Click to redeem!"}],"text":""}'
-
+            - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"Click
+            to redeem!"}],"text":""}'
       loot:
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
+          min: 8
+          max: 8
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: GOLD_BLOCK
-          min: 8
-          max: 8
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
+          min: 1
+          max: 31
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: OBSIDIAN
-          min: 1
-          max: 31
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItemCrate
-          crate: peasant
           min: 1
           max: 1
+          crate: peasant
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
+          min: 16
+          max: 16
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: DIAMOND
-          min: 16
-          max: 16
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
+          min: 1
+          max: 31
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: CACTUS
-          min: 1
-          max: 31
-
-    ultra: &group_ultra
+    ultra: &id001
       ==: com.crazicrafter1.lootcrates.crate.LootSet
       itemStack:
         ==: org.bukkit.inventory.ItemStack
@@ -170,34 +163,34 @@ data:
         meta:
           ==: ItemMeta
           meta-type: UNSPECIFIC
-          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"aqua","text":"Ultra Reward"}],"text":""}'
+          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"aqua","text":"Ultra
+            Reward"}],"text":""}'
           lore:
-            - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"Click to redeem!"}],"text":""}'
-
+            - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"Click
+            to redeem!"}],"text":""}'
       loot:
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
+          min: 6
+          max: 6
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: DIAMOND_BLOCK
-          min: 6
-          max: 6
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
+          min: 64
+          max: 64
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: OBSIDIAN
-          min: 64
-          max: 64
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
+          min: 1
+          max: 1
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: DIAMOND_CHESTPLATE
-          min: 1
-          max: 1
-
-    rare: &group_rare
+    rare: &id004
       ==: com.crazicrafter1.lootcrates.crate.LootSet
       itemStack:
         ==: org.bukkit.inventory.ItemStack
@@ -206,34 +199,34 @@ data:
         meta:
           ==: ItemMeta
           meta-type: UNSPECIFIC
-          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"dark_purple","text":"Rare Reward"}],"text":""}'
+          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"dark_purple","text":"Rare
+            Reward"}],"text":""}'
           lore:
-            - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"Click to redeem!"}],"text":""}'
-
+            - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"Click
+            to redeem!"}],"text":""}'
       loot:
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
+          min: 1
+          max: 31
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: TNT
-          min: 1
-          max: 31
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
+          min: 16
+          max: 16
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: DIAMOND
-          min: 16
-          max: 16
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
+          min: 1
+          max: 31
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: CACTUS
-          min: 1
-          max: 31
-
-    legendary: &group_legendary
+    legendary: &id005
       ==: com.crazicrafter1.lootcrates.crate.LootSet
       itemStack:
         ==: org.bukkit.inventory.ItemStack
@@ -242,33 +235,33 @@ data:
         meta:
           ==: ItemMeta
           meta-type: UNSPECIFIC
-          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"red","text":"Legendary Reward"}],"text":""}'
+          display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"red","text":"Legendary
+            Reward"}],"text":""}'
           lore:
-            - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"Click to redeem!"}],"text":""}'
-
+            - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray","text":"Click
+            to redeem!"}],"text":""}'
       loot:
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
+          min: 1
+          max: 1
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: DIAMOND_LEGGINGS
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 1
           max: 1
-        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: DIAMOND_HELMET
-          min: 1
-          max: 1
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
+          min: 8
+          max: 8
           itemStack:
             ==: org.bukkit.inventory.ItemStack
             v: 2730
             type: GOLDEN_APPLE
-          min: 8
-          max: 8
-
   crates:
     peasant:
       ==: com.crazicrafter1.lootcrates.crate.Crate
@@ -280,8 +273,8 @@ data:
           ==: ItemMeta
           meta-type: TILE_ENTITY
           display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"white",
-          "text":"Peasant Loot"}, {"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray",
-          "text":" (Tier 1)"}],"text":""}'
+            "text":"Peasant Loot"}, {"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray",
+            "text":" (Tier 1)"}],"text":""}'
           lore:
             - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,
             "color":"gray","text":"Right click on this item to unlock"}],"text":""}'
@@ -289,14 +282,14 @@ data:
             "color":"gray","text":"four pieces of loot!"}],"text":""}'
           internal: H4sIAAAAAAAA/+NiYOBgYHUuSixJZWAvSE0sTswrYQAAGUjyDhUAAAA=
           blockMaterial: CHEST
-      title: "&7Choose your Peasant loot"
+      title: ยง7Choose your Peasant loot
       size: 45
       picks: 4
       sound: ENTITY_EXPERIENCE_ORB_PICKUP
       weights:
-        *group_ultra: 8
-        *group_regular: 14
-        *group_common: 56
+        *id001: 8
+        *id002: 14
+        *id003: 56
     knight:
       ==: com.crazicrafter1.lootcrates.crate.Crate
       itemStack:
@@ -307,8 +300,8 @@ data:
           ==: ItemMeta
           meta-type: TILE_ENTITY
           display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"aqua",
-          "text":"Knight Spoils"}, {"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray",
-          "text":" (Tier 2)"}],"text":""}'
+            "text":"Knight Spoils"}, {"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray",
+            "text":" (Tier 2)"}],"text":""}'
           lore:
             - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,
             "color":"gray","text":"Right click on this item to unlock"}],"text":""}'
@@ -316,16 +309,15 @@ data:
             "color":"gray","text":"four pieces of loot!"}],"text":""}'
           internal: H4sIAAAAAAAA/+NiYOBgYHUuSixJZWDLzstMzyhhAAA/nIHiFAAAAA==
           blockMaterial: CHEST
-      title: "&7Choose your knight spoils"
+      title: ยง7Choose your knight spoils
       size: 45
       picks: 3
       sound: ENTITY_EXPERIENCE_ORB_PICKUP
       weights:
-        *group_legendary: 42
-        *group_rare: 35
-        *group_ultra: 20
-        *group_regular: 7
-
+        *id002: 7
+        *id001: 20
+        *id004: 35
+        *id005: 42
     king:
       ==: com.crazicrafter1.lootcrates.crate.Crate
       itemStack:
@@ -336,25 +328,24 @@ data:
           ==: ItemMeta
           meta-type: TILE_ENTITY
           display-name: '{"extra":[{"bold":true,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"red",
-          "text":"King Treasure"}, {"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray",
-          "text":" (Tier 3)"}],"text":""}'
+            "text":"King Treasure"}, {"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,"color":"gray",
+            "text":" (Tier 3)"}],"text":""}'
           lore:
             - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,
             "color":"gray","text":"Right click on this item to unlock"}],"text":""}'
             - '{"extra":[{"bold":false,"italic":false,"underlined":false,"strikethrough":false,"obfuscated":false,
             "color":"gray","text":"four pieces of loot!"}],"text":""}'
-          internal: H4sIAAAAAAAA/+NiYOBgYHUuSixJZWDLzstMzyhhAAA/nIHiFAAAAA==
+          internal: H4sIAAAAAAAA/+NiYOBgYHUuSixJZWDJzsxLZwAApQ9CFhIAAAA=
           blockMaterial: CHEST
-      title: "&7Choose your king treasure"
+      title: ยง7Choose your king treasure
       size: 45
       picks: 3
       sound: ENTITY_EXPERIENCE_ORB_PICKUP
       weights:
-        *group_legendary: 50
-        *group_rare: 40
-        *group_ultra: 20
-        *group_regular: 4
-
+        *id002: 4
+        *id001: 20
+        *id004: 40
+        *id005: 50
   fireworkEffect:
     ==: Firework
     flicker: false

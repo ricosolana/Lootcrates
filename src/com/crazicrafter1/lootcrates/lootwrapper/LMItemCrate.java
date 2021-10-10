@@ -2,6 +2,7 @@ package com.crazicrafter1.lootcrates.lootwrapper;
 
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.gapi.Button;
+import com.crazicrafter1.gapi.EnumResult;
 import com.crazicrafter1.gapi.ParallaxMenu;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
@@ -26,12 +27,12 @@ public class LMItemCrate extends LMWrapper {
                         ItemStack icon = new ItemBuilder(Material.LOOM).mergeLexicals(crate.itemStack).glow(crate.id.equals(loot.id)).toItem();
 
                         self.append(new Button.Builder()
-                                .icon(icon)
+                                .icon(() -> icon)
                                 .lmb(interact -> {
                                     // select as active
                                     loot.id = crate.id;
                                     //return Button.Result.refresh();
-                                    return Button.Result.open(new LMItemCrate(loot, lootSet).menu);
+                                    return EnumResult.OPEN(new LMItemCrate(loot, lootSet).menu);
                                 })
                         );
                     }

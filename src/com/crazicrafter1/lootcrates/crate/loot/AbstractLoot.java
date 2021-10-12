@@ -1,5 +1,6 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
+import com.crazicrafter1.gapi.AbstractMenu;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
@@ -14,7 +15,9 @@ import org.bukkit.inventory.ItemStack;
  */
 public abstract class AbstractLoot implements ConfigurationSerializable {
 
-    public AbstractLoot() {}
+    public AbstractLoot() {
+        //Main.get().info("AbstractLoot constructed: " + getClass().getSimpleName());
+    }
 
     public abstract ItemStack getIcon();
 
@@ -25,4 +28,5 @@ public abstract class AbstractLoot implements ConfigurationSerializable {
         return "icon: &7" + getIcon() + "\n";
     }
 
+    public abstract AbstractMenu.Builder getMenuBuilder();
 }

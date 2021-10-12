@@ -29,6 +29,16 @@ public class LootSet implements ConfigurationSerializable {
         return loot.get((int) (Math.random() * loot.size()));
     }
 
+    /**
+     * Add the specified loot, and return it
+     * @param abstractLoot loot
+     * @return the loot instance
+     */
+    public AbstractLoot addLoot(AbstractLoot abstractLoot) {
+        loot.add(abstractLoot);
+        return abstractLoot;
+    }
+
     @Override
     public Map<String, Object> serialize() {
         Map<String, Object> result = new LinkedHashMap<>();

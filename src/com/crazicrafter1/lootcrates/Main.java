@@ -11,8 +11,6 @@ import com.crazicrafter1.lootcrates.crate.loot.LootItem;
 import com.crazicrafter1.lootcrates.crate.loot.LootItemCrate;
 import com.crazicrafter1.lootcrates.crate.loot.LootItemQA;
 import com.crazicrafter1.lootcrates.listeners.*;
-import com.crazicrafter1.lootcrates.lootwrapper.LMItem;
-import com.crazicrafter1.lootcrates.lootwrapper.LMItemCrate;
 import com.crazicrafter1.lootcrates.tabs.TabCrates;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -58,18 +56,24 @@ public class Main extends JavaPlugin
         supportQualityArmory = Bukkit.getPluginManager().isPluginEnabled("QualityArmory");
 
         // register serializable objects
-        ConfigurationSerialization.registerClass(Data.class);
-        ConfigurationSerialization.registerClass(LootSet.class);
-        ConfigurationSerialization.registerClass(Crate.class);
+        ConfigurationSerialization.registerClass(Data.class, "Data");
+        ConfigurationSerialization.registerClass(LootSet.class, "LootSet");
+        ConfigurationSerialization.registerClass(Crate.class, "Crate");
 
         // api for easy
-        LootCratesAPI.registerLoot(LootItemCrate.class, LMItemCrate.class);
-        LootCratesAPI.registerLoot(LootItem.class, LMItem.class);
-        LootCratesAPI.registerLoot(LootItemQA.class/*, EditItemQAMenu.class*/);
+        LootCratesAPI.registerLoot(LootItemCrate.class, "LootItemCrate");
+        LootCratesAPI.registerLoot(LootItem.class, "LootItem");
+        if (supportQualityArmory)
+            LootCratesAPI.registerLoot(LootItemQA.class, "LootItemQA");
+
+        //org.bukkit.configuration.InvalidConfigurationException
 
         this.reloadConfig();
 
-        info("keyset: " + data.crates.keySet());
+        //debug("keyset: " + data.crates.keySet());
+        if (data == null) {
+
+        }
 
         new Updater(this, "PeriodicSeizures", "LootCrates", data.update);
 
@@ -118,7 +122,7 @@ public class Main extends JavaPlugin
     public void saveDefaultConfig(boolean replace) {
         // If replacing, then save
         // If back up failed, then save
-        if ((replace && backupConfig()) || !configFile.exists()) {
+        if ((replace && backupConfig(replace)) || !configFile.exists()) {
             info("Saving default config");
             this.saveResource("config.yml", true);
         }
@@ -128,7 +132,7 @@ public class Main extends JavaPlugin
     @Override
     public void reloadConfig() {
         if (crashNext-- == 0) {
-            crash();
+            //crash();
             return;
         }
         // Load file from jar if it doesn't exist
@@ -166,20 +170,19 @@ public class Main extends JavaPlugin
         }
     }
 
-    public boolean backupConfig() {
-        File backupFile = new File(Main.get().getDataFolder(),"backup/broken" + System.currentTimeMillis() + "_config.yml");
+    public boolean backupConfig(boolean isFailed) {
+
+        File backupFile = new File(Main.get().getDataFolder(),(isFailed ? "backup/broken_" : "backup/old_") + System.currentTimeMillis() + "_config.yml");
 
         // create the backup path
         //new File(Main.get().getDataFolder(),"backup/").mkdirs();
         try {
-            backupFile.getParentFile().mkdirs();
             // try to create the backup
-            if (configFile.exists()) {
+            if (backupFile.getParentFile().mkdirs() && configFile.exists()) {
                 info("Backing up config");
-                backupFile.createNewFile();
-
-                // copy the old to the new
-                Util.copy(new FileInputStream(configFile), new FileOutputStream(backupFile));
+                if (backupFile.createNewFile())
+                    // copy the old to the new
+                    Util.copy(new FileInputStream(configFile), new FileOutputStream(backupFile));
                 return true;
             }
         } catch (IOException e) {
@@ -191,7 +194,7 @@ public class Main extends JavaPlugin
     @Override
     public void saveConfig() {
         // if a backup was successfully made, then save
-        if (backupConfig()) {
+        if (backupConfig(false)) {
             this.getConfig().set("data", data);
 
             try {

@@ -48,7 +48,7 @@ public final class ActiveCrate {
 
     public ActiveCrate(Player p, Crate crate, int lockSlot) {
         this.player = p;
-        this.size = crate.size;
+        this.size = crate.columns * 9;
         this.picks = crate.picks;
         this.sound = crate.sound;
         this.lootChances = new LootSet[size];

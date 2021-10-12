@@ -20,8 +20,7 @@ public class ListenerOnPlayerInteract extends BaseListener {
         if (!p.hasPermission("lootcrates.open"))
             return;
 
-        if (!Main.get().openCrates.containsKey(p.getUniqueId()))
-        {
+        if (!Main.get().openCrates.containsKey(p.getUniqueId())) {
             plugin.debug("Passed unopened crate validation");
 
             Action a = e.getAction();
@@ -29,7 +28,7 @@ public class ListenerOnPlayerInteract extends BaseListener {
 
                 plugin.debug("Passed click validation");
 
-                ItemStack item = p.getInventory().getItemInMainHand();
+                ItemStack item = p.getInventory().getItemInHand(); //.getItemInMainHand();
 
                 Crate crate = LootCratesAPI.extractCrateFromItem(item);
                 if (crate != null) {

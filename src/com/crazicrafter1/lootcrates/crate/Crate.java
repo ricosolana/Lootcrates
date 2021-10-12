@@ -1,14 +1,12 @@
 package com.crazicrafter1.lootcrates.crate;
 
-import com.crazicrafter1.crutils.ReflectionUtil;
 import com.crazicrafter1.crutils.Util;
+import com.crazicrafter1.lootcrates.LootCratesAPI;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.*;
 
 public class Crate implements ConfigurationSerializable {
@@ -69,7 +67,7 @@ public class Crate implements ConfigurationSerializable {
     public String id;
     public ItemStack itemStack;
     public String title;
-    public int size;
+    public int columns;
     public int picks;
     public Sound sound;
     //public LinkedHashMap<String, Integer> lootByName;         // this will never be used beyond initialization
@@ -79,11 +77,11 @@ public class Crate implements ConfigurationSerializable {
     public HashMap<LootSet, Integer> lootByWeight;
     public int totalWeights;
 
-    public Crate(String id, ItemStack itemStack, String title, int size, int picks, Sound sound) {
+    public Crate(String id, ItemStack itemStack, String title, int columns, int picks, Sound sound) {
         this.id = id;
-        this.itemStack = Crate.makeCrate(itemStack, id);
+        this.itemStack = LootCratesAPI.makeCrate(itemStack, id);
         this.title = ChatColor.translateAlternateColorCodes('&', title);
-        this.size = size;
+        this.columns = columns;
         this.picks = picks;
         this.sound = sound;
     }
@@ -93,7 +91,7 @@ public class Crate implements ConfigurationSerializable {
         //itemStack = Crate.makeCrate((ItemStack) args.get("itemStack"), name);
         itemStack = (ItemStack) args.get("itemStack");
         title = ChatColor.translateAlternateColorCodes('&', (String) args.get("title"));
-        size = (int) args.get("size");
+        columns = (int) args.get("columns");
         picks = (int) args.get("picks");
         sound = Sound.valueOf((String) args.get("sound"));
         // go ahead and sort to make sure no weirdness occurs
@@ -126,49 +124,6 @@ public class Crate implements ConfigurationSerializable {
         return String.format("%d/%d", lootByWeight.get(lootGroup), totalWeights);
     }
 
-    public static ItemStack makeCrate(final ItemStack itemStack, final String crate) {
-
-        /*
-            Back when I used CraftBukkit to 'easily' get and set NBT data, the comments below are the code
-            that was used just for future reference
-         */
-
-        //net.minecraft.server.v1_14_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
-        Class<?> craftItemStackClass = ReflectionUtil.getCraftClass("inventory.CraftItemStack");
-
-        Method asNMSCopyMethod = ReflectionUtil.getMethod(craftItemStackClass, "asNMSCopy", ItemStack.class);
-        Object nmsStack = ReflectionUtil.invokeStaticMethod(asNMSCopyMethod, itemStack);
-
-
-
-        //NBTTagCompound nbt = nmsStack.getOrCreateTag();
-        Method getOrCreateTagMethod = ReflectionUtil.getMethod(nmsStack.getClass(), "getTag");
-        Object nbt = ReflectionUtil.invokeMethod(getOrCreateTagMethod, nmsStack);
-
-
-
-        if (nbt == null) {
-            Class nbtTagCompoundClass = ReflectionUtil.getNMClass("nbt.NBTTagCompound");
-            Constructor nbtTagCompoundConstructor = ReflectionUtil.getConstructor(nbtTagCompoundClass);
-            nbt = ReflectionUtil.invokeConstructor(nbtTagCompoundConstructor);
-        }
-
-        //nbt.setString("Crate", crate);
-        Method setStringMethod = ReflectionUtil.getMethod(nbt.getClass(), "setString", String.class, String.class);
-        ReflectionUtil.invokeMethod(setStringMethod, nbt, "Crate", crate);
-
-
-        //nmsStack.setTag(nbt);
-        Method setTagMethod = ReflectionUtil.getMethod(nmsStack.getClass(), "setTag", nbt.getClass());
-        ReflectionUtil.invokeMethod(setTagMethod, nmsStack, nbt);
-
-
-        //return CraftItemStack.asCraftMirror(nmsStack);
-        Method asCraftMirrorMethod = ReflectionUtil.getMethod(craftItemStackClass, "asCraftMirror", nmsStack.getClass());
-
-        return (ItemStack) ReflectionUtil.invokeStaticMethod(asCraftMirrorMethod, nmsStack);
-    }
-
     @Override
     public String toString() {
         return "itemStack: " + itemStack + "\n" +
@@ -186,7 +141,7 @@ public class Crate implements ConfigurationSerializable {
         //result.put("name", name);
         result.put("itemStack", itemStack);
         result.put("title", title);
-        result.put("size", size);
+        result.put("columns", columns);
         result.put("picks", picks);
         result.put("sound", sound.name());
         result.put("weights", lootBySum);

@@ -2,10 +2,12 @@ package com.crazicrafter1.lootcrates;
 
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootSet;
-import org.bukkit.*;
+import org.bukkit.FireworkEffect;
+import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.*;
 import java.util.*;
 
 public class Data implements ConfigurationSerializable {
@@ -21,8 +23,8 @@ public class Data implements ConfigurationSerializable {
         selectedItem = (ItemStack) args.get("selectedItem");
 
         // load in the same way, but need to pass name somehow
-        lootGroups = (LinkedHashMap<String, LootSet>) args.get("lootSets");
-        for (Map.Entry<String, LootSet> entry : lootGroups.entrySet()) {
+        lootSets = (LinkedHashMap<String, LootSet>) args.get("lootSets");
+        for (Map.Entry<String, LootSet> entry : lootSets.entrySet()) {
             entry.getValue().id = entry.getKey();
         }
 
@@ -32,7 +34,7 @@ public class Data implements ConfigurationSerializable {
             Crate crate = entry.getValue();
 
             crate.id = id;
-            crate.itemStack = Crate.makeCrate(crate.itemStack, id);
+            crate.itemStack = LootCratesAPI.makeCrate(crate.itemStack, id);
 
             // initialize weights
             crate.sumsToWeights();
@@ -42,25 +44,43 @@ public class Data implements ConfigurationSerializable {
 
         totalOpens = (int) args.getOrDefault("totalOpens", 0);
 
-        for (String str : (List<String>) args.getOrDefault("alertedPlayers", new ArrayList<>())) {
-            alertedPlayers.add(UUID.fromString(str));
-        }
+        try {
+            File file = new File(Main.get().getDataFolder(), "players.csv");
+
+            if (file.exists()) {
+                BufferedReader reader = new BufferedReader(new FileReader(file));
+
+                String line;
+                while ((line = reader.readLine()) != null && !line.isEmpty()) {
+                    alertedPlayers.add(UUID.fromString(line));
+                }
+                reader.close();
+            }
+        } catch (Exception e) {e.printStackTrace();}
+
+
+
+
+        //for (String str : (List<String>) args.getOrDefault("alertedPlayers", new ArrayList<>())) {
+        //    alertedPlayers.add(UUID.fromString(str));
+        //}
         //alertedPlayers = (HashSet<UUID>) args.getOrDefault("alertedPlayers", new HashSet<>());
     }
 
     /*
-     * Serializable stuff
+     * Defaults, under the assumption that config permanently fails
+     * Safe dev-like fallbacks
      */
-    public boolean debug;
-    public boolean update;
-    public int speed;
+    public boolean debug = true;
+    public boolean update = false;
+    public int speed = 4;
 
-    public ItemStack unSelectedItem;
-    public ItemStack selectedItem;
+    public ItemStack unSelectedItem = new ItemStack(Material.STONE);
+    public ItemStack selectedItem = new ItemStack(Material.NAME_TAG);
     public FireworkEffect fireworkEffect;
 
-    public HashMap<String, Crate> crates;
-    public HashMap<String, LootSet> lootGroups;
+    public HashMap<String, Crate> crates = new HashMap<>();
+    public HashMap<String, LootSet> lootSets = new HashMap<>();
 
     public int totalOpens;
 
@@ -77,8 +97,7 @@ public class Data implements ConfigurationSerializable {
         result.put("unSelectedItem", unSelectedItem);
         result.put("selectedItem", selectedItem);
 
-        result.put("lootSets", lootGroups);
-        Main.get().info(lootGroups.toString());
+        result.put("lootSets", lootSets);
 
         result.put("crates", crates);
 
@@ -86,11 +105,26 @@ public class Data implements ConfigurationSerializable {
 
         result.put("totalOpens", totalOpens);
 
-        List<String> uuids = new ArrayList<>();
-        for (UUID uuid : alertedPlayers) uuids.add(uuid.toString());
 
-        result.put("alertedPlayers", new ArrayList<>(uuids));
-        Main.get().debug(alertedPlayers.toString());
+        if (!alertedPlayers.isEmpty())
+            try {
+                File file = new File(Main.get().getDataFolder(), "players.csv");
+
+                BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+
+                for (UUID uuid : alertedPlayers) {
+                    writer.write(uuid.toString());
+                    writer.newLine();
+                }
+                writer.close();
+            } catch (Exception e) {e.printStackTrace();}
+
+
+
+
+        //List<String> uuids = new ArrayList<>();
+        //for (UUID uuid : alertedPlayers) uuids.add(uuid.toString());
+        //result.put("alertedPlayers", new ArrayList<>(uuids));
 
         return result;
     }

@@ -1,6 +1,5 @@
 package com.crazicrafter1.lootcrates.tabs;
 
-import com.crazicrafter1.lootcrates.Data;
 import com.crazicrafter1.lootcrates.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -20,7 +19,7 @@ public class TabCrates extends BaseTabCompleter {
         List<String> list = new ArrayList<>();
         if (args.length > 0) {
             if (args.length == 1) {
-                return getMatches(args[0], new String[] {"crate", "detect", "editor", "flair", "reload", "version"});
+                return getMatches(args[0], new String[] {"crate", "editor", "version"});
             }
             if (args[0].equals("crate")) {
                 if (args.length == 2) {

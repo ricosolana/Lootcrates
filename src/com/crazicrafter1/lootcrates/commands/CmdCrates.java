@@ -1,7 +1,5 @@
 package com.crazicrafter1.lootcrates.commands;
 
-import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.Data;
 import com.crazicrafter1.lootcrates.Editor;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
@@ -9,11 +7,9 @@ import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class CmdCrates extends CmdBase {
@@ -119,7 +115,7 @@ public class CmdCrates extends CmdBase {
                 return error(sender, "Can only be executed by a player");
             } case "version":
                 return feedback(sender, "LootCrates version: " + plugin.getDescription().getVersion());
-            case "flair": {
+            /*case "flair": {
                 if (!(sender instanceof Player p)) return error(sender, "Only a player can execute this argument");
 
                 Util.giveItemToPlayer(p, new ItemBuilder(Material.CHEST).
@@ -127,7 +123,7 @@ public class CmdCrates extends CmdBase {
                                 ChatColor.ITALIC + "&8in an awesome fashion"}).toItem());
 
                 return feedback(sender, "You received 1 signature crate");
-            } case "detect": {
+            }*//* case "detect": {
                 if (!(sender instanceof Player p))
                     return error(sender, "Only a player can execute this argument");
                 ItemStack itemStack = p.getInventory().getItemInMainHand();
@@ -140,29 +136,10 @@ public class CmdCrates extends CmdBase {
                     }
                 }
                 return error(sender, "Must hold an item to detect");
-            } default:
+            }*/
+            default:
                 return error(sender, "Invalid initial argument");
         }
-
-        /*
-        else if (args.length == 0){
-
-            if (!(sender instanceof Player)) return false;
-
-            Player p = (Player)sender;
-
-            ItemStack item = new ItemStack(Material.CHEST, 1);
-
-            ArrayList<String> lores = new ArrayList<>(Arrays.asList(ChatColor.ITALIC + "&8The way to reward players", ChatColor.ITALIC + "&8in an awesome fashion"));
-
-            Util.setName(item, "&c&lLootcrates");
-            Util.setLore(item, lores);
-
-            p.getInventory().addItem(item);
-
-            return feedback(sender, "You received 1 signature crate");
-        }
-        */
     }
 
 }

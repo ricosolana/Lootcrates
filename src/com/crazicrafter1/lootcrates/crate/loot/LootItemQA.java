@@ -1,8 +1,14 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
+import com.crazicrafter1.crutils.ItemBuilder;
+import com.crazicrafter1.gapi.AbstractMenu;
+import com.crazicrafter1.gapi.Button;
+import com.crazicrafter1.gapi.EnumResult;
+import com.crazicrafter1.gapi.ParallaxMenu;
 import me.zombie_striker.qg.api.QualityArmory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class LootItemQA extends AbstractLootItem {
@@ -12,7 +18,10 @@ public class LootItemQA extends AbstractLootItem {
     /**
      * Default ctor
      */
-    public LootItemQA() {}
+    public LootItemQA() {
+        // just the first loaded item
+        name = QualityArmory.getCustomItems().next().getName();
+    }
 
     public LootItemQA(Map<String, Object> args) {
         super(args);
@@ -44,5 +53,27 @@ public class LootItemQA extends AbstractLootItem {
         return super.serialize();
     }
 
+    @Override
+    public AbstractMenu.Builder getMenuBuilder() {
+        return new ParallaxMenu.PBuilder()
+                .title("LootItemQA")
+                .parentButton(4, 5)
+                .action(self -> {
+                    ArrayList<Button> result = new ArrayList<>();
 
+                    QualityArmory.getCustomItems().forEachRemaining(customBaseObject -> {
+                        result.add(new Button.Builder()
+                                .icon(() -> new ItemBuilder(customBaseObject.getItemData().getMat())
+                                        .name(customBaseObject.getName()).lore(customBaseObject.getCustomLore()).toItem())
+                                .lmb(interact -> {
+                                    // change
+                                    name = customBaseObject.getName();
+                                    return EnumResult.BACK;
+                                }).get()
+                        );
+                    });
+
+                    return result;
+                });
+    }
 }

@@ -70,10 +70,7 @@ public class Main extends JavaPlugin
 
         this.reloadConfig();
 
-        //debug("keyset: " + data.crates.keySet());
-        if (data == null) {
 
-        }
 
         new Updater(this, "PeriodicSeizures", "LootCrates", data.update);
 
@@ -133,8 +130,12 @@ public class Main extends JavaPlugin
     public void reloadConfig() {
         if (crashNext-- == 0) {
             //crash();
+            DefaultPopulator.populate();
             return;
         }
+
+
+
         // Load file from jar if it doesn't exist
         saveDefaultConfig(false);
 
@@ -178,11 +179,13 @@ public class Main extends JavaPlugin
         //new File(Main.get().getDataFolder(),"backup/").mkdirs();
         try {
             // try to create the backup
-            if (backupFile.getParentFile().mkdirs() && configFile.exists()) {
+            backupFile.getParentFile().mkdirs();
+
+            if (configFile.exists()) {
                 info("Backing up config");
-                if (backupFile.createNewFile())
+                backupFile.createNewFile();
                     // copy the old to the new
-                    Util.copy(new FileInputStream(configFile), new FileOutputStream(backupFile));
+                Util.copy(new FileInputStream(configFile), new FileOutputStream(backupFile));
                 return true;
             }
         } catch (IOException e) {
@@ -195,10 +198,12 @@ public class Main extends JavaPlugin
     public void saveConfig() {
         // if a backup was successfully made, then save
         if (backupConfig(false)) {
-            this.getConfig().set("data", data);
+            info("Saving config...");
+            //this.config = new YamlConfiguration();
+            config.set("data", data);
 
             try {
-                this.getConfig().save(configFile);
+                config.save(configFile);
             } catch (Exception e) {
                 error("Failed to save config");
                 debug(e);

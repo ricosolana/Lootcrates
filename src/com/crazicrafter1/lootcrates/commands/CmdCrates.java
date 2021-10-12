@@ -1,9 +1,6 @@
 package com.crazicrafter1.lootcrates.commands;
 
-import com.crazicrafter1.lootcrates.Data;
-import com.crazicrafter1.lootcrates.Editor;
-import com.crazicrafter1.lootcrates.LootCratesAPI;
-import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -28,6 +25,11 @@ public class CmdCrates extends CmdBase {
             return error(sender, "Input some arguments");
 
         switch (args[0].toLowerCase()) {
+            case "populate": {
+                DefaultPopulator.populate();
+
+                return feedback(sender, "Populating config with dummies");
+            }
             case "crate": {
                 if (args.length < 3) return error(sender, "Input more arguments");
 
@@ -57,8 +59,9 @@ public class CmdCrates extends CmdBase {
                 // save config somehow
                 return feedback(sender, "Config was reloaded.");
             }*/ case "editor": {
-                if (sender instanceof Player p) {
+                if (sender instanceof Player) {
                     // title, subtitle, fadein, stay, fadeout
+                    Player p = (Player) sender;
                     if (!data.alertedPlayers.contains(p.getUniqueId())) {
 
                         p.sendTitle(ChatColor.RED + "Warning",

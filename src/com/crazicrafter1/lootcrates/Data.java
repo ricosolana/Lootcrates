@@ -3,7 +3,6 @@ package com.crazicrafter1.lootcrates;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootSet;
 import org.bukkit.FireworkEffect;
-import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 
@@ -12,7 +11,7 @@ import java.util.*;
 
 public class Data implements ConfigurationSerializable {
 
-    //public Data() {}
+    public Data() {}
 
     public Data(Map<String, Object> args) {
         debug = (boolean) args.getOrDefault("debug", false);
@@ -71,16 +70,16 @@ public class Data implements ConfigurationSerializable {
      * Defaults, under the assumption that config permanently fails
      * Safe dev-like fallbacks
      */
-    public boolean debug = true;
-    public boolean update = false;
-    public int speed = 4;
+    public boolean debug;
+    public boolean update;
+    public int speed;
 
-    public ItemStack unSelectedItem = new ItemStack(Material.STONE);
-    public ItemStack selectedItem = new ItemStack(Material.NAME_TAG);
+    public ItemStack unSelectedItem;
+    public ItemStack selectedItem;
     public FireworkEffect fireworkEffect;
 
-    public HashMap<String, Crate> crates = new HashMap<>();
-    public HashMap<String, LootSet> lootSets = new HashMap<>();
+    public HashMap<String, Crate> crates;
+    public HashMap<String, LootSet> lootSets;
 
     public int totalOpens;
 

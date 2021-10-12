@@ -209,9 +209,9 @@ public final class ActiveCrate {
             // If crate GUI clicked on
             if (e.getClickedInventory() == inventory) {
                 switch (state) {
-                    case SELECTING -> selectSlot(slot);
-                    case REVEALING -> {}
-                    case REVEALED -> {
+                    case SELECTING: selectSlot(slot); break;
+                    case REVEALING: break;
+                    case REVEALED: {
                         // If slot is selected
                         QSlot qSlot = slots.get(slot);
                         if (qSlot == null
@@ -232,6 +232,7 @@ public final class ActiveCrate {
                             e.setCancelled(false);
 
                         slots.remove(slot);
+                        break;
                     }
                 }
             } else if (e.getClickedInventory() == e.getWhoClicked().getInventory()) {

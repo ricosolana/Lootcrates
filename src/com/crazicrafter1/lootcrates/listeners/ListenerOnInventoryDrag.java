@@ -15,10 +15,26 @@ public class ListenerOnInventoryDrag extends BaseListener {
             e.setCancelled(true);
         } else {
             if (LootCratesAPI.extractCrateFromItem(e.getCursor()) != null)
+                // Java 16+
+                //switch (e.getInventory().getType()) {
+                //    case ANVIL, SMOKER, BREWING, FURNACE, CRAFTING, MERCHANT, WORKBENCH, ENCHANTING, GRINDSTONE, STONECUTTER, BLAST_FURNACE -> {
+                //        e.setCancelled(true);
+                //    }
+                //}
                 switch (e.getInventory().getType()) {
-                    case ANVIL, SMOKER, BREWING, FURNACE, CRAFTING, MERCHANT, WORKBENCH, ENCHANTING, GRINDSTONE, STONECUTTER, BLAST_FURNACE -> {
+                    case ANVIL:
+                    case SMOKER:
+                    case BREWING:
+                    case FURNACE:
+                    case CRAFTING:
+                    case MERCHANT:
+                    case WORKBENCH:
+                    case ENCHANTING:
+                    case GRINDSTONE:
+                    case STONECUTTER:
+                    case BLAST_FURNACE:
                         e.setCancelled(true);
-                    }
+                        break;
                 }
         }
     }

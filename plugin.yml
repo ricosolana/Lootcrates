@@ -19,7 +19,7 @@ permissions:
     description: Allows access to /crates command
     default: op
 
-# 3.2.0 (10/12/2021)
+# 3.2.0 (10/14/2021)
 # 1.14.4 | 1.16.5 | 1.17.1 confirmed to work
 # in game editor
 # no touch config

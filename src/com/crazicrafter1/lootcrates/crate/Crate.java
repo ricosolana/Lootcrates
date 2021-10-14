@@ -84,6 +84,7 @@ public class Crate implements ConfigurationSerializable {
         this.columns = columns;
         this.picks = picks;
         this.sound = sound;
+        //lootBySum = Stream.of(new Object[][] {{Main}}).collect(Collectors.toMap(data -> data[0], data -> data[1]));
     }
 
     public Crate(Map<String, Object> args) {

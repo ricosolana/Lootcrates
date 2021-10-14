@@ -3,10 +3,12 @@ package com.crazicrafter1.lootcrates.crate.loot;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.gapi.*;
+import com.crazicrafter1.lootcrates.Editor;
 import com.crazicrafter1.lootcrates.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Map;
 
@@ -66,11 +68,10 @@ public final class LootItem extends AbstractLootItem {
                             return EnumResult.GRAB_ITEM;
                         }))
                 // Edit Name
-                .childButton(6, 1, () -> new ItemBuilder(Material.NAME_TAG).name("&eName").lore("&8LMB: &aEdit").toItem(), new TextMenu.TBuilder()
+                .childButton(6, 1, () -> new ItemBuilder(Material.NAME_TAG).name("&eName").lore(Editor.LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
                         .title("&8Edit name")
-                        //.text(Util.toAlternateColorCodes('&', lootItem.itemStack.getItemMeta().getDisplayName()))
-                        .leftInput(new Button.Builder().icon(() -> new ItemBuilder(Material.IRON_SWORD).mergeLexicals(itemStack).toItem()))
-                        .rightInput(new Button.Builder().icon(() -> new ItemBuilder(Material.IRON_SWORD).name("&8Use '&' for colors").toItem()))
+                        .text(Util.flattenedName(itemStack))
+                        .rightInput(Editor.SAMPLE_RIGHT)
                         .onClose(player -> EnumResult.BACK)
                         .onComplete((player, s) -> {
                             if (s.isEmpty())
@@ -90,7 +91,7 @@ public final class LootItem extends AbstractLootItem {
                             min = Util.clamp(min + change, 1, max);
                             return EnumResult.REFRESH;
                         })
-                        .icon(() -> new ItemBuilder(Material.MEDIUM_AMETHYST_BUD).name("&8&nMin").lore("&7LMB: &c-\n&7RMB: &a+\n&fShift: &6x5").count(min).toItem()))
+                        .icon(() -> new ItemBuilder(Material.MEDIUM_AMETHYST_BUD).name("&8&nMin").lore(Editor.LORE_LMB_NUM + "\n" + Editor.LORE_RMB_NUM + "\n" + Editor.LORE_SHIFT_NUM).count(min).toItem()))
                 // Max
                 .button(7, 2, new Button.Builder()
                         .lmb(interact -> {
@@ -103,12 +104,12 @@ public final class LootItem extends AbstractLootItem {
                             max = Util.clamp(max + change, min, itemStack.getMaxStackSize());
                             return EnumResult.REFRESH;
                         })
-                        .icon(() -> new ItemBuilder(Material.AMETHYST_CLUSTER).name("&8&nMax").lore("&7LMB: &c-\n&7RMB: &a+\n&fShift: &6x5").count(max).toItem()))
+                        .icon(() -> new ItemBuilder(Material.AMETHYST_CLUSTER).name("&8&nMax").lore(Editor.LORE_LMB_NUM + "\n" + Editor.LORE_RMB_NUM + "\n" + Editor.LORE_SHIFT_NUM).count(max).toItem()))
                 // Edit Lore
-                .childButton(6, 3, () -> new ItemBuilder(Material.MAP).name("&7Lore").lore("&8LMB: &aEdit").toItem(), new TextMenu.TBuilder()
+                .childButton(6, 3, () -> new ItemBuilder(Material.MAP).name("&7Lore").lore(Editor.LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
                         .title("&8Item lore")
-                        .leftInput(new Button.Builder().icon(() -> new ItemBuilder(Material.IRON_SWORD).mergeLexicals(itemStack).toItem()))
-                        .rightInput(new Button.Builder().icon(() -> new ItemBuilder(Material.IRON_SWORD).name("&8Use '&7&&8' for colors").lore("&8Use '&7\\n&8' for multiline").toItem()))
+                        .text(Util.flattenedLore(itemStack, "my custom lore"))
+                        .rightInput(Editor.SAMPLE_RIGHT)
                         //.leftInput(new Button.Builder().icon(() -> itemStack))
                         //.rightInput(new Button.Builder().icon(() -> new ItemBuilder(itemStack.getType()).name("&8Use '&' for colors").lore("&7Ignore the &cX &7>").toItem()))
                         .onClose(player -> EnumResult.BACK)
@@ -117,7 +118,37 @@ public final class LootItem extends AbstractLootItem {
                                 return EnumResult.OK;
                             itemStack = new ItemBuilder(itemStack).lore(s.replace("\\n", "\n")).toItem();
                             return EnumResult.BACK;
+                        })
+                )
+                // Edit CustomModelData
+                .childButton(6, 2, () -> new ItemBuilder(Material.PLAYER_HEAD).skull(Editor.BASE64_CUSTOM_MODEL_DATA).name("&8CustomModelData").lore(Editor.LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
+                        .title("&8CustomModelData")
+                        .leftInput(new Button.Builder().icon(() -> {
+                            ItemMeta meta = itemStack.getItemMeta();
+                            ItemBuilder builder = new ItemBuilder(Material.IRON_SWORD);
+                            if (meta != null && meta.hasCustomModelData())
+                                builder.lore("&8CustomModelData: &7" + meta.getCustomModelData());
+                            else builder.lore("&8CustomModelData: &7none");
+                            return builder.toItem();
                         }))
-                .validate();
+                        .rightInput(new Button.Builder().icon(() -> new ItemBuilder(Material.IRON_SWORD).name("&8Input an integer").toItem()))
+                        //.leftInput(new Button.Builder().icon(() -> itemStack))
+                        //.rightInput(new Button.Builder().icon(() -> new ItemBuilder(itemStack.getType()).name("&8Use '&' for colors").lore("&7Ignore the &cX &7>").toItem()))
+                        .onClose(player -> EnumResult.BACK)
+                        .onComplete((player, s) -> {
+                            if (s.isEmpty())
+                                return EnumResult.OK;
+
+                            int i;
+                            try {
+                                i = Integer.parseInt(s);
+                            } catch (Exception e00) {
+                                player.sendMessage("&cInput an integer");
+                                return EnumResult.OK;
+                            }
+
+                            this.itemStack = new ItemBuilder(this.itemStack).customModelData(i).toItem();
+                            return EnumResult.BACK;
+                        }));
     }
 }

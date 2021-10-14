@@ -1,12 +1,12 @@
 package com.crazicrafter1.lootcrates;
 
 import com.crazicrafter1.crutils.Metrics;
-import com.crazicrafter1.crutils.Updater;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.commands.CmdCrates;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootSet;
+import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
 import com.crazicrafter1.lootcrates.crate.loot.LootItemCrate;
 import com.crazicrafter1.lootcrates.crate.loot.LootItemQA;
@@ -14,16 +14,13 @@ import com.crazicrafter1.lootcrates.listeners.*;
 import com.crazicrafter1.lootcrates.tabs.TabCrates;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
@@ -49,6 +46,13 @@ public class Main extends JavaPlugin
         return instance;
     }
 
+    private final static int CFG_WAIT = -1;
+    private final static int CFG_CURR = 0;
+    private final static int CFG_DEF = 1;
+    private final static int CFG_POP = 2;
+    private final static int CFG_ERR = 3;
+    private int configAttempt;
+
     @Override
     public void onEnable() {
         Main.instance = this;
@@ -66,13 +70,20 @@ public class Main extends JavaPlugin
         if (supportQualityArmory)
             LootCratesAPI.registerLoot(LootItemQA.class, "LootItemQA");
 
-        //org.bukkit.configuration.InvalidConfigurationException
+        loadExternalLoots();
 
-        this.reloadConfig();
+        reloadConfig();
 
+        //new Updater(this, "PeriodicSeizures", "LootCrates", data.update);
 
-
-        new Updater(this, "PeriodicSeizures", "LootCrates", data.update);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (data.update)
+                    if (GithubUpdater.autoUpdate(instance, "PeriodicSeizures", "LootCrates", "LootCrates.jar"))
+                        cancel();
+            }
+        }.runTaskTimer(this, 1, 20 * 60 * 60 * 24);
 
         /*
          * bStats metrics init
@@ -86,9 +97,11 @@ public class Main extends JavaPlugin
             metrics.addCustomChart(new Metrics.SimplePie("crates", // what to record
                     () -> "" + data.crates.size()));
 
+            metrics.addCustomChart(new Metrics.SimplePie("abstractloots",
+                    () -> "" + LootCratesAPI.lootClasses.size()));
+
             metrics.addCustomChart(new Metrics.SingleLineChart("opened", // what to record
                     () -> data.totalOpens));
-
         } catch (Exception e) {
             error("An error occurred while enabling metrics");
             debug(e);
@@ -111,6 +124,28 @@ public class Main extends JavaPlugin
         new ListenerOnPlayerQuit();
     }
 
+    private void loadExternalLoots() {
+        try {
+            File file = new File(getDataFolder(), "loots.csv");
+
+            if (file.exists()) {
+                BufferedReader reader = new BufferedReader(new FileReader(file));
+
+                String line;
+                while ((line = reader.readLine()) != null && !line.isEmpty()) {
+                    String[] split = line.split(",");
+
+                    Class<? extends ILoot> clazz = (Class<? extends ILoot>) Class.forName(split[0]);
+                    String alias = split[1];
+
+                    LootCratesAPI.registerLoot(clazz, alias);
+                    info("Loaded external loot: " + clazz.getName() + " as " + alias);
+                }
+                reader.close();
+            }
+        } catch (Exception e) {e.printStackTrace();}
+    }
+
     @Override
     public void onDisable() {
         this.saveConfig();
@@ -125,66 +160,72 @@ public class Main extends JavaPlugin
         }
     }
 
-    int crashNext = 2;
+    //int crashNext = 2;
+
     @Override
     public void reloadConfig() {
-        if (crashNext-- == 0) {
-            //crash();
-            DefaultPopulator.populate();
-            return;
-        }
-
-
-
-        // Load file from jar if it doesn't exist
-        saveDefaultConfig(false);
-
         this.config = new YamlConfiguration();
 
-        // Parse
-        try {
-            config.load(configFile);
-            data = (Data) config.get("data");
+        configAttempt = CFG_WAIT;
+        while (++configAttempt != CFG_ERR) {
+            switch (configAttempt) {
+                case CFG_CURR:
+                    info("Attempt 1: Loading current or default config");
+                    try {
+                        saveDefaultConfig(false);
+                        config.load(configFile);
+                        data = (Data) config.get("data");
+                        configAttempt = CFG_WAIT;
+                        return;
+                    } catch (Exception e) {
+                        error(e.getMessage());
+                    }
+                    break;
+                case CFG_DEF:
+                    info("Attempt 2: Force loading default config");
+                    try {
+                        saveDefaultConfig(true);
+                        config.load(configFile);
+                        data = (Data) config.get("data");
+                        configAttempt = CFG_WAIT;
+                        return;
+                    } catch (Exception e) {
+                        error(e.getMessage());
+                    }
+                    break;
+                case CFG_POP:
+                    info("Attempt 3: Populating config with minimal built-ins");
 
-            if (data == null) {
-                throw new NullDataException();
+                    try {
+                        data = new Data();
+                        data.populate();
+                        configAttempt = CFG_WAIT;
+                        return;
+                    } catch (Exception e) {
+                        error(e.getMessage());
+                        break;
+                    }
             }
-            crashNext = 2;
-        } catch (IOException | StackOverflowError e) {
-            e.printStackTrace();
-            crash();
-        } catch (InvalidConfigurationException e) {
-            error("Malformed config.yml (saving default config...)");
-            e.printStackTrace();
-
-            // then try loading again
-            saveDefaultConfig(true);
-            this.reloadConfig();
-        } catch (NullDataException e) {
-            error("Failed to serialize Main.get().data (saving default config...)");
-
-            e.printStackTrace();
-
-            // then try loading again
-            saveDefaultConfig(true);
-            this.reloadConfig();
         }
+
+        error("Failed all contingency attempts, plugin will now disable...");
+        Bukkit.getPluginManager().disablePlugin(this);
     }
 
-    public boolean backupConfig(boolean isFailed) {
+    public boolean backupConfig(boolean isBroken) {
+        File backupFile = new File(Main.get().getDataFolder(),(isBroken ? "backup/broken_" : "backup/old_") + System.currentTimeMillis() + "_config.yml");
 
-        File backupFile = new File(Main.get().getDataFolder(),(isFailed ? "backup/broken_" : "backup/old_") + System.currentTimeMillis() + "_config.yml");
-
-        // create the backup path
-        //new File(Main.get().getDataFolder(),"backup/").mkdirs();
         try {
-            // try to create the backup
+            // Create path
             backupFile.getParentFile().mkdirs();
 
             if (configFile.exists()) {
                 info("Backing up config");
+
+                // Create backup
                 backupFile.createNewFile();
-                    // copy the old to the new
+
+                // Copy files
                 Util.copy(new FileInputStream(configFile), new FileOutputStream(backupFile));
                 return true;
             }
@@ -215,12 +256,9 @@ public class Main extends JavaPlugin
     public FileConfiguration getConfig() {
         if (this.config == null) {
             this.reloadConfig();
+            //this.config = new YamlConfiguration();
         }
         return this.config;
-    }
-
-    public void crash() {
-        Bukkit.getPluginManager().disablePlugin(this);
     }
 
     public void info(String s) {

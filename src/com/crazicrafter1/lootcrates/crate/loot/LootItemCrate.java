@@ -40,7 +40,7 @@ public class LootItemCrate extends AbstractLootItem {
 
     @Override
     public String toString() {
-        return "crate: &7" + id + "\n" +
+        return "&7crate: &f" + id + "\n" +
                 super.toString();
     }
 
@@ -57,6 +57,7 @@ public class LootItemCrate extends AbstractLootItem {
     public AbstractMenu.Builder getMenuBuilder() {
         return new ParallaxMenu.PBuilder()
                 .title("LootItemCrate")
+                .parentButton(4, 5)
                 .action(self -> {
                     ArrayList<Button> result = new ArrayList<>();
                     for (Map.Entry<String, Crate> entry : Main.get().data.crates.entrySet()) {
@@ -79,8 +80,6 @@ public class LootItemCrate extends AbstractLootItem {
                         );
                     }
                     return result;
-                })
-                .parentButton(4, 5)
-                .validate();
+                });
     }
 }

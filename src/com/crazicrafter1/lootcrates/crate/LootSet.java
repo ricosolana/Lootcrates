@@ -1,6 +1,6 @@
 package com.crazicrafter1.lootcrates.crate;
 
-import com.crazicrafter1.lootcrates.crate.loot.AbstractLoot;
+import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 
@@ -12,9 +12,9 @@ public class LootSet implements ConfigurationSerializable {
 
     public String id;
     public ItemStack itemStack;
-    public ArrayList<AbstractLoot> loot;
+    public ArrayList<ILoot> loot;
 
-    public LootSet(String id, ItemStack itemStack, ArrayList<AbstractLoot> loot) {
+    public LootSet(String id, ItemStack itemStack, ArrayList<ILoot> loot) {
         this.id = id;
         this.itemStack = itemStack;
         this.loot = loot;
@@ -22,21 +22,21 @@ public class LootSet implements ConfigurationSerializable {
 
     public LootSet(Map<String, Object> args) {
         itemStack = (ItemStack) args.get("itemStack");
-        loot = (ArrayList<AbstractLoot>) args.get("loot");
+        loot = (ArrayList<ILoot>) args.get("loot");
     }
 
-    public AbstractLoot getRandomLoot() {
+    public ILoot getRandomLoot() {
         return loot.get((int) (Math.random() * loot.size()));
     }
 
     /**
      * Add the specified loot, and return it
-     * @param abstractLoot loot
+     * @param iLoot loot
      * @return the loot instance
      */
-    public AbstractLoot addLoot(AbstractLoot abstractLoot) {
-        loot.add(abstractLoot);
-        return abstractLoot;
+    public ILoot addLoot(ILoot iLoot) {
+        loot.add(iLoot);
+        return iLoot;
     }
 
     @Override

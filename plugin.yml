@@ -8,7 +8,7 @@ softdepend: [QualityArmory]
 commands:
   lootcrates:
     description: Access the features of the loot crates plugin.
-    usage: /lootcrates [crate | detect | editor | flair | reload | version] <id> <player/*> [amount]
+    usage: /lootcrates [crate | editor | version] <cratename> <player/*>
     permission: lootcrates.admin
     aliases: [crates, lc]
 permissions:
@@ -19,11 +19,10 @@ permissions:
     description: Allows access to /crates command
     default: op
 
-# 3.2.0 (10/3/2021)
-# 1.17 only
+# 3.2.0 (10/12/2021)
+# 1.14.4 | 1.16.5 | 1.17.1 confirmed to work
 # in game editor
-# config is completely serialized with bukkit, so stay away!
-# no more glitches when placing item from guis into inventory
+# no touch config
 
 
 # 3.1.4 (4/26/2021)

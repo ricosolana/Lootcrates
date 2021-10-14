@@ -4,7 +4,7 @@ import com.crazicrafter1.crutils.refl.ItemStackMirror;
 import com.crazicrafter1.crutils.refl.NBTTagCompoundMirror;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import com.crazicrafter1.lootcrates.crate.Crate;
-import com.crazicrafter1.lootcrates.crate.loot.AbstractLoot;
+import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
@@ -15,9 +15,9 @@ import java.util.Set;
 
 public class LootCratesAPI {
 
-    static Set<Class<? extends AbstractLoot>> lootClasses = new HashSet<>();
+    static Set<Class<? extends ILoot>> lootClasses = new HashSet<>();
 
-    public static void registerLoot(Class<? extends AbstractLoot> lootClass, String alias) {
+    static void registerLoot(Class<? extends ILoot> lootClass, String alias) {
         lootClasses.add(lootClass);
         ConfigurationSerialization.registerClass(lootClass, alias);
     }

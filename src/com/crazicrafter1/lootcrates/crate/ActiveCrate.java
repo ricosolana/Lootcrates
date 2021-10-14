@@ -2,7 +2,7 @@ package com.crazicrafter1.lootcrates.crate;
 
 import com.crazicrafter1.lootcrates.Data;
 import com.crazicrafter1.lootcrates.Main;
-import com.crazicrafter1.lootcrates.crate.loot.AbstractLoot;
+import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,9 +22,9 @@ public final class ActiveCrate {
 
     private static final class QSlot {
         boolean isSelected;
-        AbstractLoot randomLoot;
+        ILoot randomLoot;
 
-        QSlot(boolean isSelected, AbstractLoot randomLoot) {
+        QSlot(boolean isSelected, ILoot randomLoot) {
             this.isSelected = isSelected;
             this.randomLoot = randomLoot;
         }
@@ -44,7 +44,7 @@ public final class ActiveCrate {
     private int taskID = -1;
     private int lockSlot;
 
-    private static Data data = Main.get().data;
+    private static final Data data = Main.get().data;
 
     public ActiveCrate(Player p, Crate crate, int lockSlot) {
         this.player = p;
@@ -76,7 +76,7 @@ public final class ActiveCrate {
 
         inventory.setItem(slot, data.selectedItem);
 
-        AbstractLoot randomLoot = lootChances[slot].getRandomLoot();
+        ILoot randomLoot = lootChances[slot].getRandomLoot();
         slots.put(slot, new QSlot(true, randomLoot));
 
 

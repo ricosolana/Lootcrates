@@ -1,6 +1,9 @@
 package com.crazicrafter1.lootcrates.commands;
 
-import com.crazicrafter1.lootcrates.*;
+import com.crazicrafter1.lootcrates.Data;
+import com.crazicrafter1.lootcrates.Editor;
+import com.crazicrafter1.lootcrates.LootCratesAPI;
+import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -25,11 +28,12 @@ public class CmdCrates extends CmdBase {
             return error(sender, "Input some arguments");
 
         switch (args[0].toLowerCase()) {
-            case "populate": {
+            /*case "populate": {
                 DefaultPopulator.populate();
 
                 return feedback(sender, "Populating config with dummies");
             }
+             */
             case "crate": {
                 if (args.length < 3) return error(sender, "Input more arguments");
 
@@ -65,16 +69,16 @@ public class CmdCrates extends CmdBase {
                     if (!data.alertedPlayers.contains(p.getUniqueId())) {
 
                         p.sendTitle(ChatColor.RED + "Warning",
-                                ChatColor.YELLOW + "Editor might have issues, be wary.",
-                                10, 20 * 3, 10);
+                                ChatColor.YELLOW + "Editor might be buggy",
+                                5, 20 * 2, 5);
 
                         new BukkitRunnable() {
                             @Override
                             public void run() {
                                 p.resetTitle();
                                 p.sendTitle(" ",
-                                        ChatColor.YELLOW + "Please submit bugs and requests to my Github",
-                                        10, 20 * 3, 10);
+                                        ChatColor.YELLOW + "Submit bugs/requests to my Github",
+                                        5, 20 * 2, 5);
 
                                 p.sendMessage("" + ChatColor.DARK_GRAY + ChatColor.UNDERLINE + "https://github.com/PeriodicSeizures/LootCrates");
 
@@ -86,8 +90,8 @@ public class CmdCrates extends CmdBase {
 
                                         p.resetTitle();
                                         p.sendTitle(" ",
-                                                ChatColor.GOLD + "Constructive feedback is also appreciated!",
-                                                10, 20 * 3, 10);
+                                                ChatColor.GOLD + "Constructive feedback is appreciated!",
+                                                5, 20 * 2, 5);
 
                                         new BukkitRunnable() {
                                             @Override
@@ -95,16 +99,16 @@ public class CmdCrates extends CmdBase {
                                                 //new MainMenu().show(p);
                                                 Editor.open(p);
                                             }
-                                        }.runTaskLater(plugin, 3 * 20 + 20 + 1);
+                                        }.runTaskLater(plugin, 20 * 2 + 10);
 
 
 
                                     }
-                                }.runTaskLater(plugin, 3 * 20 + 20 + 1);
+                                }.runTaskLater(plugin, 20 * 2 + 10);
 
 
                             }
-                        }.runTaskLater(plugin, 20 * 3 + 20 + 1);
+                        }.runTaskLater(plugin, 20 * 2 + 10);
 
                     } else {
                         Editor.open(p);

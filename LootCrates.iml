@@ -13,5 +13,6 @@
     <orderEntry type="library" name="spigot-api-1.17.1-R0.1-SNAPSHOT-shaded" level="project" />
     <orderEntry type="library" name="Gapi" level="project" />
     <orderEntry type="library" name="CRUtils" level="project" />
+    <orderEntry type="library" name="Vault" level="project" />
   </component>
 </module>

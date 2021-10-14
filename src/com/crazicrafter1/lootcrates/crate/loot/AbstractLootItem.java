@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public abstract class AbstractLootItem extends AbstractLoot {
+public abstract class AbstractLootItem implements ILoot {
 
     public int min;
     public int max;
@@ -47,8 +47,8 @@ public abstract class AbstractLootItem extends AbstractLoot {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         if (min == max)
-            sb.append("&8count: &7").append(min);
-        else sb.append("&8range: &7[").append(min).append(", ").append(max).append("]");
+            sb.append("&7count: &f").append(min);
+        else sb.append("&7range: &f[").append(min).append(", ").append(max).append("]");
 
         return sb.toString();
     }

@@ -8,13 +8,13 @@ import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootSet;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
+import com.crazicrafter1.lootcrates.temp_ignore.ItemMutateMenuBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,16 +23,12 @@ import java.util.Map;
 
 public class Editor {
 
-    public static final Button.Builder inOutline = new Button.Builder().icon(() -> new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name("&7Set to").toItem());
+    //public static final Button.Builder inOutline = new Button.Builder().icon(() -> new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name("&7Set to").toItem());
 
-    public static final Button.Builder SAMPLE_LEFT = new Button.Builder().icon(() ->
-            new ItemBuilder(Material.IRON_SWORD).name("Lorem Ipsum").toItem());
-    public static final Button.Builder SAMPLE_RIGHT = new Button.Builder().icon(() ->
-            new ItemBuilder(Material.IRON_SWORD).name("&8'&': colors").lore("&8'\\n': newline").toItem());
+    public static final Button.Builder IN_OUTLINE = new Button.Builder().icon(() -> new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name("&7Set to").toItem());
 
     public static final String LORE_LMB_EDIT = "&7LMB: &aEdit";
     public static final String LORE_RMB_DEL = "&7RMB: &cDelete";
-
     public static final String LORE_LMB_NUM = "&7LMB&r&7: &c-";
     public static final String LORE_RMB_NUM = "&7RMB&r&7: &a+";
     public static final String LORE_SHIFT_NUM = "&7SHIFT&r&7: x5";
@@ -43,6 +39,9 @@ public class Editor {
     @SuppressWarnings("SpellCheckingInspection")
     public static final String BASE64_CUSTOM_MODEL_DATA = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzQ2NDg3NGRmNDUyYzFkNzE3ZWRkZDBmYjNiODQ4MjAyYWQxNTU3MTI0NWFmNmZhZGUyZWNmNTE0ZjNjODBiYiJ9fX0=";
 
+    public static String COLOR_PREFIX = ReflectionUtil.isAtLeastVersion("1_16") ?
+            "&7'&': &#2367fbc&#3f83fbo&#5a9ffcl&#76bbfco&#91d7fcr&#acf2fds" : "&7'&': &fcolors";
+    private static final String LOREM_IPSUM = "Lorem ipsum";
 
     @SuppressWarnings("DanglingJavadoc")
     public static void open(Player p) {
@@ -63,22 +62,21 @@ public class Editor {
                         // *       *      *
                         .childButton(5, 5, () -> ITEM_NEW, new TextMenu.TBuilder()
                                 .title("Create a new crate")
-                                .leftInput(SAMPLE_LEFT)
+                                .left(() -> LOREM_IPSUM)
                                 .onClose((player) -> EnumResult.BACK)
                                 .onComplete((player, s) -> {
-                                    if (!s.isEmpty() && !Main.get().data.crates.containsKey(s)) {
-                                        Crate crate = new Crate(s, new ItemBuilder(Material.ENDER_CHEST).name("my new crate").toItem(), "select loot", 3, 4, Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
-
-                                        crate.lootBySum = new LinkedHashMap<>();
-                                        crate.lootBySum.put(Main.get().data.lootSets.values().iterator().next(), 1);
-                                        crate.sumsToWeights();
-
-                                        Main.get().data.crates.put(s, crate);
-
-                                        return EnumResult.BACK;
+                                    if (s.isEmpty() || Main.get().data.crates.containsKey(s)) {
+                                        return EnumResult.TEXT("Input a unique key");
                                     }
-                                    p.sendMessage("Must input a unique key");
-                                    return EnumResult.OK;
+                                    Crate crate = new Crate(s, new ItemBuilder(Material.ENDER_CHEST).name("my new crate").toItem(), "select loot", 3, 4, Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
+
+                                    crate.lootBySum = new LinkedHashMap<>();
+                                    crate.lootBySum.put(Main.get().data.lootSets.values().iterator().next(), 1);
+                                    crate.sumsToWeights();
+
+                                    Main.get().data.crates.put(s, crate);
+
+                                    return EnumResult.BACK;
                                 })
                         )
                         .action(self -> {
@@ -94,66 +92,26 @@ public class Editor {
                                                 // *   *   *
                                                 // Edit Crate ItemStack
                                                 // *   *   *
-                                                .childButton(1, 1, () -> new ItemBuilder(crate.itemStack.getType()).name("&8&nItemStack").lore(LORE_LMB_EDIT).toItem(), new SimpleMenu.SBuilder(5)
-                                                        .title("&8editor\\crates\\" + crate.id + "\\item")
-                                                        .background()
-                                                        .parentButton(4, 4)
-                                                        .button(2, 1, inOutline)
-                                                        .button(3, 2, inOutline)
-                                                        .button(2, 3, inOutline)
-                                                        .button(1, 2, inOutline)
-                                                        // Edit ItemStack
-                                                        .button(2, 2, new Button.Builder()
-                                                                .icon(() -> crate.itemStack)
-                                                                .lmb(interact -> {
-                                                                    if (interact.heldItem != null)
-                                                                        crate.itemStack = LootCratesAPI.makeCrate(new ItemBuilder(interact.heldItem).toItem(), crate.id);
-                                                                    return EnumResult.GRAB_ITEM;
-                                                                }))
-                                                        // Edit Name
-                                                        .childButton(6, 1, () -> new ItemBuilder(Material.NAME_TAG).name("&eName").lore(LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
-                                                                .title("&8editor\\crates\\" + crate.id + "\\item\\name")
-                                                                //.leftInput(new Button.Builder().icon(() -> left))
-                                                                .text(Util.flattenedName(crate.itemStack))
-                                                                .rightInput(SAMPLE_RIGHT)
-                                                                .onClose(player -> EnumResult.BACK)
-                                                                .onComplete((player, s) -> {
-                                                                    if (s.isEmpty())
-                                                                        return EnumResult.OK;
-                                                                    crate.itemStack = new ItemBuilder(crate.itemStack).name(s).toItem();
-                                                                    return EnumResult.BACK;
-                                                                }))
-                                                        // Edit Lore
-                                                        .childButton(6, 3, () -> new ItemBuilder(Material.MAP).name("&7Lore").lore(LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
-                                                                .title("&8editor\\crates\\" + crate.id + "\\item\\lore")
-                                                                .text(Util.flattenedLore(crate.itemStack, "my custom lore"))
-                                                                //.text(Util.toAlternateColorCodes('&', crate.itemStack.getItemMeta().getLore()))
-                                                                .rightInput(SAMPLE_RIGHT)
-                                                                .onClose(player -> EnumResult.BACK)
-                                                                .onComplete((player, s) -> {
-                                                                    if (s.isEmpty())
-                                                                        return EnumResult.OK;
-                                                                    crate.itemStack = new ItemBuilder(crate.itemStack).lore(s.replace("\\n", "\n")).toItem();
-                                                                    return EnumResult.BACK;
-                                                                }))
+                                                .childButton(1, 1, () -> new ItemBuilder(crate.itemStack.getType()).name("&8&nItemStack").lore(LORE_LMB_EDIT).toItem(), new ItemMutateMenuBuilder()
+                                                        .build(crate.itemStack, (itemStack -> crate.itemStack = itemStack))
                                                 )
                                                 // *   *   *
                                                 // Edit Inventory Title
                                                 // *   *   *
                                                 .childButton(3, 1, () -> new ItemBuilder(Material.PAPER).name("&e&nTitle&r&e: " + crate.title).lore(LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
                                                         .title("&8editor\\crates\\" + crate.id + "\\title")
-                                                        .text(Util.toAlternateColorCodes('&', crate.title))
+                                                        .left(() -> Util.toAlternateColorCodes('&', crate.title))
                                                         .onClose(player -> EnumResult.BACK)
                                                         //.leftInput(SAMPLE_LEFT)
-                                                        .rightInput(SAMPLE_RIGHT)
+                                                        .right(() -> COLOR_PREFIX)
                                                         .onComplete((player, s) -> {
                                                             // set name if it is not empty
                                                             if (!s.isEmpty()) {
-                                                                crate.title = ChatColor.translateAlternateColorCodes('&', "&7" + s);
+                                                                crate.title = Util.format("" + s);
                                                                 return EnumResult.BACK;
                                                             }
 
-                                                            return EnumResult.OK;
+                                                            return EnumResult.TEXT("Invalid");
                                                         })
                                                         .onClose(player -> EnumResult.BACK)
                                                 )
@@ -249,8 +207,8 @@ public class Editor {
                                                 .childButton(6, 3, () -> new ItemBuilder(Material.JUKEBOX).name("&a&nSound&r&a: &r&7" + crate.sound).lore(LORE_LMB_EDIT).toItem(),
                                                         new TextMenu.TBuilder()
                                                                 .title("&8editor\\crates\\" + crate.id + "\\sound")
-                                                                .leftInput(SAMPLE_LEFT)
-                                                                .rightInput(SAMPLE_RIGHT)
+                                                                .left(() -> LOREM_IPSUM)
+                                                                .right(() -> "Input a sound")
                                                                 .onClose(player -> EnumResult.BACK)
                                                                 .onComplete((player, s) -> {
                                                                     try {
@@ -259,9 +217,8 @@ public class Editor {
                                                                         p.playSound(p.getLocation(), sound, 1, 1);
                                                                         return EnumResult.BACK;
                                                                     } catch (Exception e) {
-                                                                        p.sendMessage("That sound does not exist");
+                                                                        return EnumResult.TEXT("Invalid sound");
                                                                     }
-                                                                    return EnumResult.OK;
                                                                 })
                                                 )
                                         ).get()
@@ -304,82 +261,8 @@ public class Editor {
                                                     }
                                                     return result1;
                                                 })
-                                                .childButton(3, 5, () -> new ItemBuilder(lootSet.itemStack.getType()).name(NAME_EDIT).toItem(), new SimpleMenu.SBuilder(5)
-                                                        .title("&8editor\\lootSets\\" + lootSet.id + "\\item")
-                                                        .background()
-                                                        .parentButton(4, 4)
-                                                        .button(2, 1, inOutline)
-                                                        .button(3, 2, inOutline)
-                                                        .button(2, 3, inOutline)
-                                                        .button(1, 2, inOutline)
-                                                        // Edit ItemStack
-                                                        .button(2, 2, new Button.Builder()
-                                                                .icon(() -> lootSet.itemStack)
-                                                                .lmb(interact -> {
-                                                                    if (interact.heldItem != null)
-                                                                        lootSet.itemStack = interact.heldItem;
-                                                                    return EnumResult.GRAB_ITEM;
-                                                                }))
-                                                        // Edit Name
-                                                        .childButton(6, 1, () -> new ItemBuilder(Material.NAME_TAG).name("&eName").lore(LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
-                                                                .title("&8editor\\lootSets\\" + lootSet.id + "\\item\\name")
-                                                                .text(Util.flattenedName(lootSet.itemStack))
-                                                                //.text(Util.toAlternateColorCodes('&', lootItem.itemStack.getItemMeta().getDisplayName()))
-                                                                .leftInput(SAMPLE_LEFT)
-                                                                .rightInput(SAMPLE_RIGHT)
-                                                                .onClose(player -> EnumResult.BACK)
-                                                                .onComplete((player, s) -> {
-                                                                    if (s.isEmpty())
-                                                                        return EnumResult.OK;
-                                                                    lootSet.itemStack = new ItemBuilder(lootSet.itemStack).name(s).toItem();
-                                                                    return EnumResult.BACK;
-                                                                }))
-                                                        // Edit Lore
-                                                        .childButton(6, 3, () -> new ItemBuilder(Material.MAP).name("&7Lore").lore(LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
-                                                                .title("&8editor\\lootSets\\" + lootSet.id + "\\item\\lore")
-                                                                .text(Util.flattenedLore(lootSet.itemStack, "my custom lore"))
-                                                                .rightInput(SAMPLE_RIGHT)
-                                                                .onClose(player -> EnumResult.BACK)
-                                                                .onComplete((player, s) -> {
-                                                                    if (s.isEmpty())
-                                                                        return EnumResult.OK;
-                                                                    lootSet.itemStack = new ItemBuilder(lootSet.itemStack).lore(s.replace("\\n", "\n")).toItem();
-                                                                    return EnumResult.BACK;
-                                                                }))
-                                                        // Edit CustomModelData
-                                                        .childButton(6, 2, () -> new ItemBuilder(Material.PLAYER_HEAD).skull(BASE64_CUSTOM_MODEL_DATA).name("&8CustomModelData").lore(LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
-                                                                .title("&8editor\\lootSets\\" + lootSet.id + "\\item\\model")
-                                                                .leftInput(new Button.Builder().icon(() -> {
-                                                                    ItemMeta meta = lootSet.itemStack.getItemMeta();
-                                                                    ItemBuilder builder = new ItemBuilder(Material.IRON_SWORD);
-                                                                    if (meta != null && meta.hasCustomModelData())
-                                                                        builder.lore("&8CustomModelData: &7" + meta.getCustomModelData());
-                                                                    else builder.lore("&8CustomModelData: &7none");
-                                                                    return builder.toItem();
-                                                                }))
-                                                                .rightInput(new Button.Builder().icon(() -> new ItemBuilder(Material.IRON_SWORD).name("&8Input an integer").toItem()))
-                                                                //.leftInput(new Button.Builder().icon(() -> itemStack))
-                                                                //.rightInput(new Button.Builder().icon(() -> new ItemBuilder(itemStack.getType()).name("&8Use '&' for colors").lore("&7Ignore the &cX &7>").toItem()))
-                                                                .onClose(player -> EnumResult.BACK)
-                                                                .onComplete((player, s) -> {
-                                                                    if (s.isEmpty())
-                                                                        return EnumResult.OK;
-
-                                                                    int i;
-                                                                    try {
-                                                                        i = Integer.parseInt(s);
-                                                                    } catch (Exception e00) {
-                                                                        player.sendMessage("&cInput an integer");
-                                                                        return EnumResult.OK;
-                                                                    }
-
-                                                                    lootSet.itemStack = new ItemBuilder(lootSet.itemStack).customModelData(i).toItem();
-                                                                    return EnumResult.BACK;
-                                                                }))
-                                                )
-
-
-
+                                                .childButton(3, 5, () -> new ItemBuilder(lootSet.itemStack.getType()).name(NAME_EDIT).toItem(), new ItemMutateMenuBuilder()
+                                                        .build(lootSet.itemStack, itemStack -> lootSet.itemStack = itemStack))
                                                 .childButton(5, 5, () -> ITEM_NEW, new ParallaxMenu.PBuilder()
                                                         .title("&8editor\\lootSets\\" + lootSet.id + "\\new")
                                                         //.onClose(player -> EnumResult.BACK)
@@ -421,7 +304,7 @@ public class Editor {
                         })
                         .childButton(5, 5, () -> ITEM_NEW, new TextMenu.TBuilder()
                                 .title("&8editor\\lootSets\\new")
-                                .leftInput(SAMPLE_LEFT)
+                                .left(() -> LOREM_IPSUM)
                                 .onClose(player -> EnumResult.BACK)
                                 .onComplete((player, text) -> {
                                     if (!text.isEmpty() && !Main.get().data.lootSets.containsKey(text)) {
@@ -444,10 +327,10 @@ public class Editor {
                 .childButton(5, 1, () -> new ItemBuilder(Material.FIREWORK_ROCKET).name("&e&lFireworks").toItem(), new SimpleMenu.SBuilder(5)
                         .title("&8Firework")
                         .background()
-                        .button(4, 0, inOutline)
-                        .button(3, 1, inOutline)
-                        .button(5, 1, inOutline)
-                        .button(4, 2, inOutline)
+                        .button(4, 0, IN_OUTLINE)
+                        .button(3, 1, IN_OUTLINE)
+                        .button(5, 1, IN_OUTLINE)
+                        .button(4, 2, IN_OUTLINE)
                         .button(1, 1, new Button.Builder()
                                 .icon(() -> new ItemBuilder(Material.FIREWORK_STAR).fireworkEffect(Main.get().data.fireworkEffect).toItem()))
                         .button(4, 1, new Button.Builder()

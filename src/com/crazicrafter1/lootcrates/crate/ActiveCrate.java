@@ -1,5 +1,6 @@
 package com.crazicrafter1.lootcrates.crate;
 
+import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.Data;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
@@ -17,6 +18,7 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public final class ActiveCrate {
 
@@ -175,10 +177,12 @@ public final class ActiveCrate {
     public void close() {
         // Give items if still making selecting
         if (state != State.SELECTING) {
-            for (int slot : slots.keySet()) {
-                slots.get(slot).randomLoot.execute(this,
-                        true, null);
+            for (Map.Entry<Integer, QSlot> entry : slots.entrySet()) {
+                if (entry.getValue().randomLoot.execute(this)) {
+                    Util.giveItemToPlayer(player, inventory.getItem(entry.getKey()));
+                }
             }
+
             data.totalOpens++;
         }
 
@@ -220,16 +224,11 @@ public final class ActiveCrate {
                             return;
                         }
 
-                        // Execute the loot action
-                        // tacky
-                        //Bool giveItem = new Bool(true); // Encapsulated boolean (bool ptr)
-                        boolean[] giveItem = new boolean[] {true};
-                        qSlot.randomLoot.execute(this, false, giveItem);
-
-                        if (!giveItem[0]) {
-                            inventory.setItem(slot, null);
-                        } else
+                        // Give item
+                        if (qSlot.randomLoot.execute(this))
                             e.setCancelled(false);
+                        else // Remove item
+                            inventory.setItem(slot, null);
 
                         slots.remove(slot);
                         break;

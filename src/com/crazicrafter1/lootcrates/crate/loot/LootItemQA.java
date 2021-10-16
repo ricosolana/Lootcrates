@@ -4,7 +4,6 @@ import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.gapi.*;
 import me.zombie_striker.customitemmanager.CustomBaseObject;
 import me.zombie_striker.qg.api.QualityArmory;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -62,8 +61,8 @@ public class LootItemQA extends AbstractLootItem {
                 .button(3, 5, new Button.Builder().icon(this::getIcon))
                 .childButton(5, 5, () -> new ItemBuilder(Material.COMPASS).name("&eBy name...").toItem(), new TextMenu.TBuilder()
                         .title("&8Assign by name")
-                        .text(this.name)
-                        .rightInput(new Button.Builder().icon(() -> new ItemBuilder(Material.IRON_SWORD).name("&eSet item by name").toItem()))
+                        .left(() -> name)
+                        .right(() -> "&eSet item by name")
                         .onClose(player -> EnumResult.BACK)
                         .onComplete((player, s) -> {
                             CustomBaseObject customBaseObject = QualityArmory.getCustomItemByName(s);
@@ -71,8 +70,7 @@ public class LootItemQA extends AbstractLootItem {
                                 this.name = s;
                                 return EnumResult.BACK;
                             }
-                            player.sendMessage(ChatColor.RED + "Must be an existing Quality Armory item");
-                            return EnumResult.OK;
+                            return EnumResult.TEXT("Invalid");
                         })
                 )
                 .action(self -> {

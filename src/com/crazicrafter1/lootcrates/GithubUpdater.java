@@ -12,9 +12,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 
-public class GithubUpdater {
+class GithubUpdater {
 
-    static boolean autoUpdate(final Plugin main, String author, String githubProject, String jarname) {
+    public static boolean autoUpdate(final Plugin main, String author, String githubProject, String jarname) {
         try {
             String version = main.getDescription().getVersion();
             String parseVersion = version.replace(".", "");
@@ -25,7 +25,7 @@ public class GithubUpdater {
             con.setConnectTimeout(15000);
             con.setReadTimeout(15000);
 
-            JsonObject json = null;
+            JsonObject json;
             try {
                 json = new JsonParser().parse(new InputStreamReader(con.getInputStream())).getAsJsonObject();
             } catch (Error | Exception e45) {
@@ -35,8 +35,8 @@ public class GithubUpdater {
 
             String parsedTagName = tagname.replace(".", "");
 
-            int latestVersion = Integer.valueOf(parsedTagName.substring(1, parsedTagName.length()).replaceAll("[^\\d.]", ""));
-            int parsedVersion = Integer.parseInt(parseVersion.replaceAll("[^\\d.]", ""));
+            int latestVersion = Integer.parseInt(parsedTagName.substring(1).replace(".", ""));
+            int parsedVersion = Integer.parseInt(parseVersion.replace(".", ""));
 
             final URL download = new URL("https://github.com/" + author + "/" + githubProject + "/releases/download/"
                     + tagname + "/" + jarname);

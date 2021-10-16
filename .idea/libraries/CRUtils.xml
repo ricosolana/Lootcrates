@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="CRUtils">
     <CLASSES>
-      <root url="jar://$USER_HOME$/Documents/MinecraftDev/servers/1.17/plugins/CRUtils.jar!/" />
+      <root url="jar://$USER_HOME$/Documents/MinecraftDev/api/CRUtils.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

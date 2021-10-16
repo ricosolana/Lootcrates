@@ -1,15 +1,13 @@
 package com.crazicrafter1.lootcrates;
 
-import com.crazicrafter1.crutils.Metrics;
+import ch.njol.skript.Skript;
+import ch.njol.skript.SkriptAddon;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.commands.CmdCrates;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootSet;
-import com.crazicrafter1.lootcrates.crate.loot.ILoot;
-import com.crazicrafter1.lootcrates.crate.loot.LootItem;
-import com.crazicrafter1.lootcrates.crate.loot.LootItemCrate;
-import com.crazicrafter1.lootcrates.crate.loot.LootItemQA;
+import com.crazicrafter1.lootcrates.crate.loot.*;
 import com.crazicrafter1.lootcrates.listeners.*;
 import com.crazicrafter1.lootcrates.tabs.TabCrates;
 import org.bukkit.Bukkit;
@@ -18,7 +16,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.*;
 import java.util.HashMap;
@@ -27,8 +24,7 @@ import java.util.UUID;
 
 public class Main extends JavaPlugin
 {
-    public final String prefix = ChatColor.translateAlternateColorCodes('&',
-            "&f[&b&lLootCrates&r&f] ");
+    public final String prefix = ChatColor.translateAlternateColorCodes('&', "&f[&b&lLootCrates&r&f] ");
 
     /*
      * Runtime modifiable stuff
@@ -36,6 +32,9 @@ public class Main extends JavaPlugin
     public HashMap<UUID, ActiveCrate> openCrates = new HashMap<>();
     public HashSet<UUID> crateFireworks = new HashSet<>();
     public boolean supportQualityArmory = false;
+    public boolean supportSkript = false;
+
+    public SkriptAddon addon;
 
     public Data data;
     private FileConfiguration config = null;
@@ -55,9 +54,41 @@ public class Main extends JavaPlugin
 
     @Override
     public void onEnable() {
+
+        GithubUpdater.autoUpdate(this, "PeriodicSeizures", "LootCrates", "LootCrates.jar");
+
+        boolean installedDepends = false;
+
+        if (Bukkit.getPluginManager().getPlugin("CRUtils") == null) {
+            GithubInstaller.installDepend(this,
+                    "PeriodicSeizures",
+                    "CRUtils",
+                    "CRUtils.jar",
+                    "CRUtils");
+            installedDepends = true;
+        }
+
+        if (Bukkit.getPluginManager().getPlugin("Gapi") == null) {
+            GithubInstaller.installDepend(this,
+                    "PeriodicSeizures",
+                    "Gapi",
+                    "Gapi.jar",
+                    "Gapi");
+            installedDepends = true;
+        }
+
+        if (installedDepends) {
+            error(ChatColor.RED + "Please restart server to use plugin");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
+
+
         Main.instance = this;
 
         supportQualityArmory = Bukkit.getPluginManager().isPluginEnabled("QualityArmory");
+        supportSkript = Bukkit.getPluginManager().isPluginEnabled("Skript");
 
         // register serializable objects
         ConfigurationSerialization.registerClass(Data.class, "Data");
@@ -70,20 +101,21 @@ public class Main extends JavaPlugin
         if (supportQualityArmory)
             LootCratesAPI.registerLoot(LootItemQA.class, "LootItemQA");
 
+        if (supportSkript) {
+            addon = Skript.registerAddon(this);
+            try {
+                addon.loadClasses("com.crazicrafter1.lootcrates", "sk");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            LootCratesAPI.registerLoot(LootSkriptEvent.class, "LootSkriptEvent");
+        }
+
         loadExternalLoots();
 
         reloadConfig();
 
         //new Updater(this, "PeriodicSeizures", "LootCrates", data.update);
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (data.update)
-                    if (GithubUpdater.autoUpdate(instance, "PeriodicSeizures", "LootCrates", "LootCrates.jar"))
-                        cancel();
-            }
-        }.runTaskTimer(this, 1, 20 * 60 * 60 * 24);
 
         /*
          * bStats metrics init
@@ -124,6 +156,11 @@ public class Main extends JavaPlugin
         new ListenerOnPlayerQuit();
     }
 
+    /**
+     * Use Skript now,
+     * making a plugin for 1 simple event is kinda extensive...
+     */
+    @Deprecated
     private void loadExternalLoots() {
         try {
             File file = new File(getDataFolder(), "loots.csv");
@@ -148,7 +185,8 @@ public class Main extends JavaPlugin
 
     @Override
     public void onDisable() {
-        this.saveConfig();
+        if (instance != null)
+            this.saveConfig();
     }
 
     public void saveDefaultConfig(boolean replace) {

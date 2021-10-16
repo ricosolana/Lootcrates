@@ -2,29 +2,36 @@
 <project version="4">
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
-      <artifact name="LootCrates" />
+      <artifact name="LootCratesAPI" />
+      <artifact name="LootCratesServer" />
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
     <list default="true" id="134da130-6214-4649-b404-39079de75eca" name="Changes" comment="editor backup">
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Vault.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/GithubUpdater.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/artifacts/LootCratesAPI.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Skript.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/GithubInstaller.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Metrics.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/SkriptLootEvent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootSkriptEvent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/sk/EvtLoot.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/temp_ignore/ItemMutateMenuBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/LootCrates.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/LootCratesServer.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/CRUtils.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/CRUtils.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gapi.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Gapi.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Vault.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LootCrates.iml" beforeDir="false" afterPath="$PROJECT_DIR$/LootCrates.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/plugin.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Data.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Data.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/DefaultPopulator.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Editor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Editor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/LootCratesAPI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/LootCratesAPI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/GithubUpdater.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/GithubUpdater.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/commands/CmdCrates.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/commands/CmdCrates.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/NullDataException.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/ActiveCrate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/ActiveCrate.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/Crate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/Crate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/LootSet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/LootSet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/AbstractLoot.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/ILoot.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/AbstractLootItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/AbstractLootItem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/ILoot.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/ILoot.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItem.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItemCrate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItemCrate.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItemQA.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItemQA.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -63,7 +70,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$/Downloads/Vault.jar" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Documents/MinecraftDev/api/Gapi.jar" />
     <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.29393467" />
@@ -121,13 +128,8 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItem.java</url>
-          <line>110</line>
+          <line>82</line>
           <option name="timeStamp" value="2" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Editor.java</url>
-          <line>135</line>
-          <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -2,7 +2,6 @@ package com.crazicrafter1.lootcrates.crate;
 
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
@@ -80,7 +79,7 @@ public class Crate implements ConfigurationSerializable {
     public Crate(String id, ItemStack itemStack, String title, int columns, int picks, Sound sound) {
         this.id = id;
         this.itemStack = LootCratesAPI.makeCrate(itemStack, id);
-        this.title = ChatColor.translateAlternateColorCodes('&', title);
+        this.title = Util.format(title);
         this.columns = columns;
         this.picks = picks;
         this.sound = sound;
@@ -91,7 +90,7 @@ public class Crate implements ConfigurationSerializable {
         //name = (String) args.get("name");
         //itemStack = Crate.makeCrate((ItemStack) args.get("itemStack"), name);
         itemStack = (ItemStack) args.get("itemStack");
-        title = ChatColor.translateAlternateColorCodes('&', (String) args.get("title"));
+        title = Util.format((String) args.get("title"));
         columns = (int) args.get("columns");
         picks = (int) args.get("picks");
         sound = Sound.valueOf((String) args.get("sound"));

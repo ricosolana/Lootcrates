@@ -35,12 +35,11 @@ public abstract class AbstractLootItem implements ILoot {
     }
 
     @Override
-    public final void execute(ActiveCrate activeCrate, boolean closed, boolean[] giveItem) {
-        // if inventory was closed, items must be automatically given
-        if (closed) {
-            Util.giveItemToPlayer(activeCrate.getPlayer(), getIcon());
-        } else
-            giveItem[0] = true;
+    public final boolean execute(ActiveCrate activeCrate) {
+        // Closed shouldn't matter
+        // Should execute the same no matter what
+        //Util.giveItemToPlayer(activeCrate.getPlayer(), getIcon());
+        return true;
     }
 
     @Override

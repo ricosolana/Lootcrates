@@ -2,9 +2,8 @@ name: LootCrates
 main: com.crazicrafter1.lootcrates.Main
 version: 3.2.0 # 3.1.4 was previous
 api-version: 1.13
-depend: [Gapi, CRUtils]
 author: crazicrafter1
-softdepend: [QualityArmory]
+softdepend: [CRUtils, Gapi, QualityArmory, Skript]
 commands:
   lootcrates:
     description: Access the features of the loot crates plugin.

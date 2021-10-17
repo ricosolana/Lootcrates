@@ -4,6 +4,8 @@ import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.gapi.AbstractMenu;
 import com.crazicrafter1.gapi.EnumResult;
 import com.crazicrafter1.gapi.TextMenu;
+import com.crazicrafter1.lootcrates.Editor;
+import com.crazicrafter1.lootcrates.ItemMutateMenuBuilder;
 import com.crazicrafter1.lootcrates.SkriptLootEvent;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import org.bukkit.Bukkit;
@@ -47,17 +49,21 @@ public class LootSkriptEvent implements ILoot {
 
     @Override
     public AbstractMenu.Builder getMenuBuilder() {
-        return new TextMenu.TBuilder()
-                .title("LootSkriptEvent tag edit")
-                .left(() -> tag)
-                .right(() -> "Input a tag")
-                .onComplete((player, s) -> {
-                    if (!s.isEmpty()) {
-                        this.tag = s;
-                        return EnumResult.BACK;
-                    }
-                    return EnumResult.TEXT("Invalid");
-                });
+        return new ItemMutateMenuBuilder()
+                .build(itemStack, input -> this.itemStack = input)
+                .title("LootSkriptEvent")
+                .childButton(5, 2, () -> new ItemBuilder(Material.PAPER).name("&6Event tag").lore(Editor.LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
+                        .title("edit tag", true)
+                        .onClose(player -> EnumResult.BACK)
+                        .left(() -> tag)
+                        .right(() -> "Input a tag")
+                        .onComplete((player, s) -> {
+                            if (!s.isEmpty()) {
+                                this.tag = s;
+                                return EnumResult.BACK;
+                            }
+                            return EnumResult.TEXT("Invalid");
+                        }));
     }
 
     @Override

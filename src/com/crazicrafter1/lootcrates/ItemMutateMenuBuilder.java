@@ -1,13 +1,11 @@
-package com.crazicrafter1.lootcrates.temp_ignore;
+package com.crazicrafter1.lootcrates;
 
 import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.crutils.Main;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.gapi.Button;
 import com.crazicrafter1.gapi.EnumResult;
 import com.crazicrafter1.gapi.SimpleMenu;
 import com.crazicrafter1.gapi.TextMenu;
-import com.crazicrafter1.lootcrates.Editor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -28,7 +26,7 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
 
     public ItemMutateMenuBuilder build(ItemStack it, Consumer<ItemStack> itemStackConsumer) {
         builder = new ItemBuilder(it);
-        return (ItemMutateMenuBuilder) title("item edit")
+        return (ItemMutateMenuBuilder) title("item edit", true)
                 .background()
                 .parentButton(4, 4)
                 .button(2, 1, Editor.IN_OUTLINE)
@@ -47,17 +45,8 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
                         }))
                 // Edit Name
                 .childButton(6, 1, () -> new ItemBuilder(Material.NAME_TAG).name("&eName").lore(LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
-                        .title("name")
-                        .left(() -> {
-                            Main.getInstance().info("Original: " + builder.toItem().getItemMeta().getDisplayName());
-
-                            String flat = Util.flattenedName(builder.toItem());
-                            Main.getInstance().info("Flattened: " + flat);
-
-                            String rev = Util.toAlternateColorCodes('&', builder.toItem().getItemMeta().getDisplayName());
-                            Main.getInstance().info("Reverted: " + rev);
-                            return flat;
-                        })
+                        .title("name", true)
+                        .left(() -> Util.flattenedName(builder.toItem()))
                         //.text(Util.toAlternateColorCodes('&', lootItem.itemStack.getItemMeta().getDisplayName()))
                         //.leftInput(SAMPLE_LEFT)
                         .rightF(() -> "&8Input the name of the item", () -> Editor.COLOR_PREFIX)
@@ -72,7 +61,7 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
                         }))
                 // Edit Lore
                 .childButton(6, 3, () -> new ItemBuilder(Material.MAP).name("&7Lore").lore(LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
-                        .title("lore")
+                        .title("lore", true)
                         .left(() -> Util.flattenedLore(builder.toItem(), "my custom lore"))
                         .rightF(() -> "&8Input the lore of the item", () -> Editor.COLOR_PREFIX + "&7\n'\\n': &fnewline")
                         .onClose(player -> EnumResult.BACK)
@@ -85,7 +74,7 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
                         }))
                 // Edit CustomModelData
                 .childButton(6, 2, () -> new ItemBuilder(Material.PLAYER_HEAD).skull(BASE64_CUSTOM_MODEL_DATA).name("&8CustomModelData").lore(LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
-                        .title("model")
+                        .title("model", true)
                         .left(() -> {
                             ItemMeta meta = builder.toItem().getItemMeta();
                             if (meta != null && meta.hasCustomModelData())

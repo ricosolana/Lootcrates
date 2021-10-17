@@ -55,7 +55,7 @@ public class LootItemQA extends AbstractLootItem {
     @Override
     public AbstractMenu.Builder getMenuBuilder() {
         return new ParallaxMenu.PBuilder()
-                .title("LootItemQA")
+                .title("LootItemQA", true)
                 .parentButton(4, 5)
                 //.childButton(2, 5, () -> new ItemBuilder(Material.COMPASS).name("&eSearch..."), new )
                 .button(3, 5, new Button.Builder().icon(this::getIcon))

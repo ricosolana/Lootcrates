@@ -22,7 +22,9 @@ public class LootItemCrate extends AbstractLootItem {
     /**
      * Default ctor
      */
-    public LootItemCrate() {}
+    public LootItemCrate() {
+        id = Main.get().data.crates.keySet().iterator().next();
+    }
 
     public LootItemCrate(Map<String, Object> args) {
         super(args);
@@ -56,14 +58,12 @@ public class LootItemCrate extends AbstractLootItem {
     @Override
     public AbstractMenu.Builder getMenuBuilder() {
         return new ParallaxMenu.PBuilder()
-                .title("LootItemCrate")
+                .title("LootItemCrate", true)
                 .parentButton(4, 5)
                 .action(self -> {
                     ArrayList<Button> result = new ArrayList<>();
                     for (Map.Entry<String, Crate> entry : Main.get().data.crates.entrySet()) {
                         Crate crate = entry.getValue();
-
-                        Main.get().debug("lootitemcrate: " + id + ", iterate: " + crate.id);
 
                         ItemStack icon = new ItemBuilder(Material.LOOM).mergeLexicals(crate.itemStack).glow(crate.id.equals(id)).toItem();
 

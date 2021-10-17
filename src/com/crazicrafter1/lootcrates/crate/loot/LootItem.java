@@ -7,7 +7,7 @@ import com.crazicrafter1.gapi.Button;
 import com.crazicrafter1.gapi.EnumResult;
 import com.crazicrafter1.lootcrates.Editor;
 import com.crazicrafter1.lootcrates.Main;
-import com.crazicrafter1.lootcrates.temp_ignore.ItemMutateMenuBuilder;
+import com.crazicrafter1.lootcrates.ItemMutateMenuBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -54,6 +54,7 @@ public final class LootItem extends AbstractLootItem {
         //Button.Builder inOutline = new Button.Builder().icon(() -> new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name("&7Set to").toItem());
         return new ItemMutateMenuBuilder()
                 .build(itemStack, input -> this.itemStack = input)
+                .title("LootItem")
                 // Min
                 .button(5, 2, new Button.Builder()
                         .lmb(interact -> {

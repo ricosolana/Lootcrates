@@ -8,7 +8,6 @@ import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootSet;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
-import com.crazicrafter1.lootcrates.temp_ignore.ItemMutateMenuBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -47,7 +46,7 @@ public class Editor {
     public static void open(Player p) {
 
         new SimpleMenu.SBuilder(3)
-                .title("&8editor")
+                .title("editor", true)
                 .background()
                 /*********************\
                  *                   *
@@ -55,13 +54,13 @@ public class Editor {
                  *                   *
                  \*******************/
                 .childButton(1, 1, () -> new ItemBuilder(Material.CHEST).name("&3&lCrates").toItem(), new ParallaxMenu.PBuilder()
-                        .title("&8editor\\crates")
+                        .title("crates", true)
                         .parentButton(4, 5)
                         // *       *      *
                         // Add Crate button
                         // *       *      *
                         .childButton(5, 5, () -> ITEM_NEW, new TextMenu.TBuilder()
-                                .title("Create a new crate")
+                                .title("new crate", true)
                                 .left(() -> LOREM_IPSUM)
                                 .onClose((player) -> EnumResult.BACK)
                                 .onComplete((player, s) -> {
@@ -86,7 +85,7 @@ public class Editor {
                                 result.add(new Button.Builder()
                                         .icon(() -> new ItemBuilder(crate.itemStack).lore("&8id: " + crate.id).toItem())
                                         .child(self, new SimpleMenu.SBuilder(5)
-                                                .title("&8editor\\crates\\" + crate.id)
+                                                .title(crate.id, true)
                                                 .background()
                                                 .parentButton(4, 4)
                                                 // *   *   *
@@ -99,7 +98,7 @@ public class Editor {
                                                 // Edit Inventory Title
                                                 // *   *   *
                                                 .childButton(3, 1, () -> new ItemBuilder(Material.PAPER).name("&e&nTitle&r&e: " + crate.title).lore(LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
-                                                        .title("&8editor\\crates\\" + crate.id + "\\title")
+                                                        .title("title", true)
                                                         .left(() -> Util.toAlternateColorCodes('&', crate.title))
                                                         .onClose(player -> EnumResult.BACK)
                                                         //.leftInput(SAMPLE_LEFT)
@@ -119,7 +118,7 @@ public class Editor {
                                                 // Edit LootSets
                                                 // *   *   *
                                                 .childButton(5, 1, () -> new ItemBuilder(Material.EXPERIENCE_BOTTLE).name("&6&nLoot").lore(LORE_LMB_EDIT).toItem(), new ParallaxMenu.PBuilder()
-                                                        .title("&8editor\\crates\\" + crate.id + "\\lootSets")
+                                                        .title("lootSets", true)
                                                         .parentButton(4, 5)
                                                         .action(builder -> {
                                                             ArrayList<Button> result1 = new ArrayList<>();
@@ -206,7 +205,7 @@ public class Editor {
                                                 // *   *   *
                                                 .childButton(6, 3, () -> new ItemBuilder(Material.JUKEBOX).name("&a&nSound&r&a: &r&7" + crate.sound).lore(LORE_LMB_EDIT).toItem(),
                                                         new TextMenu.TBuilder()
-                                                                .title("&8editor\\crates\\" + crate.id + "\\sound")
+                                                                .title("sound", true)
                                                                 .left(() -> LOREM_IPSUM)
                                                                 .right(() -> "Input a sound")
                                                                 .onClose(player -> EnumResult.BACK)
@@ -230,7 +229,7 @@ public class Editor {
                  * View LootSets
                  */
                 ).childButton(3, 1, () -> new ItemBuilder(Material.EXPERIENCE_BOTTLE).name("&6&lLoot").toItem(), new ParallaxMenu.PBuilder()
-                        .title("&8editor\\lootSets")
+                        .title("lootSets", true)
                         .parentButton(4, 5)
                         .action(self -> {
                             ArrayList<Button> result = new ArrayList<>();
@@ -241,7 +240,7 @@ public class Editor {
                                 result.add(new Button.Builder()
                                         .icon(() -> new ItemBuilder(lootSet.itemStack).lore("&8id: " + lootSet.id + "\n" + "&8" + lootSet.loot.size() + " elements" + "\n" + LORE_LMB_EDIT + "\n" + LORE_RMB_DEL).toItem())
                                         .child(self, new ParallaxMenu.PBuilder()
-                                                .title("&8editor\\lootSets\\" + lootSet.id)
+                                                .title(lootSet.id, true)
                                                 .parentButton(4, 5)
                                                 .action(self1 -> {
                                                     ArrayList<Button> result1 = new ArrayList<>();
@@ -264,7 +263,7 @@ public class Editor {
                                                 .childButton(3, 5, () -> new ItemBuilder(lootSet.itemStack.getType()).name(NAME_EDIT).toItem(), new ItemMutateMenuBuilder()
                                                         .build(lootSet.itemStack, itemStack -> lootSet.itemStack = itemStack))
                                                 .childButton(5, 5, () -> ITEM_NEW, new ParallaxMenu.PBuilder()
-                                                        .title("&8editor\\lootSets\\" + lootSet.id + "\\new")
+                                                        .title("new loot", true)
                                                         //.onClose(player -> EnumResult.BACK)
                                                         .parentButton(4, 5)
                                                         .action(self1 -> {
@@ -272,6 +271,11 @@ public class Editor {
                                                             for (Class<? extends ILoot> menuClazz : LootCratesAPI.lootClasses) {
                                                                 //AbstractLoot aLootInstance = new a
                                                                 result1.add(new Button.Builder()
+                                                                        // This causes a nullptr because it is instantly constructed?
+                                                                        //.icon(() -> new ItemBuilder(Material.GOLD_INGOT).name(menuClazz.getSimpleName()).toItem())
+                                                                        //.child(self1.parentMenuBuilder, lootSet.addLoot(
+                                                                        //        (ILoot) ReflectionUtil.invokeConstructor(menuClazz)).getMenuBuilder())
+
                                                                         .icon(() -> new ItemBuilder(Material.GOLD_INGOT).name(menuClazz.getSimpleName()).toItem())
                                                                         .lmb(interact -> {
                                                                             AbstractMenu.Builder menu = lootSet.addLoot(
@@ -303,7 +307,7 @@ public class Editor {
                             return result;
                         })
                         .childButton(5, 5, () -> ITEM_NEW, new TextMenu.TBuilder()
-                                .title("&8editor\\lootSets\\new")
+                                .title("new lootSet", true)
                                 .left(() -> LOREM_IPSUM)
                                 .onClose(player -> EnumResult.BACK)
                                 .onComplete((player, text) -> {
@@ -325,7 +329,7 @@ public class Editor {
                  * Global Fireworks Edit
                  */
                 .childButton(5, 1, () -> new ItemBuilder(Material.FIREWORK_ROCKET).name("&e&lFireworks").toItem(), new SimpleMenu.SBuilder(5)
-                        .title("&8Firework")
+                        .title("firework", true)
                         .background()
                         .button(4, 0, IN_OUTLINE)
                         .button(3, 1, IN_OUTLINE)
@@ -356,7 +360,7 @@ public class Editor {
                  * Misc settings
                  */
                 .childButton(7, 1, () -> new ItemBuilder(Material.IRON_HORSE_ARMOR).name("&8&lMisc").toItem(), new SimpleMenu.SBuilder(5)
-                        .title("&8Misc")
+                        .title("misc", true)
                         .button(1, 1, new Button.Builder()
                                 .icon(() -> new ItemBuilder(Material.COMMAND_BLOCK).name("&e&lToggle Debug").lore(Main.get().data.debug ? "&2enabled" : "&cdisabled").toItem())
                                 .lmb(interact -> {Main.get().data.debug ^= true; return EnumResult.REFRESH;}))

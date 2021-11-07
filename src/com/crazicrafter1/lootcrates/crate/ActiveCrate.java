@@ -23,11 +23,10 @@ import java.util.Map;
 public final class ActiveCrate {
 
     private static final class QSlot {
-        boolean isSelected;
+        boolean isHidden = true;
         ILoot randomLoot;
 
-        QSlot(boolean isSelected, ILoot randomLoot) {
-            this.isSelected = isSelected;
+        QSlot(ILoot randomLoot) {
             this.randomLoot = randomLoot;
         }
     }
@@ -79,7 +78,7 @@ public final class ActiveCrate {
         inventory.setItem(slot, data.selectedItem);
 
         ILoot randomLoot = lootChances[slot].getRandomLoot();
-        slots.put(slot, new QSlot(true, randomLoot));
+        slots.put(slot, new QSlot(randomLoot));
 
 
         if (sound != null)
@@ -164,12 +163,12 @@ public final class ActiveCrate {
      * A panel was clicked, show it
      */
     private boolean flipSlot(int slot, QSlot qSlot) {
-        if (!qSlot.isSelected) return false;
+        if (!qSlot.isHidden) return false;
 
         ItemStack visual = qSlot.randomLoot.getIcon();
 
         inventory.setItem(slot, visual);
-        qSlot.isSelected = false;
+        qSlot.isHidden = false;
 
         return true;
     }
@@ -179,7 +178,10 @@ public final class ActiveCrate {
         if (state != State.SELECTING) {
             for (Map.Entry<Integer, QSlot> entry : slots.entrySet()) {
                 if (entry.getValue().randomLoot.execute(this)) {
-                    Util.giveItemToPlayer(player, inventory.getItem(entry.getKey()));
+                    if (entry.getValue().isHidden)
+                        Util.giveItemToPlayer(player, entry.getValue().randomLoot.getIcon());
+                    else
+                        Util.giveItemToPlayer(player, inventory.getItem(entry.getKey()));
                 }
             }
 
@@ -207,15 +209,24 @@ public final class ActiveCrate {
     public void onInventoryClick(InventoryClickEvent e) {
         e.setCancelled(true);
 
+        Main.get().debug("Crate clicked (cancelled)");
+
         if (!e.isShiftClick() && e.isLeftClick()) {
             int slot = e.getSlot();
 
             // If crate GUI clicked on
             if (e.getClickedInventory() == inventory) {
                 switch (state) {
-                    case SELECTING: selectSlot(slot); break;
-                    case REVEALING: break;
+                    case SELECTING:
+                        selectSlot(slot);
+                        Main.get().debug("Select click");
+                        break;
+                    case REVEALING:
+                        //do nothing
+                        Main.get().debug("Revealing...");
+                        break;
                     case REVEALED: {
+                        Main.get().debug("Revealed click");
                         // If slot is selected
                         QSlot qSlot = slots.get(slot);
                         if (qSlot == null
@@ -225,9 +236,10 @@ public final class ActiveCrate {
                         }
 
                         // Give item
-                        if (qSlot.randomLoot.execute(this))
+                        if (qSlot.randomLoot.execute(this)) {
                             e.setCancelled(false);
-                        else // Remove item
+                            Main.get().debug("Execute (uncancel)");
+                        } else // Remove item
                             inventory.setItem(slot, null);
 
                         slots.remove(slot);

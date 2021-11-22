@@ -39,7 +39,7 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
                         .lmb(interact -> {
                             if (interact.heldItem != null)
                                 //lootSet.itemStack = interact.heldItem;
-                                itemStackConsumer.accept(interact.heldItem);
+                                itemStackConsumer.accept(interact.heldItem.clone());
 
                             return EnumResult.GRAB_ITEM;
                         }))

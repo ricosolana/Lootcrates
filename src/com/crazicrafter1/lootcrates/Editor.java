@@ -83,7 +83,8 @@ public class Editor {
                             for (Map.Entry<String, Crate> entry : Main.get().data.crates.entrySet()) {
                                 Crate crate = entry.getValue();
                                 result.add(new Button.Builder()
-                                        .icon(() -> new ItemBuilder(crate.itemStack).lore("&8id: " + crate.id).toItem())
+                                        //                                                  .lore("&8id: " + lootSet.id + "\n" + "&8" + lootSet.loot.size() + " elements" + "\n" + LORE_LMB_EDIT + "\n" + LORE_RMB_DEL)
+                                        .icon(() -> new ItemBuilder(crate.itemStack).lore("&8id: " + crate.id + "\n" + LORE_LMB_EDIT + "\n" + LORE_RMB_DEL).toItem())
                                         .child(self, new SimpleMenu.SBuilder(5)
                                                 .title(crate.id, true)
                                                 .background()
@@ -219,7 +220,12 @@ public class Editor {
                                                                         return EnumResult.TEXT("Invalid sound");
                                                                     }
                                                                 })
-                                                )
+                                                ),
+                                                /// RMB - delete crate
+                                                interact -> {
+                                                    Main.get().data.crates.remove(crate.id);
+                                                    return EnumResult.REFRESH;
+                                                }
                                         ).get()
                                 );
                             }
@@ -260,7 +266,7 @@ public class Editor {
                                                     }
                                                     return result1;
                                                 })
-                                                .childButton(3, 5, () -> new ItemBuilder(lootSet.itemStack.getType()).name(NAME_EDIT).toItem(), new ItemMutateMenuBuilder()
+                                                .childButton(3, 5, () -> new ItemBuilder(lootSet.itemStack/*.getType()*/).name(NAME_EDIT).toItem(), new ItemMutateMenuBuilder()
                                                         .build(lootSet.itemStack, itemStack -> lootSet.itemStack = itemStack))
                                                 .childButton(5, 5, () -> ITEM_NEW, new ParallaxMenu.PBuilder()
                                                         .title("new loot", true)
@@ -288,7 +294,7 @@ public class Editor {
                                                             return result1;
                                                         })
                                                 ),
-                                                // RMB event
+                                                // RMB - delete lootSet
                                                 interact -> {
                                                     if (Main.get().data.lootSets.size() > 1) {
                                                         Main.get().data.lootSets.remove(lootSet.id);

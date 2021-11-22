@@ -57,7 +57,17 @@ public class CmdCrates extends CmdBase {
                     }
                     return feedback(sender, "Gave a " + args[1] + " crate to all players (" + ChatColor.LIGHT_PURPLE + players.size() + ChatColor.GRAY + " online)");
                 }
-            }/* case "reload": {
+            } case "reset": { // Save default config and load
+                Main.get().saveDefaultConfig(true);
+                // continue to load whatever is in config
+                // no break intended
+                feedback(sender, "Saved default config");
+            } case "reload": { // Load saved config values
+                Main.get().reloadConfig();
+                return feedback(sender, "Loaded config from disk");
+            }
+
+            /* case "reload": {
                 feedback(sender, "Reloading config...");
                 plugin.reloadConfig();
                 // save config somehow

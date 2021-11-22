@@ -1,6 +1,6 @@
 name: LootCrates
 main: com.crazicrafter1.lootcrates.Main
-version: 3.2.3 # 3.2.2 was previous
+version: 3.2.4 # 3.2.3 was previous
 api-version: 1.13
 author: crazicrafter1
 softdepend: [CRUtils, Gapi, QualityArmory, Skript]
@@ -17,6 +17,10 @@ permissions:
   lootcrates.admin:
     description: Allows access to /crates command
     default: op
+
+# 3.2.4 (11/21/2021)
+# fixed item edit when not swapping with another item bug
+
 
 # 3.2.3 (11/6/2021)
 # fixed duplicating slot panel on close event bug

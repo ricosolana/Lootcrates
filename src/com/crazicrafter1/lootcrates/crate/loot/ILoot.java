@@ -3,6 +3,7 @@ package com.crazicrafter1.lootcrates.crate.loot;
 import com.crazicrafter1.gapi.AbstractMenu;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -20,7 +21,7 @@ public interface ILoot extends ConfigurationSerializable {
      * will see as a representation of loot in a crate when showed
      * @return ItemStack
      */
-    ItemStack getIcon();
+    ItemStack getIcon(Player p);
 
     /**
      * The actual loot action to do on click

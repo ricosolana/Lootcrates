@@ -1,7 +1,6 @@
 <component name="libraryTable">
-  <library name="spigot-api-1.17.1-R0.1-SNAPSHOT-shaded">
+  <library name="QualityArmory">
     <CLASSES>
-      <root url="jar://$USER_HOME$/Documents/MinecraftDev/api/spigot-api-1.17.1-R0.1-SNAPSHOT-shaded.jar!/" />
       <root url="jar://$USER_HOME$/Documents/MinecraftDev/api/QualityArmory.jar!/" />
     </CLASSES>
     <JAVADOC />

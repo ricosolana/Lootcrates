@@ -206,43 +206,34 @@ public class Main extends JavaPlugin
 
         configAttempt = CFG_WAIT;
         while (++configAttempt != CFG_ERR) {
-            switch (configAttempt) {
-                case CFG_CURR:
-                    info("Attempt 1: Loading current or default config");
-                    try {
+            try {
+                switch (configAttempt) {
+                    case CFG_CURR:
+                        info("Attempt 1: Loading current or default config");
+
                         saveDefaultConfig(false);
                         config.load(configFile);
                         data = (Data) config.get("data");
                         configAttempt = CFG_WAIT;
                         return;
-                    } catch (Exception e) {
-                        error(e.getMessage());
-                    }
-                    break;
-                case CFG_DEF:
-                    info("Attempt 2: Force loading default config");
-                    try {
+                    case CFG_DEF:
+                        info("Attempt 2: Force loading default config");
+
                         saveDefaultConfig(true);
                         config.load(configFile);
                         data = (Data) config.get("data");
                         configAttempt = CFG_WAIT;
                         return;
-                    } catch (Exception e) {
-                        error(e.getMessage());
-                    }
-                    break;
-                case CFG_POP:
-                    info("Attempt 3: Populating config with minimal built-ins");
+                    case CFG_POP:
+                        info("Attempt 3: Populating config with minimal built-ins");
 
-                    try {
                         data = new Data();
                         data.populate();
                         configAttempt = CFG_WAIT;
                         return;
-                    } catch (Exception e) {
-                        error(e.getMessage());
-                        break;
-                    }
+                }
+            } catch (Exception e) {
+                error(e.getMessage());
             }
         }
 

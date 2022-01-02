@@ -28,32 +28,36 @@ public class CmdCrates extends CmdBase {
             return error(sender, "Input some arguments");
 
         switch (args[0].toLowerCase()) {
-            /*case "populate": {
-                DefaultPopulator.populate();
-
-                return feedback(sender, "Populating config with dummies");
+            case "save": {
+                plugin.saveConfig();
+                return feedback(sender, "Saved config to disk");
             }
-             */
             case "crate": {
-                if (args.length < 3) return error(sender, "Input more arguments");
+                //if (args.length < 3) return error(sender, "Input more arguments");
 
                 Crate crate = LootCratesAPI.getCrateByID(args[1]);
 
                 if (crate == null)
                     return error(sender, "That crate doesn't exist");
 
-                if (!args[2].equals("*")) {
-                    Player p = Bukkit.getServer().getPlayer(args[2]);
+                if (args.length == 2 || !args[2].equals("*")) {
+                    Player p;
+                    if (args.length == 2) {
+                        if (sender instanceof Player) p = (Player)sender;
+                        else return error(sender, "You must be a player to give yourself a crate");
+                    }
+                    else
+                        p = Bukkit.getServer().getPlayer(args[2]);
 
                     if (p == null)
                         return error(sender, "That player cannot be found");
 
-                    p.getInventory().addItem(crate.itemStack);
+                    p.getInventory().addItem(crate.itemStack(p));
 
                     return feedback(sender, "Gave a " + args[1] + " crate to " + ChatColor.GOLD + p.getName());
                 } else {
                     for (Player p : players) {
-                        p.getInventory().addItem(crate.itemStack);
+                        p.getInventory().addItem(crate.itemStack(p));
                     }
                     return feedback(sender, "Gave a " + args[1] + " crate to all players (" + ChatColor.LIGHT_PURPLE + players.size() + ChatColor.GRAY + " online)");
                 }
@@ -65,14 +69,7 @@ public class CmdCrates extends CmdBase {
             } case "reload": { // Load saved config values
                 Main.get().reloadConfig();
                 return feedback(sender, "Loaded config from disk");
-            }
-
-            /* case "reload": {
-                feedback(sender, "Reloading config...");
-                plugin.reloadConfig();
-                // save config somehow
-                return feedback(sender, "Config was reloaded.");
-            }*/ case "editor": {
+            } case "editor": {
                 if (sender instanceof Player) {
                     // title, subtitle, fadein, stay, fadeout
                     Player p = (Player) sender;

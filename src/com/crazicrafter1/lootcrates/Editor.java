@@ -38,8 +38,8 @@ public class Editor {
     @SuppressWarnings("SpellCheckingInspection")
     public static final String BASE64_CUSTOM_MODEL_DATA = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzQ2NDg3NGRmNDUyYzFkNzE3ZWRkZDBmYjNiODQ4MjAyYWQxNTU3MTI0NWFmNmZhZGUyZWNmNTE0ZjNjODBiYiJ9fX0=";
 
-    public static String COLOR_PREFIX = ReflectionUtil.isAtLeastVersion("1_16") ?
-            "&7'&': &#2367fbc&#3f83fbo&#5a9ffcl&#76bbfco&#91d7fcr&#acf2fds" : "&7'&': &fcolors";
+    public static String COLOR_PREFIX = "&7: &bcolors" + (ReflectionUtil.isAtLeastVersion("1_16") ?
+            "&7'#&': &#2367fbc&#3f83fbo&#5a9ffcl&#76bbfco&#91d7fcr&#acf2fds" : "&7'&': &fcolors");
     private static final String LOREM_IPSUM = "Lorem ipsum";
 
     @SuppressWarnings("DanglingJavadoc")
@@ -93,7 +93,10 @@ public class Editor {
                                                 // Edit Crate ItemStack
                                                 // *   *   *
                                                 .childButton(1, 1, () -> new ItemBuilder(crate.itemStack.getType()).name("&8&nItemStack").lore(LORE_LMB_EDIT).toItem(), new ItemMutateMenuBuilder()
-                                                        .build(crate.itemStack, (itemStack -> crate.itemStack = itemStack))
+                                                        .build(crate.itemStack, (itemStack -> {
+                                                            //Main.get().info("consumer: " + itemStack);
+                                                            crate.itemStack = itemStack;
+                                                        }))
                                                 )
                                                 // *   *   *
                                                 // Edit Inventory Title
@@ -251,7 +254,7 @@ public class Editor {
                                                 .action(self1 -> {
                                                     ArrayList<Button> result1 = new ArrayList<>();
                                                     for (ILoot a : lootSet.loot) {
-                                                        ItemStack copy = a.getIcon();
+                                                        ItemStack copy = a.getIcon(null);
                                                         result1.add(new Button.Builder()
                                                                 .icon(() -> new ItemBuilder(copy).lore(a + "\n" + LORE_LMB_EDIT + "\n" + LORE_RMB_DEL).toItem())
                                                                 .child(self1, a.getMenuBuilder(), interact -> {

@@ -45,7 +45,7 @@ public final class ActiveCrate {
     private int taskID = -1;
     private int lockSlot;
 
-    private static final Data data = Main.get().data;
+    private final Data data = Main.get().data;
 
     public ActiveCrate(Player p, Crate crate, int lockSlot) {
         this.player = p;
@@ -54,7 +54,7 @@ public final class ActiveCrate {
         this.sound = crate.sound;
         this.lootChances = new LootSet[size];
 
-        this.inventory = Bukkit.createInventory(p, size, crate.title);
+        this.inventory = Bukkit.createInventory(p, size, crate.title(p));
         this.lockSlot = lockSlot;
 
         this.populate(crate);
@@ -65,7 +65,7 @@ public final class ActiveCrate {
 
     private void populate(Crate crate) {
         for (int i = 0; i < size; i++) {
-            LootSet lootGroup = crate.getBasedRandom();
+            LootSet lootGroup = crate.getRandomLootSet();
             this.lootChances[i] = lootGroup;
         }
     }
@@ -99,8 +99,9 @@ public final class ActiveCrate {
 
             state = State.REVEALING;
 
-            if (data.speed > 0) {
+            Main.get().debug("speed: " + data.speed);
 
+            if (data.speed != 0) {
                  taskID = new BukkitRunnable() {
                      int iterations = 0;
 
@@ -165,7 +166,7 @@ public final class ActiveCrate {
     private boolean flipSlot(int slot, QSlot qSlot) {
         if (!qSlot.isHidden) return false;
 
-        ItemStack visual = qSlot.randomLoot.getIcon();
+        ItemStack visual = qSlot.randomLoot.getIcon(player);
 
         inventory.setItem(slot, visual);
         qSlot.isHidden = false;
@@ -179,7 +180,7 @@ public final class ActiveCrate {
             for (Map.Entry<Integer, QSlot> entry : slots.entrySet()) {
                 if (entry.getValue().randomLoot.execute(this)) {
                     if (entry.getValue().isHidden)
-                        Util.giveItemToPlayer(player, entry.getValue().randomLoot.getIcon());
+                        Util.giveItemToPlayer(player, entry.getValue().randomLoot.getIcon(player));
                     else
                         Util.giveItemToPlayer(player, inventory.getItem(entry.getKey()));
                 }
@@ -188,7 +189,7 @@ public final class ActiveCrate {
             data.totalOpens++;
         }
 
-        if (taskID != -1)
+        if (state == State.REVEALING)
             Main.get().getServer().getScheduler().cancelTask(taskID);
     }
 
@@ -198,7 +199,6 @@ public final class ActiveCrate {
     }
 
     public Player getPlayer() {
-        //return Bukkit.getPlayer(this.owner);
         return player;
     }
 

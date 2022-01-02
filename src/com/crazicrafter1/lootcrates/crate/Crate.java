@@ -1,14 +1,22 @@
 package com.crazicrafter1.lootcrates.crate;
 
+import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
+import com.sun.istack.internal.NotNull;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Sound;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class Crate implements ConfigurationSerializable {
+
+    /// TODO Use this instead
+    /// https://stackoverflow.com/questions/1761626/weighted-random-numbers
 
     // can be used to sort any given lootgroup map
     private static <T> LinkedHashMap<T, Integer> sortByValue(HashMap<T, Integer> hm) {
@@ -17,7 +25,7 @@ public class Crate implements ConfigurationSerializable {
                 new LinkedList<>(hm.entrySet());
 
         // Sort the list
-        list.sort(Comparator.comparing(Map.Entry::getValue));
+        list.sort(Map.Entry.comparingByValue());
 
         // put data from sorted list to hashmap
         LinkedHashMap<T, Integer> temp = new LinkedHashMap<>();
@@ -69,9 +77,16 @@ public class Crate implements ConfigurationSerializable {
     public int columns;
     public int picks;
     public Sound sound;
-    //public LinkedHashMap<String, Integer> lootByName;         // this will never be used beyond initialization
-    // lootSet could be weakly referenced, basically WeakReference
-    // or a c++ std::weak_ptr to Main.get().data.lootSets
+
+    /// TODO stop using this
+    // https://stackoverflow.com/questions/1761626/weighted-random-numbers
+    /// The current implementation is tacky but fast and works
+    /// The above proposed implementation is less tacky, but slightly slower due to an extra sum step
+
+    ///             pros:       cons:
+    /// current: fast           tacky   complex   memory
+    /// propose: on the fly..
+
     public LinkedHashMap<LootSet, Integer> lootBySum;
     public HashMap<LootSet, Integer> lootByWeight;
     public int totalWeights;
@@ -89,7 +104,8 @@ public class Crate implements ConfigurationSerializable {
     public Crate(Map<String, Object> args) {
         //name = (String) args.get("name");
         //itemStack = Crate.makeCrate((ItemStack) args.get("itemStack"), name);
-        itemStack = (ItemStack) args.get("itemStack");
+        // macro "lootset" for name or lore...
+
         title = Util.format((String) args.get("title"));
         columns = (int) args.get("columns");
         picks = (int) args.get("picks");
@@ -98,17 +114,29 @@ public class Crate implements ConfigurationSerializable {
         //lootByName = sortByValue((LinkedHashMap<String, Integer>) args.get("lootGroups"));
         lootBySum = sortByValue((LinkedHashMap<LootSet, Integer>) args.get("weights"));
 
-        //Main.getInstance().info(lootBySum.toString());
-
+        /// TODO
+        /// This will never work correctly when the crate is
+        /// modified during runtime, since the values stay const (when using crate editor)
+        /// a lambda will fix this
+        /// using lambda will also require other kind of storage types
+        /// use hashmap<macro, lambda> for correct use
+        itemStack = (ItemStack) args.get("itemStack");
+        //itemStack = new MacroItemBuilder((ItemStack) args.get("itemStack"))
+        //        .macro("lootset_count", "" + lootBySum.size())
+        //        .macro("crate_name", "" + id).toItem();
     }
 
     /**
      * Assumes that the map is cumulative-weight sorted in config
      * unknown whether config map retains original order
      */
-    LootSet getBasedRandom() {
+    LootSet getRandomLootSet() {
         int rand = Util.randomRange(0, totalWeights-1);
 
+        /// could use binary search, which is faster for larger sets,
+        /// where the random weight is closer to the upper bound
+        /// current search: O(random weight - max weight)
+        /// binary search: O(random weight
         for (Map.Entry<LootSet, Integer> entry : this.lootBySum.entrySet()) {
             if (entry.getValue() > rand) return entry.getKey();
         }
@@ -122,6 +150,28 @@ public class Crate implements ConfigurationSerializable {
 
     public String getFormattedFraction(LootSet lootGroup) {
         return String.format("%d/%d", lootByWeight.get(lootGroup), totalWeights);
+    }
+
+    /**
+     * Return the macro formatted item, or unformatted if player is null
+     * @param p player
+     * @return the formatted item
+     */
+    public ItemStack itemStack(@Nullable Player p) {
+        ItemBuilder item = new ItemBuilder(itemStack);
+
+        //String res = "%player_name%'s crate";
+        //Main.get().info("res: " + PlaceholderAPI.setPlaceholders(p, res));
+
+        return item
+            .macro("%", "lootcrates_crate_picks", "" + picks)
+            .macro("%", "lootcrates_crate_id", "" + id)
+            .placeholders(p).toItem();
+    }
+
+    public String title(@NotNull Player p) {
+        return PlaceholderAPI.setPlaceholders(p,
+                Util.macro(title, "%", "lootset_count", "" + lootBySum.size()));
     }
 
     @Override

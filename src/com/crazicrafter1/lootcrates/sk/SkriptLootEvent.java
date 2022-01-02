@@ -1,4 +1,4 @@
-package com.crazicrafter1.lootcrates;
+package com.crazicrafter1.lootcrates.sk;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;

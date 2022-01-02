@@ -61,14 +61,6 @@ public class Data implements ConfigurationSerializable {
                 reader.close();
             }
         } catch (Exception e) {e.printStackTrace();}
-
-
-
-
-        //for (String str : (List<String>) args.getOrDefault("alertedPlayers", new ArrayList<>())) {
-        //    alertedPlayers.add(UUID.fromString(str));
-        //}
-        //alertedPlayers = (HashSet<UUID>) args.getOrDefault("alertedPlayers", new HashSet<>());
     }
 
     /*
@@ -122,13 +114,6 @@ public class Data implements ConfigurationSerializable {
                 }
                 writer.close();
             } catch (Exception e) {e.printStackTrace();}
-
-
-
-
-        //List<String> uuids = new ArrayList<>();
-        //for (UUID uuid : alertedPlayers) uuids.add(uuid.toString());
-        //result.put("alertedPlayers", new ArrayList<>(uuids));
 
         return result;
     }

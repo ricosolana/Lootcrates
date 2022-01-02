@@ -1,14 +1,16 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.crutils.ItemBuilder;
+import com.crazicrafter1.crutils.ReflectionUtil;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.gapi.AbstractMenu;
 import com.crazicrafter1.gapi.Button;
 import com.crazicrafter1.gapi.EnumResult;
 import com.crazicrafter1.lootcrates.Editor;
-import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.ItemMutateMenuBuilder;
+import com.crazicrafter1.lootcrates.Main;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
@@ -38,8 +40,8 @@ public final class LootItem extends AbstractLootItem {
     }
 
     @Override
-    public ItemStack getIcon() {
-        return super.ofRange(itemStack);
+    public ItemStack getIcon(Player p) {
+        return super.ofRange(p, itemStack);
     }
 
     @Override
@@ -67,7 +69,7 @@ public final class LootItem extends AbstractLootItem {
                             min = Util.clamp(min + change, 1, max);
                             return EnumResult.REFRESH;
                         })
-                        .icon(() -> new ItemBuilder(Material.MEDIUM_AMETHYST_BUD).name("&8&nMin").lore(Editor.LORE_LMB_NUM + "\n" + Editor.LORE_RMB_NUM + "\n" + Editor.LORE_SHIFT_NUM).count(min).toItem()))
+                        .icon(() -> new ItemBuilder(ReflectionUtil.isAtLeastVersion("1_17") ? Material.MEDIUM_AMETHYST_BUD : Material.RED_DYE).name("&8&nMin").lore(Editor.LORE_LMB_NUM + "\n" + Editor.LORE_RMB_NUM + "\n" + Editor.LORE_SHIFT_NUM).count(min).toItem()))
                 // Max
                 .button(7, 2, new Button.Builder()
                         .lmb(interact -> {
@@ -80,6 +82,6 @@ public final class LootItem extends AbstractLootItem {
                             max = Util.clamp(max + change, min, itemStack.getMaxStackSize());
                             return EnumResult.REFRESH;
                         })
-                        .icon(() -> new ItemBuilder(Material.AMETHYST_CLUSTER).name("&8&nMax").lore(Editor.LORE_LMB_NUM + "\n" + Editor.LORE_RMB_NUM + "\n" + Editor.LORE_SHIFT_NUM).count(max).toItem()));
+                        .icon(() -> new ItemBuilder(ReflectionUtil.isAtLeastVersion("1_17") ? Material.AMETHYST_CLUSTER : Material.GREEN_DYE).name("&8&nMax").lore(Editor.LORE_LMB_NUM + "\n" + Editor.LORE_RMB_NUM + "\n" + Editor.LORE_SHIFT_NUM).count(max).toItem()));
     }
 }

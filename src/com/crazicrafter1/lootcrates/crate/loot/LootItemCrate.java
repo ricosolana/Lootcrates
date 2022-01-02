@@ -8,10 +8,13 @@ import com.crazicrafter1.gapi.ParallaxMenu;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public class LootItemCrate extends AbstractLootItem {
 
@@ -23,7 +26,11 @@ public class LootItemCrate extends AbstractLootItem {
      * Default ctor
      */
     public LootItemCrate() {
-        id = Main.get().data.crates.keySet().iterator().next();
+        try {
+            id = Main.get().data.crates.keySet().iterator().next();
+        } catch (NoSuchElementException e) {
+            Main.get().error("No fallback crates registered");
+        }
     }
 
     public LootItemCrate(Map<String, Object> args) {
@@ -36,8 +43,11 @@ public class LootItemCrate extends AbstractLootItem {
     }
 
     @Override
-    public ItemStack getIcon() {
-        return Main.get().data.crates.get(id).itemStack;
+    public ItemStack getIcon(Player p) {
+        Crate crate = Main.get().data.crates.get(id);
+        return Objects.requireNonNull(crate,
+                "Referred a crate by name (" + id + ") " +
+                        "which doesn't have a definition in config").itemStack(p);
     }
 
     @Override
@@ -65,7 +75,7 @@ public class LootItemCrate extends AbstractLootItem {
                     for (Map.Entry<String, Crate> entry : Main.get().data.crates.entrySet()) {
                         Crate crate = entry.getValue();
 
-                        ItemStack icon = new ItemBuilder(Material.LOOM).mergeLexicals(crate.itemStack).glow(crate.id.equals(id)).toItem();
+                        ItemStack icon = new ItemBuilder(Material.LOOM).mergeLexicals(crate.itemStack(null)).glow(crate.id.equals(id)).toItem();
 
                         result.add(new Button.Builder()
                                 .icon(() -> icon)

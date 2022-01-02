@@ -10,9 +10,11 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="spigot-api-1.17.1-R0.1-SNAPSHOT-shaded" level="project" />
     <orderEntry type="library" name="Skript" level="project" />
-    <orderEntry type="library" name="CRUtils" level="project" />
     <orderEntry type="library" name="Gapi" level="project" />
+    <orderEntry type="library" name="spigot-api-1.18.1-R0.1-SNAPSHOT-shaded" level="project" />
+    <orderEntry type="library" name="QualityArmory" level="project" />
+    <orderEntry type="library" name="PlaceholderAPI-2.11.1" level="project" />
+    <orderEntry type="library" name="CRUtils" level="project" />
   </component>
 </module>

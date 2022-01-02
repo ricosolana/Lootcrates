@@ -33,13 +33,20 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
                 .button(3, 2, Editor.IN_OUTLINE)
                 .button(2, 3, Editor.IN_OUTLINE)
                 .button(1, 2, Editor.IN_OUTLINE)
+                .onClose(player -> {
+                    if (builder != null)
+                        itemStackConsumer.accept(builder.toItem());
+
+                    return EnumResult.OK;
+                })
                 // Edit ItemStack
                 .button(2, 2, new Button.Builder()
                         .icon(() -> builder.toItem())
                         .lmb(interact -> {
-                            if (interact.heldItem != null)
+                            builder = new ItemBuilder(interact.heldItem.clone());
+                            //if (interact.heldItem != null)
                                 //lootSet.itemStack = interact.heldItem;
-                                itemStackConsumer.accept(interact.heldItem.clone());
+                                //itemStackConsumer.accept(interact.heldItem.clone());
 
                             return EnumResult.GRAB_ITEM;
                         }))

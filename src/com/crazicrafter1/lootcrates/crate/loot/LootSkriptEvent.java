@@ -6,10 +6,11 @@ import com.crazicrafter1.gapi.EnumResult;
 import com.crazicrafter1.gapi.TextMenu;
 import com.crazicrafter1.lootcrates.Editor;
 import com.crazicrafter1.lootcrates.ItemMutateMenuBuilder;
-import com.crazicrafter1.lootcrates.SkriptLootEvent;
+import com.crazicrafter1.lootcrates.sk.SkriptLootEvent;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.LinkedHashMap;
@@ -32,8 +33,8 @@ public class LootSkriptEvent implements ILoot {
     }
 
     @Override
-    public ItemStack getIcon() {
-        return itemStack;
+    public ItemStack getIcon(Player p) {
+        return new ItemBuilder(itemStack).placeholders(p).toItem();
     }
 
     @Override

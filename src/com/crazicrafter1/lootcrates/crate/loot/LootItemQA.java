@@ -5,6 +5,7 @@ import com.crazicrafter1.gapi.*;
 import me.zombie_striker.customitemmanager.CustomBaseObject;
 import me.zombie_striker.qg.api.QualityArmory;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -33,8 +34,8 @@ public class LootItemQA extends AbstractLootItem {
     }
 
     @Override
-    public ItemStack getIcon() {
-        return QualityArmory.getCustomItemAsItemStack(name);
+    public ItemStack getIcon(Player p) {
+        return new ItemBuilder(QualityArmory.getCustomItemAsItemStack(name)).placeholders(p).toItem();
     }
 
     @Override
@@ -58,7 +59,7 @@ public class LootItemQA extends AbstractLootItem {
                 .title("LootItemQA", true)
                 .parentButton(4, 5)
                 //.childButton(2, 5, () -> new ItemBuilder(Material.COMPASS).name("&eSearch..."), new )
-                .button(3, 5, new Button.Builder().icon(this::getIcon))
+                .button(3, 5, new Button.Builder().icon(() -> getIcon(null)))
                 .childButton(5, 5, () -> new ItemBuilder(Material.COMPASS).name("&eBy name...").toItem(), new TextMenu.TBuilder()
                         .title("&8Assign by name")
                         .left(() -> name)
@@ -79,7 +80,7 @@ public class LootItemQA extends AbstractLootItem {
                     QualityArmory.getCustomItems().forEachRemaining(customBaseObject -> {
                         if (customBaseObject.getName().equals(this.name)) {
                             result.add(new Button.Builder()
-                                    .icon(() -> new ItemBuilder(getIcon()).glow(true).toItem())
+                                    .icon(() -> new ItemBuilder(getIcon(null)).glow(true).toItem())
                                     .get());
                         } else {
                             result.add(new Button.Builder()

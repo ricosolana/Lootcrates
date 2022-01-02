@@ -6,7 +6,6 @@ import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Getter;
-import com.crazicrafter1.lootcrates.SkriptLootEvent;
 import com.sun.istack.internal.Nullable;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;

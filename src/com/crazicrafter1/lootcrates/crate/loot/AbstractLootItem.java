@@ -3,6 +3,7 @@ package com.crazicrafter1.lootcrates.crate.loot;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.LinkedHashMap;
@@ -30,8 +31,12 @@ public abstract class AbstractLootItem implements ILoot {
             throw new IndexOutOfBoundsException("failed to assert: min <= max");
     }
 
-    protected ItemStack ofRange(ItemStack itemStack) {
-        return new ItemBuilder(itemStack).count(Util.randomRange(min, max)).toItem();
+    protected ItemStack ofRange(Player p, ItemStack itemStack) {
+        ItemBuilder builder = new ItemBuilder(itemStack).count(Util.randomRange(min, max));
+
+        builder.placeholders(p);
+
+        return builder.toItem();
     }
 
     @Override

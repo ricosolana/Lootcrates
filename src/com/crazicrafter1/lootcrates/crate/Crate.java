@@ -164,8 +164,8 @@ public class Crate implements ConfigurationSerializable {
         //Main.get().info("res: " + PlaceholderAPI.setPlaceholders(p, res));
 
         return item
-            .macro("%", "lootcrates_crate_picks", "" + picks)
-            .macro("%", "lootcrates_crate_id", "" + id)
+            .macro("%", "lc_picks", "" + picks)
+            .macro("%", "lc_id", "" + id)
             .placeholders(p).toItem();
     }
 

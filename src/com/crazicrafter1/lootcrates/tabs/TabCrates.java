@@ -19,7 +19,7 @@ public class TabCrates extends BaseTabCompleter {
         List<String> list = new ArrayList<>();
         if (args.length > 0) {
             if (args.length == 1) {
-                return getMatches(args[0], new String[] {"crate", "editor", "version", "reset", "reload"});
+                return getMatches(args[0], new String[] {"save", "crate", "editor", "version", "reset", "reload"});
             }
             if (args[0].equals("crate")) {
                 if (args.length == 2) {

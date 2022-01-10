@@ -7,7 +7,7 @@ softdepend: [CRUtils, Gapi, QualityArmory, Skript, PlaceholderAPI]
 commands:
   lootcrates:
     description: Access the features of the loot crates plugin.
-    usage: /lootcrates [crate | editor | version | reset | reload] <cratename> <player/*>
+    usage: /lootcrates [save | crate | editor | version | reset | reload] <cratename> <player/*>
     permission: lootcrates.admin
     aliases: [crates, lc]
 permissions:

@@ -8,6 +8,10 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 
 public class ListenerOnInventoryDrag extends BaseListener {
 
+    public ListenerOnInventoryDrag(Main plugin) {
+        super(plugin);
+    }
+
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent e) {
         Player p = (Player)e.getWhoClicked();

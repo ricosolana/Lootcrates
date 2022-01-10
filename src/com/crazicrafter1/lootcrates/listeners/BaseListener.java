@@ -8,7 +8,7 @@ public class BaseListener implements Listener {
 
     protected static Main plugin = Main.get();
 
-    public BaseListener() {
+    public BaseListener(Main plugin) {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 

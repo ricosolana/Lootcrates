@@ -7,6 +7,10 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 public class ListenerOnEntityDamageByEntity extends BaseListener {
 
+    public ListenerOnEntityDamageByEntity(Main plugin) {
+        super(plugin);
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
 

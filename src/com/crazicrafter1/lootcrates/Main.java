@@ -148,12 +148,13 @@ public class Main extends JavaPlugin
         /*
          * Listener init
          */
-        new ListenerOnEntityDamageByEntity();
-        new ListenerOnInventoryClick();
-        new ListenerOnInventoryClose();
-        new ListenerOnInventoryDrag();
-        new ListenerOnPlayerInteract();
-        new ListenerOnPlayerQuit();
+        new ListenerOnEntityDamageByEntity(this);
+        new ListenerOnInventoryClick(this);
+        new ListenerOnInventoryClose(this);
+        new ListenerOnInventoryDrag(this);
+        new ListenerOnPlayerInteract(this);
+        new ListenerOnPlayerInteract(this);
+        new ListenerOnPlayerQuit(this);
     }
 
     /**

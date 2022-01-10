@@ -9,6 +9,10 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 
 public class ListenerOnInventoryClick extends BaseListener {
 
+    public ListenerOnInventoryClick(Main plugin) {
+        super(plugin);
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent e)
     {

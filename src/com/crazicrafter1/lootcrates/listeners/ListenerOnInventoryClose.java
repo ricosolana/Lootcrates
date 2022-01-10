@@ -8,6 +8,10 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 
 public class ListenerOnInventoryClose extends BaseListener {
 
+    public ListenerOnInventoryClose(Main plugin) {
+        super(plugin);
+    }
+
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent e)
     {

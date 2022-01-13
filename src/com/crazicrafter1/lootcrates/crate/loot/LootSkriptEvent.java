@@ -55,7 +55,7 @@ public class LootSkriptEvent implements ILoot {
                 .title("LootSkriptEvent")
                 .childButton(5, 2, () -> new ItemBuilder(Material.PAPER).name("&6Event tag").lore(Editor.LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
                         .title("edit tag", true)
-                        .onClose(player -> EnumResult.BACK)
+                        .onClose((player, reroute) -> !reroute ? EnumResult.BACK : EnumResult.OK)
                         .left(() -> tag)
                         .right(() -> "Input a tag")
                         .onComplete((player, s) -> {

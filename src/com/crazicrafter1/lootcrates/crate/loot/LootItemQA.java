@@ -2,6 +2,7 @@ package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.gapi.*;
+import com.crazicrafter1.lootcrates.Main;
 import me.zombie_striker.customitemmanager.CustomBaseObject;
 import me.zombie_striker.qg.api.QualityArmory;
 import org.bukkit.Material;
@@ -64,7 +65,10 @@ public class LootItemQA extends AbstractLootItem {
                         .title("&8Assign by name")
                         .left(() -> name)
                         .right(() -> "&eSet item by name")
-                        .onClose(player -> EnumResult.BACK)
+                        .onClose((player, reroute) -> {
+                            Main.get().info("LootItemQA reroute: " + reroute);
+                            return !reroute ? EnumResult.BACK : EnumResult.OK;
+                        })
                         .onComplete((player, s) -> {
                             CustomBaseObject customBaseObject = QualityArmory.getCustomItemByName(s);
                             if (customBaseObject != null) {

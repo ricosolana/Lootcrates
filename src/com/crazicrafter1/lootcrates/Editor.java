@@ -62,7 +62,7 @@ public class Editor {
                         .childButton(5, 5, () -> ITEM_NEW, new TextMenu.TBuilder()
                                 .title("new crate", true)
                                 .left(() -> LOREM_IPSUM)
-                                .onClose((player) -> EnumResult.BACK)
+                                .onClose((player, reroute) -> EnumResult.BACK)
                                 .onComplete((player, s) -> {
                                     if (s.isEmpty() || Main.get().data.crates.containsKey(s)) {
                                         return EnumResult.TEXT("Input a unique key");
@@ -104,7 +104,7 @@ public class Editor {
                                                 .childButton(3, 1, () -> new ItemBuilder(Material.PAPER).name("&e&nTitle&r&e: " + crate.title).lore(LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
                                                         .title("title", true)
                                                         .left(() -> Util.toAlternateColorCodes('&', crate.title))
-                                                        .onClose(player -> EnumResult.BACK)
+                                                        .onClose((player, reroute) -> EnumResult.BACK)
                                                         //.leftInput(SAMPLE_LEFT)
                                                         .right(() -> COLOR_PREFIX)
                                                         .onComplete((player, s) -> {
@@ -116,7 +116,6 @@ public class Editor {
 
                                                             return EnumResult.TEXT("Invalid");
                                                         })
-                                                        .onClose(player -> EnumResult.BACK)
                                                 )
                                                 // *   *   *
                                                 // Edit LootSets
@@ -212,7 +211,7 @@ public class Editor {
                                                                 .title("sound", true)
                                                                 .left(() -> LOREM_IPSUM)
                                                                 .right(() -> "Input a sound")
-                                                                .onClose(player -> EnumResult.BACK)
+                                                                .onClose((player, reroute) -> EnumResult.BACK)
                                                                 .onComplete((player, s) -> {
                                                                     try {
                                                                         Sound sound = Sound.valueOf(s.toUpperCase());
@@ -318,7 +317,7 @@ public class Editor {
                         .childButton(5, 5, () -> ITEM_NEW, new TextMenu.TBuilder()
                                 .title("new lootSet", true)
                                 .left(() -> LOREM_IPSUM)
-                                .onClose(player -> EnumResult.BACK)
+                                .onClose((player, reroute) -> !reroute ? EnumResult.BACK : EnumResult.OK)
                                 .onComplete((player, text) -> {
                                     if (!text.isEmpty() && !Main.get().data.lootSets.containsKey(text)) {
                                         // Java 16

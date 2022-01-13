@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static com.crazicrafter1.lootcrates.Editor.LORE_LMB_EDIT;
 
@@ -34,8 +35,6 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
                 .button(2, 3, Editor.IN_OUTLINE)
                 .button(1, 2, Editor.IN_OUTLINE)
                 .onClose(player -> {
-                    if (builder != null)
-                        itemStackConsumer.accept(builder.toItem());
 
                     return EnumResult.OK;
                 })
@@ -58,7 +57,7 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
                         //.leftInput(SAMPLE_LEFT)
                         .rightF(() -> "&8Input the name of the item", () -> Editor.COLOR_PREFIX)
                         //.rightInput(SAMPLE_RIGHT)
-                        .onClose(player -> EnumResult.BACK)
+                        .onClose((player, reroute) -> !reroute ? EnumResult.BACK : EnumResult.OK)
                         .onComplete((player, s) -> {
                             if (s.isEmpty()) {
                                 builder.resetName();
@@ -71,7 +70,7 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
                         .title("lore", true)
                         .left(() -> Util.flattenedLore(builder.toItem(), "my custom lore"))
                         .rightF(() -> "&8Input the lore of the item", () -> Editor.COLOR_PREFIX + "&7\n'\\n': &fnewline")
-                        .onClose(player -> EnumResult.BACK)
+                        .onClose((player, reroute) -> !reroute ? EnumResult.BACK : EnumResult.OK)
                         .onComplete((player, s) -> {
                             if (s.isEmpty()) {
                                 builder.resetLore();
@@ -89,7 +88,7 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
                             return "none";
                         })
                         .rightF(() -> "&7Input an integer")
-                        .onClose(player -> EnumResult.BACK)
+                        .onClose((player, reroute) -> !reroute ? EnumResult.BACK : EnumResult.OK)
                         .onComplete((player, s) -> {
                             if (s.isEmpty())
                                 return EnumResult.OK;

@@ -35,8 +35,6 @@ public class Crate implements ConfigurationSerializable {
         return temp;
     }
 
-    // takes the weighted lootgroups and assigns the summed/cumulative weight lootgroups
-
     /**
      * [[[weights -> sums]]]
      */
@@ -78,15 +76,6 @@ public class Crate implements ConfigurationSerializable {
     public int picks;
     public Sound sound;
 
-    /// TODO stop using this
-    // https://stackoverflow.com/questions/1761626/weighted-random-numbers
-    /// The current implementation is tacky but fast and works
-    /// The above proposed implementation is less tacky, but slightly slower due to an extra sum step
-
-    ///             pros:       cons:
-    /// current: fast           tacky   complex   memory
-    /// propose: on the fly..
-
     public LinkedHashMap<LootSet, Integer> lootBySum;
     public HashMap<LootSet, Integer> lootByWeight;
     public int totalWeights;
@@ -98,32 +87,15 @@ public class Crate implements ConfigurationSerializable {
         this.columns = columns;
         this.picks = picks;
         this.sound = sound;
-        //lootBySum = Stream.of(new Object[][] {{Main}}).collect(Collectors.toMap(data -> data[0], data -> data[1]));
     }
 
     public Crate(Map<String, Object> args) {
-        //name = (String) args.get("name");
-        //itemStack = Crate.makeCrate((ItemStack) args.get("itemStack"), name);
-        // macro "lootset" for name or lore...
-
         title = Util.format((String) args.get("title"));
         columns = (int) args.get("columns");
         picks = (int) args.get("picks");
         sound = Sound.valueOf((String) args.get("sound"));
-        // go ahead and sort to make sure no weirdness occurs
-        //lootByName = sortByValue((LinkedHashMap<String, Integer>) args.get("lootGroups"));
         lootBySum = sortByValue((LinkedHashMap<LootSet, Integer>) args.get("weights"));
-
-        /// TODO
-        /// This will never work correctly when the crate is
-        /// modified during runtime, since the values stay const (when using crate editor)
-        /// a lambda will fix this
-        /// using lambda will also require other kind of storage types
-        /// use hashmap<macro, lambda> for correct use
         itemStack = (ItemStack) args.get("itemStack");
-        //itemStack = new MacroItemBuilder((ItemStack) args.get("itemStack"))
-        //        .macro("lootset_count", "" + lootBySum.size())
-        //        .macro("crate_name", "" + id).toItem();
     }
 
     /**
@@ -160,18 +132,17 @@ public class Crate implements ConfigurationSerializable {
     public ItemStack itemStack(@Nullable Player p) {
         ItemBuilder item = new ItemBuilder(itemStack);
 
-        //String res = "%player_name%'s crate";
-        //Main.get().info("res: " + PlaceholderAPI.setPlaceholders(p, res));
-
         return item
             .macro("%", "lc_picks", "" + picks)
             .macro("%", "lc_id", "" + id)
+            .macro("%", "lc_lscount", "" + lootBySum.size())
             .placeholders(p).toItem();
     }
 
     public String title(@NotNull Player p) {
-        return PlaceholderAPI.setPlaceholders(p,
-                Util.macro(title, "%", "lootset_count", "" + lootBySum.size()));
+        if (com.crazicrafter1.crutils.Main.getInstance().supportPlaceholders)
+            return PlaceholderAPI.setPlaceholders(p, title);
+        return title;
     }
 
     @Override
@@ -195,7 +166,6 @@ public class Crate implements ConfigurationSerializable {
         result.put("picks", picks);
         result.put("sound", sound.name());
         result.put("weights", lootBySum);
-        //result.put("totalWeights", totalWeights);
 
         return result;
     }

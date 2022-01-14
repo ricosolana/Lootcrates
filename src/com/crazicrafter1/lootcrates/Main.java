@@ -209,8 +209,6 @@ public class Main extends JavaPlugin
         }
     }
 
-    //int crashNext = 2;
-
     @Override
     public void reloadConfig() {
         this.config = new YamlConfiguration();
@@ -280,7 +278,6 @@ public class Main extends JavaPlugin
         // if a backup was successfully made, then save
         if (backupConfig(false)) {
             info("Saving config...");
-            //this.config = new YamlConfiguration();
             config.set("data", data);
 
             try {
@@ -296,7 +293,6 @@ public class Main extends JavaPlugin
     public FileConfiguration getConfig() {
         if (this.config == null) {
             this.reloadConfig();
-            //this.config = new YamlConfiguration();
         }
         return this.config;
     }
@@ -318,6 +314,7 @@ public class Main extends JavaPlugin
             Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.GOLD + s);
     }
 
+    @Deprecated
     public void debug(Exception e) {
         if (data.debug)
             e.printStackTrace();

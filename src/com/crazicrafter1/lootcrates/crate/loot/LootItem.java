@@ -43,9 +43,6 @@ public final class LootItem extends AbstractLootItem {
     public ItemStack getIcon(Player p) {
         ItemStack i = super.ofRange(p, itemStack);
 
-        Main.get().info("getIcon itemStack: " + itemStack);
-        Main.get().info("getIcon i: " + i);
-
         return i;
     }
 

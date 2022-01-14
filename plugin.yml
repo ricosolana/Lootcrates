@@ -1,13 +1,11 @@
 name: LootCrates
 main: com.crazicrafter1.lootcrates.Main
-version: 3.2.5 # 3.2.4 was previous
+version: 3.3.0 # 3.2.5 was previous
 api-version: 1.13
 author: crazicrafter1
 softdepend: [CRUtils, Gapi, QualityArmory, Skript, PlaceholderAPI]
 commands:
   lootcrates:
-    description: Access the features of the loot crates plugin.
-    usage: /lootcrates [save | crate | editor | version | reset | reload] <cratename> <player/*>
     permission: lootcrates.admin
     aliases: [crates, lc]
 permissions:
@@ -17,6 +15,10 @@ permissions:
   lootcrates.admin:
     description: Allows access to /crates command
     default: op
+
+# 3.3.0 (1/14/2022)
+# 1.18.1 support + fixes
+
 
 # 3.2.5 (11/22/2021)
 # fixed 1.17 only item in editor

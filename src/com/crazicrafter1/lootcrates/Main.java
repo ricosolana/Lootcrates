@@ -2,14 +2,14 @@ package com.crazicrafter1.lootcrates;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
+import com.crazicrafter1.crutils.ReflectionUtil;
 import com.crazicrafter1.crutils.Util;
-import com.crazicrafter1.lootcrates.commands.CmdCrates;
+import com.crazicrafter1.lootcrates.commands.Cmd;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootSet;
 import com.crazicrafter1.lootcrates.crate.loot.*;
 import com.crazicrafter1.lootcrates.listeners.*;
-import com.crazicrafter1.lootcrates.tabs.TabCrates;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -142,8 +142,9 @@ public class Main extends JavaPlugin
         /*
          * Command init
          */
-        new CmdCrates();
-        new TabCrates();
+        //new CmdCrates();
+        new Cmd(this);
+        //new TabCrates();
 
         /*
          * Listener init

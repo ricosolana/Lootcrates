@@ -19,12 +19,12 @@ public abstract class CmdBase implements CommandExecutor {
     }
 
     boolean error(CommandSender sender, String message) {
-        sender.sendMessage(plugin.prefix + " " + ChatColor.RED + message);
+        sender.sendMessage(plugin.prefix() + " " + ChatColor.RED + message);
         return true;
     }
 
     boolean feedback(CommandSender sender, String message) {
-        sender.sendMessage(plugin.prefix + " " + ChatColor.AQUA + message);
+        sender.sendMessage(plugin.prefix() + " " + ChatColor.AQUA + message);
         return true;
     }
 

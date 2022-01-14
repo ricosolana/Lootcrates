@@ -7,9 +7,11 @@ import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class CmdCrates extends CmdBase {
@@ -137,9 +139,12 @@ public class CmdCrates extends CmdBase {
                                 ChatColor.ITALIC + "&8in an awesome fashion"}).toItem());
 
                 return feedback(sender, "You received 1 signature crate");
-            }*//* case "detect": {
-                if (!(sender instanceof Player p))
+            }*/ case "detect": {
+                if (!(sender instanceof Player))
                     return error(sender, "Only a player can execute this argument");
+
+                Player p = (Player) sender;
+
                 ItemStack itemStack = p.getInventory().getItemInMainHand();
                 if (itemStack.getType() != Material.AIR) {
                     Crate crate = LootCratesAPI.extractCrateFromItem(itemStack);
@@ -150,7 +155,7 @@ public class CmdCrates extends CmdBase {
                     }
                 }
                 return error(sender, "Must hold an item to detect");
-            }*/
+            }
             default:
                 return error(sender, "Invalid initial argument");
         }

@@ -5,6 +5,7 @@ data:
   debug: false
   update: true
   speed: 4
+  #give-message: "&aYou were given a %lc_id% crate by"
   unSelectedItem:
     ==: org.bukkit.inventory.ItemStack
     v: 1976

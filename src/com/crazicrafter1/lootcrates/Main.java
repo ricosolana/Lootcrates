@@ -24,7 +24,13 @@ import java.util.UUID;
 
 public class Main extends JavaPlugin
 {
-    public final String prefix = ChatColor.translateAlternateColorCodes('&', "&f[&b&lLootCrates&r&f] ");
+    public String prefix() {
+        return prefix;
+    }
+
+    // Default prefix as a fallback if no CRUtils found during startup
+    // and for non 1.16+ versions
+    private String prefix = ChatColor.translateAlternateColorCodes('&', "&f[&b&lLootCrates&r&f] ");
 
     /*
      * Runtime modifiable stuff
@@ -83,7 +89,10 @@ public class Main extends JavaPlugin
             return;
         }
 
-
+        // Cool looking 1.16+ hex colors if possible
+        prefix = ReflectionUtil.isAtLeastVersion("1_16") ?
+                Util.format("&f[" + "&#fba600L&#fb9400o&#fb8100o&#fc6f00t&#fc5c00c&#fc4a00r&#fc3700a&#fd2500t&#fd1200e&#fd0000s" + "&f] ") :
+                prefix;
 
         Main.instance = this;
 

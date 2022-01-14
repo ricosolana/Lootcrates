@@ -67,18 +67,18 @@ public class LootItemQA extends AbstractLootItem {
                         .right(() -> "&eSet item by name")
                         .onClose((player, reroute) -> {
                             Main.get().info("LootItemQA reroute: " + reroute);
-                            return !reroute ? EnumResult.BACK : EnumResult.OK;
+                            return !reroute ? Result.BACK() : null;
                         })
                         .onComplete((player, s) -> {
                             CustomBaseObject customBaseObject = QualityArmory.getCustomItemByName(s);
                             if (customBaseObject != null) {
                                 this.name = s;
-                                return EnumResult.BACK;
+                                return Result.BACK();
                             }
-                            return EnumResult.TEXT("Invalid");
+                            return Result.TEXT("Invalid");
                         })
                 )
-                .action(self -> {
+                .addAll(self -> {
                     ArrayList<Button> result = new ArrayList<>();
 
                     QualityArmory.getCustomItems().forEachRemaining(customBaseObject -> {
@@ -94,7 +94,7 @@ public class LootItemQA extends AbstractLootItem {
                                     .lmb(interact -> {
                                         // change
                                         name = customBaseObject.getName();
-                                        return EnumResult.BACK;
+                                        return Result.BACK();
                                     }).get()
                             );
                         }

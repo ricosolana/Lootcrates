@@ -11,6 +11,8 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Editor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Editor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/ItemMutateMenuBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/ItemMutateMenuBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItemCrate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItemCrate.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItemQA.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItemQA.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootSkriptEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootSkriptEvent.java" afterDir="false" />
     </list>
@@ -119,13 +121,13 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItem.java</url>
-          <line>85</line>
+          <line>90</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/Crate.java</url>
-          <line>165</line>
-          <option name="timeStamp" value="3" />
+          <url>file://$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Editor.java</url>
+          <line>289</line>
+          <option name="timeStamp" value="5" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

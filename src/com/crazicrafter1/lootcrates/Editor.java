@@ -38,8 +38,9 @@ public class Editor {
     @SuppressWarnings("SpellCheckingInspection")
     public static final String BASE64_CUSTOM_MODEL_DATA = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzQ2NDg3NGRmNDUyYzFkNzE3ZWRkZDBmYjNiODQ4MjAyYWQxNTU3MTI0NWFmNmZhZGUyZWNmNTE0ZjNjODBiYiJ9fX0=";
 
-    public static String COLOR_PREFIX = "&7: &bcolors" + (ReflectionUtil.isAtLeastVersion("1_16") ?
-            "&7'#&': &#2367fbc&#3f83fbo&#5a9ffcl&#76bbfco&#91d7fcr&#acf2fds" : "&7'&': &fcolors");
+    public static String COLOR_PREFIX = "&7'&' " + (ReflectionUtil.isAtLeastVersion("1_16") ?
+            "or '#&': &#2367fbc&#3f83fbo&#5a9ffcl&#76bbfco&#91d7fcr&#acf2fds" : ": &fcolors") +
+            "\n&7Macros: &6%lc_picks%&7, &6%lc_id%\n&7Supports PlaceholderAPI";
     private static final String LOREM_IPSUM = "Lorem ipsum";
 
     @SuppressWarnings("DanglingJavadoc")
@@ -62,10 +63,10 @@ public class Editor {
                         .childButton(5, 5, () -> ITEM_NEW, new TextMenu.TBuilder()
                                 .title("new crate", true)
                                 .left(() -> LOREM_IPSUM)
-                                .onClose((player, reroute) -> EnumResult.BACK)
+                                .onClose((player, reroute) -> Result.BACK())
                                 .onComplete((player, s) -> {
                                     if (s.isEmpty() || Main.get().data.crates.containsKey(s)) {
-                                        return EnumResult.TEXT("Input a unique key");
+                                        return Result.TEXT("Input a unique key");
                                     }
                                     Crate crate = new Crate(s, new ItemBuilder(Material.ENDER_CHEST).name("my new crate").toItem(), "select loot", 3, 4, Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
 
@@ -75,10 +76,10 @@ public class Editor {
 
                                     Main.get().data.crates.put(s, crate);
 
-                                    return EnumResult.BACK;
+                                    return Result.BACK();
                                 })
                         )
-                        .action(self -> {
+                        .addAll(self -> {
                             ArrayList<Button> result = new ArrayList<>();
                             for (Map.Entry<String, Crate> entry : Main.get().data.crates.entrySet()) {
                                 Crate crate = entry.getValue();
@@ -93,7 +94,7 @@ public class Editor {
                                                 // Edit Crate ItemStack
                                                 // *   *   *
                                                 .childButton(1, 1, () -> new ItemBuilder(crate.itemStack.getType()).name("&8&nItemStack").lore(LORE_LMB_EDIT).toItem(), new ItemMutateMenuBuilder()
-                                                        .build(crate.itemStack, (itemStack -> {
+                                                        .build(crate.itemStack.clone(), (itemStack -> {
                                                             //Main.get().info("consumer: " + itemStack);
                                                             crate.itemStack = itemStack;
                                                         }))
@@ -104,17 +105,17 @@ public class Editor {
                                                 .childButton(3, 1, () -> new ItemBuilder(Material.PAPER).name("&e&nTitle&r&e: " + crate.title).lore(LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
                                                         .title("title", true)
                                                         .left(() -> Util.toAlternateColorCodes('&', crate.title))
-                                                        .onClose((player, reroute) -> EnumResult.BACK)
+                                                        .onClose((player, reroute) -> Result.BACK())
                                                         //.leftInput(SAMPLE_LEFT)
                                                         .right(() -> COLOR_PREFIX)
                                                         .onComplete((player, s) -> {
                                                             // set name if it is not empty
                                                             if (!s.isEmpty()) {
                                                                 crate.title = Util.format("" + s);
-                                                                return EnumResult.BACK;
+                                                                return Result.BACK();
                                                             }
 
-                                                            return EnumResult.TEXT("Invalid");
+                                                            return Result.TEXT("Invalid");
                                                         })
                                                 )
                                                 // *   *   *
@@ -123,7 +124,7 @@ public class Editor {
                                                 .childButton(5, 1, () -> new ItemBuilder(Material.EXPERIENCE_BOTTLE).name("&6&nLoot").lore(LORE_LMB_EDIT).toItem(), new ParallaxMenu.PBuilder()
                                                         .title("lootSets", true)
                                                         .parentButton(4, 5)
-                                                        .action(builder -> {
+                                                        .addAll(builder -> {
                                                             ArrayList<Button> result1 = new ArrayList<>();
 
                                                             for (LootSet lootSet : Main.get().data.lootSets.values()) {
@@ -141,30 +142,30 @@ public class Editor {
                                                                         // toggle inclusion
                                                                         crate.lootByWeight.remove(lootSet);
                                                                         crate.weightsToSums();
-                                                                        return EnumResult.REFRESH;
+                                                                        return Result.REFRESH();
                                                                     }).lmb(interact -> {
                                                                         // decrement
-                                                                        int change = interact.isShift() ? 5 : 1;
+                                                                        int change = interact.shift ? 5 : 1;
 
                                                                         crate.lootByWeight.put(lootSet, Util.clamp(weight - change, 1, Integer.MAX_VALUE));
                                                                         crate.weightsToSums();
 
-                                                                        return EnumResult.REFRESH;
+                                                                        return Result.REFRESH();
                                                                     }).rmb(interact -> {
                                                                         // decrement
-                                                                        int change = interact.isShift() ? 5 : 1;
+                                                                        int change = interact.shift ? 5 : 1;
 
                                                                         crate.lootByWeight.put(lootSet, Util.clamp(weight + change, 1, Integer.MAX_VALUE));
                                                                         crate.weightsToSums();
 
-                                                                        return EnumResult.REFRESH;
+                                                                        return Result.REFRESH();
                                                                     });
                                                                 } else {
                                                                     b.lore("&fMMB: &7toggle");
                                                                     btn.mmb(interact -> {
                                                                         crate.lootByWeight.put(lootSet, 1);
                                                                         crate.weightsToSums();
-                                                                        return EnumResult.REFRESH;
+                                                                        return Result.REFRESH();
                                                                     });
                                                                 }
                                                                 result1.add(btn.icon(b::toItem).get());
@@ -181,12 +182,12 @@ public class Editor {
                                                         .lmb(interact -> {
                                                             // decrease
                                                             crate.columns = Util.clamp(crate.columns - 1, 1, 6);
-                                                            return EnumResult.REFRESH;
+                                                            return Result.REFRESH();
                                                         })
                                                         .rmb(interact -> {
                                                             // decrease
                                                             crate.columns = Util.clamp(crate.columns + 1, 1, 6);
-                                                            return EnumResult.REFRESH;
+                                                            return Result.REFRESH();
                                                         }))
                                                 // *   *   *
                                                 // Edit Picks
@@ -196,12 +197,12 @@ public class Editor {
                                                         .lmb(interact -> {
                                                             // decrease
                                                             crate.picks = Util.clamp(crate.picks - 1, 1, crate.columns*9);
-                                                            return EnumResult.REFRESH;
+                                                            return Result.REFRESH();
                                                         })
                                                         .rmb(interact -> {
                                                             // decrease
                                                             crate.picks = Util.clamp(crate.picks + 1, 1, crate.columns*9);
-                                                            return EnumResult.REFRESH;
+                                                            return Result.REFRESH();
                                                         }))
                                                 // *   *   *
                                                 // Edit Pick Sound
@@ -211,22 +212,22 @@ public class Editor {
                                                                 .title("sound", true)
                                                                 .left(() -> LOREM_IPSUM)
                                                                 .right(() -> "Input a sound")
-                                                                .onClose((player, reroute) -> EnumResult.BACK)
+                                                                .onClose((player, reroute) -> Result.BACK())
                                                                 .onComplete((player, s) -> {
                                                                     try {
                                                                         Sound sound = Sound.valueOf(s.toUpperCase());
                                                                         crate.sound = sound;
                                                                         p.playSound(p.getLocation(), sound, 1, 1);
-                                                                        return EnumResult.BACK;
+                                                                        return Result.BACK();
                                                                     } catch (Exception e) {
-                                                                        return EnumResult.TEXT("Invalid sound");
+                                                                        return Result.TEXT("Invalid sound");
                                                                     }
                                                                 })
                                                 ),
                                                 /// RMB - delete crate
                                                 interact -> {
                                                     Main.get().data.crates.remove(crate.id);
-                                                    return EnumResult.REFRESH;
+                                                    return Result.REFRESH();
                                                 }
                                         ).get()
                                 );
@@ -239,7 +240,7 @@ public class Editor {
                 ).childButton(3, 1, () -> new ItemBuilder(Material.EXPERIENCE_BOTTLE).name("&6&lLoot").toItem(), new ParallaxMenu.PBuilder()
                         .title("lootSets", true)
                         .parentButton(4, 5)
-                        .action(self -> {
+                        .addAll(self -> {
                             ArrayList<Button> result = new ArrayList<>();
                             for (LootSet lootSet : Main.get().data.lootSets.values()) {
                                 /*
@@ -250,7 +251,7 @@ public class Editor {
                                         .child(self, new ParallaxMenu.PBuilder()
                                                 .title(lootSet.id, true)
                                                 .parentButton(4, 5)
-                                                .action(self1 -> {
+                                                .addAll(self1 -> {
                                                     ArrayList<Button> result1 = new ArrayList<>();
                                                     for (ILoot a : lootSet.loot) {
                                                         ItemStack copy = a.getIcon(null);
@@ -260,21 +261,21 @@ public class Editor {
                                                                     if (lootSet.loot.size() > 1) {
                                                                         // delete
                                                                         lootSet.loot.remove(a);
-                                                                        return EnumResult.REFRESH;
+                                                                        return Result.REFRESH();
                                                                     }
-                                                                    return EnumResult.OK;
+                                                                    return null;
                                                                 })
                                                                 .get());
                                                     }
                                                     return result1;
                                                 })
-                                                .childButton(3, 5, () -> new ItemBuilder(lootSet.itemStack/*.getType()*/).name(NAME_EDIT).toItem(), new ItemMutateMenuBuilder()
+                                                .childButton(3, 5, () -> new ItemBuilder(lootSet.itemStack).name(NAME_EDIT).toItem(), new ItemMutateMenuBuilder()
                                                         .build(lootSet.itemStack, itemStack -> lootSet.itemStack = itemStack))
                                                 .childButton(5, 5, () -> ITEM_NEW, new ParallaxMenu.PBuilder()
                                                         .title("new loot", true)
                                                         //.onClose(player -> EnumResult.BACK)
                                                         .parentButton(4, 5)
-                                                        .action(self1 -> {
+                                                        .addAll(self1 -> {
                                                             ArrayList<Button> result1 = new ArrayList<>();
                                                             for (Class<? extends ILoot> menuClazz : LootCratesAPI.lootClasses) {
                                                                 //AbstractLoot aLootInstance = new a
@@ -289,7 +290,7 @@ public class Editor {
                                                                             AbstractMenu.Builder menu = lootSet.addLoot(
                                                                                     (ILoot) ReflectionUtil.invokeConstructor(menuClazz)).getMenuBuilder();
                                                                             menu.parent(self1.parentMenuBuilder);
-                                                                            return EnumResult.OPEN(menu);
+                                                                            return Result.OPEN(menu);
                                                                         })
                                                                         .get());
                                                             }
@@ -305,9 +306,9 @@ public class Editor {
                                                             if (removed != null)
                                                                 crate.weightsToSums();
                                                         }
-                                                        return EnumResult.REFRESH;
+                                                        return Result.REFRESH();
                                                     }
-                                                    return EnumResult.OK;
+                                                    return null;
                                                 }
                                         ).get()
                                 );
@@ -317,7 +318,7 @@ public class Editor {
                         .childButton(5, 5, () -> ITEM_NEW, new TextMenu.TBuilder()
                                 .title("new lootSet", true)
                                 .left(() -> LOREM_IPSUM)
-                                .onClose((player, reroute) -> !reroute ? EnumResult.BACK : EnumResult.OK)
+                                .onClose((player, reroute) -> !reroute ? Result.BACK() : null)
                                 .onComplete((player, text) -> {
                                     if (!text.isEmpty() && !Main.get().data.lootSets.containsKey(text)) {
                                         // Java 16
@@ -329,7 +330,7 @@ public class Editor {
                                                         new ArrayList<>(Collections.singletonList(new LootItem()))));
 
                                     }
-                                    return EnumResult.BACK;
+                                    return Result.BACK();
                                 })
                         )
                 )
@@ -354,13 +355,13 @@ public class Editor {
                                             FireworkEffectMeta meta = (FireworkEffectMeta) interact.heldItem.getItemMeta();
                                             if (meta.hasEffect()) {
                                                 Main.get().data.fireworkEffect = meta.getEffect();
-                                                return EnumResult.REFRESH;
+                                                return Result.REFRESH();
                                             }
                                         }
                                         interact.player.sendMessage(ChatColor.YELLOW + "must have effect");
                                     }
 
-                                    return EnumResult.GRAB_ITEM;
+                                    return Result.GRAB();
                                 }))
                         .parentButton(4, 4)
                 )
@@ -371,7 +372,7 @@ public class Editor {
                         .title("misc", true)
                         .button(1, 1, new Button.Builder()
                                 .icon(() -> new ItemBuilder(Material.COMMAND_BLOCK).name("&e&lToggle Debug").lore(Main.get().data.debug ? "&2enabled" : "&cdisabled").toItem())
-                                .lmb(interact -> {Main.get().data.debug ^= true; return EnumResult.REFRESH;}))
+                                .lmb(interact -> {Main.get().data.debug ^= true; return Result.REFRESH();}))
                         .parentButton(4, 4)
                 )
                 /*

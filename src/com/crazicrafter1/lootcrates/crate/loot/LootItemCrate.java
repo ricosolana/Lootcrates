@@ -3,8 +3,8 @@ package com.crazicrafter1.lootcrates.crate.loot;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.gapi.AbstractMenu;
 import com.crazicrafter1.gapi.Button;
-import com.crazicrafter1.gapi.EnumResult;
 import com.crazicrafter1.gapi.ParallaxMenu;
+import com.crazicrafter1.gapi.Result;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import org.bukkit.Material;
@@ -70,7 +70,7 @@ public class LootItemCrate extends AbstractLootItem {
         return new ParallaxMenu.PBuilder()
                 .title("LootItemCrate", true)
                 .parentButton(4, 5)
-                .action(self -> {
+                .addAll(self -> {
                     ArrayList<Button> result = new ArrayList<>();
                     for (Map.Entry<String, Crate> entry : Main.get().data.crates.entrySet()) {
                         Crate crate = entry.getValue();
@@ -84,7 +84,7 @@ public class LootItemCrate extends AbstractLootItem {
                                     id = crate.id;
                                     //return Button.Result.refresh();
                                     //return EnumResult.OPEN(new LMItemCrate(loot, lootSet).menu);
-                                    return EnumResult.REFRESH;
+                                    return Result.REFRESH();
                                 })
                                 .get()
                         );

@@ -1,5 +1,6 @@
 package com.crazicrafter1.lootcrates;
 
+import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.refl.ItemStackMirror;
 import com.crazicrafter1.crutils.refl.NBTTagCompoundMirror;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
@@ -10,15 +11,24 @@ import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LootCratesAPI {
 
-    static Set<Class<? extends ILoot>> lootClasses = new HashSet<>();
+    //static Set<Class<? extends ILoot>> lootClasses = new HashSet<>();
+    static Map<Class<? extends ILoot>, ItemStack> lootClasses = new HashMap<>();
 
     static void registerLoot(Class<? extends ILoot> lootClass, String alias) {
-        lootClasses.add(lootClass);
+        registerLoot(lootClass,
+                new ItemBuilder(Material.GOLD_INGOT)
+                        .name(lootClass.getSimpleName())
+                        .toItem(),
+                alias);
+    }
+
+    static void registerLoot(Class<? extends ILoot> lootClass, ItemStack itemStack, String alias) {
+        lootClasses.put(lootClass, itemStack);
         ConfigurationSerialization.registerClass(lootClass, alias);
     }
 

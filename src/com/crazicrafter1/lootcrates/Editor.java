@@ -277,7 +277,8 @@ public class Editor {
                                                         .parentButton(4, 5)
                                                         .addAll(self1 -> {
                                                             ArrayList<Button> result1 = new ArrayList<>();
-                                                            for (Class<? extends ILoot> menuClazz : LootCratesAPI.lootClasses) {
+                                                            for (Map.Entry<Class<? extends ILoot>, ItemStack> entry
+                                                                    : LootCratesAPI.lootClasses.entrySet()) {
                                                                 //AbstractLoot aLootInstance = new a
                                                                 result1.add(new Button.Builder()
                                                                         // This causes a nullptr because it is instantly constructed?
@@ -285,10 +286,10 @@ public class Editor {
                                                                         //.child(self1.parentMenuBuilder, lootSet.addLoot(
                                                                         //        (ILoot) ReflectionUtil.invokeConstructor(menuClazz)).getMenuBuilder())
 
-                                                                        .icon(() -> new ItemBuilder(Material.GOLD_INGOT).name(menuClazz.getSimpleName()).toItem())
+                                                                        .icon(entry::getValue)
                                                                         .lmb(interact -> {
                                                                             AbstractMenu.Builder menu = lootSet.addLoot(
-                                                                                    (ILoot) ReflectionUtil.invokeConstructor(menuClazz)).getMenuBuilder();
+                                                                                    (ILoot) ReflectionUtil.invokeConstructor(entry.getKey())).getMenuBuilder();
                                                                             menu.parent(self1.parentMenuBuilder);
                                                                             return Result.OPEN(menu);
                                                                         })

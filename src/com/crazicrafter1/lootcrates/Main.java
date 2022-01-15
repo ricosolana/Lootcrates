@@ -2,9 +2,10 @@ package com.crazicrafter1.lootcrates;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
+import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.ReflectionUtil;
 import com.crazicrafter1.crutils.Util;
-import com.crazicrafter1.lootcrates.commands.Cmd;
+import com.crazicrafter1.lootcrates.cmd.Cmd;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootSet;
@@ -12,6 +13,7 @@ import com.crazicrafter1.lootcrates.crate.loot.*;
 import com.crazicrafter1.lootcrates.listeners.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -56,15 +58,15 @@ public class Main extends JavaPlugin
     private final static int CFG_DEF = 1;
     private final static int CFG_POP = 2;
     private final static int CFG_ERR = 3;
-    private int configAttempt;
 
     @Override
     public void onEnable() {
-
+        // Check for updates
         GithubUpdater.autoUpdate(this, "PeriodicSeizures", "LootCrates", "LootCrates.jar");
 
         boolean installedDepends = false;
 
+        // Try to auto install dependencies
         if (Bukkit.getPluginManager().getPlugin("CRUtils") == null) {
             GithubInstaller.installDepend(this,
                     "PeriodicSeizures",
@@ -99,17 +101,18 @@ public class Main extends JavaPlugin
         supportQualityArmory = Bukkit.getPluginManager().isPluginEnabled("QualityArmory");
         supportSkript = Bukkit.getPluginManager().isPluginEnabled("Skript");
 
-        // register serializable objects
+        // Register serializable objects
         ConfigurationSerialization.registerClass(Data.class, "Data");
         ConfigurationSerialization.registerClass(LootSet.class, "LootSet");
         ConfigurationSerialization.registerClass(Crate.class, "Crate");
 
         // api for easy
-        LootCratesAPI.registerLoot(LootItemCrate.class, "LootItemCrate");
-        LootCratesAPI.registerLoot(LootItem.class, "LootItem");
+        LootCratesAPI.registerLoot(LootItemCrate.class, new ItemBuilder(Material.CHEST).name("&eAdd crate...").toItem(), "LootItemCrate");
+        LootCratesAPI.registerLoot(LootItem.class, new ItemBuilder(Material.GOLD_NUGGET).name("&6Add item...").toItem(), "LootItem");
         if (supportQualityArmory)
-            LootCratesAPI.registerLoot(LootItemQA.class, "LootItemQA");
+            LootCratesAPI.registerLoot(LootItemQA.class, new ItemBuilder(Material.CROSSBOW).name("&8Add QualityArmory...").toItem(), "LootItemQA");
 
+        // Load Skript classes
         if (supportSkript) {
             addon = Skript.registerAddon(this);
             try {
@@ -117,7 +120,7 @@ public class Main extends JavaPlugin
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            LootCratesAPI.registerLoot(LootSkriptEvent.class, "LootSkriptEvent");
+            LootCratesAPI.registerLoot(LootSkriptEvent.class, new ItemBuilder(Material.MAP).name("&aAdd Skript tag... ").toItem(), "LootSkriptEvent");
         }
 
         loadExternalLoots();
@@ -213,7 +216,7 @@ public class Main extends JavaPlugin
     public void reloadConfig() {
         this.config = new YamlConfiguration();
 
-        configAttempt = CFG_WAIT;
+        int configAttempt = CFG_WAIT;
         while (++configAttempt != CFG_ERR) {
             try {
                 switch (configAttempt) {

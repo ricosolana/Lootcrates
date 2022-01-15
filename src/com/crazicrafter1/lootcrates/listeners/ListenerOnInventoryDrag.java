@@ -1,6 +1,5 @@
 package com.crazicrafter1.lootcrates.listeners;
 
-import com.crazicrafter1.lootcrates.LootCratesAPI;
 import com.crazicrafter1.lootcrates.Main;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,7 +16,7 @@ public class ListenerOnInventoryDrag extends BaseListener {
         Player p = (Player)e.getWhoClicked();
         if (Main.get().openCrates.containsKey(p.getUniqueId())) {
             e.setCancelled(true);
-        } else {
+        } /*else {
             if (LootCratesAPI.extractCrateFromItem(e.getCursor()) != null)
                 // Java 16+
                 //switch (e.getInventory().getType()) {
@@ -40,7 +39,7 @@ public class ListenerOnInventoryDrag extends BaseListener {
                         e.setCancelled(true);
                         break;
                 }
-        }
+        }*/
     }
 
 }

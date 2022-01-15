@@ -25,12 +25,7 @@ public class ListenerOnInventoryClick extends BaseListener {
         } else if (e.getClickedInventory() != null) {
             if (LootCratesAPI.extractCrateFromItem(e.getCursor()) != null)
 
-                // Java 16+
-                //switch (e.getClickedInventory().getType()) {
-                //    case ANVIL, SMOKER, BREWING, FURNACE, CRAFTING, MERCHANT, WORKBENCH, ENCHANTING, GRINDSTONE, STONECUTTER, BLAST_FURNACE -> {
-                //        e.setCancelled(true);
-                //    }
-                //}
+                Main.get().info(e.getClickedInventory().getType().name());
 
                 switch (e.getClickedInventory().getType()) {
                     case ANVIL:
@@ -47,7 +42,7 @@ public class ListenerOnInventoryClick extends BaseListener {
                         e.setCancelled(true);
                         break;
                 }
-        } //else if (e.getCurrentItem())
+        }
 
     }
 

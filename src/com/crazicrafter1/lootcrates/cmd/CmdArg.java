@@ -1,4 +1,4 @@
-package com.crazicrafter1.lootcrates.commands;
+package com.crazicrafter1.lootcrates.cmd;
 
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.Editor;

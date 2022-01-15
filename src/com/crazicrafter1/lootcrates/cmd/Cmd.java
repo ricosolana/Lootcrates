@@ -1,4 +1,4 @@
-package com.crazicrafter1.lootcrates.commands;
+package com.crazicrafter1.lootcrates.cmd;
 
 import com.crazicrafter1.lootcrates.Main;
 import org.bukkit.command.Command;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.crazicrafter1.lootcrates.commands.CmdArg.error;
+import static com.crazicrafter1.lootcrates.cmd.CmdArg.error;
 
 public class Cmd implements CommandExecutor, TabCompleter {
 

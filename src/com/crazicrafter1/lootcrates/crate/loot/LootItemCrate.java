@@ -92,4 +92,9 @@ public class LootItemCrate extends AbstractLootItem {
                     return result;
                 });
     }
+
+    //@Override
+    //public ItemStack getMenuBuilderIcon() {
+    //    return new ItemBuilder(Material.CHEST).name("");
+    //}
 }

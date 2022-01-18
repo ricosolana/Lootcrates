@@ -226,7 +226,6 @@ public class Main extends JavaPlugin
                         saveDefaultConfig(false);
                         config.load(configFile);
                         data = (Data) config.get("data");
-                        configAttempt = CFG_WAIT;
                         return;
                     case CFG_DEF:
                         info("Attempt 2: Force loading default config");
@@ -234,14 +233,12 @@ public class Main extends JavaPlugin
                         saveDefaultConfig(true);
                         config.load(configFile);
                         data = (Data) config.get("data");
-                        configAttempt = CFG_WAIT;
                         return;
                     case CFG_POP:
                         info("Attempt 3: Populating config with minimal built-ins");
 
                         data = new Data();
                         data.populate();
-                        configAttempt = CFG_WAIT;
                         return;
                 }
             } catch (Exception e) {

@@ -1,5 +1,6 @@
 package com.crazicrafter1.lootcrates.cmd;
 
+import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.Editor;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
@@ -196,12 +197,13 @@ class CmdArg {
     static List<String> getMatches(String arg, Collection<String> samples) {
         List<String> matches = new ArrayList<>();
 
+        // limit returned result set to 8 entries
         int c = 0;
         for (String s : samples) {
             if (c > 8)
                 break;
 
-            if (s.startsWith(arg.toLowerCase())) {
+            if (s.toLowerCase().replace(" ", "").startsWith(arg.toLowerCase())) {
                 matches.add(s);
                 c++;
             }

@@ -23,7 +23,7 @@ public class ListenerOnInventoryClick extends BaseListener {
         {
             Main.get().openCrates.get(p.getUniqueId()).onInventoryClick(e);
         } else if (e.getClickedInventory() != null) {
-            if (LootCratesAPI.extractCrateFromItem(e.getCursor()) != null)
+            if (LootCratesAPI.extractCrateFromItem(e.getCursor()) != null) {
 
                 Main.get().info(e.getClickedInventory().getType().name());
 
@@ -42,6 +42,7 @@ public class ListenerOnInventoryClick extends BaseListener {
                         e.setCancelled(true);
                         break;
                 }
+            }
         }
 
     }

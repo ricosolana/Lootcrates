@@ -1,6 +1,6 @@
 name: LootCrates
 main: com.crazicrafter1.lootcrates.Main
-version: 3.3.2 # 3.3.1 was previous
+version: 3.3.3 # 3.3.2 was previous
 api-version: 1.13
 author: crazicrafter1
 softdepend: [CRUtils, Gapi, QualityArmory, Skript, PlaceholderAPI]
@@ -15,6 +15,14 @@ permissions:
   lootcrates.admin:
     description: Allows access to /crates command
     default: op
+
+# 3.3.3 (1/22/2022)
+# fixed major overlooked bug when a
+# player attempts to place an items into a consumable
+# inventory (crafting/furnace/smoker) to prevent crate
+# deletion
+# place would be cancelled regardless of item
+
 
 # 3.3.2 / 3.3.1 (1/18/2022)
 # mainly direct download for SpigotMC

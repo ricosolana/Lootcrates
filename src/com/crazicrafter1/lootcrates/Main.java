@@ -127,8 +127,6 @@ public class Main extends JavaPlugin
 
         reloadConfig();
 
-        //new Updater(this, "PeriodicSeizures", "LootCrates", data.update);
-
         /*
          * bStats metrics init
          */
@@ -154,9 +152,7 @@ public class Main extends JavaPlugin
         /*
          * Command init
          */
-        //new CmdCrates();
         new Cmd(this);
-        //new TabCrates();
 
         /*
          * Listener init

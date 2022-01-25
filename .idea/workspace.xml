@@ -12,7 +12,6 @@
       <change beforePath="$PROJECT_DIR$/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/plugin.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/cmd/CmdArg.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/cmd/CmdArg.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/listeners/ListenerOnInventoryClick.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/listeners/ListenerOnInventoryClick.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,6 +85,10 @@
       <option name="AUTO_RESTART" value="false" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Application.Main" />
+      <item itemvalue="Remote JVM Debug.Unnamed" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Application.Main" />

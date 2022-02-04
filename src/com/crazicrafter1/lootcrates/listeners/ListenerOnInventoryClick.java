@@ -1,6 +1,5 @@
 package com.crazicrafter1.lootcrates.listeners;
 
-import com.crazicrafter1.lootcrates.LootCratesAPI;
 import com.crazicrafter1.lootcrates.Main;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,10 +18,9 @@ public class ListenerOnInventoryClick extends BaseListener {
         Player p = (Player) e.getWhoClicked();
 
         // If player is opening crate
-        if (Main.get().openCrates.containsKey(p.getUniqueId()))
-        {
+        if (Main.get().openCrates.containsKey(p.getUniqueId())) {
             Main.get().openCrates.get(p.getUniqueId()).onInventoryClick(e);
-        } else if (e.getClickedInventory() != null) {
+        }/* else if (e.getClickedInventory() != null) {
             if (LootCratesAPI.extractCrateFromItem(e.getCursor()) != null) {
 
                 Main.get().info(e.getClickedInventory().getType().name());
@@ -43,7 +41,7 @@ public class ListenerOnInventoryClick extends BaseListener {
                         break;
                 }
             }
-        }
+        }*/
 
     }
 

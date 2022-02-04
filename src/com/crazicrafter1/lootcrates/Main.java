@@ -167,8 +167,7 @@ public class Main extends JavaPlugin
     }
 
     /**
-     * Use Skript now,
-     * making a plugin for 1 simple event is kinda extensive...
+     * I recommend using Skript instead of this
      */
     @Deprecated
     private void loadExternalLoots() {

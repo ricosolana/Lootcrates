@@ -4,13 +4,13 @@ import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
 import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Sound;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
 public class Crate implements ConfigurationSerializable {

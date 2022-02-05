@@ -1,6 +1,6 @@
 name: LootCrates
 main: com.crazicrafter1.lootcrates.Main
-version: 3.3.5 # 3.3.4 was previous
+version: 3.3.6 # 3.3.5 was previous
 api-version: 1.13
 author: crazicrafter1
 softdepend: [CRUtils, Gapi, QualityArmory, Skript, PlaceholderAPI]
@@ -9,12 +9,22 @@ commands:
     permission: lootcrates.admin
     aliases: [crates, lc]
 permissions:
+  # Although no one has asked yet, I feel like someone eventually will...
+  # I will not be adding per crate opening permissions
+  # The only reason I can think a server owner might want that is
+  # if their server is P2W
   lootcrates.open:
     description: Allow for users to open crates
     default: true
   lootcrates.admin:
     description: Allows access to /crates command
     default: op
+
+# 3.3.6 (2/4/2022)
+# added LootCommand
+# TODO
+#   - maybe use Gapi for crate gui (would be cool and consistent because Gapi has came so far in development, but why reinvent the wheel)?
+
 
 # 3.3.5 (2/3/2022)
 # bug caused by inventory cancel difficult to fix (removed for now)

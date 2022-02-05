@@ -109,6 +109,7 @@ public class Main extends JavaPlugin
         // api for easy
         LootCratesAPI.registerLoot(LootItemCrate.class, new ItemBuilder(Material.CHEST).name("&eAdd crate...").toItem(), "LootItemCrate");
         LootCratesAPI.registerLoot(LootItem.class, new ItemBuilder(Material.GOLD_NUGGET).name("&6Add item...").toItem(), "LootItem");
+        LootCratesAPI.registerLoot(LootCommand.class, new ItemBuilder(Material.CHAIN_COMMAND_BLOCK).name("&2Add command...").toItem(), "LootCommand");
         if (supportQualityArmory)
             LootCratesAPI.registerLoot(LootItemQA.class, new ItemBuilder(Material.CROSSBOW).name("&8Add QualityArmory...").toItem(), "LootItemQA");
 
@@ -133,16 +134,17 @@ public class Main extends JavaPlugin
         try {
             Metrics metrics = new Metrics(this, 10395);
 
-            metrics.addCustomChart(new Metrics.SimplePie("updater", // what to record
+            metrics.addCustomChart(new Metrics.SimplePie("updater",
                     () -> "" + data.update));
 
-            metrics.addCustomChart(new Metrics.SimplePie("crates", // what to record
+            metrics.addCustomChart(new Metrics.SimplePie("crates",
                     () -> "" + data.crates.size()));
 
             metrics.addCustomChart(new Metrics.SimplePie("abstractloots",
                     () -> "" + LootCratesAPI.lootClasses.size()));
 
-            metrics.addCustomChart(new Metrics.SingleLineChart("opened", // what to record
+            // fun little infinite counter that really has no huge use
+            metrics.addCustomChart(new Metrics.SingleLineChart("opened",
                     () -> data.totalOpens));
         } catch (Exception e) {
             error("An error occurred while enabling metrics");

@@ -2,6 +2,7 @@ package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.gapi.AbstractMenu;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
+import com.sun.istack.internal.NotNull;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -21,18 +22,20 @@ public interface ILoot extends ConfigurationSerializable {
      * will see as a representation of loot in a crate when showed
      * @return ItemStack
      */
-    ItemStack getIcon(Player p);
+    @NotNull
+    ItemStack getIcon(@NotNull Player p);
 
     /**
      * The actual loot action to do on click
      * @param activeCrate the reference crate
      * @return whether the player should keep the clicked {@link ItemStack}
      */
-    boolean execute(ActiveCrate activeCrate);
+    boolean execute(@NotNull ActiveCrate activeCrate);
 
     /**
      * The utility menu to show in the editor to modify an ILoot instance
      * @return
      */
+    @NotNull
     AbstractMenu.Builder getMenuBuilder();
 }

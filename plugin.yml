@@ -20,8 +20,9 @@ permissions:
     description: Allows access to /crates command
     default: op
 
-# 3.3.6 (2/4/2022)
+# 3.3.6 (2/5/2022)
 # added LootCommand
+# 1.12.2 support
 # TODO
 #   - maybe use Gapi for crate gui (would be cool and consistent because Gapi has came so far in development, but why reinvent the wheel)?
 

@@ -33,17 +33,15 @@ public final class LootItem extends AbstractLootItem {
     public LootItem(Map<String, Object> args) {
         super(args);
         this.itemStack = (ItemStack) args.get("itemStack");
-        if (itemStack == null) {
+        if (itemStack == null || itemStack.getType() == Material.AIR) {
             Main.get().error(args.toString());
-            throw new NullPointerException("Item must not be null");
+            throw new NullPointerException("Item must not be null or air");
         }
     }
 
     @Override
     public ItemStack getIcon(Player p) {
-        ItemStack i = super.ofRange(p, itemStack);
-
-        return i;
+        return super.ofRange(p, itemStack);
     }
 
     @Override
@@ -71,7 +69,8 @@ public final class LootItem extends AbstractLootItem {
                             min = Util.clamp(min + change, 1, max);
                             return Result.REFRESH();
                         })
-                        .icon(() -> new ItemBuilder(ReflectionUtil.isAtLeastVersion("1_17") ? Material.MEDIUM_AMETHYST_BUD : Material.RED_DYE).name("&8&nMin").lore(Editor.LORE_LMB_NUM + "\n" + Editor.LORE_RMB_NUM + "\n" + Editor.LORE_SHIFT_NUM).count(min).toItem()))
+                        .icon(() -> new ItemBuilder(ReflectionUtil.isAtLeastVersion("1_17") ? new ItemStack(Material.MEDIUM_AMETHYST_BUD) :
+                                Editor.IS_NEW ? new ItemStack(Material.RED_DYE) : new ItemStack(Material.matchMaterial("INK_SACK"), 1, (byte)1)).name("&8&nMin").lore(Editor.LORE_LMB_NUM + "\n" + Editor.LORE_RMB_NUM + "\n" + Editor.LORE_SHIFT_NUM).count(min).toItem()))
                 // Max
                 .button(7, 2, new Button.Builder()
                         .lmb(interact -> {
@@ -84,6 +83,7 @@ public final class LootItem extends AbstractLootItem {
                             max = Util.clamp(max + change, min, itemStack.getMaxStackSize());
                             return Result.REFRESH();
                         })
-                        .icon(() -> new ItemBuilder(ReflectionUtil.isAtLeastVersion("1_17") ? Material.AMETHYST_CLUSTER : Material.GREEN_DYE).name("&8&nMax").lore(Editor.LORE_LMB_NUM + "\n" + Editor.LORE_RMB_NUM + "\n" + Editor.LORE_SHIFT_NUM).count(max).toItem()));
+                        .icon(() -> new ItemBuilder(ReflectionUtil.isAtLeastVersion("1_17") ? new ItemStack(Material.AMETHYST_CLUSTER) :
+                                Editor.IS_NEW ? new ItemStack(Material.GREEN_DYE) : new ItemStack(Material.matchMaterial("INK_SACK"), 1, (byte)2)).name("&8&nMax").lore(Editor.LORE_LMB_NUM + "\n" + Editor.LORE_RMB_NUM + "\n" + Editor.LORE_SHIFT_NUM).count(max).toItem()));
     }
 }

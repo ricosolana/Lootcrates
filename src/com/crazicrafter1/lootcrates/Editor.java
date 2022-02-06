@@ -24,7 +24,10 @@ public class Editor {
 
     //public static final Button.Builder inOutline = new Button.Builder().icon(() -> new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name("&7Set to").toItem());
 
-    public static final Button.Builder IN_OUTLINE = new Button.Builder().icon(() -> new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name("&7Set to").toItem());
+    public static final boolean IS_NEW = ReflectionUtil.isAtLeastVersion("1_16");
+
+    public static final Button.Builder IN_OUTLINE = new Button.Builder().icon(() -> new ItemBuilder(
+            IS_NEW ? new ItemStack(Material.GRAY_STAINED_GLASS_PANE) : new ItemStack(Material.matchMaterial("STAINED_GLASS_PANE"), 1, (short) 7)).name("&7Set to").toItem());
 
     public static final String LORE_LMB_EDIT = "&7LMB: &aEdit";
     public static final String LORE_RMB_DEL = "&7RMB: &cDelete";
@@ -38,9 +41,10 @@ public class Editor {
     @SuppressWarnings("SpellCheckingInspection")
     public static final String BASE64_CUSTOM_MODEL_DATA = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzQ2NDg3NGRmNDUyYzFkNzE3ZWRkZDBmYjNiODQ4MjAyYWQxNTU3MTI0NWFmNmZhZGUyZWNmNTE0ZjNjODBiYiJ9fX0=";
 
-    public static String COLOR_PREFIX = "&7'&' " + (ReflectionUtil.isAtLeastVersion("1_16") ?
+    public static String COLOR_PREFIX = "&7'&' " + (IS_NEW ?
             "or '#&': &#2367fbc&#3f83fbo&#5a9ffcl&#76bbfco&#91d7fcr&#acf2fds" : ": &fcolors") +
             "\n&7Macros: &6%lc_picks%&7, &6%lc_id%\n&7Supports PlaceholderAPI";
+
     private static final String LOREM_IPSUM = "Lorem ipsum";
 
     @SuppressWarnings("DanglingJavadoc")
@@ -121,7 +125,7 @@ public class Editor {
                                                 // *   *   *
                                                 // Edit LootSets
                                                 // *   *   *
-                                                .childButton(5, 1, () -> new ItemBuilder(Material.EXPERIENCE_BOTTLE).name("&6&nLoot").lore(LORE_LMB_EDIT).toItem(), new ParallaxMenu.PBuilder()
+                                                .childButton(5, 1, () -> new ItemBuilder(IS_NEW ? Material.EXPERIENCE_BOTTLE : Material.matchMaterial("EXP_BOTTLE")).name("&6&nLoot").lore(LORE_LMB_EDIT).toItem(), new ParallaxMenu.PBuilder()
                                                         .title("lootSets", true)
                                                         .parentButton(4, 5)
                                                         .addAll(builder -> {
@@ -237,7 +241,7 @@ public class Editor {
                 /*
                  * View LootSets
                  */
-                ).childButton(3, 1, () -> new ItemBuilder(Material.EXPERIENCE_BOTTLE).name("&6&lLoot").toItem(), new ParallaxMenu.PBuilder()
+                ).childButton(3, 1, () -> new ItemBuilder(IS_NEW ? Material.EXPERIENCE_BOTTLE : Material.matchMaterial("EXP_BOTTLE")).name("&6&lLoot").toItem(), new ParallaxMenu.PBuilder()
                         .title("lootSets", true)
                         .parentButton(4, 5)
                         .addAll(self -> {
@@ -255,6 +259,7 @@ public class Editor {
                                                     ArrayList<Button> result1 = new ArrayList<>();
                                                     for (ILoot a : lootSet.loot) {
                                                         ItemStack copy = a.getIcon(null);
+
                                                         result1.add(new Button.Builder()
                                                                 .icon(() -> new ItemBuilder(copy).lore(a + "\n" + LORE_LMB_EDIT + "\n" + LORE_RMB_DEL).toItem())
                                                                 .child(self1, a.getMenuBuilder(), interact -> {
@@ -338,7 +343,7 @@ public class Editor {
                 /*
                  * Global Fireworks Edit
                  */
-                .childButton(5, 1, () -> new ItemBuilder(Material.FIREWORK_ROCKET).name("&e&lFireworks").toItem(), new SimpleMenu.SBuilder(5)
+                .childButton(5, 1, () -> new ItemBuilder(IS_NEW ? Material.FIREWORK_ROCKET : Material.matchMaterial("FIREWORK")).name("&e&lFireworks").toItem(), new SimpleMenu.SBuilder(5)
                         .title("firework", true)
                         .background()
                         .button(4, 0, IN_OUTLINE)
@@ -346,9 +351,9 @@ public class Editor {
                         .button(5, 1, IN_OUTLINE)
                         .button(4, 2, IN_OUTLINE)
                         .button(1, 1, new Button.Builder()
-                                .icon(() -> new ItemBuilder(Material.FIREWORK_STAR).fireworkEffect(Main.get().data.fireworkEffect).toItem()))
+                                .icon(() -> new ItemBuilder(IS_NEW ? Material.FIREWORK_STAR : Material.matchMaterial("FIREWORK_CHARGE")).fireworkEffect(Main.get().data.fireworkEffect).toItem()))
                         .button(4, 1, new Button.Builder()
-                                .icon(() -> new ItemBuilder(Material.FIREWORK_STAR).fireworkEffect(Main.get().data.fireworkEffect).toItem())
+                                .icon(() -> new ItemBuilder(IS_NEW ? Material.FIREWORK_STAR : Material.matchMaterial("FIREWORK_CHARGE")).fireworkEffect(Main.get().data.fireworkEffect).toItem())
                                 .lmb(interact -> {
                                     if (interact.heldItem != null) {
                                         //if (interact.heldItem.getItemMeta() instanceof FireworkEffectMeta meta && meta.hasEffect()) {
@@ -369,11 +374,11 @@ public class Editor {
                 /*
                  * Misc settings
                  */
-                .childButton(7, 1, () -> new ItemBuilder(Material.IRON_HORSE_ARMOR).name("&8&lMisc").toItem(), new SimpleMenu.SBuilder(5)
+                .childButton(7, 1, () -> new ItemBuilder(IS_NEW ? Material.IRON_HORSE_ARMOR : Material.COMPASS).name("&8&lMisc").toItem(), new SimpleMenu.SBuilder(5)
                         .title("misc", true)
                         .button(1, 1, new Button.Builder()
-                                .icon(() -> new ItemBuilder(Material.COMMAND_BLOCK).name("&e&lToggle Debug").lore(Main.get().data.debug ? "&2enabled" : "&cdisabled").toItem())
-                                .lmb(interact -> {Main.get().data.debug ^= true; return Result.REFRESH();}))
+                                .icon(() -> new ItemBuilder(IS_NEW ? Material.COMPARATOR : Material.matchMaterial("REDSTONE_COMPARATOR")).name("&e&lToggle Debug").lore(Main.get().data.debug ? "&2enabled" : "&cdisabled").toItem())
+                                .lmb(interact -> { Main.get().data.debug ^= true; return Result.REFRESH(); }))
                         .parentButton(4, 4)
                 )
                 /*

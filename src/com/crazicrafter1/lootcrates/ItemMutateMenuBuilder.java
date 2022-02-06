@@ -79,7 +79,7 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
                             return Result.BACK();
                         }))
                 // Edit CustomModelData
-                .childButton(6, 2, () -> new ItemBuilder(Material.PLAYER_HEAD).skull(BASE64_CUSTOM_MODEL_DATA).name("&8CustomModelData").lore(LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
+                .childButton(6, 2, () -> new ItemBuilder(Editor.IS_NEW ? Material.PLAYER_HEAD : Material.matchMaterial("SKULL_ITEM")).skull(BASE64_CUSTOM_MODEL_DATA).name("&8CustomModelData").lore(LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
                         .title("model", true)
                         .left(() -> {
                             ItemMeta meta = builder.toItem().getItemMeta();
@@ -104,7 +104,7 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
                             itemStackConsumer.accept(builder.toItem());
 
                             return Result.BACK();
-                        }));
+                        }), () -> Editor.IS_NEW);
 
     }
 

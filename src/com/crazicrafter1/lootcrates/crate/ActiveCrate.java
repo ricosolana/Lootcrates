@@ -65,17 +65,15 @@ public final class ActiveCrate {
 
     private void populate(Crate crate) {
         for (int i = 0; i < size; i++) {
-            LootSet lootGroup = crate.getRandomLootSet();
-            this.lootChances[i] = lootGroup;
+            this.lootChances[i] = crate.getRandomLootSet();
         }
     }
 
     private void selectSlot(int slot) {
-
         if (slots.containsKey(slot))
             return;
 
-        inventory.setItem(slot, data.selectedItem);
+        inventory.setItem(slot, data.selectedItem(player));
 
         ILoot randomLoot = lootChances[slot].getRandomLoot();
         slots.put(slot, new QSlot(randomLoot));
@@ -195,7 +193,7 @@ public final class ActiveCrate {
 
     private void fill() {
         for (int i = 0; i < size; i++)
-            inventory.setItem(i, data.unSelectedItem);
+            inventory.setItem(i, data.unSelectedItem(player));
     }
 
     public Player getPlayer() {
@@ -203,7 +201,7 @@ public final class ActiveCrate {
     }
 
     private ItemStack getPanel(int slot) {
-        return this.lootChances[slot].itemStack;
+        return this.lootChances[slot].itemStack(player);
     }
 
     public void onInventoryClick(InventoryClickEvent e) {

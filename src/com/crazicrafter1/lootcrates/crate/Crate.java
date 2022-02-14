@@ -2,10 +2,11 @@ package com.crazicrafter1.lootcrates.crate;
 
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
+import com.crazicrafter1.lootcrates.Data;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
+import com.crazicrafter1.lootcrates.Main;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Sound;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
@@ -68,6 +69,21 @@ public class Crate implements ConfigurationSerializable {
 
         this.totalWeights = prevSum;
     }
+
+    public static class LanguageUnit {
+        public String itemStackDisplayName;
+        public String itemStackLore;
+
+        public String title;
+    }
+
+    // Any translation applicable values below
+    // such as title, and itemStack name
+    // are defaulted to English (en_us).
+
+    // so a check will involve checking whether
+    // the player language is en_us, and if not,
+    // then attempt a translation
 
     public String id;
     public ItemStack itemStack;
@@ -132,17 +148,57 @@ public class Crate implements ConfigurationSerializable {
     public ItemStack itemStack(@Nullable Player p) {
         ItemBuilder item = new ItemBuilder(itemStack);
 
+        // translations break placeholders
+        // so somehow remove placeholder text for resubstitution
+
+        // wordings are not translated haphazardly during runtime
+        // a simple rename takes place
+
+        Data.LanguageUnit dlu;
+
+        String lang = Util.MCLocaleToGoogleLocale(p.getLocale());
+
+        //Main.get().info("Google locale: " + lang);
+        //Main.get().info("Translations: " + Main.get().data.translations.keySet());
+
+        if (lang == null
+                || lang.equals("en")
+                || (dlu = Main.get().data.translations.get(lang)) == null) {
+            return item
+                    .macro("%", "lc_picks", "" + picks)
+                    .macro("%", "lc_id", "" + id)
+                    .macro("%", "lc_lscount", "" + lootBySum.size())
+                    .placeholders(p).toItem();
+        }
+
+
+        Crate.LanguageUnit clu = dlu.crates.get(id);
+        //Main.get().info("" + clu.itemStackDisplayName);
+
         return item
-            .macro("%", "lc_picks", "" + picks)
-            .macro("%", "lc_id", "" + id)
-            .macro("%", "lc_lscount", "" + lootBySum.size())
-            .placeholders(p).toItem();
+                .macro("%", "lc_picks", "" + picks)
+                .macro("%", "lc_id", "" + id)
+                .macro("%", "lc_lscount", "" + lootBySum.size())
+                .placeholders(p)
+                .name(clu.itemStackDisplayName)
+                .lore(clu.itemStackLore)
+                .toItem();
     }
 
     public String title(@NotNull Player p) {
-        if (com.crazicrafter1.crutils.Main.getInstance().supportPlaceholders)
-            return PlaceholderAPI.setPlaceholders(p, title);
-        return title;
+        Data.LanguageUnit dlu;
+
+        String lang = Util.MCLocaleToGoogleLocale(p.getLocale());
+
+        if (lang == null
+                || lang.equals("en")
+                || (dlu = Main.get().data.translations.get(lang)) == null) {
+            return Util.placeholders(p, title);
+        }
+
+        Crate.LanguageUnit clu = dlu.crates.get(id);
+
+        return Util.placeholders(p, clu.title);
     }
 
     @Override

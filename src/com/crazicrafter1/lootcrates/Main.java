@@ -2,6 +2,7 @@ package com.crazicrafter1.lootcrates;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
+import com.crazicrafter1.crutils.GoogleTranslate;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.ReflectionUtil;
 import com.crazicrafter1.crutils.Util;
@@ -26,6 +27,24 @@ import java.util.UUID;
 
 public class Main extends JavaPlugin
 {
+    /*
+     * Google translate engine design:
+     *  - LootCrates
+     * @param args
+     */
+
+    // test google translate
+    public static void main(String[] args) {
+        GoogleTranslate googleTranslate = new GoogleTranslate();
+
+        String translated = googleTranslate.translate("§c§lKing Bounty §r§7(Tier 3)",
+                "en", "fr");
+
+        // color codes are maintained; not removed
+
+        System.out.println(translated);
+    }
+
     public String prefix() {
         return prefix;
     }
@@ -151,6 +170,8 @@ public class Main extends JavaPlugin
             debug(e);
         }
 
+        data.loadLanguageFiles();
+
         /*
          * Command init
          */
@@ -196,8 +217,12 @@ public class Main extends JavaPlugin
 
     @Override
     public void onDisable() {
-        if (instance != null)
-            this.saveConfig();
+        if (instance == null)
+            return;
+
+        this.saveConfig();
+
+        data.saveLanguageFiles();
     }
 
     public void saveDefaultConfig(boolean replace) {

@@ -386,6 +386,9 @@ public class Editor {
                  */
                 .open(p);
 
+                // en_us
+                //
+                //p.getLocale()
 
     }
 

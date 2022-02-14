@@ -41,6 +41,36 @@ class CmdArg {
     static Map<String, CmdArg> args = new HashMap<>();
 
     static {
+        //args.put("locale", new CmdArg((sender, args) ->
+        //        feedback(sender,"Locale: " + ((Player)sender).getLocale()), null));
+
+        args.put("loadlang", new CmdArg((sender, args) -> {
+            String to = args[0];
+            feedback(sender, "Loading language " + to);
+
+            Main.get().data.loadLanguageFile(to);
+
+            return feedback(sender, "Loaded language from file");
+        }, null));
+
+        args.put("savelang", new CmdArg((sender, args) -> {
+            String to = args[0];
+            feedback(sender, "Saving language " + to);
+
+            Main.get().data.saveLanguageFile(to);
+
+            return feedback(sender, "Saved language to file");
+        }, null));
+
+        args.put("newlang", new CmdArg((sender, args) -> {
+            String to = args[0];
+            feedback(sender, "Translating might take a while");
+
+            Main.get().data.createLanguageFile(to);
+
+            return feedback(sender, "Created language translation unit");
+        }, null));
+
         args.put("save", new CmdArg((sender, args) -> {
             plugin.saveConfig();
             return feedback(sender, "Saved config to disk");

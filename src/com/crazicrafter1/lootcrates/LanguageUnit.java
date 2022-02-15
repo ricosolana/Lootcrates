@@ -18,4 +18,8 @@ public class LanguageUnit {
     public Map<String, Crate.Language> crates;
     // crate id, lang
     public Map<String, LootSet.Language> lootSets;
+
+    public Map<String, String> editor;
+
+
 }

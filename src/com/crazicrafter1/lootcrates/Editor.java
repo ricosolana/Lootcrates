@@ -15,10 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Editor {
 
@@ -35,7 +32,7 @@ public class Editor {
     public static final String LORE_RMB_NUM = "&7RMB&r&7: &a+";
     public static final String LORE_SHIFT_NUM = "&7SHIFT&r&7: x5";
 
-    public static final ItemStack ITEM_NEW = new ItemBuilder(Material.NETHER_STAR).name("&6New").toItem();
+    public static final ItemBuilder ITEM_NEW = new ItemBuilder(Material.NETHER_STAR).name("&6New");
     public static final String NAME_EDIT = "&aEdit";
 
     @SuppressWarnings("SpellCheckingInspection")
@@ -47,8 +44,21 @@ public class Editor {
 
     private static final String LOREM_IPSUM = "Lorem ipsum";
 
+    private static Player p = null;
+    private static String L(String key, String msg) {
+        LanguageUnit unit = Main.get().getLang(p);
+        if (unit == null)
+            return msg;
+        return unit.editor.getOrDefault(key, msg);
+    }
+
+    /**
+     * Non-asynchronous method for opening an editor to player
+     * @param p
+     */
     @SuppressWarnings("DanglingJavadoc")
     public static void open(Player p) {
+        Editor.p = p; // for eye-pleasing access
 
         new SimpleMenu.SBuilder(3)
                 .title("editor", true)
@@ -58,19 +68,19 @@ public class Editor {
                  * Global Crate List *
                  *                   *
                  \*******************/
-                .childButton(1, 1, () -> new ItemBuilder(Material.CHEST).name("&3&lCrates").toItem(), new ParallaxMenu.PBuilder()
-                        .title("crates", true)
+                .childButton(1, 1, () -> new ItemBuilder(Material.CHEST).name(L("DEPTH0_BUTTON_CRATES", "&3&lCrates")).toItem(), new ParallaxMenu.PBuilder()
+                        .title(L("DEPTH1_CRATES_TITLE", "crates"), true)
                         .parentButton(4, 5)
                         // *       *      *
                         // Add Crate button
                         // *       *      *
-                        .childButton(5, 5, () -> ITEM_NEW, new TextMenu.TBuilder()
-                                .title("new crate", true)
-                                .left(() -> LOREM_IPSUM)
+                        .childButton(5, 5, () -> new ItemBuilder(ITEM_NEW).name(L("ITEM_NEW", ITEM_NEW.getName())).toItem(), new TextMenu.TBuilder()
+                                .title(L("DEPTH2_CRATES_ADD", "new crate"), true)
+                                .left(() -> L("LOREM_IPSUM", LOREM_IPSUM))
                                 .onClose((player, reroute) -> Result.BACK())
                                 .onComplete((player, s) -> {
                                     if (s.isEmpty() || Main.get().data.crates.containsKey(s)) {
-                                        return Result.TEXT("Input a unique key");
+                                        return Result.TEXT(L("REQUIRE_UNIQUE", "Input a unique key"));
                                     }
                                     Crate crate = new Crate(s, new ItemBuilder(Material.ENDER_CHEST).name("my new crate").toItem(), "select loot", 3, 4, Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
 
@@ -88,8 +98,10 @@ public class Editor {
                             for (Map.Entry<String, Crate> entry : Main.get().data.crates.entrySet()) {
                                 Crate crate = entry.getValue();
                                 result.add(new Button.Builder()
+                                        // https://regexr.com/6fdsi
+                                        // (?<!\\)(\${)([^\${]+)[}]
                                         //                                                  .lore("&8id: " + lootSet.id + "\n" + "&8" + lootSet.loot.size() + " elements" + "\n" + LORE_LMB_EDIT + "\n" + LORE_RMB_DEL)
-                                        .icon(() -> new ItemBuilder(crate.itemStack).lore("&8id: " + crate.id + "\n" + LORE_LMB_EDIT + "\n" + LORE_RMB_DEL).toItem())
+                                        .icon(() -> new ItemBuilder(crate.itemStack).lore("&8id: " + crate.id + "\n" + L("LORE_LMB_EDIT", LORE_LMB_EDIT) + "\n" + L("LORE_RMB_DEL", LORE_RMB_DEL)).toItem())
                                         .child(self, new SimpleMenu.SBuilder(5)
                                                 .title(crate.id, true)
                                                 .background()
@@ -97,7 +109,7 @@ public class Editor {
                                                 // *   *   *
                                                 // Edit Crate ItemStack
                                                 // *   *   *
-                                                .childButton(1, 1, () -> new ItemBuilder(crate.itemStack.getType()).name("&8&nItemStack").lore(LORE_LMB_EDIT).toItem(), new ItemMutateMenuBuilder()
+                                                .childButton(1, 1, () -> new ItemBuilder(crate.itemStack.getType()).name(L("CRATES_PER_EDIT", "&8&nItemStack")).lore(L("LORE_LMB_EDIT", LORE_LMB_EDIT)).toItem(), new ItemMutateMenuBuilder()
                                                         .build(crate.itemStack.clone(), (itemStack -> {
                                                             //Main.get().info("consumer: " + itemStack);
                                                             crate.itemStack = itemStack;
@@ -106,12 +118,12 @@ public class Editor {
                                                 // *   *   *
                                                 // Edit Inventory Title
                                                 // *   *   *
-                                                .childButton(3, 1, () -> new ItemBuilder(Material.PAPER).name("&e&nTitle&r&e: " + crate.title).lore(LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
-                                                        .title("title", true)
+                                                .childButton(3, 1, () -> new ItemBuilder(Material.PAPER).name(L("CRATES_PER_TITLE", "&e&nTitle&r&e: ") + crate.title).lore(L("LORE_LMB_EDIT", LORE_LMB_EDIT)).toItem(), new TextMenu.TBuilder()
+                                                        .title(L("SINGULAR_TITLE", "title"), true)
                                                         .left(() -> Util.toAlternateColorCodes('&', crate.title))
                                                         .onClose((player, reroute) -> Result.BACK())
                                                         //.leftInput(SAMPLE_LEFT)
-                                                        .right(() -> COLOR_PREFIX)
+                                                        .right(() -> L("COLOR_PREFIX", COLOR_PREFIX))
                                                         .onComplete((player, s) -> {
                                                             // set name if it is not empty
                                                             if (!s.isEmpty()) {
@@ -119,13 +131,13 @@ public class Editor {
                                                                 return Result.BACK();
                                                             }
 
-                                                            return Result.TEXT("Invalid");
+                                                            return Result.TEXT(L("INVALID", "Invalid"));
                                                         })
                                                 )
                                                 // *   *   *
                                                 // Edit LootSets
                                                 // *   *   *
-                                                .childButton(5, 1, () -> new ItemBuilder(IS_NEW ? Material.EXPERIENCE_BOTTLE : Material.matchMaterial("EXP_BOTTLE")).name("&6&nLoot").lore(LORE_LMB_EDIT).toItem(), new ParallaxMenu.PBuilder()
+                                                .childButton(5, 1, () -> new ItemBuilder(IS_NEW ? Material.EXPERIENCE_BOTTLE : Material.matchMaterial("EXP_BOTTLE")).name(L("LOOT", "&6&nLoot")).lore(LORE_LMB_EDIT).toItem(), new ParallaxMenu.PBuilder()
                                                         .title("lootSets", true)
                                                         .parentButton(4, 5)
                                                         .addAll(builder -> {
@@ -276,7 +288,7 @@ public class Editor {
                                                 })
                                                 .childButton(3, 5, () -> new ItemBuilder(lootSet.itemStack).name(NAME_EDIT).toItem(), new ItemMutateMenuBuilder()
                                                         .build(lootSet.itemStack, itemStack -> lootSet.itemStack = itemStack))
-                                                .childButton(5, 5, () -> ITEM_NEW, new ParallaxMenu.PBuilder()
+                                                .childButton(5, 5, ITEM_NEW::toItem, new ParallaxMenu.PBuilder()
                                                         .title("new loot", true)
                                                         //.onClose(player -> EnumResult.BACK)
                                                         .parentButton(4, 5)
@@ -321,7 +333,7 @@ public class Editor {
                             }
                             return result;
                         })
-                        .childButton(5, 5, () -> ITEM_NEW, new TextMenu.TBuilder()
+                        .childButton(5, 5, ITEM_NEW::toItem, new TextMenu.TBuilder()
                                 .title("new lootSet", true)
                                 .left(() -> LOREM_IPSUM)
                                 .onClose((player, reroute) -> !reroute ? Result.BACK() : null)

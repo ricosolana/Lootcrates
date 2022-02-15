@@ -1,8 +1,7 @@
 package com.crazicrafter1.lootcrates.crate;
 
 import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.crutils.Util;
-import com.crazicrafter1.lootcrates.Data;
+import com.crazicrafter1.lootcrates.LanguageUnit;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -15,7 +14,7 @@ import java.util.Map;
 
 public class LootSet implements ConfigurationSerializable {
 
-    public static class LanguageUnit {
+    public static class Language {
         public String itemStackDisplayName;
         public String itemStackLore;
     }
@@ -36,18 +35,13 @@ public class LootSet implements ConfigurationSerializable {
     }
 
     public ItemStack itemStack(Player p) {
+        LanguageUnit dlu = Main.get().getLang(p);
 
-        Data.LanguageUnit dlu;
-
-        String lang = Util.MCLocaleToGoogleLocale(p.getLocale());
-
-        if (lang == null
-                || lang.equals("en")
-                || (dlu = Main.get().data.translations.get(lang)) == null) {
+        if (dlu == null) {
             return itemStack;
         }
 
-        LootSet.LanguageUnit llu = dlu.lootSets.get(id);
+        Language llu = dlu.lootSets.get(id);
 
         return new ItemBuilder(itemStack)
                 .name(llu.itemStackDisplayName)

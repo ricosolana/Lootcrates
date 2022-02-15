@@ -18,11 +18,13 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.UUID;
 
 public class Main extends JavaPlugin
@@ -170,8 +172,6 @@ public class Main extends JavaPlugin
             debug(e);
         }
 
-        data.loadLanguageFiles();
-
         /*
          * Command init
          */
@@ -187,6 +187,25 @@ public class Main extends JavaPlugin
         new ListenerOnPlayerInteract(this);
         new ListenerOnPlayerInteract(this);
         new ListenerOnPlayerQuit(this);
+    }
+
+    public LanguageUnit getLang(Player p) {
+        LanguageUnit dlu;
+
+        String lang = null;
+        String locale = p.getLocale();
+        int index = locale.indexOf("_");
+        if (index != -1) {
+            lang = locale.toLowerCase(Locale.ROOT).substring(0, index);
+        }
+
+        if (!data.lang
+                || lang == null
+                || lang.equals("en")
+                || (dlu = Main.get().data.translations.get(lang)) == null)
+            return null;
+
+        return dlu;
     }
 
     /**
@@ -221,8 +240,6 @@ public class Main extends JavaPlugin
             return;
 
         this.saveConfig();
-
-        data.saveLanguageFiles();
     }
 
     public void saveDefaultConfig(boolean replace) {

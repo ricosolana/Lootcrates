@@ -2,10 +2,10 @@ package com.crazicrafter1.lootcrates;
 
 import com.crazicrafter1.crutils.GoogleTranslate;
 import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootSet;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
+import com.sun.istack.internal.NotNull;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
@@ -24,6 +24,7 @@ public class Data implements ConfigurationSerializable {
     public Data() {}
 
     public Data(Map<String, Object> args) {
+        lang = (boolean) args.getOrDefault("lang", false);
         debug = (boolean) args.getOrDefault("debug", false);
         update = (boolean) args.getOrDefault("update", true);
         speed = (int) args.getOrDefault("speed", 4);
@@ -66,21 +67,18 @@ public class Data implements ConfigurationSerializable {
                 reader.close();
             }
         } catch (Exception e) {e.printStackTrace();}
+
+        loadLanguageFiles();
     }
 
     /*
      * Defaults, under the assumption that config permanently fails
      * Safe dev-like fallbacks
      */
+    public boolean lang;
     public boolean debug;
     public boolean update;
     public int speed;
-
-    /// having many maps for each item category is terrible,
-    /// so instead having 1 map for each language is better
-    /// partitioning will be difficult though.
-
-    // each class instance will represent a single separate language
 
     public ItemStack unSelectedItem;
     public ItemStack selectedItem;
@@ -94,13 +92,9 @@ public class Data implements ConfigurationSerializable {
     public HashSet<UUID> alertedPlayers = new HashSet<>();
 
     public ItemStack unSelectedItem(Player p) {
-        Data.LanguageUnit dlu;
+        LanguageUnit dlu = Main.get().getLang(p);
 
-        String lang = Util.MCLocaleToGoogleLocale(p.getLocale());
-
-        if (lang == null
-                || lang.equals("en")
-                || (dlu = Main.get().data.translations.get(lang)) == null) {
+        if (dlu == null) {
             return unSelectedItem;
         }
 
@@ -111,13 +105,9 @@ public class Data implements ConfigurationSerializable {
     }
 
     public ItemStack selectedItem(Player p) {
-        Data.LanguageUnit dlu;
+        LanguageUnit dlu = Main.get().getLang(p);
 
-        String lang = Util.MCLocaleToGoogleLocale(p.getLocale());
-
-        if (lang == null
-                || lang.equals("en")
-                || (dlu = Main.get().data.translations.get(lang)) == null) {
+        if (dlu == null) {
             return selectedItem;
         }
 
@@ -127,19 +117,6 @@ public class Data implements ConfigurationSerializable {
                 .toItem();
     }
 
-    public static class LanguageUnit {
-        public String selectedDisplayName;
-        public String selectedLore;
-
-        public String unSelectedDisplayName;
-        public String unSelectedLore;
-
-        // lootSet id, lang
-        public Map<String, Crate.LanguageUnit> crates;
-        // crate id, lang
-        public Map<String, LootSet.LanguageUnit> lootSets;
-    }
-
     //          lang, translation
     public Map<String, LanguageUnit> translations;
 
@@ -147,6 +124,7 @@ public class Data implements ConfigurationSerializable {
     public Map<String, Object> serialize() {
         Map<String, Object> result = new LinkedHashMap<>();
 
+        result.put("lang", lang);
         result.put("debug", debug);
         result.put("update", update);
         result.put("speed", speed);
@@ -176,18 +154,22 @@ public class Data implements ConfigurationSerializable {
                 writer.close();
             } catch (Exception e) {e.printStackTrace();}
 
+        saveLanguageFiles();
+
         return result;
     }
 
     /**
      * Load all the language files located in lootcrates/lang/
      */
-    public void loadLanguageFiles() {
+    public boolean loadLanguageFiles() {
         final File langFolder = new File(Main.get().getDataFolder(), "lang");
         langFolder.mkdirs();
 
         translations = new HashMap<>();
 
+        int i = 0;
+        int total = 0;
         try {
             // load from lang folder
             for (File file : langFolder.listFiles()) {
@@ -196,184 +178,200 @@ public class Data implements ConfigurationSerializable {
                 if (lang.endsWith(".yml")) {
                     lang = lang.replace(".yml", "");
 
-                    loadLanguageFile(lang);
-                }
+                    if (loadLanguageFile(lang))
+                        i++;
 
+                    total++;
+                }
             }
         } catch (Exception e) {
             Main.get().error("Unable to load language files");
             e.printStackTrace();
+            return false;
         }
+
+        if (i != total) {
+            Main.get().error("Unable to load all language yml files");
+            return false;
+        }
+
+        return true;
     }
 
-    public void loadLanguageFile(final String lang) {
-        final File langFolder = new File(Main.get().getDataFolder(), "lang");
-        langFolder.mkdirs();
-
+    public boolean loadLanguageFile(final String lang) {
         try {
             Main.get().info("Loading language " + lang);
 
-            LanguageUnit dataLanguageUnit = new Data.LanguageUnit();
+            final File langFolder = new File(Main.get().getDataFolder(), "lang");
+            langFolder.mkdirs();
+
+            LanguageUnit unit = new LanguageUnit();
 
             FileConfiguration langConfig = new YamlConfiguration();
             langConfig.load(new File(langFolder, lang + ".yml"));
 
-            dataLanguageUnit.selectedDisplayName = langConfig.getString("selectedDisplayName");
-            dataLanguageUnit.selectedLore = langConfig.getString("selectedLore");
-            dataLanguageUnit.unSelectedDisplayName = langConfig.getString("unSelectedDisplayName");
-            dataLanguageUnit.unSelectedLore = langConfig.getString("unSelectedLore");
+            unit.selectedDisplayName = langConfig.getString("selectedDisplayName");
+            unit.selectedLore = langConfig.getString("selectedLore");
+            unit.unSelectedDisplayName = langConfig.getString("unSelectedDisplayName");
+            unit.unSelectedLore = langConfig.getString("unSelectedLore");
 
-            dataLanguageUnit.crates = new HashMap<>();
-            dataLanguageUnit.lootSets = new HashMap<>();
+            unit.crates = new HashMap<>();
+            unit.lootSets = new HashMap<>();
 
             // load lootsets
             for (String id : lootSets.keySet()) {
                 String key = "lootSets." + id + ".";
 
-                LootSet.LanguageUnit lootLanguageUnit = new LootSet.LanguageUnit();
+                LootSet.Language ll = new LootSet.Language();
 
-                lootLanguageUnit.itemStackDisplayName = langConfig.getString(key + "itemStackDisplayName");
-                lootLanguageUnit.itemStackLore = langConfig.getString(key + "itemStackLore");
+                ll.itemStackDisplayName = langConfig.getString(key + "itemStackDisplayName");
+                ll.itemStackLore = langConfig.getString(key + "itemStackLore");
 
-                dataLanguageUnit.lootSets.put(id, lootLanguageUnit);
+                unit.lootSets.put(id, ll);
             }
 
             // now load crates
             for (String id : crates.keySet()) {
                 String key = "crates." + id + ".";
 
-                Crate.LanguageUnit crateLanguageUnit = new Crate.LanguageUnit();
+                Crate.Language cl = new Crate.Language();
 
-                crateLanguageUnit.itemStackDisplayName = langConfig.getString(key + "itemStackDisplayName");
-                crateLanguageUnit.itemStackLore = langConfig.getString(key + "itemStackLore");
-                crateLanguageUnit.title = langConfig.getString(key + "title");
+                cl.itemStackDisplayName = langConfig.getString(key + "itemStackDisplayName");
+                cl.itemStackLore = langConfig.getString(key + "itemStackLore");
+                cl.title = langConfig.getString(key + "title");
 
-                dataLanguageUnit.crates.put(id, crateLanguageUnit);
+                unit.crates.put(id, cl);
             }
 
-            translations.put(lang, dataLanguageUnit);
+            translations.put(lang, unit);
 
+            return true;
         } catch (Exception e) {
-            Main.get().error("Unable to load language " + lang);
             e.printStackTrace();
+            return false;
         }
     }
 
     /**
      * Save all the language files to lootcrates/lang/
      */
-    public void saveLanguageFiles() {
-        Main.get().info("About to save " + translations.size() + " languages");
+    public boolean saveLanguageFiles() {
+        Main.get().info("Saving languages");
 
-        try {
-            for (String lang : translations.keySet()) {
-                saveLanguageFile(lang);
-            }
-        } catch (Exception e) {
-            Main.get().error("Unable to save language files");
-            e.printStackTrace();
+        int i = 0;
+        for (LanguageUnit unit : translations.values()) {
+            if (saveLanguageFile(unit))
+                i++;
         }
+
+        if (i != translations.size()) {
+            Main.get().error("Saved " + i + "/" + translations.size() + " languages");
+            return false;
+        } else Main.get().info("Saved all " + translations.size() + " languages");
+
+        return true;
     }
 
-    public void saveLanguageFile(final String lang) {
-        final File langFolder = new File(Main.get().getDataFolder(), "lang" );
-        langFolder.mkdirs();
+    /**
+     * Save the specified language according to Google language code format
+     * @param language language code in the form of 'en', 'es', 'fr', 'gr'
+     */
+    public boolean saveLanguageFile(@NotNull final String language) {
+        return saveLanguageFile(translations.get(language));
+    }
 
+    public boolean saveLanguageFile(@NotNull final LanguageUnit unit) {
         try {
-            LanguageUnit dlu = translations.get(lang);
+            Main.get().info("Saving language " + unit.language);
 
-            if (dlu == null)
-                return;
-
-            Main.get().info("Saving language " + lang);
+            final File langFolder = new File(Main.get().getDataFolder(), "lang");
+            langFolder.mkdirs();
 
             FileConfiguration langConfig = new YamlConfiguration();
-            langConfig.set("selectedDisplayName", dlu.selectedDisplayName);
-            langConfig.set("selectedLore", dlu.selectedLore);
-            langConfig.set("unSelectedDisplayName", dlu.unSelectedDisplayName);
-            langConfig.set("unSelectedLore", dlu.unSelectedLore);
+            langConfig.set("selectedDisplayName", unit.selectedDisplayName);
+            langConfig.set("selectedLore", unit.selectedLore);
+            langConfig.set("unSelectedDisplayName", unit.unSelectedDisplayName);
+            langConfig.set("unSelectedLore", unit.unSelectedLore);
 
             // iterate lootsets, inserting into config
             for (String id : lootSets.keySet()) {
                 String key = "lootSets." + id + ".";
 
-                LootSet.LanguageUnit llu = dlu.lootSets.get(id);
+                LootSet.Language ll = unit.lootSets.get(id);
 
-                langConfig.set(key + "itemStackDisplayName", llu.itemStackDisplayName);
-                langConfig.set(key + "itemStackLore", llu.itemStackLore);
+                langConfig.set(key + "itemStackDisplayName", ll.itemStackDisplayName);
+                langConfig.set(key + "itemStackLore", ll.itemStackLore);
             }
 
             for (String id : crates.keySet()) {
                 String key = "crates." + id + ".";
 
-                Crate.LanguageUnit clu = dlu.crates.get(id);
+                Crate.Language cl = unit.crates.get(id);
 
-                langConfig.set(key + "itemStackDisplayName", clu.itemStackDisplayName);
-                langConfig.set(key + "itemStackLore", clu.itemStackLore);
-                langConfig.set(key + "title", clu.title);
+                langConfig.set(key + "itemStackDisplayName", cl.itemStackDisplayName);
+                langConfig.set(key + "itemStackLore", cl.itemStackLore);
+                langConfig.set(key + "title", cl.title);
             }
 
-            langConfig.save(new File(langFolder, lang + ".yml"));
+            langConfig.save(new File(langFolder, unit.language + ".yml"));
 
+            return true;
         } catch (Exception e) {
-            Main.get().error("Unable to save language " + lang);
             e.printStackTrace();
+            return false;
         }
     }
 
     /**
-     * @param lang language in the form of 'en'
+     * Perform a translation on the config and editor
+     * @param language language code in the form of 'en', 'es', 'fr', 'gr'
      */
-    public void createLanguageFile(String lang) {
-        //LanguageUnit dlu = translations.get(lang);
-        //if (dlu != null)
-        //    return;
+    public boolean createLanguageFile(String language) {
+        try {
+            LanguageUnit dlu = new LanguageUnit();
+            GoogleTranslate GOOG = new GoogleTranslate();
 
-        LanguageUnit dlu = new LanguageUnit();
-        GoogleTranslate GOOG = new GoogleTranslate();
+            ItemBuilder builder = new ItemBuilder(unSelectedItem).translateLexicals("auto", language);
+            dlu.unSelectedDisplayName = builder.getName();
+            dlu.unSelectedLore = builder.getLore();
 
-        if (GOOG.translate("test", "auto", "es") == null)
-            return;
+            builder = new ItemBuilder(selectedItem).translateLexicals("auto", language);
+            dlu.selectedDisplayName = builder.getName();
+            dlu.selectedLore = builder.getLore();
 
-        ItemBuilder builder = new ItemBuilder(unSelectedItem).translateLexicals("en", lang);
-        dlu.unSelectedDisplayName = builder.getName();
-        dlu.unSelectedLore = builder.getLore();
-        // now whether lores will work using translate?
+            dlu.lootSets = new HashMap<>();
+            for (Map.Entry<String, LootSet> entry : lootSets.entrySet()) {
+                LootSet.Language ll = new LootSet.Language();
 
-        builder = new ItemBuilder(selectedItem).translateLexicals("en", lang);
-        dlu.selectedDisplayName = builder.getName();
-        dlu.selectedLore = builder.getLore();
+                builder = new ItemBuilder(entry.getValue().itemStack).translateLexicals("auto", language);
+                ll.itemStackDisplayName = builder.getName();
+                ll.itemStackLore = builder.getLore();
 
-        // load LootsetIDS
-        dlu.lootSets = new HashMap<>();
-        for (Map.Entry<String, LootSet> entry : lootSets.entrySet()) {
+                dlu.lootSets.put(entry.getKey(), ll);
+            }
 
-            LootSet.LanguageUnit llu = new LootSet.LanguageUnit();
+            dlu.crates = new HashMap<>();
+            for (Map.Entry<String, Crate> entry : crates.entrySet()) {
+                Crate.Language cl = new Crate.Language();
 
-            builder = new ItemBuilder(entry.getValue().itemStack).translateLexicals("en", lang);
-            llu.itemStackDisplayName = builder.getName();
-            llu.itemStackLore = builder.getLore();
+                builder = new ItemBuilder(entry.getValue().itemStack).translateLexicals("auto", language);
+                cl.itemStackDisplayName = builder.getName();
+                cl.itemStackLore = builder.getLore();
+                cl.title = GOOG.translate(entry.getValue().title, "auto", language);
 
-            dlu.lootSets.put(entry.getKey(), llu);
+                dlu.crates.put(entry.getKey(), cl);
+            }
+
+            translations.put(language, dlu);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
-
-        dlu.crates = new HashMap<>();
-        for (Map.Entry<String, Crate> entry : crates.entrySet()) {
-
-            Crate.LanguageUnit clu = new Crate.LanguageUnit();
-
-            builder = new ItemBuilder(entry.getValue().itemStack).translateLexicals("en", lang);
-            clu.itemStackDisplayName = builder.getName();
-            clu.itemStackLore = builder.getLore();
-            clu.title = GOOG.translate(entry.getValue().title, "en", lang);
-
-            dlu.crates.put(entry.getKey(), clu);
-        }
-
-        translations.put(lang, dlu);
     }
 
     void populate() {
+        lang = false;
         debug = false;
         update = true;
         speed = 4;

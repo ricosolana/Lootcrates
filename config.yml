@@ -2,6 +2,7 @@
 # 1976: 1.14.4
 data:
   ==: Data
+  lang: false
   debug: false
   update: true
   speed: 4

@@ -2,7 +2,7 @@ package com.crazicrafter1.lootcrates.crate;
 
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
-import com.crazicrafter1.lootcrates.Data;
+import com.crazicrafter1.lootcrates.LanguageUnit;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
 import com.crazicrafter1.lootcrates.Main;
 import com.sun.istack.internal.NotNull;
@@ -70,7 +70,7 @@ public class Crate implements ConfigurationSerializable {
         this.totalWeights = prevSum;
     }
 
-    public static class LanguageUnit {
+    public static class Language {
         public String itemStackDisplayName;
         public String itemStackLore;
 
@@ -148,22 +148,9 @@ public class Crate implements ConfigurationSerializable {
     public ItemStack itemStack(@Nullable Player p) {
         ItemBuilder item = new ItemBuilder(itemStack);
 
-        // translations break placeholders
-        // so somehow remove placeholder text for resubstitution
+        LanguageUnit dlu = Main.get().getLang(p);
 
-        // wordings are not translated haphazardly during runtime
-        // a simple rename takes place
-
-        Data.LanguageUnit dlu;
-
-        String lang = Util.MCLocaleToGoogleLocale(p.getLocale());
-
-        //Main.get().info("Google locale: " + lang);
-        //Main.get().info("Translations: " + Main.get().data.translations.keySet());
-
-        if (lang == null
-                || lang.equals("en")
-                || (dlu = Main.get().data.translations.get(lang)) == null) {
+        if (dlu == null) {
             return item
                     .macro("%", "lc_picks", "" + picks)
                     .macro("%", "lc_id", "" + id)
@@ -171,9 +158,7 @@ public class Crate implements ConfigurationSerializable {
                     .placeholders(p).toItem();
         }
 
-
-        Crate.LanguageUnit clu = dlu.crates.get(id);
-        //Main.get().info("" + clu.itemStackDisplayName);
+        Language clu = dlu.crates.get(id);
 
         return item
                 .macro("%", "lc_picks", "" + picks)
@@ -186,17 +171,13 @@ public class Crate implements ConfigurationSerializable {
     }
 
     public String title(@NotNull Player p) {
-        Data.LanguageUnit dlu;
+        LanguageUnit dlu = Main.get().getLang(p);
 
-        String lang = Util.MCLocaleToGoogleLocale(p.getLocale());
-
-        if (lang == null
-                || lang.equals("en")
-                || (dlu = Main.get().data.translations.get(lang)) == null) {
+        if (dlu == null) {
             return Util.placeholders(p, title);
         }
 
-        Crate.LanguageUnit clu = dlu.crates.get(id);
+        Language clu = dlu.crates.get(id);
 
         return Util.placeholders(p, clu.title);
     }

@@ -32,11 +32,7 @@ class CmdArg {
     }
 
     /**
-     * Add all command args to this map,
-     * IndexOutOfBoundsException safe,
-     * TODO
-     *  use a contracted command arg requirement with a map or something to streamline
-     *  arg passing
+     * Command executor and tab-completer map
      */
     static Map<String, CmdArg> args = new HashMap<>();
 
@@ -44,32 +40,68 @@ class CmdArg {
         //args.put("locale", new CmdArg((sender, args) ->
         //        feedback(sender,"Locale: " + ((Player)sender).getLocale()), null));
 
-        args.put("loadlang", new CmdArg((sender, args) -> {
-            String to = args[0];
-            feedback(sender, "Loading language " + to);
+        args.put("lang", new CmdArg((sender, args) -> {
+            if (args.length == 0) {
+                return feedback(sender, "Currently " + Main.get().data.translations.size() + " languages are loaded\n" + Main.get().data.translations.keySet());
+            }
 
-            Main.get().data.loadLanguageFile(to);
+            final long start = System.currentTimeMillis();
+            boolean success;
+            if ((args.length == 1 || args[1].equalsIgnoreCase("confirm"))
+                && (args[0].equalsIgnoreCase("save") || args[0].equalsIgnoreCase("load"))) {
 
-            return feedback(sender, "Loaded language from file");
-        }, null));
+                if (args.length == 1)
+                    return error(sender, "Are you sure you want to save/load all language files? If so, append 'confirm' to the command");
 
-        args.put("savelang", new CmdArg((sender, args) -> {
-            String to = args[0];
-            feedback(sender, "Saving language " + to);
+                switch (args[0].toLowerCase()) {
+                    case "save": {
+                        feedback(sender, "Saving all languages");
+                        success = Main.get().data.saveLanguageFiles();
+                        break;
+                    }
+                    case "load": {
+                        feedback(sender, "Loading all languages");
+                        success = Main.get().data.loadLanguageFiles();
+                        break;
+                    }
+                    default:
+                        return error(sender, "Unknown argument");
+                }
+            } else {
+                String lang = args[1];
+                switch (args[0].toLowerCase()) {
+                    case "save": {
+                        feedback(sender, "Saving language " + lang);
+                        success = Main.get().data.saveLanguageFile(lang);
+                        break;
+                    }
+                    case "load": {
+                        feedback(sender, "Loading language " + lang);
+                        success = Main.get().data.loadLanguageFile(lang);
+                        break;
+                    }
+                    case "translate": {
+                        feedback(sender, "Translating language unit to " + lang);
+                        success = Main.get().data.createLanguageFile(lang);
+                        break;
+                    }
+                    default:
+                        return error(sender, "Unknown argument");
+                }
+            }
 
-            Main.get().data.saveLanguageFile(to);
+            final long end = System.currentTimeMillis();
 
-            return feedback(sender, "Saved language to file");
-        }, null));
-
-        args.put("newlang", new CmdArg((sender, args) -> {
-            String to = args[0];
-            feedback(sender, "Translating might take a while");
-
-            Main.get().data.createLanguageFile(to);
-
-            return feedback(sender, "Created language translation unit");
-        }, null));
+            return !success ?
+                    error(sender, "Operation failed (see console)") :
+                    feedback(sender, String.format("Operation took %.02fs", (float)(end-start)/1000.f));
+        }, (sender, args) -> {
+            if (args.length == 1) {
+                return getMatches(args[0], Arrays.asList("save", "load", "translate"));
+            } else if (args.length == 2 && args[0].equalsIgnoreCase("save") || args[0].equalsIgnoreCase("load"))
+                return getMatches(args[1], Main.get().data.translations.keySet());
+            return new ArrayList<>();
+        }));
 
         args.put("save", new CmdArg((sender, args) -> {
             plugin.saveConfig();

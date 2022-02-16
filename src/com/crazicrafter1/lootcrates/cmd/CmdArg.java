@@ -131,7 +131,7 @@ class CmdArg {
                 return feedback(sender, "Gave a " + crate.id + " crate to all players (" + ChatColor.LIGHT_PURPLE + Bukkit.getOnlinePlayers().size() + ChatColor.GRAY + " online)");
             }
 
-            Player p = Bukkit.getServer().getPlayer(args[2]);
+            Player p = Bukkit.getServer().getPlayer(args[1]);
             if (p == null)
                 return error(sender, "That player cannot be found");
 

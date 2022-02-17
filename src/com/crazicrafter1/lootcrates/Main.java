@@ -2,10 +2,9 @@ package com.crazicrafter1.lootcrates;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
-import com.crazicrafter1.crutils.GoogleTranslate;
 import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.crutils.ReflectionUtil;
 import com.crazicrafter1.crutils.Util;
+import com.crazicrafter1.crutils.Version;
 import com.crazicrafter1.lootcrates.cmd.Cmd;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import com.crazicrafter1.lootcrates.crate.Crate;
@@ -29,24 +28,6 @@ import java.util.UUID;
 
 public class Main extends JavaPlugin
 {
-    /*
-     * Google translate engine design:
-     *  - LootCrates
-     * @param args
-     */
-
-    // test google translate
-    public static void main(String[] args) {
-        GoogleTranslate googleTranslate = new GoogleTranslate();
-
-        String translated = googleTranslate.translate("§c§lKing Bounty §r§7(Tier 3)",
-                "en", "fr");
-
-        // color codes are maintained; not removed
-
-        System.out.println(translated);
-    }
-
     public String prefix() {
         return prefix;
     }
@@ -113,7 +94,7 @@ public class Main extends JavaPlugin
         }
 
         // Cool looking 1.16+ hex colors if possible
-        prefix = ReflectionUtil.isAtLeastVersion("1_16") ?
+        prefix = Version.AT_LEAST_v1_16.a() ?
                 Util.format("&f[" + "&#fba600L&#fb9400o&#fb8100o&#fc6f00t&#fc5c00c&#fc4a00r&#fc3700a&#fd2500t&#fd1200e&#fd0000s" + "&f] ") :
                 prefix;
 
@@ -128,11 +109,11 @@ public class Main extends JavaPlugin
         ConfigurationSerialization.registerClass(Crate.class, "Crate");
 
         // api for easy
-        LootCratesAPI.registerLoot(LootItemCrate.class, new ItemBuilder(Material.CHEST).name("&eAdd crate...").toItem(), "LootItemCrate");
-        LootCratesAPI.registerLoot(LootItem.class, new ItemBuilder(Material.GOLD_NUGGET).name("&6Add item...").toItem(), "LootItem");
-        LootCratesAPI.registerLoot(LootCommand.class, new ItemBuilder(Material.PAPER).name("&2Add command...").toItem(), "LootCommand");
+        LootCratesAPI.registerLoot(LootItemCrate.class, ItemBuilder.copyOf(Material.CHEST).name("&eAdd crate...").build(), "LootItemCrate");
+        LootCratesAPI.registerLoot(LootItem.class, ItemBuilder.copyOf(Material.GOLD_NUGGET).name("&6Add item...").build(), "LootItem");
+        LootCratesAPI.registerLoot(LootCommand.class, ItemBuilder.copyOf(Material.PAPER).name("&2Add command...").build(), "LootCommand");
         if (supportQualityArmory)
-            LootCratesAPI.registerLoot(LootItemQA.class, new ItemBuilder(Material.CROSSBOW).name("&8Add QualityArmory...").toItem(), "LootItemQA");
+            LootCratesAPI.registerLoot(LootItemQA.class, ItemBuilder.copyOf(Material.CROSSBOW).name("&8Add QualityArmory...").build(), "LootItemQA");
 
         // Load Skript classes
         if (supportSkript) {
@@ -142,7 +123,7 @@ public class Main extends JavaPlugin
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            LootCratesAPI.registerLoot(LootSkriptEvent.class, new ItemBuilder(Material.MAP).name("&aAdd Skript tag... ").toItem(), "LootSkriptEvent");
+            LootCratesAPI.registerLoot(LootSkriptEvent.class, ItemBuilder.copyOf(Material.MAP).name("&aAdd Skript tag... ").build(), "LootSkriptEvent");
         }
 
         loadExternalLoots();
@@ -190,6 +171,11 @@ public class Main extends JavaPlugin
     }
 
     public LanguageUnit getLang(Player p) {
+
+        // If translations are disabled return
+        if (!data.lang)
+            return null;
+
         LanguageUnit dlu;
 
         String lang = null;
@@ -199,8 +185,11 @@ public class Main extends JavaPlugin
             lang = locale.toLowerCase(Locale.ROOT).substring(0, index);
         }
 
-        if (!data.lang
-                || lang == null
+        // If player language is invalid, or
+        // If player by default is using english, or
+        // If language couldnt be found
+        // return none
+        if (lang == null
                 || lang.equals("en")
                 || (dlu = Main.get().data.translations.get(lang)) == null)
             return null;
@@ -277,7 +266,6 @@ public class Main extends JavaPlugin
                         info("Attempt 3: Populating config with minimal built-ins");
 
                         data = new Data();
-                        data.populate();
                         return;
                 }
             } catch (Exception e) {
@@ -290,7 +278,7 @@ public class Main extends JavaPlugin
     }
 
     public boolean backupConfig(boolean isBroken) {
-        File backupFile = new File(Main.get().getDataFolder(),(isBroken ? "backup/broken_" : "backup/old_") + System.currentTimeMillis() + "_config.yml");
+        File backupFile = new File(Main.get().getDataFolder(),"backup/" + System.currentTimeMillis() + "_" + (isBroken ? "broken" : "old") + "_config.yml");
 
         try {
             // Create path
@@ -321,9 +309,32 @@ public class Main extends JavaPlugin
 
             try {
                 config.save(configFile);
+
+                // now delete old files in backup
+                File backupDir = new File(Main.get().getDataFolder(),"backup");
+                // backup/1010928476782461_old_config.yml
+                int deletedCount = 0;
+                for (File file : backupDir.listFiles()) {
+                    if (file.getName().endsWith("_config.yml")) {
+                        try {
+                            long create = Long.parseLong(file.getName().substring(0, file.getName().indexOf("_")));
+                            if (create < System.currentTimeMillis() - (data.cleanHour * 60 * 60 * 1000)) {
+                                // delete it
+                                file.delete();
+                                deletedCount++;
+                            }
+                        } catch (Exception e) {
+                            //e.printStackTrace();
+                        }
+                    }
+                }
+
+                if (deletedCount > 0)
+                    info("Purged " + deletedCount + " old configurations");
+                else info("No old configurations to purge");
             } catch (Exception e) {
                 error("Failed to save config");
-                debug(e);
+                e.printStackTrace();
             }
         }
     }

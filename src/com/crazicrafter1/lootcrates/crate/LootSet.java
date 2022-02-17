@@ -43,10 +43,10 @@ public class LootSet implements ConfigurationSerializable {
 
         Language llu = dlu.lootSets.get(id);
 
-        return new ItemBuilder(itemStack)
+        return ItemBuilder.copyOf(itemStack)
                 .name(llu.itemStackDisplayName)
                 .lore(llu.itemStackLore)
-                .toItem();
+                .build();
     }
 
     public ILoot getRandomLoot() {

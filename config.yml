@@ -2,6 +2,7 @@
 # 1976: 1.14.4
 data:
   ==: Data
+  cleanHour: 168
   lang: false
   debug: false
   update: true

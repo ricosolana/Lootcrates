@@ -12,7 +12,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.function.Consumer;
 
-import static com.crazicrafter1.lootcrates.Editor.LORE_LMB_EDIT;
+import static com.crazicrafter1.lootcrates.Editor.*;
 
 public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
 
@@ -25,32 +25,32 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
     private ItemBuilder builder;
 
     public ItemMutateMenuBuilder build(ItemStack it, Consumer<ItemStack> itemStackConsumer) {
-        builder = new ItemBuilder(it);
+        builder = ItemBuilder.copyOf(it);
         return (ItemMutateMenuBuilder) title("item edit", true)
                 .background()
                 .parentButton(4, 4)
-                .button(2, 1, Editor.IN_OUTLINE)
-                .button(3, 2, Editor.IN_OUTLINE)
-                .button(2, 3, Editor.IN_OUTLINE)
-                .button(1, 2, Editor.IN_OUTLINE)
+                .button(2, 1, IN_OUTLINE)
+                .button(3, 2, IN_OUTLINE)
+                .button(2, 3, IN_OUTLINE)
+                .button(1, 2, IN_OUTLINE)
                 // Edit ItemStack
                 .button(2, 2, new Button.Builder()
-                        .icon(() -> builder.toItem())
+                        .icon(() -> builder.build())
                         .lmb((interact) -> {
                             if (interact.heldItem == null) {
                                 return Result.MESSAGE("Must swap with an item");
                             }
-                            builder = new ItemBuilder(interact.heldItem);
+                            builder = ItemBuilder.copyOf(interact.heldItem);
 
-                            itemStackConsumer.accept(builder.toItem());
+                            itemStackConsumer.accept(builder.build());
 
                             return Result.GRAB();
                         }))
                 // Edit Name
-                .childButton(6, 1, () -> new ItemBuilder(Material.NAME_TAG).name("&eName").lore(LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
+                .childButton(6, 1, () -> ItemBuilder.copyOf(Material.NAME_TAG).name("&eName").lore(LORE_LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title("name", true)
-                        .left(() -> Util.flattenedName(builder.toItem(), "no name"))
-                        .rightF(() -> "&8Input custom item name", () -> Editor.COLOR_PREFIX)
+                        .leftRaw(() -> Util.flattenedName(builder.build(), "no name"))
+                        .right(() -> "&8Input custom item name", () -> COLOR_PREFIX)
                         .onClose((player, reroute) -> Result.BACK())
                         .onComplete((player, s) -> {
                             if (s.isEmpty()) {
@@ -58,15 +58,15 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
                             } else
                                 builder.name(s);
 
-                            itemStackConsumer.accept(builder.toItem());
+                            itemStackConsumer.accept(builder.build());
 
                             return Result.BACK();
                         }))
                 // Edit Lore
-                .childButton(6, 3, () -> new ItemBuilder(Material.MAP).name("&7Lore").lore(LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
+                .childButton(6, 3, () -> ItemBuilder.copyOf(Material.MAP).name("&7Lore").lore(LORE_LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title("lore", true)
-                        .left(() -> Util.flattenedLore(builder.toItem(), "my custom lore"))
-                        .rightF(() -> "&8Input custom item lore", () -> Editor.COLOR_PREFIX + "&7\n'\\n': &fnewline")
+                        .leftRaw(() -> Util.flattenedLore(builder.build(), "my custom lore"))
+                        .right(() -> "&8Input custom item lore", () -> COLOR_PREFIX + "&7\n'\\n': &fnewline")
                         .onClose((player, reroute) -> !reroute ? Result.BACK() : null)
                         .onComplete((player, s) -> {
                             if (s.isEmpty()) {
@@ -74,22 +74,22 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
                             } else
                                 builder.lore(s.replace("\\n", "\n"));
 
-                            itemStackConsumer.accept(builder.toItem());
+                            itemStackConsumer.accept(builder.build());
 
                             return Result.BACK();
                         }))
                 // Edit CustomModelData
-                .childButton(6, 2, () -> new ItemBuilder(Editor.IS_NEW ? Material.PLAYER_HEAD : Material.matchMaterial("SKULL_ITEM")).skull(BASE64_CUSTOM_MODEL_DATA).name("&8CustomModelData").lore(LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
+                .childButton(6, 2, () -> ItemBuilder.of("PLAYER_HEAD").skull(BASE64_CUSTOM_MODEL_DATA).name("&8CustomModelData").lore(LORE_LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title("model", true)
-                        .left(() -> {
-                            ItemMeta meta = builder.toItem().getItemMeta();
+                        .leftRaw(() -> {
+                            ItemMeta meta = builder.getMeta();
                             if (meta != null && meta.hasCustomModelData())
                                 return "" + meta.getCustomModelData();
                             return "none";
                         })
-                        .rightF(() -> "&7Input an integer")
+                        .right(() -> "&7Input an integer")
                         .onClose((player, reroute) -> !reroute ? Result.BACK() : null)
-                        .onComplete((player, s) -> {
+                        .onComplete((p, s) -> {
                             if (s.isEmpty())
                                 return null;
 
@@ -97,11 +97,11 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
                             try {
                                 i = Integer.parseInt(s);
                             } catch (Exception e00) {
-                                return Result.TEXT("Invalid");
+                                return Result.TEXT(L(p,"Invalid", "Invalid"));
                             }
-                            builder.customModelData(i);
+                            builder.model(i);
 
-                            itemStackConsumer.accept(builder.toItem());
+                            itemStackConsumer.accept(builder.build());
 
                             return Result.BACK();
                         }), () -> Editor.IS_NEW);

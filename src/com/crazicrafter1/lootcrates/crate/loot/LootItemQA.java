@@ -36,7 +36,7 @@ public class LootItemQA extends AbstractLootItem {
 
     @Override
     public ItemStack getIcon(Player p) {
-        return new ItemBuilder(QualityArmory.getCustomItemAsItemStack(name)).placeholders(p).toItem();
+        return ItemBuilder.copyOf(QualityArmory.getCustomItemAsItemStack(name)).placeholders(p).build();
     }
 
     @Override
@@ -61,9 +61,9 @@ public class LootItemQA extends AbstractLootItem {
                 .parentButton(4, 5)
                 //.childButton(2, 5, () -> new ItemBuilder(Material.COMPASS).name("&eSearch..."), new )
                 .button(3, 5, new Button.Builder().icon(() -> getIcon(null)))
-                .childButton(5, 5, () -> new ItemBuilder(Material.COMPASS).name("&eBy name...").toItem(), new TextMenu.TBuilder()
+                .childButton(5, 5, () -> ItemBuilder.copyOf(Material.COMPASS).name("&eBy name...").build(), new TextMenu.TBuilder()
                         .title("&8Assign by name")
-                        .left(() -> name)
+                        .leftRaw(() -> name)
                         .right(() -> "&eSet item by name")
                         .onClose((player, reroute) -> {
                             Main.get().info("LootItemQA reroute: " + reroute);
@@ -84,7 +84,7 @@ public class LootItemQA extends AbstractLootItem {
                     QualityArmory.getCustomItems().forEachRemaining(customBaseObject -> {
                         if (customBaseObject.getName().equals(this.name)) {
                             result.add(new Button.Builder()
-                                    .icon(() -> new ItemBuilder(getIcon(null)).glow(true).toItem())
+                                    .icon(() -> ItemBuilder.copyOf(getIcon(null)).glow(true).build())
                                     .get());
                         } else {
                             result.add(new Button.Builder()

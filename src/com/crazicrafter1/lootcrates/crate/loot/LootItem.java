@@ -1,7 +1,6 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.crutils.ReflectionUtil;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.gapi.AbstractMenu;
 import com.crazicrafter1.gapi.Button;
@@ -69,8 +68,7 @@ public final class LootItem extends AbstractLootItem {
                             min = Util.clamp(min + change, 1, max);
                             return Result.REFRESH();
                         })
-                        .icon(() -> new ItemBuilder(ReflectionUtil.isAtLeastVersion("1_17") ? new ItemStack(Material.MEDIUM_AMETHYST_BUD) :
-                                Editor.IS_NEW ? new ItemStack(Material.RED_DYE) : new ItemStack(Material.matchMaterial("INK_SACK"), 1, (byte)1)).name("&8&nMin").lore(Editor.LORE_LMB_NUM + "\n" + Editor.LORE_RMB_NUM + "\n" + Editor.LORE_SHIFT_NUM).count(min).toItem()))
+                        .icon(() -> ItemBuilder.of("RED_DYE").name("&8&nMin").lore(Editor.LORE_LMB_NUM + "\n" + Editor.LORE_RMB_NUM + "\n" + Editor.LORE_SHIFT_NUM).amount(min).build()))
                 // Max
                 .button(7, 2, new Button.Builder()
                         .lmb(interact -> {
@@ -83,7 +81,6 @@ public final class LootItem extends AbstractLootItem {
                             max = Util.clamp(max + change, min, itemStack.getMaxStackSize());
                             return Result.REFRESH();
                         })
-                        .icon(() -> new ItemBuilder(ReflectionUtil.isAtLeastVersion("1_17") ? new ItemStack(Material.AMETHYST_CLUSTER) :
-                                Editor.IS_NEW ? new ItemStack(Material.GREEN_DYE) : new ItemStack(Material.matchMaterial("INK_SACK"), 1, (byte)2)).name("&8&nMax").lore(Editor.LORE_LMB_NUM + "\n" + Editor.LORE_RMB_NUM + "\n" + Editor.LORE_SHIFT_NUM).count(max).toItem()));
+                        .icon(() -> ItemBuilder.of("GREEN_DYE").name("&8&nMax").lore(Editor.LORE_LMB_NUM + "\n" + Editor.LORE_RMB_NUM + "\n" + Editor.LORE_SHIFT_NUM).amount(max).build()));
     }
 }

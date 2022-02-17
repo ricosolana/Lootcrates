@@ -23,7 +23,7 @@ public class LootSkriptEvent implements ILoot {
 
     public LootSkriptEvent() {
         tag = "awesome";
-        itemStack = new ItemBuilder(Material.JUKEBOX).name("my tag").toItem();
+        itemStack = ItemBuilder.copyOf(Material.JUKEBOX).name("my tag").build();
     }
 
     public LootSkriptEvent(Map<String, Object> result) {
@@ -34,7 +34,7 @@ public class LootSkriptEvent implements ILoot {
 
     @Override
     public ItemStack getIcon(Player p) {
-        return new ItemBuilder(itemStack).placeholders(p).toItem();
+        return ItemBuilder.copyOf(itemStack).placeholders(p).build();
     }
 
     @Override
@@ -53,10 +53,10 @@ public class LootSkriptEvent implements ILoot {
         return new ItemMutateMenuBuilder()
                 .build(itemStack, input -> this.itemStack = input)
                 .title("LootSkriptEvent")
-                .childButton(5, 2, () -> new ItemBuilder(Material.PAPER).name("&6Event tag").lore(Editor.LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
+                .childButton(5, 2, () -> ItemBuilder.copyOf(Material.PAPER).name("&6Event tag").lore(Editor.LORE_LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title("edit tag", true)
                         .onClose((player, reroute) -> !reroute ? Result.BACK() : null)
-                        .left(() -> tag)
+                        .leftRaw(() -> tag)
                         .right(() -> "Input a tag")
                         .onComplete((player, s) -> {
                             if (!s.isEmpty()) {

@@ -32,11 +32,11 @@ public abstract class AbstractLootItem implements ILoot {
     }
 
     protected ItemStack ofRange(Player p, ItemStack itemStack) {
-        ItemBuilder builder = new ItemBuilder(itemStack).count(Util.randomRange(min, max));
+        ItemBuilder builder = ItemBuilder.copyOf(itemStack).amount(Util.randomRange(min, max));
 
         builder.placeholders(p);
 
-        return builder.toItem();
+        return builder.build();
     }
 
     @Override

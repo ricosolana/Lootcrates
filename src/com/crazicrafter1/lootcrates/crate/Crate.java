@@ -146,7 +146,7 @@ public class Crate implements ConfigurationSerializable {
      * @return the formatted item
      */
     public ItemStack itemStack(@Nullable Player p) {
-        ItemBuilder item = new ItemBuilder(itemStack);
+        ItemBuilder item = ItemBuilder.copyOf(itemStack);
 
         LanguageUnit dlu = Main.get().getLang(p);
 
@@ -155,7 +155,7 @@ public class Crate implements ConfigurationSerializable {
                     .macro("%", "lc_picks", "" + picks)
                     .macro("%", "lc_id", "" + id)
                     .macro("%", "lc_lscount", "" + lootBySum.size())
-                    .placeholders(p).toItem();
+                    .placeholders(p).build();
         }
 
         Language clu = dlu.crates.get(id);
@@ -167,7 +167,7 @@ public class Crate implements ConfigurationSerializable {
                 .placeholders(p)
                 .name(clu.itemStackDisplayName)
                 .lore(clu.itemStackLore)
-                .toItem();
+                .build();
     }
 
     public String title(@NotNull Player p) {

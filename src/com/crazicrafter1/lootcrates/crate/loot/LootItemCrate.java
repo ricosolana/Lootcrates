@@ -75,7 +75,7 @@ public class LootItemCrate extends AbstractLootItem {
                     for (Map.Entry<String, Crate> entry : Main.get().data.crates.entrySet()) {
                         Crate crate = entry.getValue();
 
-                        ItemStack icon = new ItemBuilder(Material.LOOM).mergeLexicals(crate.itemStack(null)).glow(crate.id.equals(id)).toItem();
+                        ItemStack icon = ItemBuilder.copyOf(Material.LOOM).apply(crate.itemStack(null)).glow(crate.id.equals(id)).build();
 
                         result.add(new Button.Builder()
                                 .icon(() -> icon)

@@ -21,9 +21,12 @@ import java.util.*;
 
 public class Data implements ConfigurationSerializable {
 
-    public Data() {}
+    public Data() {
+        populate();
+    }
 
     public Data(Map<String, Object> args) {
+        cleanHour = (long) args.getOrDefault("cleanHour", 168);
         lang = (boolean) args.getOrDefault("lang", false);
         debug = (boolean) args.getOrDefault("debug", false);
         update = (boolean) args.getOrDefault("update", true);
@@ -69,12 +72,11 @@ public class Data implements ConfigurationSerializable {
         } catch (Exception e) {e.printStackTrace();}
 
         loadLanguageFiles();
+
+        editorEnglish = new HashMap<>();
     }
 
-    /*
-     * Defaults, under the assumption that config permanently fails
-     * Safe dev-like fallbacks
-     */
+    public long cleanHour;
     public boolean lang;
     public boolean debug;
     public boolean update;
@@ -98,10 +100,10 @@ public class Data implements ConfigurationSerializable {
             return unSelectedItem;
         }
 
-        return new ItemBuilder(unSelectedItem)
+        return ItemBuilder.copyOf(unSelectedItem)
                 .name(dlu.unSelectedDisplayName)
                 .lore(dlu.unSelectedLore)
-                .toItem();
+                .build();
     }
 
     public ItemStack selectedItem(Player p) {
@@ -111,19 +113,23 @@ public class Data implements ConfigurationSerializable {
             return selectedItem;
         }
 
-        return new ItemBuilder(selectedItem)
+        return ItemBuilder.copyOf(selectedItem)
                 .name(dlu.selectedDisplayName)
                 .lore(dlu.selectedLore)
-                .toItem();
+                .build();
     }
 
     //          lang, translation
-    public Map<String, LanguageUnit> translations;
+    public Map<String, LanguageUnit> translations = new HashMap<>();
+    public Map<String, String> editorEnglish = new HashMap<>();
 
     @Override
     public Map<String, Object> serialize() {
+        saveLanguageFiles();
+
         Map<String, Object> result = new LinkedHashMap<>();
 
+        result.put("backupClean", cleanHour);
         result.put("lang", lang);
         result.put("debug", debug);
         result.put("update", update);
@@ -141,7 +147,7 @@ public class Data implements ConfigurationSerializable {
         result.put("totalOpens", totalOpens);
 
 
-        if (!alertedPlayers.isEmpty())
+        if (!alertedPlayers.isEmpty()) {
             try {
                 File file = new File(Main.get().getDataFolder(), "players.csv");
 
@@ -152,9 +158,10 @@ public class Data implements ConfigurationSerializable {
                     writer.newLine();
                 }
                 writer.close();
-            } catch (Exception e) {e.printStackTrace();}
-
-        saveLanguageFiles();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         return result;
     }
@@ -165,8 +172,6 @@ public class Data implements ConfigurationSerializable {
     public boolean loadLanguageFiles() {
         final File langFolder = new File(Main.get().getDataFolder(), "lang");
         langFolder.mkdirs();
-
-        translations = new HashMap<>();
 
         int i = 0;
         int total = 0;
@@ -198,27 +203,25 @@ public class Data implements ConfigurationSerializable {
         return true;
     }
 
-    public boolean loadLanguageFile(final String lang) {
+    public boolean loadLanguageFile(final String language) {
         try {
-            Main.get().info("Loading language " + lang);
+            Main.get().info("Loading language " + language);
 
             final File langFolder = new File(Main.get().getDataFolder(), "lang");
             langFolder.mkdirs();
 
-            LanguageUnit unit = new LanguageUnit();
+            LanguageUnit unit = new LanguageUnit(language);
 
             FileConfiguration langConfig = new YamlConfiguration();
-            langConfig.load(new File(langFolder, lang + ".yml"));
+            langConfig.load(new File(langFolder, language + ".yml"));
 
             unit.selectedDisplayName = langConfig.getString("selectedDisplayName");
             unit.selectedLore = langConfig.getString("selectedLore");
             unit.unSelectedDisplayName = langConfig.getString("unSelectedDisplayName");
             unit.unSelectedLore = langConfig.getString("unSelectedLore");
 
-            unit.crates = new HashMap<>();
-            unit.lootSets = new HashMap<>();
-
             // load lootsets
+            unit.lootSets = new HashMap<>();
             for (String id : lootSets.keySet()) {
                 String key = "lootSets." + id + ".";
 
@@ -231,6 +234,7 @@ public class Data implements ConfigurationSerializable {
             }
 
             // now load crates
+            unit.crates = new HashMap<>();
             for (String id : crates.keySet()) {
                 String key = "crates." + id + ".";
 
@@ -243,7 +247,15 @@ public class Data implements ConfigurationSerializable {
                 unit.crates.put(id, cl);
             }
 
-            translations.put(lang, unit);
+            // load editor translations
+            unit.editor = new HashMap<>();
+            if (langConfig.isSet("editor")) {
+                for (String key : langConfig.getConfigurationSection("editor").getKeys(false)) {
+                    unit.editor.put(key, langConfig.getString("editor." + key));
+                }
+            }
+
+            translations.put(language, unit);
 
             return true;
         } catch (Exception e) {
@@ -282,7 +294,7 @@ public class Data implements ConfigurationSerializable {
 
     public boolean saveLanguageFile(@NotNull final LanguageUnit unit) {
         try {
-            Main.get().info("Saving language " + unit.language);
+            Main.get().info("Saving language " + unit.LANGUAGE);
 
             final File langFolder = new File(Main.get().getDataFolder(), "lang");
             langFolder.mkdirs();
@@ -313,7 +325,11 @@ public class Data implements ConfigurationSerializable {
                 langConfig.set(key + "title", cl.title);
             }
 
-            langConfig.save(new File(langFolder, unit.language + ".yml"));
+            for (Map.Entry<String, String> entry : unit.editor.entrySet()) {
+                langConfig.set("editor." + entry.getKey(), Objects.requireNonNull(entry.getValue()));
+            }
+
+            langConfig.save(new File(langFolder, unit.LANGUAGE + ".yml"));
 
             return true;
         } catch (Exception e) {
@@ -326,43 +342,48 @@ public class Data implements ConfigurationSerializable {
      * Perform a translation on the config and editor
      * @param language language code in the form of 'en', 'es', 'fr', 'gr'
      */
-    public boolean createLanguageFile(String language) {
+    public boolean createLanguageFile(final String language) {
         try {
-            LanguageUnit dlu = new LanguageUnit();
+            LanguageUnit unit = new LanguageUnit(language);
             GoogleTranslate GOOG = new GoogleTranslate();
 
-            ItemBuilder builder = new ItemBuilder(unSelectedItem).translateLexicals("auto", language);
-            dlu.unSelectedDisplayName = builder.getName();
-            dlu.unSelectedLore = builder.getLore();
+            ItemBuilder builder = ItemBuilder.copyOf(unSelectedItem).transcribe("auto", language);
+            unit.unSelectedDisplayName = builder.getName();
+            unit.unSelectedLore = builder.getLoreString();
 
-            builder = new ItemBuilder(selectedItem).translateLexicals("auto", language);
-            dlu.selectedDisplayName = builder.getName();
-            dlu.selectedLore = builder.getLore();
+            builder = ItemBuilder.copyOf(selectedItem).transcribe("auto", language);
+            unit.selectedDisplayName = builder.getName();
+            unit.selectedLore = builder.getLoreString();
 
-            dlu.lootSets = new HashMap<>();
+            unit.lootSets = new HashMap<>();
             for (Map.Entry<String, LootSet> entry : lootSets.entrySet()) {
                 LootSet.Language ll = new LootSet.Language();
 
-                builder = new ItemBuilder(entry.getValue().itemStack).translateLexicals("auto", language);
+                builder = ItemBuilder.copyOf(entry.getValue().itemStack).transcribe("auto", language);
                 ll.itemStackDisplayName = builder.getName();
-                ll.itemStackLore = builder.getLore();
+                ll.itemStackLore = builder.getLoreString();
 
-                dlu.lootSets.put(entry.getKey(), ll);
+                unit.lootSets.put(entry.getKey(), ll);
             }
 
-            dlu.crates = new HashMap<>();
+            unit.crates = new HashMap<>();
             for (Map.Entry<String, Crate> entry : crates.entrySet()) {
                 Crate.Language cl = new Crate.Language();
 
-                builder = new ItemBuilder(entry.getValue().itemStack).translateLexicals("auto", language);
+                builder = ItemBuilder.copyOf(entry.getValue().itemStack).transcribe("auto", language);
                 cl.itemStackDisplayName = builder.getName();
-                cl.itemStackLore = builder.getLore();
+                cl.itemStackLore = builder.getLoreString();
                 cl.title = GOOG.translate(entry.getValue().title, "auto", language);
 
-                dlu.crates.put(entry.getKey(), cl);
+                unit.crates.put(entry.getKey(), cl);
             }
 
-            translations.put(language, dlu);
+            unit.editor = new HashMap<>();
+            for (Map.Entry<String, String> entry : editorEnglish.entrySet()) {
+                unit.editor.put(entry.getKey(), GOOG.translate(entry.getValue(), "auto", language));
+            }
+
+            translations.put(language, unit);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -370,24 +391,25 @@ public class Data implements ConfigurationSerializable {
         }
     }
 
-    void populate() {
+    private void populate() {
+        cleanHour = 24*7; // Cleanup config files older than a week
         lang = false;
         debug = false;
         update = true;
         speed = 4;
-        unSelectedItem = new ItemBuilder(Material.CHEST).name("&f&l???").lore("&7Choose 4 mystery chests, and\n&7your loot will be revealed!").toItem();
-        selectedItem = new ItemBuilder(Material.WHITE_STAINED_GLASS_PANE).name("&7&l???").lore("&7You have selected this mystery chest").toItem();
+        unSelectedItem = ItemBuilder.copyOf(Material.CHEST).name("&f&l???").lore("&7Choose 4 mystery chests, and\n&7your loot will be revealed!").build();
+        selectedItem = ItemBuilder.of("WHITE_STAINED_GLASS_PANE").name("&7&l???").lore("&7You have selected this mystery chest").build();
 
         lootSets = new LinkedHashMap<>();
         LootSet lootSet = new LootSet(
                 "common",
-                new ItemBuilder(Material.WHITE_STAINED_GLASS_PANE).name("&f&lCommon Reward").toItem(),
+                ItemBuilder.of("WHITE_STAINED_GLASS_PANE").name("&f&lCommon Reward").build(),
                 new ArrayList<>(Collections.singletonList(new LootItem())));
         lootSets.put("common", lootSet);
 
         crates = new LinkedHashMap<>();
         Crate crate = new Crate("peasant",
-                new ItemBuilder(Material.CHEST).name("&f&lPeasant Crate").toItem(),
+                ItemBuilder.copyOf(Material.CHEST).name("&f&lPeasant Crate").build(),
                 "select loot",
                 3,
                 4,

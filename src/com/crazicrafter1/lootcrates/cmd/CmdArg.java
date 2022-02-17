@@ -1,6 +1,7 @@
 package com.crazicrafter1.lootcrates.cmd;
 
 import com.crazicrafter1.crutils.Util;
+import com.crazicrafter1.lootcrates.Data;
 import com.crazicrafter1.lootcrates.Editor;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
 import com.crazicrafter1.lootcrates.Main;
@@ -42,8 +43,12 @@ class CmdArg {
 
         args.put("lang", new CmdArg((sender, args) -> {
             if (args.length == 0) {
-                return feedback(sender, "Currently " + Main.get().data.translations.size() + " languages are loaded\n" + Main.get().data.translations.keySet());
+                return info(sender, "Currently " + Main.get().data.translations.size() + " languages are loaded\n" + Main.get().data.translations.keySet());
             }
+
+            warn(sender, "The server will freeze momentarily");
+            warn(sender, "If a timeout crash occurs, increase the server respond timeout");
+            warn(sender, "The more stuff you have created, the longer this will take");
 
             final long start = System.currentTimeMillis();
             boolean success;
@@ -51,16 +56,14 @@ class CmdArg {
                 && (args[0].equalsIgnoreCase("save") || args[0].equalsIgnoreCase("load"))) {
 
                 if (args.length == 1)
-                    return error(sender, "Are you sure you want to save/load all language files? If so, append 'confirm' to the command");
+                    return warn(sender, "Are you sure you want to save/load all language files? If so, append 'confirm' to the command");
 
                 switch (args[0].toLowerCase()) {
                     case "save": {
-                        feedback(sender, "Saving all languages");
                         success = Main.get().data.saveLanguageFiles();
                         break;
                     }
                     case "load": {
-                        feedback(sender, "Loading all languages");
                         success = Main.get().data.loadLanguageFiles();
                         break;
                     }
@@ -71,17 +74,15 @@ class CmdArg {
                 String lang = args[1];
                 switch (args[0].toLowerCase()) {
                     case "save": {
-                        feedback(sender, "Saving language " + lang);
                         success = Main.get().data.saveLanguageFile(lang);
                         break;
                     }
                     case "load": {
-                        feedback(sender, "Loading language " + lang);
                         success = Main.get().data.loadLanguageFile(lang);
                         break;
                     }
                     case "translate": {
-                        feedback(sender, "Translating language unit to " + lang);
+                        info(sender, "Translating language unit to " + lang);
                         success = Main.get().data.createLanguageFile(lang);
                         break;
                     }
@@ -94,7 +95,7 @@ class CmdArg {
 
             return !success ?
                     error(sender, "Operation failed (see console)") :
-                    feedback(sender, String.format("Operation took %.02fs", (float)(end-start)/1000.f));
+                    info(sender, String.format("Operation took %.02fs", (float)(end-start)/1000.f));
         }, (sender, args) -> {
             if (args.length == 1) {
                 return getMatches(args[0], Arrays.asList("save", "load", "translate"));
@@ -103,9 +104,15 @@ class CmdArg {
             return new ArrayList<>();
         }));
 
+        args.put("populate", new CmdArg((sender, args) -> {
+            plugin.saveConfig();
+            plugin.data = new Data();
+            return info(sender, "Populating config with built-ins");
+        }, null));
+
         args.put("save", new CmdArg((sender, args) -> {
             plugin.saveConfig();
-            return feedback(sender, "Saved config to disk");
+            return info(sender, "Saved config to disk");
         }, null));
 
         args.put("crate", new CmdArg((sender, args) -> {
@@ -118,7 +125,7 @@ class CmdArg {
                 if (!(sender instanceof Player))
                     return error(sender, "You must be a player to give yourself a crate");
                 Util.giveItemToPlayer((Player) sender, crate.itemStack((Player) sender));
-                return feedback(sender, "Gave yourself 1 " + crate.id + " crate");
+                return info(sender, "Gave yourself 1 " + crate.id + " crate");
             }
 
             if (args[1].equals("*")) {
@@ -128,7 +135,7 @@ class CmdArg {
                     //if (p != sender)
                     //    p.sendMessage("You received 1 " + crate.id + " crate");
                 });
-                return feedback(sender, "Gave a " + crate.id + " crate to all players (" + ChatColor.LIGHT_PURPLE + Bukkit.getOnlinePlayers().size() + ChatColor.GRAY + " online)");
+                return info(sender, "Gave a " + crate.id + " crate to all players (" + ChatColor.LIGHT_PURPLE + Bukkit.getOnlinePlayers().size() + ChatColor.GRAY + " online)");
             }
 
             Player p = Bukkit.getServer().getPlayer(args[1]);
@@ -141,7 +148,7 @@ class CmdArg {
             //if (p != sender)
             //    p.sendMessage("You received 1 " + crate.id + " crate");
 
-            return feedback(sender, "Gave a " + crate.id + " crate to " + ChatColor.GOLD + p.getName());
+            return info(sender, "Gave a " + crate.id + " crate to " + ChatColor.GOLD + p.getName());
 
         }, (sender, args) -> {
             if (args.length == 1) {
@@ -160,12 +167,12 @@ class CmdArg {
         args.put("reset", new CmdArg((sender, args) -> {
             Main.get().saveDefaultConfig(true);
             Main.get().reloadConfig();
-            return feedback(sender, "Loaded default config");
+            return info(sender, "Loaded default config");
         }, null));
 
         args.put("reload", new CmdArg((sender, args) -> {
             Main.get().reloadConfig();
-            return feedback(sender, "Loaded config from disk");
+            return info(sender, "Loaded config from disk");
         }, null));
 
         args.put("editor", new CmdArg((sender, args) -> {
@@ -226,7 +233,7 @@ class CmdArg {
             return error(sender, "Can only be executed by a player");
         }, null));
 
-        args.put("version", new CmdArg((sender, args) -> feedback(sender, "LootCrates version: " + plugin.getDescription().getVersion()), null));
+        args.put("version", new CmdArg((sender, args) -> info(sender, "LootCrates version: " + plugin.getDescription().getVersion()), null));
 
         args.put("detect", new CmdArg((sender, args) -> {
             if (!(sender instanceof Player))
@@ -238,9 +245,9 @@ class CmdArg {
             if (itemStack.getType() != Material.AIR) {
                 Crate crate = LootCratesAPI.extractCrateFromItem(itemStack);
                 if (crate != null) {
-                    return feedback(sender, "Item is a crate (" + crate.id + ")");
+                    return info(sender, "Item is a crate (" + crate.id + ")");
                 } else {
-                    return feedback(sender, "Item is a not a crate");
+                    return info(sender, "Item is a not a crate");
                 }
             }
             return error(sender, "Must hold an item to detect");
@@ -248,12 +255,17 @@ class CmdArg {
     }
 
     static boolean error(CommandSender sender, String message) {
-        sender.sendMessage(plugin.prefix() + ChatColor.RED + message);
+        sender.sendMessage("" + ChatColor.DARK_RED + ChatColor.BOLD + "\u26A0 " + ChatColor.RESET + ChatColor.RED + message);
         return true;
     }
 
-    static boolean feedback(CommandSender sender, String message) {
-        sender.sendMessage(plugin.prefix() + ChatColor.AQUA + message);
+    static boolean info(CommandSender sender, String message) {
+        sender.sendMessage("" + ChatColor.DARK_GRAY + ChatColor.BOLD + "\u24D8 " + ChatColor.RESET + ChatColor.GRAY + message);
+        return true;
+    }
+
+    static boolean warn(CommandSender sender, String message) {
+        sender.sendMessage("" + ChatColor.GOLD + ChatColor.BOLD + "\u26A1 " + ChatColor.RESET + ChatColor.YELLOW + message);
         return true;
     }
 

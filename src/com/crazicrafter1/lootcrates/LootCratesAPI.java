@@ -21,9 +21,9 @@ public class LootCratesAPI {
 
     static void registerLoot(Class<? extends ILoot> lootClass, String alias) {
         registerLoot(lootClass,
-                new ItemBuilder(Material.GOLD_INGOT)
+                ItemBuilder.copyOf(Material.GOLD_INGOT)
                         .name(lootClass.getSimpleName())
-                        .toItem(),
+                        .build(),
                 alias);
     }
 

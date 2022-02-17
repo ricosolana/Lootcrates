@@ -23,7 +23,7 @@ public class LootCommand implements ILoot {
 
     public LootCommand() {
         command = "say %player_name% hi there";
-        itemStack = new ItemBuilder(Material.CACTUS).name("Hello, world!").toItem();
+        itemStack = ItemBuilder.copyOf(Material.CACTUS).name("Hello, world!").build();
     }
 
     public LootCommand(Map<String, Object> result) {
@@ -33,7 +33,7 @@ public class LootCommand implements ILoot {
 
     @Override
     public ItemStack getIcon(Player p) {
-        return new ItemBuilder(itemStack).placeholders(p).toItem();
+        return ItemBuilder.copyOf(itemStack).placeholders(p).build();
     }
 
     @Override
@@ -55,10 +55,10 @@ public class LootCommand implements ILoot {
         return new ItemMutateMenuBuilder()
                 .build(itemStack, input -> this.itemStack = input)
                 .title("LootCommand")
-                .childButton(5, 2, () -> new ItemBuilder(Material.PAPER).name("&6Command").lore(Editor.LORE_LMB_EDIT).toItem(), new TextMenu.TBuilder()
+                .childButton(5, 2, () -> ItemBuilder.copyOf(Material.PAPER).name("&6Command").lore(Editor.LORE_LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title("edit command", true)
                         .onClose((player, reroute) -> !reroute ? Result.BACK() : null)
-                        .left(() -> command)
+                        .leftRaw(() -> command)
                         .right(() -> "Input the command (PAPI supported)")
                         .onComplete((player, s) -> {
                             if (!s.isEmpty()) {

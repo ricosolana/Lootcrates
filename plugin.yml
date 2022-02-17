@@ -20,9 +20,11 @@ permissions:
     description: Allows access to /crates command
     default: op
 
-# 3.3.7 (2/14/2022)
+# 3.3.7 (2/17/2022)
 # language translations using Google translate
 # manual translation available too
+# editor translations too, but a bit finicky
+# must automatically visit each branch, then run translation scheme
 
 
 # 3.3.6 (2/5/2022)

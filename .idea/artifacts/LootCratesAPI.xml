@@ -6,6 +6,7 @@
       <element id="file-copy" path="$PROJECT_DIR$/legacy_config.yml" />
       <element id="file-copy" path="$PROJECT_DIR$/plugin.yml" />
       <element id="file-copy" path="$PROJECT_DIR$/config.yml" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/InnerUtils/target/InnerUtils.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

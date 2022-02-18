@@ -9,11 +9,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="134da130-6214-4649-b404-39079de75eca" name="Changes" comment="editor backup">
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/LootCratesAPI.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/LootCratesAPI.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/LootCratesServer.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/LootCratesServer.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/LootCratesServer2.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/LootCratesServer2.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/plugin.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LootCrates.iml" beforeDir="false" afterPath="$PROJECT_DIR$/LootCrates.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/util/GithubInstaller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/util/GithubInstaller.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/util/GithubUpdater.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/util/GithubUpdater.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,7 +54,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$/Documents/InfernoMod" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Documents/InnerUtils/target/InnerUtils.jar" />
     <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.29393467" />

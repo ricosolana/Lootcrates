@@ -14,6 +14,8 @@ import com.crazicrafter1.lootcrates.listeners.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -47,6 +49,7 @@ public class Main extends JavaPlugin
     public SkriptAddon addon;
 
     public Data data;
+    public Lang lang;
     private FileConfiguration config = null;
     private final File configFile = new File(getDataFolder(), "config.yml");
 
@@ -149,8 +152,7 @@ public class Main extends JavaPlugin
             metrics.addCustomChart(new Metrics.SingleLineChart("opened",
                     () -> data.totalOpens));
         } catch (Exception e) {
-            error("An error occurred while enabling metrics");
-            debug(e);
+            error("Unable to enable bStats Metrics (" + e.getMessage() + ")");
         }
 
         /*
@@ -170,31 +172,31 @@ public class Main extends JavaPlugin
         new ListenerOnPlayerQuit(this);
     }
 
-    public LanguageUnit getLang(Player p) {
+    public Lang.Unit getLang(Player p) {
 
         // If translations are disabled return
         if (!data.lang)
             return null;
 
-        LanguageUnit dlu;
+        Lang.Unit unit;
 
-        String lang = null;
+        String langCode = null;
         String locale = p.getLocale();
         int index = locale.indexOf("_");
         if (index != -1) {
-            lang = locale.toLowerCase(Locale.ROOT).substring(0, index);
+            langCode = locale.toLowerCase(Locale.ROOT).substring(0, index);
         }
 
         // If player language is invalid, or
         // If player by default is using english, or
         // If language couldnt be found
         // return none
-        if (lang == null
-                || lang.equals("en")
-                || (dlu = Main.get().data.translations.get(lang)) == null)
+        if (langCode == null
+                || langCode.equals("en")
+                || (unit = lang.translations.get(langCode)) == null)
             return null;
 
-        return dlu;
+        return unit;
     }
 
     /**
@@ -243,6 +245,9 @@ public class Main extends JavaPlugin
     @Override
     public void reloadConfig() {
         this.config = new YamlConfiguration();
+        this.lang = new Lang();
+
+        //saveLanguageFiles();
 
         int configAttempt = CFG_WAIT;
         while (++configAttempt != CFG_ERR) {
@@ -254,6 +259,7 @@ public class Main extends JavaPlugin
                         saveDefaultConfig(false);
                         config.load(configFile);
                         data = (Data) config.get("data");
+                        lang.loadLanguageFiles();
                         return;
                     case CFG_DEF:
                         info("Attempt 2: Force loading default config");
@@ -261,11 +267,13 @@ public class Main extends JavaPlugin
                         saveDefaultConfig(true);
                         config.load(configFile);
                         data = (Data) config.get("data");
+                        lang.loadLanguageFiles();
                         return;
                     case CFG_POP:
                         info("Attempt 3: Populating config with minimal built-ins");
 
                         data = new Data();
+                        lang.loadLanguageFiles();
                         return;
                 }
             } catch (Exception e) {
@@ -303,6 +311,9 @@ public class Main extends JavaPlugin
     @Override
     public void saveConfig() {
         // if a backup was successfully made, then save
+
+        lang.saveLanguageFiles();
+
         if (backupConfig(false)) {
             info("Saving config...");
             config.set("data", data);
@@ -348,15 +359,15 @@ public class Main extends JavaPlugin
     }
 
     public void info(String s) {
-        Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.DARK_GRAY + s);
+        info(Bukkit.getConsoleSender(), s);
     }
 
-    public void important(String s) {
-        Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.DARK_PURPLE + s);
+    void warn(String s) {
+        warn(Bukkit.getConsoleSender(), s);
     }
 
     public void error(String s) {
-        Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.RED + s);
+        error(Bukkit.getConsoleSender(), s);
     }
 
     public void debug(String s) {
@@ -364,10 +375,24 @@ public class Main extends JavaPlugin
             Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.GOLD + s);
     }
 
-    @Deprecated
-    public void debug(Exception e) {
-        if (data.debug)
-            e.printStackTrace();
+    public boolean info(CommandSender sender, String s) {
+            sender.sendMessage(
+                    (sender instanceof ConsoleCommandSender ? ChatColor.WHITE + "[" + ChatColor.LIGHT_PURPLE + "L" + ChatColor.DARK_PURPLE + "C" + ChatColor.WHITE + "]" : "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "\u24D8") + " "
+                    + ChatColor.RESET + ChatColor.GRAY + s);
+        return true;
     }
 
+    public boolean warn(CommandSender sender, String s) {
+        sender.sendMessage(
+                (sender instanceof ConsoleCommandSender ? ChatColor.WHITE + "[" + ChatColor.YELLOW + "L" + ChatColor.GOLD + "C" + ChatColor.WHITE + "]" : "" + ChatColor.GOLD + ChatColor.BOLD + "\u26A1") + " "
+                + ChatColor.RESET + ChatColor.YELLOW + s);
+        return true;
+    }
+
+    public boolean error(CommandSender sender, String s) {
+        sender.sendMessage(
+                (sender instanceof ConsoleCommandSender ? ChatColor.WHITE + "[" + ChatColor.RED + "L" + ChatColor.DARK_RED + "C" + ChatColor.WHITE + "]" : "" + ChatColor.DARK_RED + ChatColor.BOLD + "\u26A0") + " "
+                + ChatColor.RESET + ChatColor.RED + s);
+        return true;
+    }
 }

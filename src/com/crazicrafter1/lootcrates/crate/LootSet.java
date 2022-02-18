@@ -1,7 +1,7 @@
 package com.crazicrafter1.lootcrates.crate;
 
 import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.lootcrates.LanguageUnit;
+import com.crazicrafter1.lootcrates.Lang;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -35,7 +35,7 @@ public class LootSet implements ConfigurationSerializable {
     }
 
     public ItemStack itemStack(Player p) {
-        LanguageUnit dlu = Main.get().getLang(p);
+        Lang.Unit dlu = Main.get().getLang(p);
 
         if (dlu == null) {
             return itemStack;

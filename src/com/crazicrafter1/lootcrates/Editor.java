@@ -48,7 +48,7 @@ public class Editor {
 
     @NotNull
     static String L(Player p, String key, String msg) {
-        LanguageUnit unit = Main.get().getLang(p);
+        Lang.Unit unit = Main.get().getLang(p);
         /// If language match failed, return the default
         if (unit == null) {
             //String find = Main.get().data.editorEnglish.get(key);
@@ -56,7 +56,7 @@ public class Editor {
             //    if (!find.equals(msg))
             //        throw new RuntimeException("Tried registering dup of key: " + key + " (old: " + find + ", new: " + msg);
             //}
-            Main.get().data.editorEnglish.put(key, msg); // TEMPORARY for debug generation
+            Main.get().lang.editorEnglish.put(key, msg); // TEMPORARY for debug generation
             return msg;
         }
 

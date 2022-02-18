@@ -19,7 +19,7 @@ class GithubUpdater {
             String version = main.getDescription().getVersion();
             String parseVersion = version.replace(".", "");
 
-            String tagname = null;
+            String tag_name;
             URL api = new URL("https://api.github.com/repos/" + author + "/" + githubProject + "/releases/latest");
             URLConnection con = api.openConnection();
             con.setConnectTimeout(15000);
@@ -27,24 +27,24 @@ class GithubUpdater {
 
             JsonObject json;
             try {
-                json = new JsonParser().parse(new InputStreamReader(con.getInputStream())).getAsJsonObject();
+                json = JsonParser.parseReader(new InputStreamReader(con.getInputStream())).getAsJsonObject();
             } catch (Error | Exception e45) {
                 return false;
             }
-            tagname = json.get("tag_name").getAsString();
+            tag_name = json.get("tag_name").getAsString();
 
-            String parsedTagName = tagname.replace(".", "");
+            String parsedTagName = tag_name.replace(".", "");
 
             int latestVersion = Integer.parseInt(parsedTagName.substring(1).replace(".", ""));
             int parsedVersion = Integer.parseInt(parseVersion.replace(".", ""));
 
             final URL download = new URL("https://github.com/" + author + "/" + githubProject + "/releases/download/"
-                    + tagname + "/" + jarname);
+                    + tag_name + "/" + jarname);
 
             if (latestVersion > parsedVersion) {
                 Bukkit.getConsoleSender()
                         .sendMessage(ChatColor.GREEN + "Found a new version of " + ChatColor.GOLD
-                                + main.getDescription().getName() + ": " + ChatColor.WHITE + tagname
+                                + main.getDescription().getName() + ": " + ChatColor.WHITE + tag_name
                                 + ChatColor.LIGHT_PURPLE + " downloading now!!");
 
                 new BukkitRunnable() {
@@ -55,7 +55,7 @@ class GithubUpdater {
 
                             InputStream in = download.openStream();
 
-                            File pluginFile = null;
+                            File pluginFile;
 
                             try {
                                 pluginFile = new File(URLDecoder.decode(
@@ -93,7 +93,7 @@ class GithubUpdater {
                             e.printStackTrace();
                         }
                     }
-                }.runTaskLaterAsynchronously(main, 0);
+                }.runTaskAsynchronously(main);
                 return true;
             } else {
                 Bukkit.getConsoleSender()

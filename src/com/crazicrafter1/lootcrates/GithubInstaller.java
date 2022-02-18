@@ -24,7 +24,7 @@ class GithubInstaller {
 
             JsonObject json;
             try {
-                json = new JsonParser().parse(new InputStreamReader(con.getInputStream())).getAsJsonObject();
+                json = JsonParser.parseReader(new InputStreamReader(con.getInputStream())).getAsJsonObject();
             } catch (Error | Exception e45) {
                 return false;
             }

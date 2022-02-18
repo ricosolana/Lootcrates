@@ -9,6 +9,7 @@ import org.bukkit.command.TabCompleter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.crazicrafter1.lootcrates.cmd.CmdArg.error;
 
@@ -26,13 +27,16 @@ public class Cmd implements CommandExecutor, TabCompleter {
                     + String.join(", ", CmdArg.args.keySet())
             + "]");
 
-        CmdArg arg = CmdArg.args.get(args[0]);
+        CmdArg cmdArg = CmdArg.args.get(args[0]);
 
-        if (arg == null)
+        if (cmdArg == null)
             return error(sender, "Unknown command argument");
 
         try {
-            return arg.exe.apply(sender, Arrays.copyOfRange(args, 1, args.length));
+            cmdArg.exe.apply(sender,
+                    Arrays.copyOfRange(args, 1, args.length),
+                    Arrays.stream(args).filter(arg -> arg.length() >= 2 && arg.startsWith("-")).map(arg -> arg.substring(1)).collect(Collectors.toSet()));
+            return true;
         } catch (ArrayIndexOutOfBoundsException e) {
             // Just ensure index with an error print
             return error(sender, "Input more arguments: " + e.getMessage());

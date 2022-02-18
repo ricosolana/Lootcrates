@@ -2,7 +2,7 @@ package com.crazicrafter1.lootcrates.crate;
 
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
-import com.crazicrafter1.lootcrates.LanguageUnit;
+import com.crazicrafter1.lootcrates.Lang;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
 import com.crazicrafter1.lootcrates.Main;
 import com.sun.istack.internal.NotNull;
@@ -148,7 +148,7 @@ public class Crate implements ConfigurationSerializable {
     public ItemStack itemStack(@Nullable Player p) {
         ItemBuilder item = ItemBuilder.copyOf(itemStack);
 
-        LanguageUnit dlu = Main.get().getLang(p);
+        Lang.Unit dlu = Main.get().getLang(p);
 
         if (dlu == null) {
             return item
@@ -171,7 +171,7 @@ public class Crate implements ConfigurationSerializable {
     }
 
     public String title(@NotNull Player p) {
-        LanguageUnit dlu = Main.get().getLang(p);
+        Lang.Unit dlu = Main.get().getLang(p);
 
         if (dlu == null) {
             return Util.placeholders(p, title);

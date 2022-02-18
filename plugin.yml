@@ -20,7 +20,7 @@ permissions:
     description: Allows access to /crates command
     default: op
 
-# 3.3.9
+# 3.3.9 (2/18/2022)
 # zip configs, better updater
 # still no restarting updater :(
 

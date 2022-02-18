@@ -11,11 +11,6 @@
     <list default="true" id="134da130-6214-4649-b404-39079de75eca" name="Changes" comment="editor backup">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/listeners/ListenerOnEntityDamageByEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/listeners/ListenerOnEntityDamageByEntity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/listeners/ListenerOnInventoryClose.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/listeners/ListenerOnInventoryClose.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/listeners/ListenerOnInventoryOpen.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/listeners/ListenerOnPlayerInteract.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/listeners/ListenerOnPlayerInteract.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/listeners/ListenerOnPlayerQuit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/listeners/ListenerOnPlayerQuit.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

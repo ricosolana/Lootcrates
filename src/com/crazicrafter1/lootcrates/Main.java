@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class Main extends JavaPlugin
 {
@@ -55,6 +57,7 @@ public class Main extends JavaPlugin
     public Lang lang;
     private FileConfiguration config = null;
     private final File configFile = new File(getDataFolder(), "config.yml");
+    private final File backupPath = new File(getDataFolder(), "backup");
 
     private static Main instance;
     public static Main get() {
@@ -242,7 +245,7 @@ public class Main extends JavaPlugin
         // If back up failed, then save
         if ((replace && backupConfig(replace)) || !configFile.exists()) {
             info("Saving default config");
-            this.saveResource("config.yml", true);
+            this.saveResource(configFile.getName(), true);
         }
     }
 
@@ -290,25 +293,44 @@ public class Main extends JavaPlugin
     }
 
     public boolean backupConfig(boolean isBroken) {
-        File backupFile = new File(Main.get().getDataFolder(),"backup/" + System.currentTimeMillis() + "_" + (isBroken ? "broken" : "old") + "_config.yml");
+        File backupFile = new File(backupPath, System.currentTimeMillis() + "_" + (isBroken ? "broken" : "old") + "_config.zip");
+
+        //try {
+        //    // Create path
+        //    backupFile.getParentFile().mkdirs();
+
+        //    if (configFile.exists()) {
+        //        info("Backing up config");
+
+        //        // Create backup
+        //        backupFile.createNewFile();
+
+        //        // Copy files
+        //        Util.copy(new FileInputStream(configFile), new FileOutputStream(backupFile));
+        //        return true;
+        //    }
+        //} catch (IOException e) {
+        //    e.printStackTrace();
+        //}
+
+        info("Backing up config");
 
         try {
-            // Create path
             backupFile.getParentFile().mkdirs();
 
-            if (configFile.exists()) {
-                info("Backing up config");
+            ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(backupFile));
+            zipOut.putNextEntry(new ZipEntry(configFile.getName()));
 
-                // Create backup
-                backupFile.createNewFile();
+            byte[] bytes = config.saveToString().getBytes();
+            zipOut.write(bytes, 0, bytes.length);
 
-                // Copy files
-                Util.copy(new FileInputStream(configFile), new FileOutputStream(backupFile));
-                return true;
-            }
-        } catch (IOException e) {
+            zipOut.close();
+
+            return true;
+        } catch (Exception e) {
             e.printStackTrace();
         }
+
         return false;
     }
 
@@ -324,34 +346,40 @@ public class Main extends JavaPlugin
 
             try {
                 config.save(configFile);
-
-                // now delete old files in backup
-                File backupDir = new File(Main.get().getDataFolder(),"backup");
-                // backup/1010928476782461_old_config.yml
-                int deletedCount = 0;
-                for (File file : backupDir.listFiles()) {
-                    if (file.getName().endsWith("_config.yml")) {
-                        try {
-                            long create = Long.parseLong(file.getName().substring(0, file.getName().indexOf("_")));
-                            if (create < System.currentTimeMillis() - (data.cleanHour * 60 * 60 * 1000)) {
-                                // delete it
-                                file.delete();
-                                deletedCount++;
-                            }
-                        } catch (Exception e) {
-                            //e.printStackTrace();
-                        }
-                    }
-                }
-
-                if (deletedCount > 0)
-                    info("Purged " + deletedCount + " old configurations");
-                else info("No old configurations to purge");
             } catch (Exception e) {
                 error("Failed to save config");
                 e.printStackTrace();
             }
         }
+
+        purge();
+    }
+
+    private void purge() {
+        // now delete old files in backup
+        // backup/1010928476782461_old_config.yml
+        int deletedCount = 0;
+        try {
+            backupPath.mkdirs();
+
+            for (File file : backupPath.listFiles()) {
+                if (file.getName().endsWith("_config.zip")) {
+
+                    long create = Long.parseLong(file.getName().substring(0, file.getName().indexOf("_")));
+                    if (create < System.currentTimeMillis() - (data.cleanHour * 60 * 60 * 1000)) {
+                        // delete it
+                        file.delete();
+                        deletedCount++;
+                    }
+
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (deletedCount > 0)
+            info("Purged " + deletedCount + " old configurations");
+        else info("No old configurations to purge");
     }
 
     @Override
@@ -381,21 +409,21 @@ public class Main extends JavaPlugin
 
     public boolean info(CommandSender sender, String s) {
             sender.sendMessage(
-                    (sender instanceof ConsoleCommandSender ? ChatColor.WHITE + "[" + ChatColor.LIGHT_PURPLE + "L" + ChatColor.DARK_PURPLE + "C" + ChatColor.WHITE + "]" : "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "\u24D8") + " "
+                    (sender instanceof ConsoleCommandSender ? ChatColor.WHITE + "[" + ChatColor.DARK_PURPLE + "L" + ChatColor.LIGHT_PURPLE + "C" + ChatColor.WHITE + "]" : "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "\u24D8") + " "
                     + ChatColor.RESET + ChatColor.GRAY + s);
         return true;
     }
 
     public boolean warn(CommandSender sender, String s) {
         sender.sendMessage(
-                (sender instanceof ConsoleCommandSender ? ChatColor.WHITE + "[" + ChatColor.YELLOW + "L" + ChatColor.GOLD + "C" + ChatColor.WHITE + "]" : "" + ChatColor.GOLD + ChatColor.BOLD + "\u26A1") + " "
+                (sender instanceof ConsoleCommandSender ? ChatColor.WHITE + "[" + ChatColor.GOLD + "L" + ChatColor.YELLOW + "C" + ChatColor.WHITE + "]" : "" + ChatColor.GOLD + ChatColor.BOLD + "\u26A1") + " "
                 + ChatColor.RESET + ChatColor.YELLOW + s);
         return true;
     }
 
     public boolean error(CommandSender sender, String s) {
         sender.sendMessage(
-                (sender instanceof ConsoleCommandSender ? ChatColor.WHITE + "[" + ChatColor.RED + "L" + ChatColor.DARK_RED + "C" + ChatColor.WHITE + "]" : "" + ChatColor.DARK_RED + ChatColor.BOLD + "\u26A0") + " "
+                (sender instanceof ConsoleCommandSender ? ChatColor.WHITE + "[" + ChatColor.DARK_RED + "L" + ChatColor.RED + "C" + ChatColor.WHITE + "]" : "" + ChatColor.DARK_RED + ChatColor.BOLD + "\u26A0") + " "
                 + ChatColor.RESET + ChatColor.RED + s);
         return true;
     }

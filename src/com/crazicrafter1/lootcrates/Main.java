@@ -118,6 +118,7 @@ public class Main extends JavaPlugin
         LootCratesAPI.registerLoot(LootItemCrate.class, ItemBuilder.copyOf(Material.CHEST).name("&eAdd crate...").build(), "LootItemCrate");
         LootCratesAPI.registerLoot(LootItem.class, ItemBuilder.copyOf(Material.GOLD_NUGGET).name("&6Add item...").build(), "LootItem");
         LootCratesAPI.registerLoot(LootCommand.class, ItemBuilder.copyOf(Material.PAPER).name("&2Add command...").build(), "LootCommand");
+
         if (supportQualityArmory)
             LootCratesAPI.registerLoot(LootItemQA.class, ItemBuilder.copyOf(Material.CROSSBOW).name("&8Add QualityArmory...").build(), "LootItemQA");
 

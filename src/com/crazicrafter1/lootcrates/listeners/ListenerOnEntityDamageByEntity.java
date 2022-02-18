@@ -13,24 +13,8 @@ public class ListenerOnEntityDamageByEntity extends BaseListener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
-
         if (Main.get().crateFireworks.contains(e.getDamager().getUniqueId())) {
             e.setCancelled(true);
         }
-
-        /*
-        if ((e.getDamager() instanceof Firework))
-        {
-            if (e.getEntity() instanceof Player)
-            {
-                Player p = (Player)e.getEntity();
-                if (Main.openCrates.containsKey(p.getUniqueId())) {
-                    e.setCancelled(true);
-                }
-            }
-        }
-
-         */
     }
-
 }

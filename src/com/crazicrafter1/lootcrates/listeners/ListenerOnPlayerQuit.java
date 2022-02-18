@@ -18,10 +18,7 @@ public class ListenerOnPlayerQuit extends BaseListener {
         Player p = e.getPlayer();
 
         if (Main.get().openCrates.containsKey(p.getUniqueId())) {
-            //plugin.openCrates.get(p.getUniqueId()).giveAndCancel(); //.onPlayerQuit(e);
             LootCratesAPI.closeCrate(p);
-            //plugin.openCrates.remove(p.getUniqueId());
         }
-
     }
 }

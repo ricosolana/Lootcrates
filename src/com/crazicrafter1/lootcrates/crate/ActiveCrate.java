@@ -207,8 +207,6 @@ public final class ActiveCrate {
     public void onInventoryClick(InventoryClickEvent e) {
         e.setCancelled(true);
 
-        Main.get().debug("Crate clicked (cancelled)");
-
         if (!e.isShiftClick() && e.isLeftClick()) {
             int slot = e.getSlot();
 
@@ -217,14 +215,11 @@ public final class ActiveCrate {
                 switch (state) {
                     case SELECTING:
                         selectSlot(slot);
-                        Main.get().debug("Select click");
                         break;
                     case REVEALING:
                         //do nothing
-                        Main.get().debug("Revealing...");
                         break;
                     case REVEALED: {
-                        Main.get().debug("Revealed click");
                         // If slot is selected
                         QSlot qSlot = slots.get(slot);
                         if (qSlot == null
@@ -236,7 +231,6 @@ public final class ActiveCrate {
                         // Give item
                         if (qSlot.randomLoot.execute(this)) {
                             e.setCancelled(false);
-                            Main.get().debug("Execute (uncancel)");
                         } else // Remove item
                             inventory.setItem(slot, null);
 

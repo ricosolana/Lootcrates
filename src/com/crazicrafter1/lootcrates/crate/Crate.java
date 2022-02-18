@@ -148,9 +148,9 @@ public class Crate implements ConfigurationSerializable {
     public ItemStack itemStack(@Nullable Player p) {
         ItemBuilder item = ItemBuilder.copyOf(itemStack);
 
-        Lang.Unit dlu = Main.get().getLang(p);
+        Lang.Unit unit = Main.get().getLang(p);
 
-        if (dlu == null) {
+        if (unit == null) {
             return item
                     .macro("%", "lc_picks", "" + picks)
                     .macro("%", "lc_id", "" + id)
@@ -158,28 +158,28 @@ public class Crate implements ConfigurationSerializable {
                     .placeholders(p).build();
         }
 
-        Language clu = dlu.crates.get(id);
+        Language lang = unit.crates.get(id);
 
         return item
                 .macro("%", "lc_picks", "" + picks)
                 .macro("%", "lc_id", "" + id)
                 .macro("%", "lc_lscount", "" + lootBySum.size())
                 .placeholders(p)
-                .name(clu.itemStackDisplayName)
-                .lore(clu.itemStackLore)
+                .name(lang.itemStackDisplayName)
+                .lore(lang.itemStackLore)
                 .build();
     }
 
     public String title(@NotNull Player p) {
-        Lang.Unit dlu = Main.get().getLang(p);
+        Lang.Unit unit = Main.get().getLang(p);
 
-        if (dlu == null) {
+        if (unit == null) {
             return Util.placeholders(p, title);
         }
 
-        Language clu = dlu.crates.get(id);
+        Language lang = unit.crates.get(id);
 
-        return Util.placeholders(p, clu.title);
+        return Util.placeholders(p, lang.title);
     }
 
     @Override
@@ -196,7 +196,6 @@ public class Crate implements ConfigurationSerializable {
     public Map<String, Object> serialize() {
         Map<String, Object> result = new LinkedHashMap<>();
 
-        //result.put("name", name);
         result.put("itemStack", itemStack);
         result.put("title", title);
         result.put("columns", columns);

@@ -17,9 +17,6 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class LootItemCrate extends AbstractLootItem {
-
-    // Important to use id, because a referenced Crate object is sort of an
-    // small leak
     public String id;
 
     /**
@@ -82,8 +79,6 @@ public class LootItemCrate extends AbstractLootItem {
                                 .lmb(interact -> {
                                     // select as active
                                     id = crate.id;
-                                    //return Button.Result.refresh();
-                                    //return EnumResult.OPEN(new LMItemCrate(loot, lootSet).menu);
                                     return Result.REFRESH();
                                 })
                                 .get()
@@ -92,9 +87,4 @@ public class LootItemCrate extends AbstractLootItem {
                     return result;
                 });
     }
-
-    //@Override
-    //public ItemStack getMenuBuilderIcon() {
-    //    return new ItemBuilder(Material.CHEST).name("");
-    //}
 }

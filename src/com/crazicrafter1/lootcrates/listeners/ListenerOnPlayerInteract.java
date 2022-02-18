@@ -18,33 +18,21 @@ public class ListenerOnPlayerInteract extends BaseListener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e)
     {
-        plugin.debug("Player interact caught");
         Player p = e.getPlayer();
 
         if (!p.hasPermission("lootcrates.open"))
             return;
 
         if (!Main.get().openCrates.containsKey(p.getUniqueId())) {
-            plugin.debug("Passed unopened crate validation");
-
             Action a = e.getAction();
             if (a == Action.RIGHT_CLICK_AIR || a == Action.RIGHT_CLICK_BLOCK) {
-
-                plugin.debug("Passed click validation");
-
-                ItemStack item = p.getInventory().getItemInHand(); //.getItemInMainHand();
+                ItemStack item = p.getInventory().getItemInHand();
 
                 Crate crate = LootCratesAPI.extractCrateFromItem(item);
                 if (crate != null) {
-                    plugin.debug("Successful crate validation");
-
-
-
-                    plugin.debug(p.getDisplayName() + " has just opened a " + crate.id + " crate");
                     LootCratesAPI.openCrate(p, crate.id, p.getInventory().getHeldItemSlot());
 
                     e.setCancelled(true);
-
                 }
 
             }

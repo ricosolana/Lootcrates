@@ -55,7 +55,6 @@ public class GithubInstaller {
                             pluginToInstall = Paths.get(thisPluginFile.getParentFile().getPath(), jarname).toFile();
 
                             pluginToInstall.createNewFile();
-
                         } catch (UnsupportedEncodingException e) {
                             throw new RuntimeException("You don't have a good text codec on your system", e);
                         }

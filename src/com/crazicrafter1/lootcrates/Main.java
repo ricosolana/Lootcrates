@@ -394,7 +394,7 @@ public class Main extends JavaPlugin
         info(Bukkit.getConsoleSender(), s);
     }
 
-    void warn(String s) {
+    public void warn(String s) {
         warn(Bukkit.getConsoleSender(), s);
     }
 
@@ -402,6 +402,7 @@ public class Main extends JavaPlugin
         error(Bukkit.getConsoleSender(), s);
     }
 
+    @Deprecated
     public void debug(String s) {
         if (data.debug)
             Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.GOLD + s);

@@ -1,6 +1,6 @@
 name: LootCrates
 main: com.crazicrafter1.lootcrates.Main
-version: 3.3.8 # 3.3.8 was previous
+version: 3.3.9 # 3.3.8 was previous
 api-version: 1.13
 author: crazicrafter1
 softdepend: [CRUtils, Gapi, QualityArmory, Skript, PlaceholderAPI]
@@ -19,6 +19,11 @@ permissions:
   lootcrates.admin:
     description: Allows access to /crates command
     default: op
+
+# 3.3.9
+# zip configs, better updater
+# still no restarting updater :(
+
 
 # 3.3.7 / 3.3.8 (2/17/2022)
 # language translations using Google translate

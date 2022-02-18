@@ -1,4 +1,4 @@
-package com.crazicrafter1.lootcrates;
+package com.crazicrafter1.lootcrates.util;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -12,7 +12,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 
-class GithubUpdater {
+public class GithubUpdater {
 
     public static boolean autoUpdate(final Plugin main, String author, String githubProject, String jarname) {
         try {

@@ -30,7 +30,7 @@ public class Cmd implements CommandExecutor, TabCompleter {
         CmdArg cmdArg = CmdArg.args.get(args[0]);
 
         if (cmdArg == null)
-            return error(sender, "Unknown command argument");
+            return error(sender, "Unknown argument");
 
         try {
             cmdArg.exe.apply(sender,

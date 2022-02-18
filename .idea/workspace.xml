@@ -81,7 +81,7 @@
       <module name="LootCrates" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.crazicrafter1.lootcrates.*" />
+          <option name="PATTERN" value="com.crazicrafter1.lootcrates.util.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>

@@ -1,4 +1,4 @@
-package com.crazicrafter1.lootcrates;
+package com.crazicrafter1.lootcrates.util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;

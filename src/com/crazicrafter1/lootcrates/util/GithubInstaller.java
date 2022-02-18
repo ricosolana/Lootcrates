@@ -1,4 +1,4 @@
-package com.crazicrafter1.lootcrates;
+package com.crazicrafter1.lootcrates.util;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -13,7 +13,7 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.file.Paths;
 
-class GithubInstaller {
+public class GithubInstaller {
 
     public static boolean installDepend(final Plugin main, String author, String githubProject, String jarname, String dependName) {
         try {

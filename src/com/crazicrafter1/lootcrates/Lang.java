@@ -36,6 +36,8 @@ public class Lang {
         }
     }
 
+    private final File langFolder = new File(Main.get().getDataFolder(), "lang");
+
     public Map<String, Unit> translations = new HashMap<>();
     public Map<String, String> editorEnglish = new HashMap<>();
 
@@ -43,9 +45,6 @@ public class Lang {
      * Load all the language files located in lootcrates/lang/
      */
     public boolean loadLanguageFiles() {
-        final File langFolder = new File(Main.get().getDataFolder(), "lang");
-        langFolder.mkdirs();
-
         int i = 0;
         int total = 0;
         try {
@@ -79,9 +78,6 @@ public class Lang {
     public boolean loadLanguageFile(final String language) {
         try {
             Main.get().info("Loading language " + language);
-
-            final File langFolder = new File(Main.get().getDataFolder(), "lang");
-            langFolder.mkdirs();
 
             Lang.Unit unit = new Lang.Unit(language);
 
@@ -169,9 +165,6 @@ public class Lang {
         try {
             Main.get().info("Saving language " + unit.LANGUAGE);
 
-            final File langFolder = new File(Main.get().getDataFolder(), "lang");
-            langFolder.mkdirs();
-
             FileConfiguration langConfig = new YamlConfiguration();
             langConfig.set("selectedDisplayName", unit.selectedDisplayName);
             langConfig.set("selectedLore", unit.selectedLore);
@@ -202,6 +195,7 @@ public class Lang {
                 langConfig.set("editor." + entry.getKey(), Objects.requireNonNull(entry.getValue()));
             }
 
+            // Save will create parent directories
             langConfig.save(new File(langFolder, unit.LANGUAGE + ".yml"));
 
             return true;

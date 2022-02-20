@@ -3,70 +3,55 @@ package com.crazicrafter1.lootcrates.crate.loot;
 import com.crazicrafter1.crutils.ColorMode;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.gapi.*;
-import me.zombie_striker.customitemmanager.CustomBaseObject;
-import me.zombie_striker.qg.api.QualityArmory;
+import com.willfp.ecoitems.items.EcoItem;
+import com.willfp.ecoitems.items.EcoItems;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
-public class LootItemQA extends AbstractLootItem {
+public class LootEcoItem extends AbstractLootItem {
 
-    public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.CROSSBOW).name("&8Add QualityArmory item...").build();
+    public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.BEACON).name("&cAdd LootEcoItem...").build();
 
-    public String name;
+    public String id;
 
-    /**
-     * Default ctor
-     */
-    public LootItemQA() {
-        // just the first loaded item
-        name = QualityArmory.getCustomItems().next().getName();
+    public LootEcoItem() {
+        id = EcoItems.values().get(0).getId();
     }
 
-    public LootItemQA(Map<String, Object> args) {
+    public LootEcoItem(Map<String, Object> args) {
         super(args);
-        this.name = (String) args.get("name");
+
+        id = (String) args.get("id");
+
+        //EcoItems.getByID(id)
     }
 
     @Override
     public ItemStack getIcon(Player p) {
-        return ItemBuilder.copyOf(QualityArmory.getCustomItemAsItemStack(name)).placeholders(p).build();
-    }
-
-    @Override
-    public String toString() {
-        return "&8Quality armory: &f" + name + "\n" +
-                super.toString();
-    }
-
-    @Override
-    public Map<String, Object> serialize() {
-        Map<String, Object> result = super.serialize();
-
-        result.put("name", name);
-
-        return result;
+        return Objects.requireNonNull(EcoItems.getByID(id)).getItemStack();
     }
 
     @Override
     public AbstractMenu.Builder getMenuBuilder() {
         return new ParallaxMenu.PBuilder()
-                .title("LootItemQA")
+                .title("LootEcoItem")
                 .parentButton(4, 5)
                 //.childButton(2, 5, () -> new ItemBuilder(Material.COMPASS).name("&eSearch..."), new )
                 .button(3, 5, new Button.Builder().icon(() -> getIcon(null)))
-                .childButton(5, 5, () -> ItemBuilder.copyOf(Material.COMPASS).name("&eBy name...").build(), new TextMenu.TBuilder()
+                .childButton(5, 5, () -> ItemBuilder.copyOf(Material.COMPASS).name("&eBy id...").build(), new TextMenu.TBuilder()
                         .title("Assign by name")
-                        .leftRaw(() -> name, null, ColorMode.STRIP)
-                        .right(() -> "&eSet item by name")
+                        .leftRaw(() -> id, null, ColorMode.STRIP)
+                        .right(() -> "&eSet item by id")
                         .onClose((player) -> Result.PARENT())
                         .onComplete((player, s) -> {
-                            CustomBaseObject customBaseObject = QualityArmory.getCustomItemByName(s);
-                            if (customBaseObject != null) {
-                                this.name = s;
+                            EcoItem ecoItem = EcoItems.getByID(s);
+                            if (ecoItem != null) {
+                                this.id = s;
                                 return Result.PARENT();
                             }
                             return Result.TEXT("Invalid");
@@ -75,19 +60,19 @@ public class LootItemQA extends AbstractLootItem {
                 .addAll(self -> {
                     ArrayList<Button> result = new ArrayList<>();
 
-                    QualityArmory.getCustomItems().forEachRemaining(customBaseObject -> {
-                        if (customBaseObject.getName().equals(this.name)) {
+                    EcoItems.values().forEach(ecoItem -> {
+                        if (ecoItem.getId().equals(this.id)) {
                             result.add(new Button.Builder()
                                     .icon(() -> ItemBuilder.copyOf(getIcon(null)).build())
                                     .get());
                         } else {
                             result.add(new Button.Builder()
-                                    .icon(() -> QualityArmory.getCustomItemAsItemStack(customBaseObject.getName()))
+                                    .icon(ecoItem::getItemStack)
                                     //.icon(() -> new ItemBuilder(customBaseObject.getItemData().getMat())
                                     //.name(customBaseObject.getName()).lore(customBaseObject.getCustomLore()).toItem())
                                     .lmb(interact -> {
                                         // change
-                                        name = customBaseObject.getName();
+                                        id = ecoItem.getId();
                                         return Result.PARENT();
                                     }).get()
                             );

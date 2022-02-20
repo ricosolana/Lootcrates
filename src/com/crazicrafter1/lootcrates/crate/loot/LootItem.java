@@ -6,7 +6,7 @@ import com.crazicrafter1.gapi.AbstractMenu;
 import com.crazicrafter1.gapi.Button;
 import com.crazicrafter1.gapi.Result;
 import com.crazicrafter1.lootcrates.Editor;
-import com.crazicrafter1.lootcrates.ItemMutateMenuBuilder;
+import com.crazicrafter1.lootcrates.ItemModifyMenu;
 import com.crazicrafter1.lootcrates.Main;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -16,17 +16,15 @@ import java.util.Map;
 
 public final class LootItem extends AbstractLootItem {
 
+    public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.GOLD_NUGGET).name("&6Add item...").build();
+
     public ItemStack itemStack;
 
     /**
      * Default ctor
      */
     public LootItem() {
-        this(new ItemStack(Material.STONE));
-    }
-
-    public LootItem(ItemStack itemStack) {
-        this.itemStack = itemStack;
+        this.itemStack = new ItemStack(Material.STONE);
     }
 
     public LootItem(Map<String, Object> args) {
@@ -53,7 +51,7 @@ public final class LootItem extends AbstractLootItem {
     @Override
     public AbstractMenu.Builder getMenuBuilder() {
         //Button.Builder inOutline = new Button.Builder().icon(() -> new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name("&7Set to").toItem());
-        return new ItemMutateMenuBuilder()
+        return new ItemModifyMenu()
                 .build(itemStack, input -> this.itemStack = input)
                 .title("LootItem")
                 // Min
@@ -68,7 +66,7 @@ public final class LootItem extends AbstractLootItem {
                             min = Util.clamp(min + change, 1, max);
                             return Result.REFRESH();
                         })
-                        .icon(() -> ItemBuilder.of("RED_DYE").name("&8&nMin").lore(Editor.LORE_LMB_NUM + "\n" + Editor.LORE_RMB_NUM + "\n" + Editor.LORE_SHIFT_NUM).amount(min).build()))
+                        .icon(() -> ItemBuilder.of("PLAYER_HEAD").name("&8&nMin").skull(Editor.BASE64_DEC).lore(Editor.LORE_LMB_NUM + "\n" + Editor.LORE_RMB_NUM + "\n" + Editor.LORE_SHIFT_NUM).amount(min).build()))
                 // Max
                 .button(7, 2, new Button.Builder()
                         .lmb(interact -> {
@@ -81,6 +79,6 @@ public final class LootItem extends AbstractLootItem {
                             max = Util.clamp(max + change, min, itemStack.getMaxStackSize());
                             return Result.REFRESH();
                         })
-                        .icon(() -> ItemBuilder.of("GREEN_DYE").name("&8&nMax").lore(Editor.LORE_LMB_NUM + "\n" + Editor.LORE_RMB_NUM + "\n" + Editor.LORE_SHIFT_NUM).amount(max).build()));
+                        .icon(() -> ItemBuilder.of("PLAYER_HEAD").name("&8&nMax").skull(Editor.BASE64_INC).lore(Editor.LORE_LMB_NUM + "\n" + Editor.LORE_RMB_NUM + "\n" + Editor.LORE_SHIFT_NUM).amount(max).build()));
     }
 }

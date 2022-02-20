@@ -6,7 +6,6 @@ import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Getter;
-import com.sun.istack.internal.Nullable;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
@@ -18,7 +17,6 @@ public class EvtLoot extends SkriptEvent {
         // Create the 'player' macro
         EventValues.registerEventValue(SkriptLootEvent.class, Player.class, new Getter<Player, SkriptLootEvent>() {
             @Override
-            @Nullable
             public Player get(SkriptLootEvent e) {
                 return e.getPlayer();
             }
@@ -41,7 +39,7 @@ public class EvtLoot extends SkriptEvent {
     }
 
     @Override
-    public String toString(@Nullable Event event, boolean b) {
+    public String toString(Event event, boolean b) {
         return "Loot execute event";
     }
 }

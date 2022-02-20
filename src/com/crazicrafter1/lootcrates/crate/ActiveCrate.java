@@ -97,8 +97,6 @@ public final class ActiveCrate {
 
             state = State.REVEALING;
 
-            Main.get().debug("speed: " + data.speed);
-
             if (data.speed != 0) {
                  taskID = new BukkitRunnable() {
                      int iterations = 0;

@@ -2,18 +2,14 @@ package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.gapi.AbstractMenu;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
-import com.sun.istack.internal.NotNull;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nonnull;
+
 /**
- * TODO
- *  Abstract loot class is more or less abstracted config data
- *
- *  ActiveLoot is a loot that has calculated values upon being revealed
- *      - what to show on reveal
- *      - what to do on click
+ * Must create a static method in class to get the Editor-representative item
  */
 public interface ILoot extends ConfigurationSerializable {
 
@@ -22,20 +18,28 @@ public interface ILoot extends ConfigurationSerializable {
      * will see as a representation of loot in a crate when showed
      * @return ItemStack
      */
-    @NotNull
-    ItemStack getIcon(@NotNull Player p);
+    @Nonnull
+    ItemStack getIcon(@Nonnull Player p);
 
     /**
      * The actual loot action to do on click
      * @param activeCrate the reference crate
      * @return whether the player should keep the clicked {@link ItemStack}
      */
-    boolean execute(@NotNull ActiveCrate activeCrate);
+    boolean execute(@Nonnull ActiveCrate activeCrate);
 
     /**
      * The utility menu to show in the editor to modify an ILoot instance
-     * @return
+     *  TODO Important: Must not assign a onClose(...) function to the menu
+     *      This results in unexpected menu behaviour
+     *      I have no idea how to fix this issue ATM.
+     * @return {@link AbstractMenu.Builder} instance
      */
-    @NotNull
+    @Nonnull
     AbstractMenu.Builder getMenuBuilder();
+
+    /*
+     * The static method which must be included in class has the following signature:
+     */
+    //public static ItemStack getEditorIcon();
 }

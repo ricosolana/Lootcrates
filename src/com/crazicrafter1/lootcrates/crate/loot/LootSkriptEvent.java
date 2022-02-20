@@ -5,7 +5,7 @@ import com.crazicrafter1.gapi.AbstractMenu;
 import com.crazicrafter1.gapi.Result;
 import com.crazicrafter1.gapi.TextMenu;
 import com.crazicrafter1.lootcrates.Editor;
-import com.crazicrafter1.lootcrates.ItemMutateMenuBuilder;
+import com.crazicrafter1.lootcrates.ItemModifyMenu;
 import com.crazicrafter1.lootcrates.sk.SkriptLootEvent;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import org.bukkit.Bukkit;
@@ -17,6 +17,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class LootSkriptEvent implements ILoot {
+
+    public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.MAP).name("&aAdd Skript tag...").build();
 
     String tag;
     ItemStack itemStack;
@@ -50,18 +52,18 @@ public class LootSkriptEvent implements ILoot {
 
     @Override
     public AbstractMenu.Builder getMenuBuilder() {
-        return new ItemMutateMenuBuilder()
+        return new ItemModifyMenu()
                 .build(itemStack, input -> this.itemStack = input)
                 .title("LootSkriptEvent")
                 .childButton(5, 2, () -> ItemBuilder.copyOf(Material.PAPER).name("&6Event tag").lore(Editor.LORE_LMB_EDIT).build(), new TextMenu.TBuilder()
-                        .title("edit tag", true)
-                        .onClose((player, reroute) -> !reroute ? Result.BACK() : null)
+                        .title("edit tag")
+                        .onClose((player) -> Result.PARENT())
                         .leftRaw(() -> tag)
                         .right(() -> "Input a tag")
                         .onComplete((player, s) -> {
                             if (!s.isEmpty()) {
                                 this.tag = s;
-                                return Result.BACK();
+                                return Result.PARENT();
                             }
                             return Result.TEXT("Invalid");
                         }));

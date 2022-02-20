@@ -1,7 +1,9 @@
 package com.crazicrafter1.lootcrates;
 
+import com.crazicrafter1.crutils.ColorMode;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
+import com.crazicrafter1.crutils.Version;
 import com.crazicrafter1.gapi.Button;
 import com.crazicrafter1.gapi.Result;
 import com.crazicrafter1.gapi.SimpleMenu;
@@ -14,9 +16,9 @@ import java.util.function.Consumer;
 
 import static com.crazicrafter1.lootcrates.Editor.*;
 
-public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
+public class ItemModifyMenu extends SimpleMenu.SBuilder {
 
-    public ItemMutateMenuBuilder() {
+    public ItemModifyMenu() {
         super(5);
     }
 
@@ -24,9 +26,9 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
 
     private ItemBuilder builder;
 
-    public ItemMutateMenuBuilder build(ItemStack it, Consumer<ItemStack> itemStackConsumer) {
+    public ItemModifyMenu build(ItemStack it, Consumer<ItemStack> itemStackConsumer) {
         builder = ItemBuilder.copyOf(it);
-        return (ItemMutateMenuBuilder) title("item edit", true)
+        return (ItemModifyMenu) title("item edit")
                 .background()
                 .parentButton(4, 4)
                 .button(2, 1, IN_OUTLINE)
@@ -48,10 +50,10 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
                         }))
                 // Edit Name
                 .childButton(6, 1, () -> ItemBuilder.copyOf(Material.NAME_TAG).name("&eName").lore(LORE_LMB_EDIT).build(), new TextMenu.TBuilder()
-                        .title("name", true)
-                        .leftRaw(() -> Util.flattenedName(builder.build(), "no name"))
+                        .title("name")
+                        .leftRaw(() -> builder.getNameOrLocaleName(), null, ColorMode.REVERT)
                         .right(() -> "&8Input custom item name", () -> COLOR_PREFIX)
-                        .onClose((player, reroute) -> Result.BACK())
+                        .onClose((player) -> Result.PARENT())
                         .onComplete((player, s) -> {
                             if (s.isEmpty()) {
                                 builder.resetName();
@@ -60,14 +62,14 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
 
                             itemStackConsumer.accept(builder.build());
 
-                            return Result.BACK();
+                            return Result.PARENT();
                         }))
                 // Edit Lore
                 .childButton(6, 3, () -> ItemBuilder.copyOf(Material.MAP).name("&7Lore").lore(LORE_LMB_EDIT).build(), new TextMenu.TBuilder()
-                        .title("lore", true)
-                        .leftRaw(() -> Util.flattenedLore(builder.build(), "my custom lore"))
+                        .title("lore")
+                        .leftRaw(() -> Util.strDef(builder.getLoreString(), LOREM_IPSUM), null, ColorMode.REVERT)
                         .right(() -> "&8Input custom item lore", () -> COLOR_PREFIX + "&7\n'\\n': &fnewline")
-                        .onClose((player, reroute) -> !reroute ? Result.BACK() : null)
+                        .onClose((player) -> Result.PARENT())
                         .onComplete((player, s) -> {
                             if (s.isEmpty()) {
                                 builder.resetLore();
@@ -76,11 +78,11 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
 
                             itemStackConsumer.accept(builder.build());
 
-                            return Result.BACK();
+                            return Result.PARENT();
                         }))
                 // Edit CustomModelData
                 .childButton(6, 2, () -> ItemBuilder.of("PLAYER_HEAD").skull(BASE64_CUSTOM_MODEL_DATA).name("&8CustomModelData").lore(LORE_LMB_EDIT).build(), new TextMenu.TBuilder()
-                        .title("model", true)
+                        .title("model")
                         .leftRaw(() -> {
                             ItemMeta meta = builder.getMeta();
                             if (meta != null && meta.hasCustomModelData())
@@ -88,7 +90,7 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
                             return "none";
                         })
                         .right(() -> "&7Input an integer")
-                        .onClose((player, reroute) -> !reroute ? Result.BACK() : null)
+                        .onClose((player) -> Result.PARENT())
                         .onComplete((p, s) -> {
                             if (s.isEmpty())
                                 return null;
@@ -97,14 +99,14 @@ public class ItemMutateMenuBuilder extends SimpleMenu.SBuilder {
                             try {
                                 i = Integer.parseInt(s);
                             } catch (Exception e00) {
-                                return Result.TEXT(L(p,"Invalid", "Invalid"));
+                                return Result.TEXT(L(p, "Invalid"));
                             }
                             builder.model(i);
 
                             itemStackConsumer.accept(builder.build());
 
-                            return Result.BACK();
-                        }), () -> Editor.IS_NEW);
+                            return Result.PARENT();
+                        }), Version.AT_LEAST_v1_16.a());
 
     }
 

@@ -24,7 +24,6 @@ public class Data implements ConfigurationSerializable {
     public Data(Map<String, Object> args) {
         cleanHour = (Integer) args.getOrDefault("cleanHour", 168);
         lang = (boolean) args.getOrDefault("lang", false);
-        debug = (boolean) args.getOrDefault("debug", false);
         update = (boolean) args.getOrDefault("update", true);
         speed = (int) args.getOrDefault("speed", 4);
 
@@ -70,7 +69,6 @@ public class Data implements ConfigurationSerializable {
 
     public long cleanHour;
     public boolean lang;
-    public boolean debug;
     public boolean update;
     public int speed;
 
@@ -117,7 +115,6 @@ public class Data implements ConfigurationSerializable {
 
         result.put("backupClean", cleanHour);
         result.put("lang", lang);
-        result.put("debug", debug);
         result.put("update", update);
         result.put("speed", speed);
 
@@ -155,7 +152,6 @@ public class Data implements ConfigurationSerializable {
     private void populate() {
         cleanHour = 24*7; // Cleanup config files older than a week
         lang = false;
-        debug = false;
         update = true;
         speed = 4;
         unSelectedItem = ItemBuilder.copyOf(Material.CHEST).name("&f&l???").lore("&7Choose 4 mystery chests, and\n&7your loot will be revealed!").build();
@@ -178,7 +174,7 @@ public class Data implements ConfigurationSerializable {
         crates.put("peasant", crate);
 
         crate.lootByWeight = new HashMap<>();
-        crate.lootByWeight.put(lootSets.get("common"), 10);
+        crate.lootByWeight.put(lootSet, 10);
         crate.weightsToSums();
 
         fireworkEffect = FireworkEffect.builder().withColor(Color.RED, Color.BLUE, Color.WHITE).with(FireworkEffect.Type.BURST).build();

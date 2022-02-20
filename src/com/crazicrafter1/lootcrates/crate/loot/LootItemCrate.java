@@ -17,6 +17,8 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class LootItemCrate extends AbstractLootItem {
+    public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.CHEST).name("&eAdd crate...").build();
+
     public String id;
 
     /**
@@ -65,7 +67,7 @@ public class LootItemCrate extends AbstractLootItem {
     @Override
     public AbstractMenu.Builder getMenuBuilder() {
         return new ParallaxMenu.PBuilder()
-                .title("LootItemCrate", true)
+                .title("LootItemCrate")
                 .parentButton(4, 5)
                 .addAll(self -> {
                     ArrayList<Button> result = new ArrayList<>();

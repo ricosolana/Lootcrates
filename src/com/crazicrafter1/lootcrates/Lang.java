@@ -4,7 +4,6 @@ import com.crazicrafter1.crutils.GoogleTranslate;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootSet;
-import com.sun.istack.internal.NotNull;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -61,6 +60,8 @@ public class Lang {
                     total++;
                 }
             }
+        } catch (NullPointerException e) {
+            Main.get().info("No languages to load");
         } catch (Exception e) {
             Main.get().error("Unable to load language files");
             e.printStackTrace();
@@ -157,11 +158,11 @@ public class Lang {
      * Save the specified language according to Google language code format
      * @param language language code in the form of 'en', 'es', 'fr', 'gr'
      */
-    public boolean saveLanguageFile(@NotNull final String language) {
+    public boolean saveLanguageFile(final String language) {
         return saveLanguageFile(translations.get(language));
     }
 
-    public boolean saveLanguageFile(@NotNull final Lang.Unit unit) {
+    public boolean saveLanguageFile(final Lang.Unit unit) {
         try {
             Main.get().info("Saving language " + unit.LANGUAGE);
 

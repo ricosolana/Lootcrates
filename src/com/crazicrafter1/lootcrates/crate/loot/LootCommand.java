@@ -6,7 +6,7 @@ import com.crazicrafter1.gapi.AbstractMenu;
 import com.crazicrafter1.gapi.Result;
 import com.crazicrafter1.gapi.TextMenu;
 import com.crazicrafter1.lootcrates.Editor;
-import com.crazicrafter1.lootcrates.ItemMutateMenuBuilder;
+import com.crazicrafter1.lootcrates.ItemModifyMenu;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -17,6 +17,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class LootCommand implements ILoot {
+
+    public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.PAPER).name("&7Add command...").build();
 
     public String command;
     public ItemStack itemStack;
@@ -52,18 +54,18 @@ public class LootCommand implements ILoot {
 
     @Override
     public AbstractMenu.Builder getMenuBuilder() {
-        return new ItemMutateMenuBuilder()
+        return new ItemModifyMenu()
                 .build(itemStack, input -> this.itemStack = input)
                 .title("LootCommand")
                 .childButton(5, 2, () -> ItemBuilder.copyOf(Material.PAPER).name("&6Command").lore(Editor.LORE_LMB_EDIT).build(), new TextMenu.TBuilder()
-                        .title("edit command", true)
-                        .onClose((player, reroute) -> !reroute ? Result.BACK() : null)
+                        .title("edit command")
+                        .onClose((player) -> Result.PARENT())
                         .leftRaw(() -> command)
                         .right(() -> "Input the command (PAPI supported)")
                         .onComplete((player, s) -> {
                             if (!s.isEmpty()) {
                                 this.command = s;
-                                return Result.BACK();
+                                return Result.PARENT();
                             }
                             return Result.TEXT("Invalid");
                         }));

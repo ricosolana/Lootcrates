@@ -1,6 +1,6 @@
 package com.crazicrafter1.lootcrates;
 
-import com.crazicrafter1.crutils.ItemBuilder;
+import com.crazicrafter1.crutils.ReflectionUtil;
 import com.crazicrafter1.crutils.refl.ItemStackMirror;
 import com.crazicrafter1.crutils.refl.NBTTagCompoundMirror;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
@@ -19,17 +19,31 @@ public class LootCratesAPI {
     //static Set<Class<? extends ILoot>> lootClasses = new HashSet<>();
     static Map<Class<? extends ILoot>, ItemStack> lootClasses = new HashMap<>();
 
-    static void registerLoot(Class<? extends ILoot> lootClass, String alias) {
-        registerLoot(lootClass,
-                ItemBuilder.copyOf(Material.GOLD_INGOT)
-                        .name(lootClass.getSimpleName())
-                        .build(),
-                alias);
-    }
+    //@Deprecated
+    //static void registerLoot(Class<? extends ILoot> lootClass, String alias) {
+    //    registerLoot(lootClass,
+    //            ItemBuilder.copyOf(Material.GOLD_INGOT)
+    //                    .name(lootClass.getSimpleName())
+    //                    .build(),
+    //            alias);
+    //}
 
-    static void registerLoot(Class<? extends ILoot> lootClass, ItemStack itemStack, String alias) {
-        lootClasses.put(lootClass, itemStack);
-        ConfigurationSerialization.registerClass(lootClass, alias);
+    //@Deprecated
+    //static void registerLoot(Class<? extends ILoot> lootClass, ItemStack itemStack, String alias) {
+    //    lootClasses.put(lootClass, itemStack);
+    //    ConfigurationSerialization.registerClass(lootClass, alias);
+    //}
+
+    //static void registerLoot(Class<? extends ILoot> lootClass) {
+    //    registerLoot(lootClass,
+    //            ItemBuilder.copyOf(Material.GOLD_INGOT)
+    //                    .name(lootClass.getSimpleName())
+    //                    .build());
+    //}
+
+    static void registerLoot(Class<? extends ILoot> lootClass) {
+        lootClasses.put(lootClass, (ItemStack) ReflectionUtil.getFieldInstance(ReflectionUtil.getField(lootClass, "EDITOR_ICON"), null));
+        ConfigurationSerialization.registerClass(lootClass, lootClass.getSimpleName());
     }
 
     public static Crate getCrateByID(String id) {

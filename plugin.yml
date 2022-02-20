@@ -1,9 +1,9 @@
 name: LootCrates
 main: com.crazicrafter1.lootcrates.Main
-version: 3.3.9 # 3.3.8 was previous
+version: 3.3.10 # 3.3.8 was previous
 api-version: 1.13
 author: crazicrafter1
-softdepend: [CRUtils, Gapi, QualityArmory, Skript, PlaceholderAPI]
+softdepend: [CRUtils, Gapi, QualityArmory, Skript, MMOItems, EcoItems]
 commands:
   lootcrates:
     permission: lootcrates.admin

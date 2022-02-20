@@ -19,24 +19,16 @@ public abstract class AbstractLootItem implements ILoot {
         max = 1;
     }
 
-    public AbstractLootItem(int min, int max) {
-        this.min = min;
-        this.max = max;
-    }
-
     public AbstractLootItem(Map<String, Object> args) {
-        this((int)args.get("min"), (int)args.get("max"));
+        this.min = (int) args.get("min");
+        this.max = (int) args.get("max");
 
         if (min > max)
             throw new IndexOutOfBoundsException("failed to assert: min <= max");
     }
 
     protected ItemStack ofRange(Player p, ItemStack itemStack) {
-        ItemBuilder builder = ItemBuilder.copyOf(itemStack).amount(Util.randomRange(min, max));
-
-        builder.placeholders(p);
-
-        return builder.build();
+        return ItemBuilder.copyOf(itemStack).amount(Util.randomRange(min, max)).placeholders(p).build();
     }
 
     @Override

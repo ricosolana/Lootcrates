@@ -1,17 +1,18 @@
 package com.crazicrafter1.lootcrates.crate;
 
+import com.crazicrafter1.crutils.ColorUtil;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.Lang;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
 import com.crazicrafter1.lootcrates.Main;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 import org.bukkit.Sound;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class Crate implements ConfigurationSerializable {
@@ -99,14 +100,14 @@ public class Crate implements ConfigurationSerializable {
     public Crate(String id, ItemStack itemStack, String title, int columns, int picks, Sound sound) {
         this.id = id;
         this.itemStack = LootCratesAPI.makeCrate(itemStack, id);
-        this.title = Util.format(title);
+        this.title = ColorUtil.color(title);
         this.columns = columns;
         this.picks = picks;
         this.sound = sound;
     }
 
     public Crate(Map<String, Object> args) {
-        title = Util.format((String) args.get("title"));
+        title = ColorUtil.color((String) args.get("title"));
         columns = (int) args.get("columns");
         picks = (int) args.get("picks");
         sound = Sound.valueOf((String) args.get("sound"));
@@ -170,7 +171,7 @@ public class Crate implements ConfigurationSerializable {
                 .build();
     }
 
-    public String title(@NotNull Player p) {
+    public String title(@Nonnull Player p) {
         Lang.Unit unit = Main.get().getLang(p);
 
         if (unit == null) {

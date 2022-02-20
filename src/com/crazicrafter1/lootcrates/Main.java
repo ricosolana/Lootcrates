@@ -2,21 +2,17 @@ package com.crazicrafter1.lootcrates;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
-import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.crutils.Util;
-import com.crazicrafter1.crutils.Version;
+import com.crazicrafter1.innerutils.GithubInstaller;
+import com.crazicrafter1.innerutils.GithubUpdater;
+import com.crazicrafter1.innerutils.Metrics;
 import com.crazicrafter1.lootcrates.cmd.Cmd;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootSet;
 import com.crazicrafter1.lootcrates.crate.loot.*;
 import com.crazicrafter1.lootcrates.listeners.*;
-import com.crazicrafter1.innerutils.GithubInstaller;
-import com.crazicrafter1.innerutils.GithubUpdater;
-import com.crazicrafter1.innerutils.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -25,23 +21,28 @@ import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class Main extends JavaPlugin
 {
-    public String prefix() {
-        return prefix;
-    }
+    public static void main(String[] args) {
+        Pattern VALID_PATTERN = Pattern.compile("(?=.*[a-z])[a-z_]+");
 
-    // Default prefix as a fallback if no CRUtils found during startup
-    // and for non 1.16+ versions
-    private String prefix = ChatColor.translateAlternateColorCodes('&', "&f[&b&lLootCrates&r&f] ");
+        String test1 = "_";
+
+        System.out.println("Valid: " + VALID_PATTERN.matcher(test1).matches());
+    }
 
     /*
      * Runtime modifiable stuff
@@ -50,6 +51,8 @@ public class Main extends JavaPlugin
     public HashSet<UUID> crateFireworks = new HashSet<>();
     public boolean supportQualityArmory = false;
     public boolean supportSkript = false;
+    public boolean supportMMOItems = false;
+    public boolean supportEcoItems = false;
 
     public SkriptAddon addon;
 
@@ -97,20 +100,17 @@ public class Main extends JavaPlugin
         }
 
         if (installedDepends) {
-            error(ChatColor.RED + "Please restart server to use plugin");
+            error(ChatColor.RED + "Must restart server to use plugin");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
-
-        // Cool looking 1.16+ hex colors if possible
-        prefix = Version.AT_LEAST_v1_16.a() ?
-                Util.format("&f[" + "&#fba600L&#fb9400o&#fb8100o&#fc6f00t&#fc5c00c&#fc4a00r&#fc3700a&#fd2500t&#fd1200e&#fd0000s" + "&f] ") :
-                prefix;
 
         Main.instance = this;
 
         supportQualityArmory = Bukkit.getPluginManager().isPluginEnabled("QualityArmory");
         supportSkript = Bukkit.getPluginManager().isPluginEnabled("Skript");
+        supportMMOItems = Bukkit.getPluginManager().isPluginEnabled("MMOItems");
+        supportEcoItems = Bukkit.getPluginManager().isPluginEnabled("EcoItems");
 
         // Register serializable objects
         ConfigurationSerialization.registerClass(Data.class, "Data");
@@ -118,12 +118,12 @@ public class Main extends JavaPlugin
         ConfigurationSerialization.registerClass(Crate.class, "Crate");
 
         // api for easy
-        LootCratesAPI.registerLoot(LootItemCrate.class, ItemBuilder.copyOf(Material.CHEST).name("&eAdd crate...").build(), "LootItemCrate");
-        LootCratesAPI.registerLoot(LootItem.class, ItemBuilder.copyOf(Material.GOLD_NUGGET).name("&6Add item...").build(), "LootItem");
-        LootCratesAPI.registerLoot(LootCommand.class, ItemBuilder.copyOf(Material.PAPER).name("&2Add command...").build(), "LootCommand");
+        LootCratesAPI.registerLoot(LootItemCrate.class);
+        LootCratesAPI.registerLoot(LootItem.class);
+        LootCratesAPI.registerLoot(LootCommand.class);
 
         if (supportQualityArmory)
-            LootCratesAPI.registerLoot(LootItemQA.class, ItemBuilder.copyOf(Material.CROSSBOW).name("&8Add QualityArmory...").build(), "LootItemQA");
+            LootCratesAPI.registerLoot(LootItemQA.class);
 
         // Load Skript classes
         if (supportSkript) {
@@ -133,8 +133,14 @@ public class Main extends JavaPlugin
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            LootCratesAPI.registerLoot(LootSkriptEvent.class, ItemBuilder.copyOf(Material.MAP).name("&aAdd Skript tag... ").build(), "LootSkriptEvent");
+            LootCratesAPI.registerLoot(LootSkriptEvent.class);
         }
+
+        if (supportMMOItems)
+            LootCratesAPI.registerLoot(LootMMOItem.class);
+
+        if (supportEcoItems)
+            LootCratesAPI.registerLoot(LootEcoItem.class);
 
         loadExternalLoots();
 
@@ -152,12 +158,12 @@ public class Main extends JavaPlugin
             metrics.addCustomChart(new Metrics.SimplePie("crates",
                     () -> "" + data.crates.size()));
 
-            metrics.addCustomChart(new Metrics.SimplePie("abstractloots",
+            metrics.addCustomChart(new Metrics.SimplePie("loot",
                     () -> "" + LootCratesAPI.lootClasses.size()));
 
-            // fun little infinite counter that really has no huge use
-            metrics.addCustomChart(new Metrics.SingleLineChart("opened",
-                    () -> data.totalOpens));
+            metrics.addCustomChart(new Metrics.SimplePie("languages",
+                    () -> "" + lang.translations.size()));
+
         } catch (Exception e) {
             error("Unable to enable bStats Metrics (" + e.getMessage() + ")");
         }
@@ -166,6 +172,8 @@ public class Main extends JavaPlugin
          * Command init
          */
         new Cmd(this);
+
+        //MMOItems.plugin.getTiers().getAll().forEach(tier -> info("id: " + tier.getId() + ", name: " + tier.getName()));
 
         /*
          * Listener init
@@ -224,7 +232,7 @@ public class Main extends JavaPlugin
                     Class<? extends ILoot> clazz = (Class<? extends ILoot>) Class.forName(split[0]);
                     String alias = split[1];
 
-                    LootCratesAPI.registerLoot(clazz, alias);
+                    LootCratesAPI.registerLoot(clazz);
                     info("Loaded external loot: " + clazz.getName() + " as " + alias);
                 }
                 reader.close();
@@ -295,24 +303,6 @@ public class Main extends JavaPlugin
     public boolean backupConfig(boolean isBroken) {
         File backupFile = new File(backupPath, System.currentTimeMillis() + "_" + (isBroken ? "broken" : "old") + "_config.zip");
 
-        //try {
-        //    // Create path
-        //    backupFile.getParentFile().mkdirs();
-
-        //    if (configFile.exists()) {
-        //        info("Backing up config");
-
-        //        // Create backup
-        //        backupFile.createNewFile();
-
-        //        // Copy files
-        //        Util.copy(new FileInputStream(configFile), new FileOutputStream(backupFile));
-        //        return true;
-        //    }
-        //} catch (IOException e) {
-        //    e.printStackTrace();
-        //}
-
         info("Backing up config");
 
         try {
@@ -355,6 +345,7 @@ public class Main extends JavaPlugin
         purge();
     }
 
+    private static final Pattern BACKUP_PATTERN = Pattern.compile("([0-9])+_\\S+_config.zip");
     private void purge() {
         // now delete old files in backup
         // backup/1010928476782461_old_config.yml
@@ -362,16 +353,17 @@ public class Main extends JavaPlugin
         try {
             backupPath.mkdirs();
 
+            //noinspection ConstantConditions
             for (File file : backupPath.listFiles()) {
-                if (file.getName().endsWith("_config.zip")) {
-
-                    long create = Long.parseLong(file.getName().substring(0, file.getName().indexOf("_")));
+                String name = file.getName();
+                Matcher matcher = BACKUP_PATTERN.matcher(name);
+                if (matcher.matches()) {
+                    long create = Long.parseLong(name.substring(0, name.indexOf("_")));
                     if (create < System.currentTimeMillis() - (data.cleanHour * 60 * 60 * 1000)) {
                         // delete it
                         file.delete();
                         deletedCount++;
                     }
-
                 }
             }
         } catch (Exception e) {
@@ -400,12 +392,6 @@ public class Main extends JavaPlugin
 
     public void error(String s) {
         error(Bukkit.getConsoleSender(), s);
-    }
-
-    @Deprecated
-    public void debug(String s) {
-        if (data.debug)
-            Bukkit.getConsoleSender().sendMessage(prefix + ChatColor.GOLD + s);
     }
 
     public boolean info(CommandSender sender, String s) {

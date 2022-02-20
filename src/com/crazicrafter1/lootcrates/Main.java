@@ -52,7 +52,6 @@ public class Main extends JavaPlugin
     public boolean supportQualityArmory = false;
     public boolean supportSkript = false;
     public boolean supportMMOItems = false;
-    public boolean supportEcoItems = false;
 
     public SkriptAddon addon;
 
@@ -110,7 +109,6 @@ public class Main extends JavaPlugin
         supportQualityArmory = Bukkit.getPluginManager().isPluginEnabled("QualityArmory");
         supportSkript = Bukkit.getPluginManager().isPluginEnabled("Skript");
         supportMMOItems = Bukkit.getPluginManager().isPluginEnabled("MMOItems");
-        supportEcoItems = Bukkit.getPluginManager().isPluginEnabled("EcoItems");
 
         // Register serializable objects
         ConfigurationSerialization.registerClass(Data.class, "Data");
@@ -138,9 +136,6 @@ public class Main extends JavaPlugin
 
         if (supportMMOItems)
             LootCratesAPI.registerLoot(LootMMOItem.class);
-
-        if (supportEcoItems)
-            LootCratesAPI.registerLoot(LootEcoItem.class);
 
         loadExternalLoots();
 

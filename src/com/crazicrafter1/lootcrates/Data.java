@@ -12,63 +12,15 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.*;
 import java.util.*;
 
+/**
+ * Legacy data configurator
+ */
 public class Data implements ConfigurationSerializable {
+    private static final int REV_LATEST = 1;
 
-    public Data() {
-        populate();
-    }
-
-    public Data(Map<String, Object> args) {
-        cleanHour = (Integer) args.getOrDefault("cleanHour", 168);
-        lang = (boolean) args.getOrDefault("lang", false);
-        update = (boolean) args.getOrDefault("update", true);
-        speed = (int) args.getOrDefault("speed", 4);
-
-        unSelectedItem = (ItemStack) args.get("unSelectedItem");
-        selectedItem = (ItemStack) args.get("selectedItem");
-
-        // load in the same way, but need to pass name somehow
-        lootSets = (LinkedHashMap<String, LootSet>) args.get("lootSets");
-        for (Map.Entry<String, LootSet> entry : lootSets.entrySet()) {
-            entry.getValue().id = entry.getKey();
-        }
-
-        crates = (LinkedHashMap<String, Crate>) args.get("crates");
-        for (Map.Entry<String, Crate> entry : crates.entrySet()) {
-            String id = entry.getKey();
-            Crate crate = entry.getValue();
-
-            crate.id = id;
-            crate.itemStack = LootCratesAPI.makeCrate(crate.itemStack, id);
-
-            // initialize weights
-            crate.sumsToWeights();
-        }
-
-        fireworkEffect = (FireworkEffect) args.get("fireworkEffect");
-
-        totalOpens = (int) args.getOrDefault("totalOpens", 0);
-
-        try {
-            File file = new File(Main.get().getDataFolder(), "players.csv");
-
-            if (file.exists()) {
-                BufferedReader reader = new BufferedReader(new FileReader(file));
-
-                String line;
-                while ((line = reader.readLine()) != null && !line.isEmpty()) {
-                    alertedPlayers.add(UUID.fromString(line));
-                }
-                reader.close();
-            }
-        } catch (Exception e) {e.printStackTrace();}
-    }
-
-    public long cleanHour;
-    public boolean lang;
+    public long cleanAfterDays;
     public boolean update;
     public int speed;
 
@@ -79,79 +31,11 @@ public class Data implements ConfigurationSerializable {
     public LinkedHashMap<String, Crate> crates;
     public LinkedHashMap<String, LootSet> lootSets;
 
-    public int totalOpens;
-
-    public HashSet<UUID> alertedPlayers = new HashSet<>();
-
-    public ItemStack unSelectedItem(Player p) {
-        Lang.Unit dlu = Main.get().getLang(p);
-
-        if (dlu == null) {
-            return unSelectedItem;
-        }
-
-        return ItemBuilder.copyOf(unSelectedItem)
-                .name(dlu.unSelectedDisplayName)
-                .lore(dlu.unSelectedLore)
-                .build();
-    }
-
-    public ItemStack selectedItem(Player p) {
-        Lang.Unit dlu = Main.get().getLang(p);
-
-        if (dlu == null) {
-            return selectedItem;
-        }
-
-        return ItemBuilder.copyOf(selectedItem)
-                .name(dlu.selectedDisplayName)
-                .lore(dlu.selectedLore)
-                .build();
-    }
-
-    @Override
-    public Map<String, Object> serialize() {
-        Map<String, Object> result = new LinkedHashMap<>();
-
-        result.put("backupClean", cleanHour);
-        result.put("lang", lang);
-        result.put("update", update);
-        result.put("speed", speed);
-
-        result.put("unSelectedItem", unSelectedItem);
-        result.put("selectedItem", selectedItem);
-
-        result.put("lootSets", lootSets);
-
-        result.put("crates", crates);
-
-        result.put("fireworkEffect", fireworkEffect);
-
-        result.put("totalOpens", totalOpens);
-
-
-        if (!alertedPlayers.isEmpty()) {
-            try {
-                File file = new File(Main.get().getDataFolder(), "players.csv");
-
-                BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-
-                for (UUID uuid : alertedPlayers) {
-                    writer.write(uuid.toString());
-                    writer.newLine();
-                }
-                writer.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        return result;
-    }
-
-    private void populate() {
-        cleanHour = 24*7; // Cleanup config files older than a week
-        lang = false;
+    /**
+     * Default constructor in the case of a normal config not being available
+     */
+    public Data() {
+        cleanAfterDays = 7; // Cleanup config files older than a week
         update = true;
         speed = 4;
         unSelectedItem = ItemBuilder.copyOf(Material.CHEST).name("&f&l???").lore("&7Choose 4 mystery chests, and\n&7your loot will be revealed!").build();
@@ -178,5 +62,92 @@ public class Data implements ConfigurationSerializable {
         crate.weightsToSums();
 
         fireworkEffect = FireworkEffect.builder().withColor(Color.RED, Color.BLUE, Color.WHITE).with(FireworkEffect.Type.BURST).build();
+    }
+
+    public Data(Map<String, Object> args) {
+        int rev = (int) args.getOrDefault("rev", 0); // for legacy unmarked revisions
+
+        if (rev == 0) {
+            // 2/20/2022 and before
+            cleanAfterDays = (int) args.getOrDefault("cleanHour", 7) / 24;
+            Main.get().lang.translate = (boolean) args.getOrDefault("translate", false);
+        } else if (rev == 1) {
+            // after 2/20/22
+            cleanAfterDays = (int) args.getOrDefault("cleanAfterDays", 7);
+        }
+
+        update = (boolean) args.getOrDefault("update", true);
+        speed = (int) args.getOrDefault("speed", 4);
+
+        unSelectedItem = (ItemStack) args.get("unSelectedItem");
+        selectedItem = (ItemStack) args.get("selectedItem");
+
+        // load in the same way, but need to pass name somehow
+        lootSets = (LinkedHashMap<String, LootSet>) args.get("lootSets");
+        for (Map.Entry<String, LootSet> entry : lootSets.entrySet()) {
+            entry.getValue().id = entry.getKey();
+        }
+
+        crates = (LinkedHashMap<String, Crate>) args.get("crates");
+        for (Map.Entry<String, Crate> entry : crates.entrySet()) {
+            String id = entry.getKey();
+            Crate crate = entry.getValue();
+
+            crate.id = id;
+            crate.itemStack = LootCratesAPI.makeCrate(crate.itemStack, id);
+
+            // initialize weights
+            crate.sumsToWeights();
+        }
+
+        fireworkEffect = (FireworkEffect) args.get("fireworkEffect");
+    }
+
+    public ItemStack unSelectedItem(Player p) {
+        Lang.Unit dlu = Main.get().lang.getUnit(p);
+
+        if (dlu == null) {
+            return unSelectedItem;
+        }
+
+        return ItemBuilder.copyOf(unSelectedItem)
+                .name(dlu.unSelectedDisplayName)
+                .lore(dlu.unSelectedLore)
+                .build();
+    }
+
+    public ItemStack selectedItem(Player p) {
+        Lang.Unit dlu = Main.get().lang.getUnit(p);
+
+        if (dlu == null) {
+            return selectedItem;
+        }
+
+        return ItemBuilder.copyOf(selectedItem)
+                .name(dlu.selectedDisplayName)
+                .lore(dlu.selectedLore)
+                .build();
+    }
+
+    @Override
+    public final Map<String, Object> serialize() {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        result.put("rev", REV_LATEST);
+        result.put("cleanAfterDays", cleanAfterDays);
+        //result.put("translate", translate);
+        result.put("update", update);
+        result.put("speed", speed);
+
+        result.put("unSelectedItem", unSelectedItem);
+        result.put("selectedItem", selectedItem);
+
+        result.put("lootSets", lootSets);
+
+        result.put("crates", crates);
+
+        result.put("fireworkEffect", fireworkEffect);
+
+        return result;
     }
 }

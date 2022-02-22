@@ -35,17 +35,17 @@ public class LootSet implements ConfigurationSerializable {
     }
 
     public ItemStack itemStack(Player p) {
-        Lang.Unit dlu = Main.get().getLang(p);
+        Lang.Unit unit = Main.get().lang.getUnit(p);
 
-        if (dlu == null) {
+        if (unit == null) {
             return itemStack;
         }
 
-        Language llu = dlu.lootSets.get(id);
+        Language lang = unit.lootSets.get(id);
 
         return ItemBuilder.copyOf(itemStack)
-                .name(llu.itemStackDisplayName)
-                .lore(llu.itemStackLore)
+                .name(lang.itemStackDisplayName)
+                .lore(lang.itemStackLore)
                 .build();
     }
 

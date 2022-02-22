@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+import static com.crazicrafter1.lootcrates.Lang.L;
+
 public class LootItemCrate extends AbstractLootItem {
     public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.CHEST).name("&eAdd crate...").build();
 
@@ -28,7 +30,7 @@ public class LootItemCrate extends AbstractLootItem {
         try {
             id = Main.get().data.crates.keySet().iterator().next();
         } catch (NoSuchElementException e) {
-            Main.get().error("No fallback crates registered");
+            Main.get().error(L("No crates are registered"));
         }
     }
 
@@ -67,7 +69,6 @@ public class LootItemCrate extends AbstractLootItem {
     @Override
     public AbstractMenu.Builder getMenuBuilder() {
         return new ParallaxMenu.PBuilder()
-                .title("LootItemCrate")
                 .parentButton(4, 5)
                 .addAll(self -> {
                     ArrayList<Button> result = new ArrayList<>();
@@ -77,7 +78,7 @@ public class LootItemCrate extends AbstractLootItem {
                         ItemStack icon = ItemBuilder.copyOf(Material.LOOM).apply(crate.itemStack(null)).glow(crate.id.equals(id)).build();
 
                         result.add(new Button.Builder()
-                                .icon(() -> icon)
+                                .icon(p -> icon)
                                 .lmb(interact -> {
                                     // select as active
                                     id = crate.id;

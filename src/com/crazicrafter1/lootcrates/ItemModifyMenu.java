@@ -15,6 +15,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.function.Consumer;
 
 import static com.crazicrafter1.lootcrates.Editor.*;
+import static com.crazicrafter1.lootcrates.Lang.L;
 
 public class ItemModifyMenu extends SimpleMenu.SBuilder {
 
@@ -24,11 +25,20 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
 
     public static final String BASE64_CUSTOM_MODEL_DATA = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzQ2NDg3NGRmNDUyYzFkNzE3ZWRkZDBmYjNiODQ4MjAyYWQxNTU3MTI0NWFmNmZhZGUyZWNmNTE0ZjNjODBiYiJ9fX0=";
 
+    private static final String Edit_item = "Edit item";
+    private static final String Must_swap = "Must swap with an item";
+    private static final String Name = "Name";
+    private static final String Input_name = "Input custom item name";
+    private static final String Input_lore = "Input custom item lore";
+    private static final String Newline = "newline";
+    private static final String None = "None";
+    private static final String Input_integer = "Input an integer";
+
     private ItemBuilder builder;
 
     public ItemModifyMenu build(ItemStack it, Consumer<ItemStack> itemStackConsumer) {
         builder = ItemBuilder.copyOf(it);
-        return (ItemModifyMenu) title("item edit")
+        return (ItemModifyMenu) title(p -> L(p, Edit_item))
                 .background()
                 .parentButton(4, 4)
                 .button(2, 1, IN_OUTLINE)
@@ -37,10 +47,10 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                 .button(1, 2, IN_OUTLINE)
                 // Edit ItemStack
                 .button(2, 2, new Button.Builder()
-                        .icon(() -> builder.build())
+                        .icon(p -> builder.build())
                         .lmb((interact) -> {
                             if (interact.heldItem == null) {
-                                return Result.MESSAGE("Must swap with an item");
+                                return Result.MESSAGE(L(interact.player, Must_swap));
                             }
                             builder = ItemBuilder.copyOf(interact.heldItem);
 
@@ -49,12 +59,12 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             return Result.GRAB();
                         }))
                 // Edit Name
-                .childButton(6, 1, () -> ItemBuilder.copyOf(Material.NAME_TAG).name("&eName").lore(LORE_LMB_EDIT).build(), new TextMenu.TBuilder()
-                        .title("name")
-                        .leftRaw(() -> builder.getNameOrLocaleName(), null, ColorMode.REVERT)
-                        .right(() -> "&8Input custom item name", () -> COLOR_PREFIX)
+                .childButton(6, 1, p -> ItemBuilder.copyOf(Material.NAME_TAG).name("&e" + L(p, Name)).lore("&7" + L(p, Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new TextMenu.TBuilder()
+                        .title(p -> L(p, Name))
+                        .leftRaw(p -> builder.getNameOrLocaleName(), null, ColorMode.REVERT)
+                        .right(p -> "&8" + L(p, Input_name), p -> ColorDem)
                         .onClose((player) -> Result.PARENT())
-                        .onComplete((player, s) -> {
+                        .onComplete((player, s, b) -> {
                             if (s.isEmpty()) {
                                 builder.resetName();
                             } else
@@ -65,12 +75,12 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             return Result.PARENT();
                         }))
                 // Edit Lore
-                .childButton(6, 3, () -> ItemBuilder.copyOf(Material.MAP).name("&7Lore").lore(LORE_LMB_EDIT).build(), new TextMenu.TBuilder()
-                        .title("lore")
-                        .leftRaw(() -> Util.strDef(builder.getLoreString(), LOREM_IPSUM), null, ColorMode.REVERT)
-                        .right(() -> "&8Input custom item lore", () -> COLOR_PREFIX + "&7\n'\\n': &fnewline")
+                .childButton(6, 3, p -> ItemBuilder.copyOf(Material.MAP).name("&7" + L(p, Lang.A.Lore)).lore("&7" + L(p, Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new TextMenu.TBuilder()
+                        .title(p -> Lang.A.Lore)
+                        .leftRaw(p -> Util.strDef(builder.getLoreString(), Lang.A.Lorem_ipsum), null, ColorMode.REVERT)
+                        .right(p -> "&8" + L(p, Input_lore), p -> ColorDem + "&7\n'\\n': &f" + L(p, Newline))
                         .onClose((player) -> Result.PARENT())
-                        .onComplete((player, s) -> {
+                        .onComplete((player, s, b) -> {
                             if (s.isEmpty()) {
                                 builder.resetLore();
                             } else
@@ -81,17 +91,17 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             return Result.PARENT();
                         }))
                 // Edit CustomModelData
-                .childButton(6, 2, () -> ItemBuilder.of("PLAYER_HEAD").skull(BASE64_CUSTOM_MODEL_DATA).name("&8CustomModelData").lore(LORE_LMB_EDIT).build(), new TextMenu.TBuilder()
-                        .title("model")
-                        .leftRaw(() -> {
+                .childButton(6, 2, p -> ItemBuilder.of("PLAYER_HEAD").skull(BASE64_CUSTOM_MODEL_DATA).name("&8" + L(p, Lang.A.Custom_model_data)).lore("&7" + L(p, Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new TextMenu.TBuilder()
+                        .title(p -> L(p, Lang.A.Custom_model_data))
+                        .leftRaw(p -> {
                             ItemMeta meta = builder.getMeta();
                             if (meta != null && meta.hasCustomModelData())
                                 return "" + meta.getCustomModelData();
-                            return "none";
+                            return L(p, None);
                         })
-                        .right(() -> "&7Input an integer")
+                        .right(p -> "&7" + L(p, Input_integer))
                         .onClose((player) -> Result.PARENT())
-                        .onComplete((p, s) -> {
+                        .onComplete((p, s, b) -> {
                             if (s.isEmpty())
                                 return null;
 
@@ -99,7 +109,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             try {
                                 i = Integer.parseInt(s);
                             } catch (Exception e00) {
-                                return Result.TEXT(L(p, "Invalid"));
+                                return Result.TEXT(L(p, Lang.A.Invalid));
                             }
                             builder.model(i);
 

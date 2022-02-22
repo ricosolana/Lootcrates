@@ -149,7 +149,7 @@ public class Crate implements ConfigurationSerializable {
     public ItemStack itemStack(@Nullable Player p) {
         ItemBuilder item = ItemBuilder.copyOf(itemStack);
 
-        Lang.Unit unit = Main.get().getLang(p);
+        Lang.Unit unit = Main.get().lang.getUnit(p);
 
         if (unit == null) {
             return item
@@ -172,7 +172,7 @@ public class Crate implements ConfigurationSerializable {
     }
 
     public String title(@Nonnull Player p) {
-        Lang.Unit unit = Main.get().getLang(p);
+        Lang.Unit unit = Main.get().lang.getUnit(p);
 
         if (unit == null) {
             return Util.placeholders(p, title);

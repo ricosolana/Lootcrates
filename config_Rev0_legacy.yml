@@ -1,9 +1,10 @@
 # 2730: 1.17.1
 # 1976: 1.14.4
 data:
-  ==: Data
-  rev: 1
-  cleanAfterDays: 7 # in days now
+  ==: Data # will denote the revision
+  cleanHour: 168 # in days now
+  lang: false
+  debug: false
   update: true
   speed: 4
   #give-message: "&aYou were given a %lc_id% crate by"

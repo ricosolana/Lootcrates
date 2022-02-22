@@ -33,6 +33,7 @@ public final class ActiveCrate {
 
     // Constants
     private final Player player;
+    private final String id;
     private final int size;
     private final int picks;
     private final Sound sound;
@@ -49,6 +50,7 @@ public final class ActiveCrate {
 
     public ActiveCrate(Player p, Crate crate, int lockSlot) {
         this.player = p;
+        this.id = crate.id;
         this.size = crate.columns * 9;
         this.picks = crate.picks;
         this.sound = crate.sound;
@@ -181,9 +183,9 @@ public final class ActiveCrate {
                         Util.giveItemToPlayer(player, inventory.getItem(entry.getKey()));
                 }
             }
-
-            data.totalOpens++;
         }
+
+        Main.get().getStat(player.getUniqueId()).crateInc(this.id);
 
         if (state == State.REVEALING)
             Main.get().getServer().getScheduler().cancelTask(taskID);

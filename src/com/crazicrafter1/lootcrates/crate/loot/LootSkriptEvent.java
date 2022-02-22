@@ -4,10 +4,10 @@ import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.gapi.AbstractMenu;
 import com.crazicrafter1.gapi.Result;
 import com.crazicrafter1.gapi.TextMenu;
-import com.crazicrafter1.lootcrates.Editor;
 import com.crazicrafter1.lootcrates.ItemModifyMenu;
-import com.crazicrafter1.lootcrates.sk.SkriptLootEvent;
+import com.crazicrafter1.lootcrates.Lang;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
+import com.crazicrafter1.lootcrates.sk.SkriptLootEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,6 +15,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static com.crazicrafter1.lootcrates.Lang.L;
 
 public class LootSkriptEvent implements ILoot {
 
@@ -54,18 +56,17 @@ public class LootSkriptEvent implements ILoot {
     public AbstractMenu.Builder getMenuBuilder() {
         return new ItemModifyMenu()
                 .build(itemStack, input -> this.itemStack = input)
-                .title("LootSkriptEvent")
-                .childButton(5, 2, () -> ItemBuilder.copyOf(Material.PAPER).name("&6Event tag").lore(Editor.LORE_LMB_EDIT).build(), new TextMenu.TBuilder()
-                        .title("edit tag")
+                .childButton(5, 2, p -> ItemBuilder.copyOf(Material.PAPER).name("&6" + L(p, Lang.A.Event_tag)).lore("&7" + L(Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new TextMenu.TBuilder()
+                        .title(p -> L(p, Lang.A.Event_tag))
                         .onClose((player) -> Result.PARENT())
-                        .leftRaw(() -> tag)
-                        .right(() -> "Input a tag")
-                        .onComplete((player, s) -> {
+                        .leftRaw(p -> tag)
+                        .right(p -> L(p, Lang.A.Input_a_tag))
+                        .onComplete((p, s, b) -> {
                             if (!s.isEmpty()) {
                                 this.tag = s;
                                 return Result.PARENT();
                             }
-                            return Result.TEXT("Invalid");
+                            return Result.TEXT(L(p, Lang.A.Invalid));
                         }));
     }
 

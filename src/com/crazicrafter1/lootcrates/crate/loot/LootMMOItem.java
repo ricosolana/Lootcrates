@@ -4,7 +4,7 @@ import com.crazicrafter1.crutils.ColorMode;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.gapi.*;
-import com.crazicrafter1.lootcrates.Editor;
+import com.crazicrafter1.lootcrates.Lang;
 import net.Indyuce.mmoitems.MMOItems;
 import net.Indyuce.mmoitems.api.ItemTier;
 import net.Indyuce.mmoitems.api.player.PlayerData;
@@ -15,6 +15,9 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.crazicrafter1.lootcrates.Editor.*;
+import static com.crazicrafter1.lootcrates.Lang.L;
 
 public class LootMMOItem extends AbstractLootItem {
 
@@ -53,11 +56,6 @@ public class LootMMOItem extends AbstractLootItem {
             this.level = (int) args.get("level");
             this.tier = (String) args.get("tier");
         }
-
-        //if (getIcon(null) == null)
-        //    throw new NullPointerException("LootMMOItem: " + type + ":" + name + " is invalid");
-
-        //MMOItems.plugin.getTiers().getOrThrow(tier);
     }
 
     @Override
@@ -103,7 +101,6 @@ public class LootMMOItem extends AbstractLootItem {
     @Override
     public AbstractMenu.Builder getMenuBuilder() {
         return new SimpleMenu.SBuilder(3)
-                .title("LootMMOItem")
                 .background()
                 .parentButton(4, 2)
                 // Unexpected behaviour when clicked
@@ -120,7 +117,7 @@ public class LootMMOItem extends AbstractLootItem {
                             min = Util.clamp(min + change, 1, max);
                             return Result.REFRESH();
                         })
-                        .icon(() -> ItemBuilder.of("PLAYER_HEAD").name("&8&nMin").skull(Editor.BASE64_DEC).lore(Editor.LORE_LMB_NUM + "\n" + Editor.LORE_RMB_NUM + "\n" + Editor.LORE_SHIFT_NUM).amount(min).build()))
+                        .icon((p) -> ItemBuilder.of("PLAYER_HEAD").name("&8&n" + L(p, Lang.A.Minimum)).skull(BASE64_DEC).lore(LMB_Dec + "\n" + RMB_Inc + "\n&7" + L(Lang.A.SHIFT_Mul) + "&r&7: x5").amount(min).build()))
                 // Max
                 .button(5, 1, new Button.Builder()
                         .lmb(interact -> {
@@ -133,15 +130,15 @@ public class LootMMOItem extends AbstractLootItem {
                             max = Util.clamp(max + change, min, getIcon(null).getMaxStackSize());
                             return Result.REFRESH();
                         })
-                        .icon(() -> ItemBuilder.of("PLAYER_HEAD").name("&8&nMax").skull(Editor.BASE64_INC).lore(Editor.LORE_LMB_NUM + "\n" + Editor.LORE_RMB_NUM + "\n" + Editor.LORE_SHIFT_NUM).amount(max).build()))
+                        .icon((p) -> ItemBuilder.of("PLAYER_HEAD").name("&8&n" + L(p, Lang.A.Maximum)).skull(BASE64_INC).lore(LMB_Dec + "\n" + RMB_Inc + "\n&7" + L(Lang.A.SHIFT_Mul) + "&r&7: x5").amount(max).build()))
 
                 // Type/Name menu:
-                .childButton(4, 1, () -> ItemBuilder.mutable(getIcon(null)).amount(1).name2Lore(ColorMode.STRIP).name("&7Edit").build(), new TextMenu.TBuilder()
-                    .title("Assign by name")
-                    .leftRaw(() -> type + ":" + name, null, ColorMode.STRIP)
-                    .right(() -> "&eEnter the &ltype:item")
+                .childButton(4, 1, (p) -> ItemBuilder.mutable(getIcon(null)).amount(1).name("&7" + L(p, Lang.A.MMO_Manually_assign)).lore(type + ":" + name).build(), new TextMenu.TBuilder()
+                    .title(p -> L(p, Lang.A.MMO_Manually_assign))
+                    .leftRaw(p -> type + ":" + name, null, ColorMode.STRIP)
+                    .right(p -> L(p, Lang.A.MMO_Enter))
                     .onClose((player) -> Result.PARENT())
-                    .onComplete((player, s) -> {
+                    .onComplete((p, s, b) -> {
                         try {
                             String[] split = s.toUpperCase().split(":");
 
@@ -157,19 +154,19 @@ public class LootMMOItem extends AbstractLootItem {
                             //e.printStackTrace();
                         }
 
-                        return Result.TEXT("Invalid");
+                        return Result.TEXT(L(p, Lang.A.Invalid));
                     })
                 )
                 //special delimiter reader/writer for
                 // 0: Level, Tier
                 // 1: Random
                 // 2: Scale with player
-                .childButton(7, 1, () -> ItemBuilder.copyOf(Material.PAINTING).amount(1).name("&8&lEdit tiers").lore(getFormatString()).build(), new TextMenu.TBuilder()
-                        .title("Assign by name")
-                        .leftRaw(this::getFormatString, null, ColorMode.STRIP)
-                        .right(() -> "&8Format", () -> " &7- exact:<level>,<tier>\n &7- random tiers\n &7- scale with player\n&eExamples:\n &7- exact:2,RARE\n &7- random\n &7- scale")
+                .childButton(7, 1, (p) -> ItemBuilder.copyOf(Material.PAINTING).amount(1).name("&8&l" + L(p, Lang.A.MMO_Edit_tiers)).lore(getFormatString()).build(), new TextMenu.TBuilder()
+                        .title(p -> "")
+                        .leftRaw((p) -> this.getFormatString(), null, ColorMode.STRIP)
+                        .right(p -> "&8" + L(p, Lang.A.Format), p -> "&7 - " + L(p, Lang.A.MMO_Format1) + "\n&7 - " + L(p, Lang.A.MMO_Format2) + "\n&7 - " + L(p, Lang.A.MMO_Format3) + "\n&e" + L(p, Lang.A.Example) + "\n&7- exact:2,RARE\n &7- random\n &7- scale")
                         .onClose((player) -> Result.PARENT())
-                        .onComplete((player, s) -> {
+                        .onComplete((p, s, b) -> {
                             s = s.replace(" ", "");
                             try {
                                 Matcher m = MODE_PATTERN.matcher(s);
@@ -192,10 +189,9 @@ public class LootMMOItem extends AbstractLootItem {
                                         String tier = sub.substring(index+1); // 6
 
                                         if (!MMOItems.plugin.getTiers().has(tier))
-                                            return Result.TEXT("Invalid tier");
+                                            return Result.TEXT(L(p, Lang.A.Invalid_tier));
 
                                         this.tier = tier;
-
                                     } else if (sub.charAt(0) == 'r') { // random
                                         mode = 1;
                                     } else mode = 2; // scale
@@ -205,7 +201,7 @@ public class LootMMOItem extends AbstractLootItem {
                             }
                             catch (Exception ignored) {}
 
-                            return Result.TEXT("Invalid format");
+                            return Result.TEXT(L(p, Lang.A.Invalid));
                         })
                 );
     }

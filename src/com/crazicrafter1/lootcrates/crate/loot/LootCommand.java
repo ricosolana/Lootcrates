@@ -5,8 +5,8 @@ import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.gapi.AbstractMenu;
 import com.crazicrafter1.gapi.Result;
 import com.crazicrafter1.gapi.TextMenu;
-import com.crazicrafter1.lootcrates.Editor;
 import com.crazicrafter1.lootcrates.ItemModifyMenu;
+import com.crazicrafter1.lootcrates.Lang;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -15,6 +15,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static com.crazicrafter1.lootcrates.Lang.L;
 
 public class LootCommand implements ILoot {
 
@@ -56,18 +58,17 @@ public class LootCommand implements ILoot {
     public AbstractMenu.Builder getMenuBuilder() {
         return new ItemModifyMenu()
                 .build(itemStack, input -> this.itemStack = input)
-                .title("LootCommand")
-                .childButton(5, 2, () -> ItemBuilder.copyOf(Material.PAPER).name("&6Command").lore(Editor.LORE_LMB_EDIT).build(), new TextMenu.TBuilder()
-                        .title("edit command")
+                .childButton(5, 2, p -> ItemBuilder.copyOf(Material.PAPER).name("&6" + L(p, Lang.A.Edit_command)).lore("&7" + L(Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new TextMenu.TBuilder()
+                        .title(p -> L(p, Lang.A.Edit_command))
                         .onClose((player) -> Result.PARENT())
-                        .leftRaw(() -> command)
-                        .right(() -> "Input the command (PAPI supported)")
-                        .onComplete((player, s) -> {
+                        .leftRaw(p ->  command)
+                        .right(p ->  L(p, Lang.A.Input_command), p -> L(p, Lang.A.support_PAPI))
+                        .onComplete((p, s, b) -> {
                             if (!s.isEmpty()) {
                                 this.command = s;
                                 return Result.PARENT();
                             }
-                            return Result.TEXT("Invalid");
+                            return Result.TEXT(L(p, Lang.A.Invalid));
                         }));
     }
 

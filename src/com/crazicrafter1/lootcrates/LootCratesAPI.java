@@ -44,6 +44,7 @@ public class LootCratesAPI {
     static void registerLoot(Class<? extends ILoot> lootClass) {
         lootClasses.put(lootClass, (ItemStack) ReflectionUtil.getFieldInstance(ReflectionUtil.getField(lootClass, "EDITOR_ICON"), null));
         ConfigurationSerialization.registerClass(lootClass, lootClass.getSimpleName());
+        Main.get().info("Registering " + lootClass.getSimpleName());
     }
 
     public static Crate getCrateByID(String id) {

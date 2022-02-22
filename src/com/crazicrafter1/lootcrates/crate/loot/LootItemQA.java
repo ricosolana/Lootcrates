@@ -3,6 +3,7 @@ package com.crazicrafter1.lootcrates.crate.loot;
 import com.crazicrafter1.crutils.ColorMode;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.gapi.*;
+import com.crazicrafter1.lootcrates.Lang;
 import me.zombie_striker.customitemmanager.CustomBaseObject;
 import me.zombie_striker.qg.api.QualityArmory;
 import org.bukkit.Material;
@@ -11,6 +12,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Map;
+
+import static com.crazicrafter1.lootcrates.Lang.L;
 
 public class LootItemQA extends AbstractLootItem {
 
@@ -54,22 +57,21 @@ public class LootItemQA extends AbstractLootItem {
     @Override
     public AbstractMenu.Builder getMenuBuilder() {
         return new ParallaxMenu.PBuilder()
-                .title("LootItemQA")
                 .parentButton(4, 5)
                 //.childButton(2, 5, () -> new ItemBuilder(Material.COMPASS).name("&eSearch..."), new )
-                .button(3, 5, new Button.Builder().icon(() -> getIcon(null)))
-                .childButton(5, 5, () -> ItemBuilder.copyOf(Material.COMPASS).name("&eBy name...").build(), new TextMenu.TBuilder()
-                        .title("Assign by name")
-                        .leftRaw(() -> name, null, ColorMode.STRIP)
-                        .right(() -> "&eSet item by name")
+                .button(3, 5, new Button.Builder().icon((p) -> getIcon(null)))
+                .childButton(5, 5, p -> ItemBuilder.copyOf(Material.COMPASS).name("&e" + L(p, Lang.A.Assign_by_name)).build(), new TextMenu.TBuilder()
+                        .title(p -> L(p, Lang.A.Assign_by_name))
+                        .leftRaw(p -> name, null, ColorMode.STRIP)
+                        .right(p -> "&e" + L(p, Lang.A.Set_item_by_name))
                         .onClose((player) -> Result.PARENT())
-                        .onComplete((player, s) -> {
+                        .onComplete((p, s, b) -> {
                             CustomBaseObject customBaseObject = QualityArmory.getCustomItemByName(s);
                             if (customBaseObject != null) {
                                 this.name = s;
                                 return Result.PARENT();
                             }
-                            return Result.TEXT("Invalid");
+                            return Result.TEXT(L(p, Lang.A.Invalid));
                         })
                 )
                 .addAll(self -> {
@@ -78,13 +80,11 @@ public class LootItemQA extends AbstractLootItem {
                     QualityArmory.getCustomItems().forEachRemaining(customBaseObject -> {
                         if (customBaseObject.getName().equals(this.name)) {
                             result.add(new Button.Builder()
-                                    .icon(() -> ItemBuilder.copyOf(getIcon(null)).build())
+                                    .icon((p) -> ItemBuilder.copyOf(getIcon(null)).build())
                                     .get());
                         } else {
                             result.add(new Button.Builder()
-                                    .icon(() -> QualityArmory.getCustomItemAsItemStack(customBaseObject.getName()))
-                                    //.icon(() -> new ItemBuilder(customBaseObject.getItemData().getMat())
-                                    //.name(customBaseObject.getName()).lore(customBaseObject.getCustomLore()).toItem())
+                                    .icon((p) -> QualityArmory.getCustomItemAsItemStack(customBaseObject.getName()))
                                     .lmb(interact -> {
                                         // change
                                         name = customBaseObject.getName();

@@ -15,20 +15,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.UUID;
+import javax.annotation.Nonnull;
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -36,13 +33,37 @@ import java.util.zip.ZipOutputStream;
 
 public class Main extends JavaPlugin
 {
-    public static void main(String[] args) {
-        Pattern VALID_PATTERN = Pattern.compile("(?=.*[a-z])[a-z_]+");
+    public static void main(String[] args) throws Exception{
 
-        String test1 = "_";
+        //String s = "https://minecraft-heads.com/custom-heads/798";
+        String s = "https://minecraft-heads.com/scripts/api.php?cat=";
 
-        System.out.println("Valid: " + VALID_PATTERN.matcher(test1).matches());
+        while (true) {
+            Scanner in = new Scanner(System.in);
+
+            URL url = new URL(s + in.nextLine());
+            URLConnection conn = url.openConnection();
+
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader(conn.getInputStream()));
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
+            }
+        }
+
+         //Pattern VALID_PATTERN = Pattern.compile("(?=.*[a-z])[a-z_]+");
+ //
+         //String test1 = "_";
+ //
+         //System.out.println("Valid: " + VALID_PATTERN.matcher(test1).matches());
     }
+
+    private final File configFile = new File(getDataFolder(), "config.yml");
+    private final File playerFile = new File(getDataFolder(), "player_stats.yml");
+    private final File backupPath = new File(getDataFolder(), "backup");
+    private FileConfiguration config = null;
 
     /*
      * Runtime modifiable stuff
@@ -57,20 +78,25 @@ public class Main extends JavaPlugin
 
     public Data data;
     public Lang lang;
-    private FileConfiguration config = null;
-    private final File configFile = new File(getDataFolder(), "config.yml");
-    private final File backupPath = new File(getDataFolder(), "backup");
+    private final HashMap<UUID, PlayerStat> playerStats = new HashMap<>();
+
+    @Nonnull
+    public PlayerStat getStat(UUID uuid) {
+        // if not present add
+
+        PlayerStat stat = playerStats.get(uuid);
+        if (stat == null) {
+            stat = new PlayerStat();
+            playerStats.put(uuid, stat);
+        }
+
+        return stat;
+    }
 
     private static Main instance;
     public static Main get() {
         return instance;
     }
-
-    private final static int CFG_WAIT = -1;
-    private final static int CFG_CURR = 0;
-    private final static int CFG_DEF = 1;
-    private final static int CFG_POP = 2;
-    private final static int CFG_ERR = 3;
 
     @Override
     public void onEnable() {
@@ -99,7 +125,7 @@ public class Main extends JavaPlugin
         }
 
         if (installedDepends) {
-            error(ChatColor.RED + "Must restart server to use plugin");
+            error(ChatColor.RED + "LootCrates requires a server restart to use");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
@@ -141,6 +167,10 @@ public class Main extends JavaPlugin
 
         reloadConfig();
 
+        if (data == null) {
+            return;
+        }
+
         /*
          * bStats metrics init
          */
@@ -168,8 +198,6 @@ public class Main extends JavaPlugin
          */
         new Cmd(this);
 
-        //MMOItems.plugin.getTiers().getAll().forEach(tier -> info("id: " + tier.getId() + ", name: " + tier.getName()));
-
         /*
          * Listener init
          */
@@ -180,33 +208,6 @@ public class Main extends JavaPlugin
         new ListenerOnPlayerInteract(this);
         new ListenerOnPlayerInteract(this);
         new ListenerOnPlayerQuit(this);
-    }
-
-    public Lang.Unit getLang(Player p) {
-
-        // If translations are disabled return
-        if (!data.lang)
-            return null;
-
-        Lang.Unit unit;
-
-        String langCode = null;
-        String locale = p.getLocale();
-        int index = locale.indexOf("_");
-        if (index != -1) {
-            langCode = locale.toLowerCase(Locale.ROOT).substring(0, index);
-        }
-
-        // If player language is invalid, or
-        // If player by default is using english, or
-        // If language couldnt be found
-        // return none
-        if (langCode == null
-                || langCode.equals("en")
-                || (unit = lang.translations.get(langCode)) == null)
-            return null;
-
-        return unit;
     }
 
     /**
@@ -243,11 +244,21 @@ public class Main extends JavaPlugin
         this.saveConfig();
     }
 
+    @Override
+    @Deprecated
+    public void saveDefaultConfig() {
+        throw new RuntimeException("Do not call this method");
+    }
+
     public void saveDefaultConfig(boolean replace) {
+        saveDefaultConfig(replace, true);
+    }
+
+    public void saveDefaultConfig(boolean replace, boolean verbose) {
         // If replacing, then save
         // If back up failed, then save
         if ((replace && backupConfig(replace)) || !configFile.exists()) {
-            info("Saving default config");
+            if (verbose) info("Saving default config");
             this.saveResource(configFile.getName(), true);
         }
     }
@@ -257,48 +268,49 @@ public class Main extends JavaPlugin
         this.config = new YamlConfiguration();
         this.lang = new Lang();
 
-        //saveLanguageFiles();
+        loadPlayerStats();
 
-        int configAttempt = CFG_WAIT;
-        while (++configAttempt != CFG_ERR) {
+        try {
+            info("Attempt 1: Loading config");
+            saveDefaultConfig(false, false);
+            config.load(configFile);
+            data = (Data) config.get("data");
+        } catch (Exception e) {
+            error(e.getMessage());
             try {
-                switch (configAttempt) {
-                    case CFG_CURR:
-                        info("Attempt 1: Loading current or default config");
+                popup("Attempt 2: Loading default config");
 
-                        saveDefaultConfig(false);
-                        config.load(configFile);
-                        data = (Data) config.get("data");
-                        lang.loadLanguageFiles();
-                        return;
-                    case CFG_DEF:
-                        info("Attempt 2: Force loading default config");
+                saveDefaultConfig(true, false);
+                config.load(configFile);
+                data = (Data) config.get("data");
+            } catch (Exception e1) {
+                error(e1.getMessage());
+                try {
+                    warn("Attempt 3: Populating config with defaults");
 
-                        saveDefaultConfig(true);
-                        config.load(configFile);
-                        data = (Data) config.get("data");
-                        lang.loadLanguageFiles();
-                        return;
-                    case CFG_POP:
-                        info("Attempt 3: Populating config with minimal built-ins");
-
-                        data = new Data();
-                        lang.loadLanguageFiles();
-                        return;
+                    data = new Data();
+                } catch (Exception e2) {
+                    // Very severe, should theoretically never reach this point
+                    e2.printStackTrace();
                 }
-            } catch (Exception e) {
-                error(e.getMessage());
             }
         }
 
-        error("Failed all contingency attempts, plugin will now disable...");
+        if (data != null) {
+            lang.loadLanguageFiles();
+            info("Successfully loaded config");
+            return;
+        }
+
+        severe("All fallback attempts failed");
+        severe("Please report this at https://discord.gg/2JkFBnyvNQ");
         Bukkit.getPluginManager().disablePlugin(this);
     }
 
     public boolean backupConfig(boolean isBroken) {
         File backupFile = new File(backupPath, System.currentTimeMillis() + "_" + (isBroken ? "broken" : "old") + "_config.zip");
 
-        info("Backing up config");
+        info("Making a backup of the config");
 
         try {
             backupFile.getParentFile().mkdirs();
@@ -325,6 +337,8 @@ public class Main extends JavaPlugin
 
         lang.saveLanguageFiles();
 
+        savePlayerStats();
+
         if (backupConfig(false)) {
             info("Saving config...");
             config.set("data", data);
@@ -337,13 +351,11 @@ public class Main extends JavaPlugin
             }
         }
 
-        purge();
+        deleteOldBackups();
     }
 
     private static final Pattern BACKUP_PATTERN = Pattern.compile("([0-9])+_\\S+_config.zip");
-    private void purge() {
-        // now delete old files in backup
-        // backup/1010928476782461_old_config.yml
+    private void deleteOldBackups() {
         int deletedCount = 0;
         try {
             backupPath.mkdirs();
@@ -354,7 +366,7 @@ public class Main extends JavaPlugin
                 Matcher matcher = BACKUP_PATTERN.matcher(name);
                 if (matcher.matches()) {
                     long create = Long.parseLong(name.substring(0, name.indexOf("_")));
-                    if (create < System.currentTimeMillis() - (data.cleanHour * 60 * 60 * 1000)) {
+                    if (create < System.currentTimeMillis() - (data.cleanAfterDays * 24 * 60 * 60 * 1000)) {
                         // delete it
                         file.delete();
                         deletedCount++;
@@ -369,12 +381,57 @@ public class Main extends JavaPlugin
         else info("No old configurations to purge");
     }
 
+    private void savePlayerStats() {
+        try {
+            YamlConfiguration playerConfig = new YamlConfiguration();
+
+            for (Map.Entry<UUID, PlayerStat> entry : playerStats.entrySet()) {
+                String uuid = entry.getKey().toString();
+                playerConfig.set(uuid + ".editorMessaged",
+                        entry.getValue().editorMessaged);
+                for (Map.Entry<String, Integer> entry1 : entry.getValue().openedCrates.entrySet()) {
+                    playerConfig.set(uuid + ".crates." + entry1.getKey(),
+                            entry1.getValue());
+                }
+            }
+
+            playerConfig.save(playerFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadPlayerStats() {
+        try {
+            if (!playerFile.exists())
+                return;
+
+            YamlConfiguration playerConfig = new YamlConfiguration();
+            playerConfig.load(playerFile);
+
+            for (String uuid : playerConfig.getKeys(false)) {
+                PlayerStat stat = new PlayerStat();
+                playerStats.put(UUID.fromString(uuid), stat);
+                stat.editorMessaged = playerConfig.getBoolean(uuid + ".editorMessaged");
+                ConfigurationSection section = playerConfig.getConfigurationSection(uuid + ".crates");
+                if (section != null)
+                    for (String id : section.getKeys(false)) {
+                        stat.openedCrates.put(id, playerConfig.getInt(uuid + ".crates." + id));
+                    }
+            }
+        } catch (Exception e) {e.printStackTrace();}
+    }
+
     @Override
     public FileConfiguration getConfig() {
         if (this.config == null) {
             this.reloadConfig();
         }
         return this.config;
+    }
+
+    public void popup(String s) {
+        popup(Bukkit.getConsoleSender(), s);
     }
 
     public void info(String s) {
@@ -389,24 +446,42 @@ public class Main extends JavaPlugin
         error(Bukkit.getConsoleSender(), s);
     }
 
+    public void severe(String s) {
+        severe(Bukkit.getConsoleSender(), s);
+    }
+
+    public boolean popup(CommandSender sender, String s) {
+        sender.sendMessage(
+                (sender instanceof ConsoleCommandSender ? ChatColor.WHITE + "[" + ChatColor.GREEN + "LC" + ChatColor.WHITE + "]" : "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "\u24D8") + " "
+                        + ChatColor.RESET + ChatColor.AQUA + s);
+        return true;
+    }
+
     public boolean info(CommandSender sender, String s) {
-            sender.sendMessage(
-                    (sender instanceof ConsoleCommandSender ? ChatColor.WHITE + "[" + ChatColor.DARK_PURPLE + "L" + ChatColor.LIGHT_PURPLE + "C" + ChatColor.WHITE + "]" : "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "\u24D8") + " "
-                    + ChatColor.RESET + ChatColor.GRAY + s);
+        sender.sendMessage(
+                (sender instanceof ConsoleCommandSender ? ChatColor.WHITE + "[" + ChatColor.BLUE + "LC" + ChatColor.WHITE + "]" : "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "\u24D8") + " "
+                        + ChatColor.RESET + s);
         return true;
     }
 
     public boolean warn(CommandSender sender, String s) {
         sender.sendMessage(
-                (sender instanceof ConsoleCommandSender ? ChatColor.WHITE + "[" + ChatColor.GOLD + "L" + ChatColor.YELLOW + "C" + ChatColor.WHITE + "]" : "" + ChatColor.GOLD + ChatColor.BOLD + "\u26A1") + " "
+                (sender instanceof ConsoleCommandSender ? ChatColor.WHITE + "[" + ChatColor.YELLOW + "LC" + ChatColor.WHITE + "]" : "" + ChatColor.GOLD + ChatColor.BOLD + "\u26A1") + " "
                 + ChatColor.RESET + ChatColor.YELLOW + s);
         return true;
     }
 
     public boolean error(CommandSender sender, String s) {
         sender.sendMessage(
-                (sender instanceof ConsoleCommandSender ? ChatColor.WHITE + "[" + ChatColor.DARK_RED + "L" + ChatColor.RED + "C" + ChatColor.WHITE + "]" : "" + ChatColor.DARK_RED + ChatColor.BOLD + "\u26A0") + " "
+                (sender instanceof ConsoleCommandSender ? ChatColor.WHITE + "[" + ChatColor.RED + "LC" + ChatColor.WHITE + "]" : "" + ChatColor.DARK_RED + ChatColor.BOLD + "\u26A0") + " "
                 + ChatColor.RESET + ChatColor.RED + s);
+        return true;
+    }
+
+    public boolean severe(CommandSender sender, String s) {
+        sender.sendMessage(
+                (sender instanceof ConsoleCommandSender ? ChatColor.WHITE + "[" + ChatColor.DARK_RED + "LC" + ChatColor.WHITE + "]" : "" + ChatColor.DARK_RED + ChatColor.BOLD + "\u26A0") + " "
+                        + ChatColor.RESET + ChatColor.DARK_RED + s);
         return true;
     }
 }

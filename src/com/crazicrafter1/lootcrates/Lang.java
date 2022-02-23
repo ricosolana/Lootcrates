@@ -40,7 +40,7 @@ public class Lang {
      * @return
      */
     @Nullable
-    public static String L(Player p, @Nonnull String keyMsg) {
+    public static String L(@Nullable Player p, @Nonnull String keyMsg) {
         return plugin.lang.getUnitText(p, keyMsg);
     }
 
@@ -126,10 +126,6 @@ public class Lang {
         if (!keyMsg.equals(key))
             throw new RuntimeException("Must not contain color codes: " + key + " (" + ColorMode.REVERT.a(key) + ")");
 
-        //if (key.contains("\n"))
-        //    throw new RuntimeException("Must not contain newlines: " + keyMsg.replace("\n", "\\n"));
-
-        // just translate
         key = keyMsg.trim().replace(" ", "_");
         key = Editor.TRANSLATION_STRIPPER_PATTERN.matcher(key).replaceAll("").toLowerCase();
 
@@ -139,7 +135,7 @@ public class Lang {
         Unit unit = getUnit(unitCode);
         if (unit == null) {
             // Insert english default
-            textDef.put(key, keyMsg);
+            textDef.put(key, keyMsg);// This can be removed once all translations have been inlined in A.class
             return keyMsg;
         }
 
@@ -151,6 +147,8 @@ public class Lang {
     public static class A {
         private A() {}
 
+        public static final String count = "count";
+        public static final String range = "range";
         public static final String Edit_command = "Edit command";
         public static final String Input_command = "Input the command";
         public static final String support_PAPI = "(supports PlaceholderAPI)";
@@ -163,7 +161,7 @@ public class Lang {
         public static final String MMO_Format1 = "exact level and tier";
         public static final String MMO_Format2 = "random level and tier";
         public static final String MMO_Format3 = "scale with player";
-        public static final String Example = "Example:";
+        public static final String Example = "Example";
         public static final String Invalid_tier = "Invalid tier";
         public static final String Event_tag = "Event tag";
         public static final String Input_a_tag = "Input a tag";
@@ -173,7 +171,7 @@ public class Lang {
         public static final String New = "New";
         public static final String New_crate = "New crate";
         public static final String Lorem_ipsum = "Lorem ipsum";
-        public static final String Format_strict = "Format (strict):";
+        public static final String Format_strict = "Format (strict)";
         public static final String Format_strict1 = "Lowercase";
         public static final String Format_strict2 = "Optional underscores";
         public static final String Duplicate = "Invalid or duplicate";
@@ -373,6 +371,7 @@ public class Lang {
      */
     public boolean saveLanguageFiles() {
         plugin.info("Saving languages");
+
 
 
         try {

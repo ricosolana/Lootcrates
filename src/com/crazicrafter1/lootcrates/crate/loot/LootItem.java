@@ -68,7 +68,7 @@ public final class LootItem extends AbstractLootItem {
                             min = Util.clamp(min + change, 1, max);
                             return Result.REFRESH();
                         })
-                        .icon(p -> ItemBuilder.of("PLAYER_HEAD").name("&8&n" + L(p, Lang.A.Minimum)).skull(Editor.BASE64_DEC).lore(Editor.LMB_Dec + "\n" + Editor.RMB_Inc + "\n&7" + L(Lang.A.SHIFT_Mul) + "&r&7: x5").amount(min).build()))
+                        .icon(p -> ItemBuilder.of("PLAYER_HEAD").name("&8&n" + L(p, Lang.A.Minimum)).skull(Editor.BASE64_DEC).lore(L(Lang.A.LMB) + " &c-\n" +  L(Lang.A.RMB) + " &a+\n&7" + L(Lang.A.SHIFT_Mul) + "&r&7: x5").amount(min).build()))
                 // Max
                 .button(7, 2, new Button.Builder()
                         .lmb(interact -> {
@@ -81,6 +81,6 @@ public final class LootItem extends AbstractLootItem {
                             max = Util.clamp(max + change, min, itemStack.getMaxStackSize());
                             return Result.REFRESH();
                         })
-                        .icon(p -> ItemBuilder.of("PLAYER_HEAD").name("&8&n" + L(p, Lang.A.Maximum)).skull(Editor.BASE64_INC).lore(Editor.LMB_Dec + "\n" + Editor.RMB_Inc + "\n&7" + L(Lang.A.SHIFT_Mul) + "&r&7: x5").amount(max).build()));
+                        .icon(p -> ItemBuilder.of("PLAYER_HEAD").name("&8&n" + L(p, Lang.A.Maximum)).skull(Editor.BASE64_INC).lore(L(Lang.A.LMB) + " &c-\n" +  L(Lang.A.RMB) + " &a+\n&7" + L(Lang.A.SHIFT_Mul) + "&r&7: x5").amount(max).build()));
     }
 }

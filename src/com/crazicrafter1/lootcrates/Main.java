@@ -2,6 +2,7 @@ package com.crazicrafter1.lootcrates;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
+import com.crazicrafter1.crutils.ColorUtil;
 import com.crazicrafter1.innerutils.GithubInstaller;
 import com.crazicrafter1.innerutils.GithubUpdater;
 import com.crazicrafter1.innerutils.Metrics;
@@ -22,7 +23,10 @@ import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nonnull;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
@@ -130,6 +134,9 @@ public class Main extends JavaPlugin
             return;
         }
 
+        Bukkit.getConsoleSender().sendMessage("\n" + ColorUtil.color(SPLASH));
+        //Bukkit.getConsoleSender().sendMessage("\n\n\n" + ColorUtil.color(FLAME_SPLASH));
+
         Main.instance = this;
 
         supportQualityArmory = Bukkit.getPluginManager().isPluginEnabled("QualityArmory");
@@ -162,8 +169,6 @@ public class Main extends JavaPlugin
 
         if (supportMMOItems)
             LootCratesAPI.registerLoot(LootMMOItem.class);
-
-        loadExternalLoots();
 
         reloadConfig();
 
@@ -210,31 +215,35 @@ public class Main extends JavaPlugin
         new ListenerOnPlayerQuit(this);
     }
 
-    /**
-     * I recommend using Skript instead of this
-     */
-    @Deprecated
-    private void loadExternalLoots() {
-        try {
-            File file = new File(getDataFolder(), "loots.csv");
+    private static final String SPLASH =
+            " &#adf3fd_&#aaf1fd_      &#a7eefd_&#a4ecfd_&#a1e9fd_&#9ee7fd_&#9be4fd_&#98e2fd_  &#95dffd_&#92ddfd_&#8fdafd_&#8cd8fd_&#89d5fd_&#86d3fd_  &#83d0fc_&#80cefc_&#7dcbfc_&#7ac9fc_&#77c6fc_&#74c4fc_ &#71c1fc_&#6ebffc_&#6bbcfc_&#68bafc_&#65b7fc_&#62b5fc_  &#5fb2fc_&#5cb0fc_&#5aadfc_&#57abfc_&#54a8fc_&#51a6fc_  &#4ea3fc_&#4ba1fc_&#489efc_&#459cfc_&#4299fc_&#3f97fc_  &#3c94fc_&#3992fc_&#368ffc_&#338dfc_&#308afb_&#2d88fb_ &#2a85fb_&#2783fb_&#2480fb_&#217efb_&#1e7bfb_&#1b79fb_  &#1876fb_&#1574fb_&#1271fb_&#0f6ffb_&#0c6cfb_&#096afb_\n" +
+                    "&#adf3fd/&#aaf0fd\\ &#a6eefd\\    &#a3ebfd/&#a0e8fd\\  &#9de5fd_&#99e3fd_ &#96e0fd\\&#93ddfd/&#8fdafd\\  &#8cd8fd_&#89d5fd_ &#86d2fd\\&#82cffc/&#7fcdfc\\&#7ccafc_&#79c7fc_  &#75c4fc_&#72c2fc/&#6fbffc\\  &#6bbcfc_&#68b9fc_&#65b7fc_&#62b4fc\\&#5eb1fc/&#5baffc\\  &#58acfc=&#54a9fc= &#51a6fc\\&#4ea4fc/&#4ba1fc\\  &#479efc_&#449bfc_ &#4199fc\\&#3d96fc/&#3a93fc\\&#3790fc_&#348efc_  &#308bfb_&#2d88fb/&#2a85fb\\  &#2783fb_&#2380fb_&#207dfb_&#1d7afb\\&#1978fb/&#1675fb\\  &#1372fb_&#106ffb_&#0c6dfb_&#096afb\\   \n" +
+                    "&#adf3fd\\ &#aaf0fd\\ &#a7eefd\\&#a4ebfd_&#a1e9fd_&#9ee6fd_&#9ae3fd\\ &#97e1fd\\ &#94defd\\&#91dcfd/&#8ed9fd\\ &#8bd7fd\\ &#88d4fd\\ &#85d1fd\\&#82cffc/&#7fccfc\\ &#7bcafc\\&#78c7fc/&#75c4fc_&#72c2fc/&#6fbffc\\ &#6cbdfc\\&#69bafc\\ &#66b8fc\\ &#63b5fc\\&#60b2fc_&#5db0fc_&#59adfc_&#56abfc\\ &#53a8fc\\  &#50a5fc_&#4da3fc_&#4aa0fc<&#479efc\\ &#449bfc\\  &#4199fc_&#3e96fc_ &#3b93fc\\&#3791fc/&#348efc_&#318cfb/&#2e89fb\\ &#2b86fb\\&#2884fb\\ &#2581fb\\  &#227ffb_&#1f7cfb_&#1c7afb\\&#1877fb\\ &#1574fb\\&#1272fb_&#0f6ffb_&#0c6dfb_  &#096afb\\  \n" +
+                    " &#adf3fd\\ &#aaf1fd\\&#a8effd_&#a5edfd_&#a3ebfd_&#a0e8fd_&#9ee6fd_&#9be4fd\\ &#99e2fd\\&#96e0fd_&#94defd_&#91dcfd_&#8fdafd_&#8cd8fd_&#8ad5fd\\ &#87d3fd\\&#85d1fd_&#82cffc_&#80cdfc_&#7dcbfc_&#7bc9fc_&#78c7fc\\ &#75c5fc\\ &#73c3fc\\&#70c0fc_&#6ebefc\\&#6bbcfc\\ &#69bafc\\&#66b8fc_&#64b6fc_&#61b4fc_&#5fb2fc_&#5cb0fc_&#5aadfc\\ &#57abfc\\&#55a9fc_&#52a7fc\\ &#50a5fc\\&#4da3fc_&#4ba1fc\\ &#489ffc\\&#469dfc_&#439afc\\ &#4198fc\\&#3e96fc_&#3b94fc\\ &#3992fc\\ &#3690fc\\&#348efc_&#318cfb\\&#2f8afb\\ &#2c88fb\\&#2a85fb_&#2783fb_&#2581fb_&#227ffb_&#207dfb_&#1d7bfb\\&#1b79fb/&#1877fb\\&#1675fb_&#1372fb_&#1170fb_&#0e6efb_&#0c6cfb_&#096afb\\ \n" +
+                    "  &#adf3fd\\&#abf1fd/&#a8effd_&#a6edfd_&#a4ebfd_&#a1e9fd_&#9fe7fd_&#9de5fd/&#9ae3fd\\&#98e1fd/&#96dffd_&#93ddfd_&#91dcfd_&#8fdafd_&#8cd8fd_&#8ad6fd/&#88d4fd\\&#85d2fd/&#83d0fc_&#80cefc_&#7eccfc_&#7ccafc_&#79c8fc_&#77c6fc/  &#75c4fc\\&#72c2fc/&#70c0fc_&#6ebefc/ &#6bbcfc\\&#69bafc/&#67b8fc_&#64b6fc_&#62b4fc_&#60b2fc_&#5db0fc_&#5baffc/&#59adfc\\&#56abfc/&#54a9fc_&#52a7fc/ &#4fa5fc/&#4da3fc_&#4ba1fc/&#489ffc\\&#469dfc/&#449bfc_&#4199fc/&#3f97fc\\&#3d95fc/&#3a93fc_&#3891fc/  &#368ffc\\&#338dfc/&#318bfb_&#2e89fb/ &#2c87fb\\&#2a85fb/&#2783fb_&#2581fb_&#2380fb_&#207efb_&#1e7cfb_&#1c7afb/&#1978fb\\&#1776fb/&#1574fb_&#1272fb_&#1070fb_&#0e6efb_&#0b6cfb_&#096afb/ ";
 
-            if (file.exists()) {
-                BufferedReader reader = new BufferedReader(new FileReader(file));
 
-                String line;
-                while ((line = reader.readLine()) != null && !line.isEmpty()) {
-                    String[] split = line.split(",");
+    //private static final String FLAME_SPLASH =
+    //        "\n" +
+    //                "                              &#A51101)`·.                                                                                                                                                                  &#A51101)`·.                                                      '                                                                                                                                        ’                               &#A51101)`·.           \n" +
+    //                "                  &#A51101/(      &#BD2B02.·´    (                                  &#A51101)`·.                                         &#A51101)`·.                                                                   &#A51101/(      &#BD2B02.·´    &#BD2B02(                        &#A51101'                                                                                                                         &#A51101(`·.                    &#A51101)`·._.·´(        &#A51101)`·.                   &#A51101/(      &#BD2B02.·´    (           \n" +
+    //                "          &#A51101)\\      &#BD2B02)  `·._):::.    )’'                   &#A51101/(      &#BD2B02.·´    (                             &#A51101/(      &#BD2B02.·´    (                    &#A51101(`·.                  &#A51101)\\               &#A51101)\\      &#BD2B02)  `·._):::.    &#E34D00)        &#A51101’'            &#A51101(`·.               &#A51101)\\'                            &#A51101)\\       &#A51101)\\                            &#A51101(`·.                  &#A51101)\\            &#BD2B02\\::`·._)`·.     &#A51101)\\.·´::...  .::)   &#BD2B02.·´   ./           &#A51101)\\      &#BD2B02)  `·._):::.    &#E34D00)        ’'\n" +
+    //                "    &#A51101)\\ .·´ .:`·.(:;;  --  ' '\\:. :(             &#A51101)\\      &#BD2B02)  `·._):::.    )        &#A51101'’          &#A51101)\\      &#BD2B02)  `·._):::.    )        &#A51101'’            &#BD2B02)  `·.      &#BD2B02.·´( .·´  (        &#A51101)\\ &#BD2B02.·´ .:`·.(:;;  --  ' '\\:. :(.·´)    &#BD2B02)\\              &#BD2B02)  `·.   &#A51101.·´( .·´  (     &#A51101/('                 &#BD2B02.·´  /  .·´.:/           &#A51101.·´(                &#BD2B02)  `·.      .·´( .·´  (      &#E34D00.·´(   )::. ..:::).·´;· --  ´ ´\\::.`·.(::...:(’       &#A51101)\\ .·´ .:`·.(:;;  --  ' '\\:. :(.·´)    &#A51101)\\ \n" +
+    //                ".·´  (,): --  ' '              \\:·´       &#A51101)\\ .·´ .:`·.(:;;  --  ' '\\:. :(.·´)    &#BD2B02)\\     &#BD2B02)\\ .·´ .:`·.(:;;  --  ' '\\:. :(.·´)    &#BD2B02)\\     &#E34D00.·´( .·´:..::(,__(::..--  ' &#E34D00'\\:·´('.·´  (,): --  ' '              \\....:::`·.(  (     .·´( .·´:..::(,(::--  ' '\\::.`·._) &#BD2B02`·.’     &#A51101.·´(     ):.::`·.)::::)    &#A51101)\\     &#BD2B02)   `·.     &#E34D00.·´( .·´:..::(,__(::..--  ' '\\:·´('  ):..\\(;;::--  ´ ´               ’\\:::::::...::)   .·´  (,): --  ' '              \\....:::`·.(  (\n" +
+    //                "):.::/\\                ,..::´/       .·´  (,): --  ' '              \\....:::`·.(  (.·´  (,): --  ' '              \\....:::`·.(  (   D);; :--  ' ’                  _\\::/):.::/\\                        ¯¯¯` · ::·´’     );; :--   '               \\::....:::::)   &#E34D00(  &#BD2B02.:::`·./::;,  --  ' '\\/(.·´.::).·´:   .::)   D);; :--  ' ’                  _\\::/(::...:/\\                          ’¯¯¯¯¯¯/'    ):.::/\\                        ¯¯¯`·’ ::·´ \n" +
+    //                "`·:/::::\\...:´/       /:::::/        ):.::/\\                        ¯¯¯` · ::·´’):.::/\\                        ¯¯¯` · ::·´’.·´/\\                   ,.. : ´:::'/:’ ’`·:/::::\\...:´/       ____          \\       .·´/\\                ,...__ ¯¯¯` ·:·´’.·´.;);;--  ' '               '\\:::::.    .:::·´'.·´/\\                   ,.. : ´:::'/:’ ’  `·:/::::\\...:´/        ___________'/      `·:/::::\\...:´/       ____          \\     \n" +
+    //                "   \\::::/::::/      /;:::-'     '     `·:/::::\\...:´/       ____          \\     `·:/::::\\...:´/       ____          \\     )/:::'\\__..:´/       /::::::::::/   ' '   \\::::/::::/      /::::::::/\\         I\"     )/:::'\\...:´/       /:::::::::::/     /   I:::/\\                         `` ··:::::·´   ’')/:::'\\__..:´/       /::::::::::/   ' '     \\::::/::::/        /:::::::::;; --  ´ ´\\     ’    \\::::/::::/      /::::::::/\\         'I’   \n" +
+    //                "     \\/;::-'/      /              '      \\::::/::::/      /::::::::/I        /    ’'   \\::::/::::/      /::::::::/I        /    ’' \\:::/:::::·'/       /:::;;::· ´'            \\/;::-'/’     /::::::::/:::I       /        \\:::/::::/       /;;::;;´-··´´     /  '  )/::::'\\..:´/       /`::-..,         `./      '  \\:::/:::::·'/       /:::;;::· ´'              \\/;::-'/        /;;::·-  ´ ´         _\\    '      \\/;::-'/      /::::::::/:::I       ’/    \n" +
+    //                "          /      /                        \\/;::-'/      /::::::::/:/       /'           \\/;::-'/      /::::::::/:/       /'        '\\/;::::-'/       /· ´                          /’     /¯¯¯¯¯\\::'/..-::::/          '\\/;::-'/               ,...::::´/     ' '\\:::'/::::/       /,::-·· ' '         /           '\\/;::::-'/       /· ´                            /                      .,.,·:::::'/   ’'           /I      I¯¯¯¯¯\\::'/..-::::/    ’'\n" +
+    //                "        '/      /       &#A51101)`·.         '          /      /¯¯¯¯¯'I/       /''                 /      /¯¯¯¯¯'I/       /''          (`·.)':/       /'                            ’/     /__.·´(    I:/::::::/                 /       ,, -,      \\::::::/    '     \\/;::-'/       ,...-:::' '/        /         '    (`·.)':/       /'                      )`·.    '/         _ ,.,.,·:::::::::::::::/     '         /::I       ` * · . ____           \n" +
+    //                "   .·´/I       I     .·´ ..(.·´(    '         '/      /          /       /         '        '/      /          /       /         '     ):./       /'                '        .·´/I'       I `·::__)  /;;::- '´           .·´( '/       /:::/::\\      \\:· ´                /       /:::::::::/        /                 ):./       /'                '     (::..:(.·/         /:::::::::::::::::::--  ´      ’        I:::/`:::·...              /’   '      \n" +
+    //                "   )/::I,       ` ·’.):::...:::/.·´:('       /I      'I         /       /'      '           /I      'I         /       /'      '        '\\:/       /'                          )/::I,       ` · .                       ’'_) ::/       '/;;:/::::'\\      '\\          ’'     '/       /;::: ·- '/        '/           '      '\\:/       /'                        `·::..'/          `·__:::::· ’\\:   .·´                   I:/::::::::::::·-,       ’/'           \n" +
+    //                "   I:::::::.,         ¯¯¯¯¯¯’.·´/     /::/`· ,    ` ·,_'/       /’                 /::/`· ,    ` ·,_'/       /’                 /       /'                 '          I:::::::.,         ¯¯¯.·´/              )..::/       /    '\\::::::'\\      '\\             /____/.·´)    (/        '/            '       /       /'                 '            )/`·.                        \\(              ’         ` ·::;;::- ··  ´´      /'         '   \n" +
+    //                "   I::::::::::::.. ______.·´:::/’    I:/::::::::` · , ___,.·:/'             '    I:/::::::::` · , ___,.·:/'             '   '/,..::·´/'                             I::::::::::::.. __.·´:::/               ’`·:/____ /       '\\::::::\\____\\         /::::::::/;;  --  ´´      .·´/                  '/,..::·´/'                              /::::::`·._____ ...·::::::/                  /\\¯¯¯¯         ,,  -:::::'/'              \n" +
+    //                "    ' ·:::;:::::::/::::::::::/::::·´'      `·:;::::::::::/:::::/:::/'      '             `·:;::::::::::/:::::/:::/'      '         '/:::::::'/                                ' ·:::;:::::::/::/::::·´                 ' /::::::::/           '\\::::/:::::::/       /::::::::/':-.., .,..-:::'/::::/                 '/:::::::'/                                `·:::::::/::::::::/:::::::::/                 ’/::::\\,,  -::::´´::::::::::::/''               \n" +
+    //                "         ' ·::::'/::::::::::/::·´               ` ·:;:::/:::::/;·´'             '             ` ·:;:::/:::::/;·´'             '   /:;:: · ´'                       '               ' ·::::'/::/::·´                     /::::::::/              '\\/:::::::'/     '    ¯¯¯¯/::::::/:::::::/:::·´                  /:;:: · ´'                       '              `·::/::::::::/::::: ·´´                   ’\\:::/:::::::::::::::;;::-·´´'                 '\n" +
+    //                "                ¯¯¯¯¯¯      '                     ¯¯¯ ’                                      ¯¯¯ ’                      ¯                                   ’'                  ¯                        ’'¯¯¯¯¯                 ¯¯¯¯          ’       '` ·::;/::;::-·· ´´                   '   ¯                                   ’'            ¯¯¯¯¯                               '\\/::::::;;::-· ´´'                           \n";
 
-                    Class<? extends ILoot> clazz = (Class<? extends ILoot>) Class.forName(split[0]);
-                    String alias = split[1];
-
-                    LootCratesAPI.registerLoot(clazz);
-                    info("Loaded external loot: " + clazz.getName() + " as " + alias);
-                }
-                reader.close();
-            }
-        } catch (Exception e) {e.printStackTrace();}
-    }
 
     @Override
     public void onDisable() {

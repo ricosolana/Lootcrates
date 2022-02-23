@@ -17,7 +17,7 @@ import java.util.Map;
 public class LootCratesAPI {
 
     //static Set<Class<? extends ILoot>> lootClasses = new HashSet<>();
-    static Map<Class<? extends ILoot>, ItemStack> lootClasses = new HashMap<>();
+    public static Map<Class<? extends ILoot>, ItemStack> lootClasses = new HashMap<>();
 
     //@Deprecated
     //static void registerLoot(Class<? extends ILoot> lootClass, String alias) {

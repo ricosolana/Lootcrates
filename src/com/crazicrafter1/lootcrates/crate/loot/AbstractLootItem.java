@@ -2,6 +2,7 @@ package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
+import com.crazicrafter1.lootcrates.Lang;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -36,14 +37,18 @@ public abstract class AbstractLootItem implements ILoot {
         return true;
     }
 
-    @Override
-    public String toString() {
+    public String toString(Player p) {
         StringBuilder sb = new StringBuilder();
         if (min == max)
-            sb.append("&7count: &f").append(min);
-        else sb.append("&7range: &f[").append(min).append(", ").append(max).append("]");
+            sb.append("&7").append(Lang.L(p, Lang.A.count)).append(": &f").append(min);
+        else sb.append("&7").append(Lang.L(p, Lang.A.range)).append(": &f[").append(min).append(", ").append(max).append("]");
 
         return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return toString(null);
     }
 
     @Override

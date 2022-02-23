@@ -74,7 +74,7 @@ public class LootItemQA extends AbstractLootItem {
                             return Result.TEXT(L(p, Lang.A.Invalid));
                         })
                 )
-                .addAll(self -> {
+                .addAll((self, p00) -> {
                     ArrayList<Button> result = new ArrayList<>();
 
                     QualityArmory.getCustomItems().forEachRemaining(customBaseObject -> {

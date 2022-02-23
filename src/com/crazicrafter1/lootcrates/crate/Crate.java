@@ -1,11 +1,15 @@
 package com.crazicrafter1.lootcrates.crate;
 
+import com.crazicrafter1.crutils.ColorMode;
 import com.crazicrafter1.crutils.ColorUtil;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
+import com.crazicrafter1.gapi.*;
+import com.crazicrafter1.lootcrates.ItemModifyMenu;
 import com.crazicrafter1.lootcrates.Lang;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
 import com.crazicrafter1.lootcrates.Main;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
@@ -14,6 +18,9 @@ import org.bukkit.inventory.ItemStack;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+
+import static com.crazicrafter1.lootcrates.Editor.ColorDem;
+import static com.crazicrafter1.lootcrates.Lang.L;
 
 public class Crate implements ConfigurationSerializable {
 
@@ -206,4 +213,142 @@ public class Crate implements ConfigurationSerializable {
 
         return result;
     }
+
+    public AbstractMenu.Builder getBuilder() {
+        return new SimpleMenu.SBuilder(5)
+                .title(p -> id)
+                .background()
+                .parentButton(4, 4)
+                // *   *   *
+                // Edit Crate ItemStack
+                // *   *   *
+                .childButton(1, 1, p -> ItemBuilder.copyOf(itemStack.getType()).name("&8&n" + L(p, Lang.A.ItemStack)).lore("&7" + L(p, Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new ItemModifyMenu()
+                        .build(itemStack.clone(), (itemStack -> {
+                            this.itemStack = itemStack;
+                        }))
+                )
+                // Edit Inventory Title
+                .childButton(3, 1, p -> ItemBuilder.copyOf(Material.PAPER).name("&e&n" + L(p, Lang.A.Title) + "&r&e: " + title).lore("&7" + L(p, Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new TextMenu.TBuilder()
+                        .title(p -> L(p, Lang.A.Title))
+                        .leftRaw(p -> ColorMode.REVERT.a(title))
+                        .onClose((player) -> Result.PARENT())
+                        .right(p -> L(p, ColorDem))
+                        .onComplete((p, s, b) -> {
+                            if (!s.isEmpty()) {
+                                title = ColorMode.COLOR.a(s);
+                                return Result.PARENT();
+                            }
+
+                            return Result.TEXT(L(p, Lang.A.Invalid));
+                        })
+                )
+                // *   *   *
+                // Edit LootSets
+                // *   *   *
+                .childButton(5, 1, p -> ItemBuilder.of("EXPERIENCE_BOTTLE").name("&6&n" + L(p, Lang.A.Loot)).lore("&7" + L(p, Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new ParallaxMenu.PBuilder()
+                        .title(p -> L(p, Lang.A.Loot))
+                        .parentButton(4, 5)
+                        .onClose((player) -> Result.PARENT())
+                        .addAll((builder, p) -> {
+                            ArrayList<Button> result1 = new ArrayList<>();
+
+                            for (LootSet lootSet : Main.get().data.lootSets.values()) {
+                                Integer weight = lootByWeight.get(lootSet);
+                                Button.Builder btn = new Button.Builder();
+                                ItemBuilder b = ItemBuilder.copyOf(lootSet.itemStack.getType()).name("&8" + lootSet.id);
+                                if (weight != null) {
+                                    b.lore("&7" + getFormattedFraction(lootSet) + "\n" +
+                                            "&7" + getFormattedPercent(lootSet) + "\n" +
+                                            L(p, Lang.A.LMB) + " &c-\n" +
+                                            L(p, Lang.A.RMB) + " &a+\n" +
+                                            "&f" + L(Lang.A.MMB) + ": &7" + L(Lang.A.Toggle) + "\n" +
+                                            "&7" + L(Lang.A.SHIFT_Mul) + "&r&7: x5").glow(true);
+                                    btn.mmb(interact -> {
+                                        // toggle inclusion
+                                        lootByWeight.remove(lootSet);
+                                        weightsToSums();
+                                        return Result.REFRESH();
+                                    }).lmb(interact -> {
+                                        // decrement
+                                        int change = interact.shift ? 5 : 1;
+
+                                        lootByWeight.put(lootSet, Util.clamp(weight - change, 1, Integer.MAX_VALUE));
+                                        weightsToSums();
+
+                                        return Result.REFRESH();
+                                    }).rmb(interact -> {
+                                        // decrement
+                                        int change = interact.shift ? 5 : 1;
+
+                                        lootByWeight.put(lootSet, Util.clamp(weight + change, 1, Integer.MAX_VALUE));
+                                        weightsToSums();
+
+                                        return Result.REFRESH();
+                                    });
+                                } else {
+                                    b.lore("&f" + L(Lang.A.MMB) + ": &7" + L(Lang.A.Toggle));
+                                    btn.mmb(interact -> {
+                                        lootByWeight.put(lootSet, 1);
+                                        weightsToSums();
+                                        return Result.REFRESH();
+                                    });
+                                }
+                                result1.add(btn.icon(p1 -> b.build()).get());
+                            }
+
+                            return result1;
+                        })
+                )
+                // *   *   *
+                // Edit Columns
+                // *   *   *
+                .button(7, 1, new Button.Builder()
+                        .icon(p -> ItemBuilder.copyOf(Material.LADDER).name("&8&n" + L(Lang.A.Columns) + "&r&8: &7" + columns).lore(L(Lang.A.LMB) + " &c-\n" +  L(Lang.A.RMB) + " &a+").amount(columns).build())
+                        .lmb(interact -> {
+                            // decrease
+                            columns = Util.clamp(columns - 1, 1, 6);
+                            return Result.REFRESH();
+                        })
+                        .rmb(interact -> {
+                            // decrease
+                            columns = Util.clamp(columns + 1, 1, 6);
+                            return Result.REFRESH();
+                        }))
+                // *   *   *
+                // Edit Picks
+                // *   *   *
+                .button(2, 3, new Button.Builder()
+                        .icon(p -> ItemBuilder.copyOf(Material.MELON_SEEDS).name("&8&n" + L(Lang.A.Picks) + "&r&8: &7" + picks).lore(L(Lang.A.LMB) + " &c-\n" +  L(Lang.A.RMB) + " &a+").amount(picks).build())
+                        .lmb(interact -> {
+                            // decrease
+                            picks = Util.clamp(picks - 1, 1, columns*9);
+                            return Result.REFRESH();
+                        })
+                        .rmb(interact -> {
+                            // decrease
+                            picks = Util.clamp(picks + 1, 1, columns*9);
+                            return Result.REFRESH();
+                        }))
+                // *   *   *
+                // Edit Pick Sound
+                // *   *   *
+                .childButton(6, 3, p -> ItemBuilder.copyOf(Material.JUKEBOX).name("&a&n" + L(Lang.A.Sound) + "&r&a: &r&7" + sound.name()).lore("&7" + L(Lang.A.LMB) + ": &a" + L(Lang.A.Edit)).build(),
+                        new TextMenu.TBuilder()
+                                .title(p -> L(Lang.A.Sound))
+                                .leftRaw(p -> Lang.A.Lorem_ipsum)
+                                .right(p -> L(Lang.A.Input_a_sound))
+                                .onClose((player) -> Result.PARENT())
+                                .onComplete((p, s, b) -> {
+                                    try {
+                                        Sound sound = Sound.valueOf(s.toUpperCase());
+                                        this.sound = sound;
+                                        p.playSound(p.getLocation(), sound, 1, 1);
+                                        return Result.PARENT();
+                                    } catch (Exception e) {
+                                        return Result.TEXT(L(Lang.A.Invalid));
+                                    }
+                                })
+                );
+    }
+
 }

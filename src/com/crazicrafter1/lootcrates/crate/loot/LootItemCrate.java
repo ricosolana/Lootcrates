@@ -70,7 +70,7 @@ public class LootItemCrate extends AbstractLootItem {
     public AbstractMenu.Builder getMenuBuilder() {
         return new ParallaxMenu.PBuilder()
                 .parentButton(4, 5)
-                .addAll(self -> {
+                .addAll((self, p00) -> {
                     ArrayList<Button> result = new ArrayList<>();
                     for (Map.Entry<String, Crate> entry : Main.get().data.crates.entrySet()) {
                         Crate crate = entry.getValue();

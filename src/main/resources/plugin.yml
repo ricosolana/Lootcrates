@@ -1,0 +1,17 @@
+name: Lootcrates
+version: ${version}
+main: com.crazicrafter1.lootcrates.Main
+api-version: 1.13
+softdepend: [ CRUtils, Gapi, QualityArmory, Skript, MMOItems ]
+authors: [ crazicrafter1 ]
+commands:
+  lootcrates:
+    permission: lootcrates.admin
+    aliases: [crates, lc]
+permissions:
+  lootcrates.open:
+    description: Allow for users to open crates
+    default: true
+  lootcrates.admin:
+    description: Allows access to /crates command
+    default: op

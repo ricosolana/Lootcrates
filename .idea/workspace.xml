@@ -8,19 +8,8 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="134da130-6214-4649-b404-39079de75eca" name="Changes" comment="remove ecoitems">
+    <list default="true" id="134da130-6214-4649-b404-39079de75eca" name="Changes" comment="editor backup">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Editor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Editor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Lang.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Lang.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/LootCratesAPI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/LootCratesAPI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/Crate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/Crate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/LootSet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/LootSet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/AbstractLootItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/AbstractLootItem.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItem.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItemCrate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItemCrate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItemQA.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootItemQA.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootMMOItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/crazicrafter1/lootcrates/crate/loot/LootMMOItem.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,7 +54,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.29393467" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
@@ -123,6 +112,7 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.Main" />
         <item itemvalue="Application.Main" />
       </list>
     </recent_temporary>
@@ -183,7 +173,7 @@
         <line-breakpoint enabled="true" type="java-method">
           <url>jar://$USER_HOME$/Documents/MinecraftDev/api/MMOItems-6.7-SNAPSHOT.jar!/net/Indyuce/mmoitems/MMOItems.class</url>
           <line>549</line>
-          <properties class="net.Indyuce.mmoitems.MMOItems" method="getMMOItem">
+          <properties class="net.Indyuce.mmoitems.MMOItems">
             <option name="EMULATED" value="true" />
           </properties>
           <option name="timeStamp" value="3" />
@@ -191,7 +181,7 @@
         <line-breakpoint enabled="true" type="java-method">
           <url>jar://$USER_HOME$/Documents/MinecraftDev/api/MMOItems-6.7-SNAPSHOT.jar!/net/Indyuce/mmoitems/MMOItems.class</url>
           <line>533</line>
-          <properties class="net.Indyuce.mmoitems.MMOItems" method="getMMOItem">
+          <properties class="net.Indyuce.mmoitems.MMOItems">
             <option name="EMULATED" value="true" />
           </properties>
           <option name="timeStamp" value="4" />
@@ -199,7 +189,7 @@
         <line-breakpoint enabled="true" type="java-method">
           <url>jar://$USER_HOME$/Documents/MinecraftDev/api/MMOItems-6.7-SNAPSHOT.jar!/net/Indyuce/mmoitems/MMOItems.class</url>
           <line>559</line>
-          <properties class="net.Indyuce.mmoitems.MMOItems" method="getItem">
+          <properties class="net.Indyuce.mmoitems.MMOItems">
             <option name="EMULATED" value="true" />
           </properties>
           <option name="timeStamp" value="5" />

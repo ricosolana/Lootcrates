@@ -6,31 +6,34 @@ group = project.plugin_group
 archivesBaseName = project.plugin_name
 version = project.plugin_version
 
-repositories {
-    mavenCentral()
-    maven {
-        name = 'spigotmc-repo'
-        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+allprojects {
+    repositories {
+        mavenCentral()
+        maven {
+            name = 'spigotmc-repo'
+            url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+        }
+        maven {
+            name = 'sonatype'
+            url = 'https://oss.sonatype.org/content/groups/public/'
+        }
+        maven {
+            url 'https://repo.skriptlang.org/releases'
+        }
+        maven {
+            url 'https://repo.destroystokyo.com/repository/maven-public/'
+        }
+        maven {
+            name = 'codemc'
+            url = 'https://repo.codemc.io/repository/maven-snapshots/'
+        }
+        maven {
+            name = 'lumine'
+            url = 'https://mvn.lumine.io/repository/maven-public/'
+        }
+        // jitpack is a github repository grabber
+        maven { url "https://jitpack.io" }
     }
-    maven {
-        name = 'sonatype'
-        url = 'https://oss.sonatype.org/content/groups/public/'
-    }
-    maven {
-        url 'https://repo.skriptlang.org/releases'
-    }
-    maven {
-        url 'https://repo.destroystokyo.com/repository/maven-public/'
-    }
-    maven {
-        name = 'codemc'
-        url = 'https://repo.codemc.io/repository/maven-snapshots/'
-    }
-    maven {
-        name = 'lumine'
-        url = 'https://mvn.lumine.io/repository/maven-public/'
-    }
-    maven { url "https://jitpack.io" }
 }
 
 dependencies {
@@ -41,9 +44,16 @@ dependencies {
     implementation 'com.github.SkriptLang:Skript:2.6.1'
     implementation 'net.Indyuce:MMOItems:6.7.1-SNAPSHOT'
     implementation 'io.lumine:MythicLib-dist:1.3-SNAPSHOT'
+
+    implementation files('C:\\Users\\Rico\\Documents\\MinecraftDev\\api\\EcoItems v3.28.0.jar')
+
+    // this is broken for some fucking reason ATM
+    //implementation 'com.github.Auxilor:EcoItems:master-SNAPSHOT'
+    //implementation 'com.github.Auxilor:EcoItems:3.10.0'
+    //compileOnly 'com.willfp:EcoItems:2.6.0'
 }
 
-def targetJavaVersion = 8
+def targetJavaVersion = 17
 java {
     def javaVersion = JavaVersion.toVersion(targetJavaVersion)
     sourceCompatibility = javaVersion

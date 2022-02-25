@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Must create a static method in class to get the Editor-representative item
@@ -19,7 +20,7 @@ public interface ILoot extends ConfigurationSerializable {
      * @return ItemStack
      */
     @Nonnull
-    ItemStack getIcon(@Nonnull Player p);
+    ItemStack getIcon(@Nullable Player p);
 
     /**
      * The actual loot action to do on click
@@ -37,9 +38,4 @@ public interface ILoot extends ConfigurationSerializable {
      */
     @Nonnull
     AbstractMenu.Builder getMenuBuilder();
-
-    /*
-     * The static method which must be included in class has the following signature:
-     */
-    //public static ItemStack getEditorIcon();
 }

@@ -53,7 +53,7 @@ public class Lang {
      */
     @Nullable
     public String getUnitText(@Nullable Player p, @Nonnull String keyMsg) {
-        return p != null ? getUnitText(getUnitCode(p.getLocale()), keyMsg) : null;
+        return p != null ? getUnitText(getUnitCode(p.getLocale()), keyMsg) : keyMsg;
     }
 
     /**

@@ -101,10 +101,12 @@ public class LootSet implements ConfigurationSerializable {
                     for (ILoot a : loot) {
                         ItemStack copy = a.getIcon(null);
 
+                        AbstractMenu.Builder menu = a.getMenuBuilder().title(p -> a.getClass().getSimpleName());
+
                         result1.add(new Button.Builder()
                                 .icon(p -> ItemBuilder.copyOf(copy).lore(a + "\n&7" + L(Lang.A.LMB) + ": &a" + L(Lang.A.Edit) + "\n&7" + L(Lang.A.RMB) + ": &c" + L(Lang.A.Delete)).build())
 
-                                .child(self1, a.getMenuBuilder(), interact -> {
+                                .child(self1, menu, interact -> {
                                     if (loot.size() > 1) {
                                         // delete
                                         loot.remove(a);

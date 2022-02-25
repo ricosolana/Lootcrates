@@ -26,8 +26,8 @@ public class Editor {
     //public static final Button.Builder inOutline = new Button.Builder().icon(() -> ItemBuilder.copyOf(Material.GRAY_STAINED_GLASS_PANE).name("&7Set to").toItem());
 
     /// TODO make this butchery mess somehow translatable
-    public static String ColorDem = "&7'&' " + (Version.AT_LEAST_v1_16.a() ?
-            "or '#&': &#2367fbc&#3f83fbo&#5a9ffcl&#76bbfco&#91d7fcr&#acf2fds" : ": &fcolors") +
+    public static String ColorDem = "&7'&a' " + (Version.AT_LEAST_v1_16.a() ?
+            "or '#&123456': &#2367fbc&#3f83fbo&#5a9ffcl&#76bbfco&#91d7fcr&#acf2fds" : ": &fcolors") +
             "\n&7Macros: &6%lc_picks%&7, &6%lc_id%\n&7Supports PlaceholderAPI";
 
     public static final Button.Builder IN_OUTLINE = new Button.Builder().icon(p -> ItemBuilder.of(
@@ -88,7 +88,7 @@ public class Editor {
                                         Crate crate = entry.getValue();
                                         result.add(new Button.Builder()
                                                 // https://regexr.com/6fdsi
-                                                .icon(p -> ItemBuilder.copyOf(crate.itemStack).lore("&8id: " + crate.id + "\n&7" + L(Lang.A.LMB) + ": &a" + L(Lang.A.Edit) + "\n&7" + L(Lang.A.RMB) + ": &c" + L(Lang.A.Delete)).build())
+                                                .icon(p -> ItemBuilder.copyOf(crate.itemStack).lore("&8" + L(Lang.A.id) + ": " + crate.id + "\n&7" + L(Lang.A.LMB) + ": &a" + L(Lang.A.Edit) + "\n&7" + L(Lang.A.RMB) + ": &c" + L(Lang.A.Delete)).build())
                                                 .child(self, crate.getBuilder(),
                                                         /// RMB - delete crate
                                                         interact -> {
@@ -113,7 +113,7 @@ public class Editor {
                                  * List all LootSets
                                  */
                                 result.add(new Button.Builder()
-                                        .icon(p -> ItemBuilder.copyOf(lootSet.itemStack).lore("&8id: " + lootSet.id + "\n" + "&8" + lootSet.loot.size() + " " + L(Lang.A.Elements) + "\n&7" + L(Lang.A.LMB) + ": &a" + L(Lang.A.Edit) + "\n&7" + L(Lang.A.RMB) + ": &c" + L(Lang.A.Delete)).build())
+                                        .icon(p -> ItemBuilder.copyOf(lootSet.itemStack).lore("&8" + L(Lang.A.id) + ": " + lootSet.id + "\n" + "&8" + lootSet.loot.size() + " " + L(Lang.A.Elements) + "\n&7" + L(Lang.A.LMB) + ": &a" + L(Lang.A.Edit) + "\n&7" + L(Lang.A.RMB) + ": &c" + L(Lang.A.Delete)).build())
                                         .child(self, lootSet.getBuilder(),
                                                 // RMB - delete lootSet
                                                 interact -> {
@@ -138,7 +138,7 @@ public class Editor {
                                 .leftRaw(p -> Lang.A.Lorem_ipsum, null, ColorMode.STRIP) // id
                                 .onClose((player) -> Result.PARENT())
                                 .onComplete((player, s, b) -> {
-                                    if (s.isEmpty() || Main.get().data.lootSets.containsKey(s))
+                                    if (!VALID_KEY_PATTERN.matcher(s).matches() || Main.get().data.lootSets.containsKey(s))
                                         return Result.TEXT(L(Lang.A.Duplicate));
 
                                     Main.get().data.lootSets.put(s,

@@ -83,15 +83,6 @@ public class LootSet implements ConfigurationSerializable {
         return result;
     }
 
-    @Override
-    public String toString() {
-        return "LootGroup{" +
-                "id='" + id + '\'' +
-                ", itemStack=" + itemStack.getType() +
-                ", loot=" + loot +
-                '}';
-    }
-
     public AbstractMenu.Builder getBuilder() {
         return new ParallaxMenu.PBuilder()
                 .title(p -> id)

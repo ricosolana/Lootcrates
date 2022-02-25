@@ -224,7 +224,14 @@ public class Crate implements ConfigurationSerializable {
                 // *   *   *
                 .childButton(1, 1, p -> ItemBuilder.copyOf(itemStack.getType()).name("&8&n" + L(p, Lang.A.ItemStack)).lore("&7" + L(p, Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new ItemModifyMenu()
                         .build(itemStack.clone(), (itemStack -> {
-                            this.itemStack = itemStack;
+                            // This will break NBT if the server is not reloaded
+                            //this.itemStack = itemStack;
+
+                            // Several options here
+                            // Should the name and lore be merged along also?
+                            // or just the material?
+                            return ItemBuilder.mutable(this.itemStack).apply(itemStack).material(itemStack.getType()).build();
+                            //this.itemStack.setType(itemStack.getType());
                         }))
                 )
                 // Edit Inventory Title
@@ -232,7 +239,7 @@ public class Crate implements ConfigurationSerializable {
                         .title(p -> L(p, Lang.A.Title))
                         .leftRaw(p -> ColorMode.REVERT.a(title))
                         .onClose((player) -> Result.PARENT())
-                        .right(p -> L(p, ColorDem))
+                        .right(p -> ColorDem)
                         .onComplete((p, s, b) -> {
                             if (!s.isEmpty()) {
                                 title = ColorMode.COLOR.a(s);

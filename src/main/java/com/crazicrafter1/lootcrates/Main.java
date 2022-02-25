@@ -3,9 +3,9 @@ package com.crazicrafter1.lootcrates;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
 import com.crazicrafter1.crutils.ColorUtil;
-import com.crazicrafter1.crutils.GithubInstaller;
-import com.crazicrafter1.crutils.GithubUpdater;
+import com.crazicrafter1.crutils.GitUtils;
 import com.crazicrafter1.crutils.Metrics;
+import com.crazicrafter1.crutils.Version;
 import com.crazicrafter1.lootcrates.cmd.Cmd;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import com.crazicrafter1.lootcrates.crate.Crate;
@@ -23,15 +23,13 @@ import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nonnull;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -104,38 +102,47 @@ public class Main extends JavaPlugin
 
     @Override
     public void onEnable() {
-        // Check for updates
-        GithubUpdater.autoUpdate(this, "PeriodicSeizures", "LootCrates", "LootCrates.jar");
-
-        boolean installedDepends = false;
-
-        // Try to auto install dependencies
-        if (Bukkit.getPluginManager().getPlugin("CRUtils") == null) {
-            GithubInstaller.installDepend(this,
-                    "PeriodicSeizures",
-                    "CRUtils",
-                    "CRUtils.jar",
-                    "CRUtils");
-            installedDepends = true;
-        }
-
         if (Bukkit.getPluginManager().getPlugin("Gapi") == null) {
-            GithubInstaller.installDepend(this,
-                    "PeriodicSeizures",
-                    "Gapi",
-                    "Gapi.jar",
-                    "Gapi");
-            installedDepends = true;
-        }
-
-        if (installedDepends) {
-            error(ChatColor.RED + "LootCrates requires a server restart to use");
+            getLogger().severe("Gapi is required");
+            getLogger().severe("Install it from here https://github.com/PeriodicSeizures/CRUtils/releases");
+            getLogger().severe("Join the Discord for help or whatever https://discord.gg/2JkFBnyvNQ");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
 
-        Bukkit.getConsoleSender().sendMessage("\n" + ColorUtil.color(SPLASH));
-        //Bukkit.getConsoleSender().sendMessage("\n\n\n" + ColorUtil.color(FLAME_SPLASH));
+        // Check for updates
+        // Look for a file named NO_UPDATE
+        getDataFolder().mkdirs();
+        File noUpdateFile = new File(getDataFolder(), "NO_UPDATE.txt");
+        if (!(noUpdateFile.exists() && noUpdateFile.isFile())) try {
+                StringBuilder outTag = new StringBuilder();
+                if (GitUtils.updatePlugin(this, "PeriodicSeizures", "Lootcrates", "Lootcrates.jar", outTag)) {
+                    getLogger().warning("Updated to " + outTag + "; restart server to use");
+
+                    Bukkit.getPluginManager().disablePlugin(this);
+                    return;
+                } else {
+                    getLogger().info("Using the latest version");
+                }
+            } catch (IOException e) {
+                getLogger().warning("Error while updating");
+                e.printStackTrace();
+            }
+        else getLogger().warning("Updating is disabled (delete " + noUpdateFile.getName() + " to enable)");
+
+        String COLOR = ColorUtil.color(SPLASH);
+
+        if (Version.AT_LEAST_v1_16.a())
+            Bukkit.getConsoleSender().sendMessage("\n\n\n\n" + COLOR + "\n\n\n\n");
+        else {
+            String STRIP = ColorUtil.strip(COLOR);
+            int i = STRIP.indexOf("\n") / 3;
+
+            Bukkit.getConsoleSender().sendMessage("\n\n\n\n"
+                    + Arrays.stream(STRIP.split("\n")).map(
+                            s -> ChatColor.AQUA + s.substring(0, i) + ChatColor.BLUE + s.substring(i, 2 * i) + ChatColor.DARK_BLUE + s.substring(2 * i))
+                    .collect(Collectors.joining("\n")) + "\n\n\n\n");
+        }
 
         Main.instance = this;
 

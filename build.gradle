@@ -59,6 +59,10 @@ tasks.withType(JavaCompile).configureEach {
     }
 }
 
+jar {
+    archiveFileName = project.plugin_name + ".jar"
+}
+
 processResources {
     def props = [version: version]
     inputs.properties props

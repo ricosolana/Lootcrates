@@ -181,15 +181,34 @@ public class Editor {
                         .parentButton(4, 4)
                 )
                 /*
-                 * Misc settings
+                 * Language settings
                  */
-                .childButton(7, 1, p -> ItemBuilder.of("IRON_HORSE_ARMOR").name("&8&l" + L(Lang.A.Language)).build(), new SimpleMenu.SBuilder(5)
+                .childButton(7, 1, p -> ItemBuilder.of("IRON_HORSE_ARMOR").name("&6&l" + L(Lang.A.Language) + " &r&8(" + Main.get().lang.translations.size() + ")").build(), new ParallaxMenu.PBuilder()
+                        .addAll((menu00, p00) -> {
+                            ArrayList<Button> buttons = new ArrayList<>();
+
+                            for (Lang.Unit unit : Main.get().lang.translations.values()) {
+                                buttons.add(new Button.Builder()
+                                        .icon(p -> ItemBuilder.copyOf(Material.PAPER).name("&a" + unit.LANGUAGE).build())
+                                        .get()
+                                );
+                            }
+
+                            return buttons;
+                        })
                         .title(p -> L(Lang.A.Language))
-                        .button(1, 1, new Button.Builder()
-                                .icon(p -> ItemBuilder.copyOf(Material.PAINTING).name("&6&l" + L(Lang.A.Toggle_translations)).lore(Main.get().lang.translate ? "&2" + L(Lang.A.Enabled) : "&c" + L(Lang.A.Disabled)).build())
+                        .button(3, 5, new Button.Builder()
+                                .icon(p -> ItemBuilder.copyOf(Material.PAINTING).name("&6&l" + L(Lang.A.Translations)).lore((Main.get().lang.translate ? "&2" + L(Lang.A.Enabled) : "&c" + L(Lang.A.Disabled)) + "\n&f" + L(Lang.A.LMB) + ": &7" + L(Lang.A.Toggle)).build())
                                 .lmb(interact -> { Main.get().lang.translate ^= true; return Result.REFRESH(); }))
-                        .parentButton(4, 4)
+                        .parentButton(4, 5)
                 )
+                //.childButton(7, 1, p -> ItemBuilder.of("IRON_HORSE_ARMOR").name("&8&l" + L(Lang.A.Language)).build(), new SimpleMenu.SBuilder(5)
+                //        .title(p -> L(Lang.A.Language))
+                //        .button(1, 1, new Button.Builder()
+                //                .icon(p -> ItemBuilder.copyOf(Material.PAINTING).name("&6&l" + L(Lang.A.Toggle_translations)).lore(Main.get().lang.translate ? "&2" + L(Lang.A.Enabled) : "&c" + L(Lang.A.Disabled)).build())
+                //                .lmb(interact -> { Main.get().lang.translate ^= true; return Result.REFRESH(); }))
+                //        .parentButton(4, 4)
+                //)
                 /*
                  * Finally open
                  */

@@ -186,13 +186,13 @@ public class Lang {
         public static final String Picks = "Picks";
         public static final String Sound = "Sound";
         public static final String Input_a_sound = "Input a sound";
-        public static final String LootSets = "LootSets";
+        public static final String LootSets = "Lootsets";
         public static final String Elements = "Elements";
         public static final String New_LootSet = "New LootSet";
         public static final String Firework = "Firework";
         public static final String Must_have_effect = "Must have effect";
         public static final String Language = "Languages";
-        public static final String Toggle_translations = "Toggle translations";
+        public static final String Translations = "Translations";
         public static final String Enabled = "Enabled";
         public static final String Disabled = "Disabled";
 

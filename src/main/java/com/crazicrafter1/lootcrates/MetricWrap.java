@@ -4,12 +4,12 @@ import com.crazicrafter1.crutils.Metrics;
 
 public class MetricWrap {
 
-    public static void init(Main plugin) {
+    public static void init(Main plugin, boolean update) {
         try {
             Metrics metrics = new Metrics(plugin, 10395);
 
             metrics.addCustomChart(new Metrics.SimplePie("updater",
-                    () -> "" + plugin.data.update));
+                    () -> "" + update));
 
             metrics.addCustomChart(new Metrics.SimplePie("crates",
                     () -> "" + plugin.data.crates.size()));

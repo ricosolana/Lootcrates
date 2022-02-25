@@ -94,7 +94,8 @@ public class Main extends JavaPlugin
         // Look for a file named NO_UPDATE
         getDataFolder().mkdirs();
         File noUpdateFile = new File(getDataFolder(), "NO_UPDATE.txt");
-        if (!(noUpdateFile.exists() && noUpdateFile.isFile())) try {
+        boolean update = !(noUpdateFile.exists() && noUpdateFile.isFile());
+        if (update) try {
                 StringBuilder outTag = new StringBuilder();
                 if (GitUtils.updatePlugin(this, "PeriodicSeizures", "Lootcrates", "Lootcrates.jar", outTag)) {
                     warn("Updated to " + outTag + "; restart server to use");
@@ -169,7 +170,7 @@ public class Main extends JavaPlugin
         /*
          * bStats metrics init
          */
-        MetricWrap.init(this);
+        MetricWrap.init(this, update);
 
         /*
          * Command init

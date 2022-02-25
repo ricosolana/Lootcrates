@@ -2,7 +2,7 @@ name: Lootcrates
 version: ${version}
 main: com.crazicrafter1.lootcrates.Main
 api-version: 1.13
-softdepend: [ CRUtils, Gapi, QualityArmory, Skript, MMOItems ]
+softdepend: [ Gapi, QualityArmory, Skript, MMOItems ]
 authors: [ crazicrafter1 ]
 commands:
   lootcrates:

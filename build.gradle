@@ -70,8 +70,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 jar {
-    onlyIf { !sourceSets.main.allSource.files.isEmpty() }
-    archiveFileName = project.plugin_name + " v" + project.plugin_version + " EcoItem Support.jar"
+    archiveFileName = project.plugin_name + ".jar"
 }
 
 processResources {

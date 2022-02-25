@@ -21,7 +21,6 @@ public class Data implements ConfigurationSerializable {
     private static final int REV_LATEST = 1;
 
     public long cleanAfterDays;
-    public boolean update;
     public int speed;
 
     public ItemStack unSelectedItem;
@@ -36,7 +35,6 @@ public class Data implements ConfigurationSerializable {
      */
     public Data() {
         cleanAfterDays = 7; // Cleanup config files older than a week
-        update = true;
         speed = 4;
         unSelectedItem = ItemBuilder.copyOf(Material.CHEST).name("&f&l???").lore("&7Choose 4 mystery chests, and\n&7your loot will be revealed!").build();
         selectedItem = ItemBuilder.of("WHITE_STAINED_GLASS_PANE").name("&7&l???").lore("&7You have selected this mystery chest").build();
@@ -76,7 +74,6 @@ public class Data implements ConfigurationSerializable {
             cleanAfterDays = (int) args.getOrDefault("cleanAfterDays", 7);
         }
 
-        update = (boolean) args.getOrDefault("update", true);
         speed = (int) args.getOrDefault("speed", 4);
 
         unSelectedItem = (ItemStack) args.get("unSelectedItem");
@@ -135,8 +132,6 @@ public class Data implements ConfigurationSerializable {
 
         result.put("rev", REV_LATEST);
         result.put("cleanAfterDays", cleanAfterDays);
-        //result.put("translate", translate);
-        result.put("update", update);
         result.put("speed", speed);
 
         result.put("unSelectedItem", unSelectedItem);

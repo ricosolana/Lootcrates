@@ -20,6 +20,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nonnull;
@@ -35,33 +36,6 @@ import java.util.zip.ZipOutputStream;
 
 public class Main extends JavaPlugin
 {
-    public static void main(String[] args) throws Exception{
-
-        //String s = "https://minecraft-heads.com/custom-heads/798";
-        String s = "https://minecraft-heads.com/scripts/api.php?cat=";
-
-        while (true) {
-            Scanner in = new Scanner(System.in);
-
-            URL url = new URL(s + in.nextLine());
-            URLConnection conn = url.openConnection();
-
-            BufferedReader br = new BufferedReader(
-                    new InputStreamReader(conn.getInputStream()));
-
-            String line;
-            while ((line = br.readLine()) != null) {
-                System.out.println(line);
-            }
-        }
-
-         //Pattern VALID_PATTERN = Pattern.compile("(?=.*[a-z])[a-z_]+");
- //
-         //String test1 = "_";
- //
-         //System.out.println("Valid: " + VALID_PATTERN.matcher(test1).matches());
-    }
-
     private final File configFile = new File(getDataFolder(), "config.yml");
     private final File playerFile = new File(getDataFolder(), "player_stats.yml");
     private final File backupPath = new File(getDataFolder(), "backup");
@@ -102,13 +76,19 @@ public class Main extends JavaPlugin
 
     @Override
     public void onEnable() {
-        if (Bukkit.getPluginManager().getPlugin("Gapi") == null) {
-            getLogger().severe("Gapi is required");
-            getLogger().severe("Install it from here https://github.com/PeriodicSeizures/CRUtils/releases");
-            getLogger().severe("Join the Discord for help or whatever https://discord.gg/2JkFBnyvNQ");
+        Plugin GAPI = Bukkit.getPluginManager().getPlugin("Gapi");
+        if (GAPI == null || !GAPI.isEnabled()) {
+            if (GAPI == null) {
+                error("Plugin Gapi is required");
+                error("Install it from here " + ChatColor.UNDERLINE + "https://github.com/PeriodicSeizures/Gapi/releases");
+            } else
+                error("Gapi failed to enable");
+
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
+
+        info("Join the " + ChatColor.DARK_GRAY + ChatColor.BOLD + "Discord " + ChatColor.RESET + "for help or whatever " + ChatColor.UNDERLINE + "https://discord.gg/2JkFBnyvNQ");
 
         // Check for updates
         // Look for a file named NO_UPDATE
@@ -117,18 +97,21 @@ public class Main extends JavaPlugin
         if (!(noUpdateFile.exists() && noUpdateFile.isFile())) try {
                 StringBuilder outTag = new StringBuilder();
                 if (GitUtils.updatePlugin(this, "PeriodicSeizures", "Lootcrates", "Lootcrates.jar", outTag)) {
-                    getLogger().warning("Updated to " + outTag + "; restart server to use");
+                    warn("Updated to " + outTag + "; restart server to use");
 
                     Bukkit.getPluginManager().disablePlugin(this);
                     return;
                 } else {
-                    getLogger().info("Using the latest version");
+                    info("Using the latest version");
                 }
             } catch (IOException e) {
-                getLogger().warning("Error while updating");
+                warn("Error while updating");
                 e.printStackTrace();
             }
-        else getLogger().warning("Updating is disabled (delete " + noUpdateFile.getName() + " to enable)");
+        else {
+            warn("Updating is disabled (delete " + noUpdateFile.getName() + " to enable)");
+            GitUtils.checkForUpdateAsync(this, "PeriodicSeizures", "Lootcrates", (result, tag) -> popup("Update " + tag + " is available"));
+        }
 
         String COLOR = ColorUtil.color(SPLASH);
 
@@ -186,24 +169,7 @@ public class Main extends JavaPlugin
         /*
          * bStats metrics init
          */
-        try {
-            Metrics metrics = new Metrics(this, 10395);
-
-            metrics.addCustomChart(new Metrics.SimplePie("updater",
-                    () -> "" + data.update));
-
-            metrics.addCustomChart(new Metrics.SimplePie("crates",
-                    () -> "" + data.crates.size()));
-
-            metrics.addCustomChart(new Metrics.SimplePie("loot",
-                    () -> "" + LootCratesAPI.lootClasses.size()));
-
-            metrics.addCustomChart(new Metrics.SimplePie("languages",
-                    () -> "" + lang.translations.size()));
-
-        } catch (Exception e) {
-            error("Unable to enable bStats Metrics (" + e.getMessage() + ")");
-        }
+        MetricWrap.init(this);
 
         /*
          * Command init

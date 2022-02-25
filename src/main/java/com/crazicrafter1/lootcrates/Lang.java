@@ -147,6 +147,7 @@ public class Lang {
     public static class A {
         private A() {}
 
+        public static final String id = "id";
         public static final String count = "count";
         public static final String range = "range";
         public static final String Edit_command = "Edit command";

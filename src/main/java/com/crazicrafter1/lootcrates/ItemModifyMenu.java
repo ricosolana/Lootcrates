@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static com.crazicrafter1.lootcrates.Editor.*;
 import static com.crazicrafter1.lootcrates.Lang.L;
@@ -36,7 +37,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
 
     private ItemBuilder builder;
 
-    public ItemModifyMenu build(ItemStack it, Consumer<ItemStack> itemStackConsumer) {
+    public ItemModifyMenu build(ItemStack it, Function<ItemStack, ItemStack> itemStackFunction) {
         builder = ItemBuilder.copyOf(it);
         return (ItemModifyMenu) title(p -> L(p, Edit_item))
                 .background()
@@ -54,7 +55,8 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             }
                             builder = ItemBuilder.copyOf(interact.heldItem);
 
-                            itemStackConsumer.accept(builder.build());
+                            // reapply a new item result for fancy  consistency
+                            builder = ItemBuilder.copyOf(itemStackFunction.apply(builder.build()));
 
                             return Result.GRAB();
                         }))
@@ -70,7 +72,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             } else
                                 builder.name(s);
 
-                            itemStackConsumer.accept(builder.build());
+                            builder = ItemBuilder.copyOf(itemStackFunction.apply(builder.build()));
 
                             return Result.PARENT();
                         }))
@@ -86,7 +88,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             } else
                                 builder.lore(s.replace("\\n", "\n"));
 
-                            itemStackConsumer.accept(builder.build());
+                            builder = ItemBuilder.copyOf(itemStackFunction.apply(builder.build()));
 
                             return Result.PARENT();
                         }))
@@ -113,7 +115,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             }
                             builder.model(i);
 
-                            itemStackConsumer.accept(builder.build());
+                            builder = ItemBuilder.copyOf(itemStackFunction.apply(builder.build()));
 
                             return Result.PARENT();
                         }), Version.AT_LEAST_v1_16.a());

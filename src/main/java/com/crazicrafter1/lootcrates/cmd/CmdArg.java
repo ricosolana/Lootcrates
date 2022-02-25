@@ -51,7 +51,7 @@ class CmdArg {
                 && (args[0].equalsIgnoreCase("save") || args[0].equalsIgnoreCase("load"))) {
 
                 if (args.length == 1)
-                    return warn(sender, L("Are you sure you want to save/load all language files? If so, append") + " 'confirm' " + L(" to the command"));
+                    return warn(sender, L("Are you sure you want to save/load all language files? If so, append") + " 'CONFIRM'" + L(" to the command"));
 
                 switch (args[0].toLowerCase()) {
                     case "save": {

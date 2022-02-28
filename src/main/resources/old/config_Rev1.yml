@@ -1,0 +1,350 @@
+# 2730: 1.17.1
+# 1976: 1.14.4
+data:
+  ==: Data
+  rev: 1
+  cleanAfterDays: 7 # in days now
+  speed: 4
+  #give-message: "&aYou were given a %lc_id% crate by"
+  unSelectedItem:
+    ==: org.bukkit.inventory.ItemStack
+    v: 1976
+    type: CHEST
+    meta:
+      ==: ItemMeta
+      meta-type: TILE_ENTITY
+      display-name: §f§l???
+      lore:
+        - §7§oChoose 4 mystery chests, and
+        - §7§oyour loot will be revealed!
+      blockMaterial: CHEST
+  selectedItem:
+    ==: org.bukkit.inventory.ItemStack
+    v: 1976
+    type: WHITE_STAINED_GLASS_PANE
+    meta:
+      ==: ItemMeta
+      meta-type: UNSPECIFIC
+      display-name: §f§l???
+      lore:
+        - §7You have selected this mystery chest
+  lootSets:
+    common: &id003
+      ==: LootSet
+      itemStack:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1976
+        type: WHITE_STAINED_GLASS_PANE
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: §f§lCommon Reward
+          lore:
+            - §7Click to redeem!
+      loot:
+        - ==: LootItem
+          min: 1
+          max: 31
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: TNT
+        - ==: LootItem
+          min: 32
+          max: 32
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: TNT
+        - ==: LootItem
+          min: 16
+          max: 16
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: DIAMOND
+        - ==: LootItem
+          min: 64
+          max: 64
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: CACTUS
+        - ==: LootItem
+          min: 1
+          max: 31
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: COAL
+        - ==: LootItem
+          min: 1
+          max: 31
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: BLAZE_ROD
+        - ==: LootItem
+          min: 32
+          max: 32
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: OBSIDIAN
+        - ==: LootItem
+          min: 4
+          max: 4
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: DIAMOND_BLOCK
+        - ==: LootItem
+          min: 1
+          max: 15
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: POTATO
+    regular: &id002
+      ==: LootSet
+      itemStack:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1976
+        type: YELLOW_STAINED_GLASS_PANE
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: §e§lRegular Reward
+          lore:
+            - §7Click to redeem!
+      loot:
+        - ==: LootItem
+          min: 8
+          max: 8
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: GOLD_BLOCK
+        - ==: LootItem
+          min: 1
+          max: 31
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: OBSIDIAN
+        - ==: LootItemCrate
+          min: 1
+          max: 1
+          crate: peasant
+        - ==: LootItem
+          min: 16
+          max: 16
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: DIAMOND
+        - ==: LootItem
+          min: 1
+          max: 31
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: CACTUS
+    ultra: &id001
+      ==: LootSet
+      itemStack:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1976
+        type: BLUE_STAINED_GLASS_PANE
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: §b§lUltra Reward
+          lore:
+            - §7Click to redeem!
+      loot:
+        - ==: LootItem
+          min: 6
+          max: 6
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: DIAMOND_BLOCK
+        - ==: LootItem
+          min: 64
+          max: 64
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: OBSIDIAN
+        - ==: LootItem
+          min: 1
+          max: 1
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: DIAMOND_CHESTPLATE
+    rare: &id004
+      ==: LootSet
+      itemStack:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1976
+        type: PURPLE_STAINED_GLASS_PANE
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: §d§lRare Reward
+          lore:
+            - §7Click to redeem!
+      loot:
+        - ==: LootItem
+          min: 1
+          max: 31
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: TNT
+        - ==: LootItem
+          min: 16
+          max: 16
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: DIAMOND
+        - ==: LootItem
+          min: 1
+          max: 31
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: CACTUS
+    legendary: &id005
+      ==: LootSet
+      itemStack:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1976
+        type: RED_STAINED_GLASS_PANE
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: §c§lLegendary Reward
+          lore:
+            - §7Click to redeem!
+      loot:
+        - ==: LootItem
+          min: 1
+          max: 1
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: DIAMOND_LEGGINGS
+        - ==: LootItem
+          min: 1
+          max: 1
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: DIAMOND_HELMET
+        - ==: LootItem
+          min: 8
+          max: 8
+          itemStack:
+            ==: org.bukkit.inventory.ItemStack
+            v: 1976
+            type: GOLDEN_APPLE
+  crates:
+    peasant:
+      ==: Crate
+      itemStack:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1976
+        type: CHEST
+        meta:
+          ==: ItemMeta
+          meta-type: TILE_ENTITY
+          display-name: §f§lPeasant Loot §r§7(Tier 1)
+          lore:
+            - §7Right click on this item to unlock
+            - §7four pieces of loot!
+          internal: H4sIAAAAAAAA/+NiYOBgYHUuSixJZWAvSE0sTswrYQAAGUjyDhUAAAA=
+          blockMaterial: CHEST
+      title: §7Choose your loot ...
+      columns: 3
+      picks: 4
+      sound: ENTITY_EXPERIENCE_ORB_PICKUP
+      weights:
+        *id001: 8
+        *id002: 14
+        *id003: 56
+    knight:
+      ==: Crate
+      itemStack:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1976
+        type: CHEST
+        meta:
+          ==: ItemMeta
+          meta-type: TILE_ENTITY
+          display-name: §b§lKnight Plunder §r§7(Tier 2)
+          lore:
+            - §7Right click on this item to unlock
+            - §7four pieces of loot!
+          internal: H4sIAAAAAAAA/+NiYOBgYHUuSixJZWDLzstMzyhhAAA/nIHiFAAAAA==
+          blockMaterial: CHEST
+      title: §7Choose your loot ...
+      columns: 3
+      picks: 3
+      sound: ENTITY_EXPERIENCE_ORB_PICKUP
+      weights:
+        *id002: 7
+        *id001: 20
+        *id004: 35
+        *id005: 42
+    king:
+      ==: Crate
+      itemStack:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1976
+        type: CHEST
+        meta:
+          ==: ItemMeta
+          meta-type: TILE_ENTITY
+          display-name: §c§lKing Bounty §r§7(Tier 3)
+          lore:
+            - §7Right click on this item to unlock
+            - §7four pieces of loot!
+          internal: H4sIAAAAAAAA/+NiYOBgYHUuSixJZWDJzsxLZwAApQ9CFhIAAAA=
+          blockMaterial: CHEST
+      title: §7Choose your loot ...
+      columns: 4
+      picks: 3
+      sound: ENTITY_EXPERIENCE_ORB_PICKUP
+      weights:
+        *id002: 4
+        *id001: 20
+        *id004: 40
+        *id005: 50
+  fireworkEffect:
+    ==: Firework
+    flicker: false
+    trail: false
+    colors:
+      - ==: Color
+        RED: 179
+        BLUE: 44
+        GREEN: 49
+      - ==: Color
+        RED: 37
+        BLUE: 146
+        GREEN: 49
+      - ==: Color
+        RED: 59
+        BLUE: 26
+        GREEN: 81
+    fade-colors:
+      - ==: Color
+        RED: 59
+        BLUE: 26
+        GREEN: 81
+    type: BURST
+

@@ -5,6 +5,7 @@ import com.crazicrafter1.gapi.AbstractMenu;
 import com.crazicrafter1.gapi.Button;
 import com.crazicrafter1.gapi.ParallaxMenu;
 import com.crazicrafter1.gapi.Result;
+import com.crazicrafter1.lootcrates.Lang;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import org.bukkit.Material;
@@ -18,8 +19,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-import static com.crazicrafter1.lootcrates.Lang.L;
-
 public class LootItemCrate extends AbstractLootItem {
     public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.CHEST).name("&eAdd crate...").build();
 
@@ -32,7 +31,7 @@ public class LootItemCrate extends AbstractLootItem {
         try {
             id = Main.get().data.crates.keySet().iterator().next();
         } catch (NoSuchElementException e) {
-            Main.get().error(L("No crates are registered"));
+            Main.get().error(Lang.ERR_NO_CRATES);
         }
     }
 

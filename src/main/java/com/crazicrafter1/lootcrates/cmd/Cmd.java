@@ -1,5 +1,6 @@
 package com.crazicrafter1.lootcrates.cmd;
 
+import com.crazicrafter1.lootcrates.Lang;
 import com.crazicrafter1.lootcrates.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -13,7 +14,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.crazicrafter1.lootcrates.Lang.L;
 import static com.crazicrafter1.lootcrates.cmd.CmdArg.error;
 
 public class Cmd implements CommandExecutor, TabCompleter {
@@ -27,24 +27,24 @@ public class Cmd implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command c, String s, String[] args) {
         if (args.length == 0) {
             if (Main.get().rev == -1) {
-                return Main.get().error(sender, L("Must assign revision ") + ChatColor.UNDERLINE + "/crates rev");
+                return Main.get().error(sender, Lang.ASSIGN_REV + ChatColor.UNDERLINE + "/crates rev");
             }
-            Main.get().popup(sender, L("Using version: ") + Main.get().getDescription().getVersion());
-            Main.get().popup(sender, L("Using revision: ") + Main.get().rev);
-            return Main.get().popup(sender, L("Usage") + ": /crates ["
+            Main.get().popup(sender, Lang.VERSION + Main.get().getDescription().getVersion());
+            Main.get().popup(sender, Lang.REV + Main.get().rev);
+            return Main.get().popup(sender, Lang.USAGE + "/crates ["
                     + String.join(", ", CmdArg.args.keySet())
                     + "]");
         }
 
         if (Main.get().rev == -1
                 && !args[0].equalsIgnoreCase("rev")) {
-            return error(sender, L("Must assign revision ") + ChatColor.UNDERLINE + "/crates rev");
+            return error(sender, Lang.ASSIGN_REV + ChatColor.UNDERLINE + "/crates rev");
         }
 
         CmdArg cmdArg = CmdArg.args.get(args[0].toLowerCase());
 
         if (cmdArg == null)
-            return error(sender, L("Unknown argument"));
+            return error(sender, Lang.ERR_ARG_UNKNOWN);
 
         try {
             String[] smartArgs = smartParse(Arrays.copyOfRange(args, 1, args.length)).toArray(new String[0]);
@@ -54,7 +54,7 @@ public class Cmd implements CommandExecutor, TabCompleter {
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
             // Just ensure index with an error print
-            return error(sender, L("Input more arguments: " + e.getMessage()));
+            return error(sender, Lang.ERR_ARG_MORE + e.getMessage());
         }
     }
 

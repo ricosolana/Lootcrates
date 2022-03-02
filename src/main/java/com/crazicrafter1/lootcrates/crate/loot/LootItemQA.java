@@ -15,8 +15,6 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Map;
 
-import static com.crazicrafter1.lootcrates.Lang.L;
-
 public class LootItemQA extends AbstractLootItem {
 
     public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.CROSSBOW).name("&8Add QualityArmory item...").build();
@@ -72,10 +70,10 @@ public class LootItemQA extends AbstractLootItem {
                 .parentButton(4, 5)
                 //.childButton(2, 5, () -> new ItemBuilder(Material.COMPASS).name("&eSearch..."), new )
                 .button(3, 5, new Button.Builder().icon((p) -> getMenuIcon(null)))
-                .childButton(5, 5, p -> ItemBuilder.copyOf(Material.COMPASS).name("&e" + L(p, Lang.A.Assign_by_name)).build(), new TextMenu.TBuilder()
-                        .title(p -> L(p, Lang.A.Assign_by_name))
-                        .leftRaw(p -> name, null, ColorMode.STRIP)
-                        .right(p -> "&e" + L(p, Lang.A.Set_item_by_name))
+                .childButton(5, 5, p -> ItemBuilder.copyOf(Material.COMPASS).name(Lang.ASSIGN_EXACT).build(), new TextMenu.TBuilder()
+                        .title(p -> Lang.ASSIGN_EXACT)
+                        .leftRaw(p -> name, ColorMode.STRIP_RENDERED, null, ColorMode.STRIP_RENDERED)
+                        .right(p -> Lang.SET_BY_NAME)
                         .onClose((player) -> Result.PARENT())
                         .onComplete((p, s, b) -> {
                             CustomBaseObject customBaseObject = QualityArmory.getCustomItemByName(s);
@@ -83,7 +81,7 @@ public class LootItemQA extends AbstractLootItem {
                                 this.name = s;
                                 return Result.PARENT();
                             }
-                            return Result.TEXT(L(p, Lang.A.Invalid));
+                            return Result.TEXT(Lang.ERR_INVALID);
                         })
                 )
                 .addAll((self, p00) -> {

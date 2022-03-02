@@ -14,8 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nonnull;
 import java.util.Map;
 
-import static com.crazicrafter1.lootcrates.Lang.L;
-
 public final class LootItem extends AbstractLootItem {
 
     public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.GOLD_NUGGET).name("&6Add item...").build();
@@ -84,7 +82,7 @@ public final class LootItem extends AbstractLootItem {
                             min = Util.clamp(min + change, 1, max);
                             return Result.REFRESH();
                         })
-                        .icon(p -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name("&8&n" + L(p, Lang.A.Minimum)).skull(Editor.BASE64_DEC).lore(L(Lang.A.LMB) + " &c-\n" +  L(Lang.A.RMB) + " &a+\n&7" + L(Lang.A.SHIFT_Mul) + "&r&7: x5").amount(min).build()))
+                        .icon(p -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name(Lang.MINIMUM).skull(Editor.BASE64_DEC).lore(Lang.LMB_DEC + "\n" + Lang.RMB_INC + "\n" + Lang.SHIFT_MUL).amount(min).build()))
                 // Max
                 .button(7, 2, new Button.Builder()
                         .lmb(interact -> {
@@ -97,6 +95,6 @@ public final class LootItem extends AbstractLootItem {
                             max = Util.clamp(max + change, min, item.getMaxSize());
                             return Result.REFRESH();
                         })
-                        .icon(p -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name("&8&n" + L(p, Lang.A.Maximum)).skull(Editor.BASE64_INC).lore(L(Lang.A.LMB) + " &c-\n" +  L(Lang.A.RMB) + " &a+\n&7" + L(Lang.A.SHIFT_Mul) + "&r&7: x5").amount(max).build()));
+                        .icon(p -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name(Lang.MAXIMUM).skull(Editor.BASE64_INC).lore(Lang.LMB_DEC + "\n" + Lang.RMB_INC + "\n" + Lang.SHIFT_MUL).amount(max).build()));
     }
 }

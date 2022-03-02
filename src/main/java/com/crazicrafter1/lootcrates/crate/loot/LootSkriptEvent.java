@@ -15,10 +15,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import static com.crazicrafter1.lootcrates.Lang.L;
 
 public class LootSkriptEvent implements ILoot {
 
@@ -43,9 +42,10 @@ public class LootSkriptEvent implements ILoot {
             item = (ItemBuilder) result.get("item");
     }
 
+    @Nonnull
     @Override
-    public ItemStack getRenderIcon(Player p) {
-        return ItemBuilder.copyOf(item).placeholders(p).renderAll().build();
+    public ItemStack getRenderIcon(@Nonnull Player p) {
+        return item.copy().placeholders(p).renderAll().build();
     }
 
     @Override
@@ -57,7 +57,7 @@ public class LootSkriptEvent implements ILoot {
     @NotNull
     @Override
     public ItemStack getMenuIcon(@NotNull Player p) {
-        return item.buildCopy(false);
+        return item.buildCopy();
     }
 
     @NotNull
@@ -70,17 +70,17 @@ public class LootSkriptEvent implements ILoot {
     public AbstractMenu.Builder getMenuBuilder() {
         return new ItemModifyMenu()
                 .build(item.build(), input -> (this.item = ItemBuilder.mutable(input)).build())
-                .childButton(5, 2, p -> ItemBuilder.copyOf(Material.PAPER).name("&6" + L(p, Lang.A.Event_tag)).lore("&7" + L(Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new TextMenu.TBuilder()
-                        .title(p -> L(p, Lang.A.Event_tag))
+                .childButton(5, 2, p -> ItemBuilder.copyOf(Material.PAPER).name(Lang.SKRIPT_EVENT_TAG).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
+                        .title(p -> Lang.SKRIPT_EVENT_TAG)
                         .onClose((player) -> Result.PARENT())
                         .leftRaw(p -> tag)
-                        .right(p -> L(p, Lang.A.Input_a_tag))
+                        .right(p -> Lang.SKRIPT_INPUT_TAG)
                         .onComplete((p, s, b) -> {
                             if (!s.isEmpty()) {
                                 this.tag = s;
                                 return Result.PARENT();
                             }
-                            return Result.TEXT(L(p, Lang.A.Invalid));
+                            return Result.TEXT(Lang.ERR_INVALID);
                         }));
     }
 

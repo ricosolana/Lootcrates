@@ -17,9 +17,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
-import static com.crazicrafter1.lootcrates.Editor.ColorDem;
-import static com.crazicrafter1.lootcrates.Lang.L;
-
 public class Crate implements ConfigurationSerializable {
 
     /// TODO Use this instead
@@ -74,13 +71,6 @@ public class Crate implements ConfigurationSerializable {
         }
 
         this.totalWeights = prevSum;
-    }
-
-    public static class Language {
-        public String itemStackDisplayName;
-        public String itemStackLore;
-
-        public String title;
     }
 
     // Any translation applicable values below
@@ -159,18 +149,10 @@ public class Crate implements ConfigurationSerializable {
     public ItemStack itemStack(@Nullable Player p, boolean renderAll) {
         ItemBuilder item = ItemBuilder.copyOf(this.item);
 
-        Lang.Unit unit = Main.get().lang.getUnit(p);
-
         item.macro("%", "lc_picks", "" + picks)
                 .macro("%", "lc_id", "" + id)
                 .macro("%", "lc_lscount", "" + lootBySum.size())
                 .placeholders(p);
-
-        if (unit != null) {
-            Language lang = unit.crates.get(id);
-            item.name(lang.itemStackDisplayName)
-                    .lore(lang.itemStackLore);
-        }
 
         return item
                 .renderAll(renderAll)
@@ -178,15 +160,7 @@ public class Crate implements ConfigurationSerializable {
     }
 
     public String title(@Nonnull Player p) {
-        Lang.Unit unit = Main.get().lang.getUnit(p);
-
-        if (unit == null) {
-            return Util.placeholders(p, title);
-        }
-
-        Language lang = unit.crates.get(id);
-
-        return Util.placeholders(p, lang.title);
+        return Util.placeholders(p, title);
     }
 
     @Override
@@ -221,7 +195,7 @@ public class Crate implements ConfigurationSerializable {
                 // *   *   *
                 // Edit Crate ItemStack
                 // *   *   *
-                .childButton(1, 1, p -> ItemBuilder.copyOf(item.getMaterial()).name("&8&n" + L(p, Lang.A.ItemStack)).lore("&7" + L(p, Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new ItemModifyMenu()
+                .childButton(1, 1, p -> ItemBuilder.copyOf(item.getMaterial()).name(Lang.EDIT_ITEM).lore(Lang.LMB_EDIT).build(), new ItemModifyMenu()
                         .build(item.build(), (itemStack -> {
                             // This will break NBT if the server is not reloaded
                             //this.itemStack = itemStack;
@@ -234,25 +208,25 @@ public class Crate implements ConfigurationSerializable {
                         }))
                 )
                 // Edit Inventory Title
-                .childButton(3, 1, p -> ItemBuilder.copyOf(Material.PAPER).name("&e&n" + L(p, Lang.A.Title) + "&r&e: " + title).lore("&7" + L(p, Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new TextMenu.TBuilder()
-                        .title(p -> L(p, Lang.A.Title))
-                        .leftRaw(p -> ColorMode.INVERT.a(title))
+                .childButton(3, 1, p -> ItemBuilder.copyOf(Material.PAPER).name(String.format(Lang.EDIT_TITLE, title)).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
+                        .title(p -> Lang.TITLE)
+                        .leftRaw(p -> ColorMode.INVERT_RENDERED.a(title))
                         .onClose((player) -> Result.PARENT())
-                        .right(p -> ColorDem)
+                        .right(p -> "Special formatting", ColorMode.AS_IS, p -> Editor.COLORS, ColorMode.AS_IS)
                         .onComplete((p, s, b) -> {
                             if (!s.isEmpty()) {
-                                title = ColorMode.RENDER.a(s);
+                                title = ColorMode.RENDER_MARKERS.a(s);
                                 return Result.PARENT();
                             }
 
-                            return Result.TEXT(L(p, Lang.A.Invalid));
+                            return Result.TEXT(Lang.ERR_INVALID);
                         })
                 )
                 // *   *   *
                 // Edit LootSets
                 // *   *   *
-                .childButton(5, 1, p -> ItemBuilder.fromModernMaterial("EXPERIENCE_BOTTLE").name("&6&n" + L(p, Lang.A.Loot)).lore("&7" + L(p, Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new ParallaxMenu.PBuilder()
-                        .title(p -> L(p, Lang.A.Loot))
+                .childButton(5, 1, p -> ItemBuilder.fromModernMaterial("EXPERIENCE_BOTTLE").name(Lang.LOOT).lore(Lang.LMB_EDIT).build(), new ParallaxMenu.PBuilder()
+                        .title(p -> Lang.LOOT)
                         .parentButton(4, 5)
                         .onClose((player) -> Result.PARENT())
                         .addAll((builder, p) -> {
@@ -265,10 +239,10 @@ public class Crate implements ConfigurationSerializable {
                                 if (weight != null) {
                                     b.lore("&7" + getFormattedFraction(lootSet) + "\n" +
                                             "&7" + getFormattedPercent(lootSet) + "\n" +
-                                            L(p, Lang.A.LMB) + " &c-\n" +
-                                            L(p, Lang.A.RMB) + " &a+\n" +
-                                            "&f" + L(Lang.A.MMB) + ": &7" + L(Lang.A.Toggle) + "\n" +
-                                            "&7" + L(Lang.A.SHIFT_Mul) + "&r&7: x5").glow(true);
+                                            Lang.LMB_DEC + "\n" +
+                                            Lang.RMB_INC + "\n" +
+                                            Lang.MMB_TOGGLE + "\n" +
+                                            Lang.SHIFT_MUL).glow(true);
                                     btn.mmb(interact -> {
                                         // toggle inclusion
                                         lootByWeight.remove(lootSet);
@@ -292,7 +266,7 @@ public class Crate implements ConfigurationSerializable {
                                         return Result.REFRESH();
                                     });
                                 } else {
-                                    b.lore("&f" + L(Lang.A.MMB) + ": &7" + L(Lang.A.Toggle));
+                                    b.lore(Lang.MMB_TOGGLE);
                                     btn.mmb(interact -> {
                                         lootByWeight.put(lootSet, 1);
                                         weightsToSums();
@@ -309,7 +283,7 @@ public class Crate implements ConfigurationSerializable {
                 // Edit Columns
                 // *   *   *
                 .button(7, 1, new Button.Builder()
-                        .icon(p -> ItemBuilder.copyOf(Material.LADDER).name("&8&n" + L(Lang.A.Columns) + "&r&8: &7" + columns).lore(L(Lang.A.LMB) + " &c-\n" +  L(Lang.A.RMB) + " &a+").amount(columns).build())
+                        .icon(p -> ItemBuilder.copyOf(Material.LADDER).name(String.format(Lang.BUTTON_COLUMNS, columns)).lore(Lang.LMB_DEC + "\n" + Lang.RMB_INC).amount(columns).build())
                         .lmb(interact -> {
                             // decrease
                             columns = Util.clamp(columns - 1, 1, 6);
@@ -324,7 +298,7 @@ public class Crate implements ConfigurationSerializable {
                 // Edit Picks
                 // *   *   *
                 .button(2, 3, new Button.Builder()
-                        .icon(p -> ItemBuilder.copyOf(Material.MELON_SEEDS).name("&8&n" + L(Lang.A.Picks) + "&r&8: &7" + picks).lore(L(Lang.A.LMB) + " &c-\n" +  L(Lang.A.RMB) + " &a+").amount(picks).build())
+                        .icon(p -> ItemBuilder.copyOf(Material.MELON_SEEDS).name(String.format(Lang.BUTTON_PICKS, picks)).lore(Lang.LMB_DEC + "\n" + Lang.RMB_INC).amount(picks).build())
                         .lmb(interact -> {
                             // decrease
                             picks = Util.clamp(picks - 1, 1, columns*9);
@@ -338,11 +312,11 @@ public class Crate implements ConfigurationSerializable {
                 // *   *   *
                 // Edit Pick Sound
                 // *   *   *
-                .childButton(6, 3, p -> ItemBuilder.copyOf(Material.JUKEBOX).name("&a&n" + L(Lang.A.Sound) + "&r&a: &r&7" + sound.name()).lore("&7" + L(Lang.A.LMB) + ": &a" + L(Lang.A.Edit)).build(),
+                .childButton(6, 3, p -> ItemBuilder.copyOf(Material.JUKEBOX).name(String.format(Lang.BUTTON_SOUND, sound)).lore(Lang.LMB_EDIT).build(),
                         new TextMenu.TBuilder()
-                                .title(p -> L(Lang.A.Sound))
-                                .leftRaw(p -> Lang.A.Lorem_ipsum)
-                                .right(p -> L(Lang.A.Input_a_sound))
+                                .title(p -> Lang.TITLE_SOUND)
+                                .leftRaw(p -> "Lorem ipsum")
+                                .right(p -> Lang.INPUT_SOUND)
                                 .onClose((player) -> Result.PARENT())
                                 .onComplete((p, s, b) -> {
                                     try {
@@ -351,7 +325,7 @@ public class Crate implements ConfigurationSerializable {
                                         p.playSound(p.getLocation(), sound, 1, 1);
                                         return Result.PARENT();
                                     } catch (Exception e) {
-                                        return Result.TEXT(L(Lang.A.Invalid));
+                                        return Result.TEXT(Lang.ERR_INVALID);
                                     }
                                 })
                 );

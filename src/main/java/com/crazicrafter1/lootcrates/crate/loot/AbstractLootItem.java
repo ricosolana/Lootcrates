@@ -41,8 +41,8 @@ public abstract class AbstractLootItem implements ILoot {
     public String getMenuDesc(@Nonnull Player p) {
         StringBuilder sb = new StringBuilder();
         if (min == max)
-            sb.append("&7").append(Lang.L(p, Lang.A.count)).append(": &f").append(min);
-        else sb.append("&7").append(Lang.L(p, Lang.A.range)).append(": &f[").append(min).append(", ").append(max).append("]");
+            sb.append(String.format(Lang.ITEM_COUNT, min));
+        else sb.append(String.format(Lang.ITEM_COUNT, min, max));
 
         return sb.toString();
     }

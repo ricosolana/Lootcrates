@@ -73,7 +73,6 @@ public class Data implements ConfigurationSerializable {
             if (rev == 0) {
                 // 2/20/2022 and before
                 cleanAfterDays = (int) args.getOrDefault("cleanHour", 7) / 24;
-                Main.get().lang.translate = (boolean) args.getOrDefault("translate", false);
             } else if (rev == 1) {
                 // after 2/20/22
                 cleanAfterDays = (int) args.getOrDefault("cleanAfterDays", 7);
@@ -115,27 +114,11 @@ public class Data implements ConfigurationSerializable {
     }
 
     public ItemBuilder unSelectedItem(Player p) {
-        Lang.Unit dlu = Main.get().lang.getUnit(p);
-
-        if (dlu == null) {
-            return unSelectedItem;
-        }
-
-        return ItemBuilder.copyOf(unSelectedItem)
-                .name(dlu.unSelectedDisplayName)
-                .lore(dlu.unSelectedLore);
+        return unSelectedItem;
     }
 
     public ItemBuilder selectedItem(Player p) {
-        Lang.Unit dlu = Main.get().lang.getUnit(p);
-
-        if (dlu == null) {
-            return selectedItem;
-        }
-
-        return ItemBuilder.copyOf(selectedItem)
-                .name(dlu.selectedDisplayName)
-                .lore(dlu.selectedLore);
+        return selectedItem;
     }
 
     @Override

@@ -49,7 +49,6 @@ public class Main extends JavaPlugin
     public SkriptAddon addon;
 
     public Data data;
-    public Lang lang;
     private final HashMap<UUID, PlayerStat> playerStats = new HashMap<>();
     public int rev = -1;
 
@@ -261,7 +260,6 @@ public class Main extends JavaPlugin
     @Override
     public void reloadConfig() {
         this.config = new YamlConfiguration();
-        this.lang = new Lang();
 
         if (!findRev()) {
             // then we have a problem
@@ -299,7 +297,6 @@ public class Main extends JavaPlugin
         }
 
         if (data != null) {
-            lang.loadLanguageFiles();
             info("Successfully loaded config");
             return;
         }
@@ -332,8 +329,6 @@ public class Main extends JavaPlugin
         } catch (IOException e) {
             error("Unable to save " + revFile.getName() + ": " + e.getMessage());
         }
-
-        lang.saveLanguageFiles();
 
         savePlayerStats();
 

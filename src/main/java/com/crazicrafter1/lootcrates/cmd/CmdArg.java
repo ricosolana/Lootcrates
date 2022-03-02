@@ -7,7 +7,6 @@ import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -18,8 +17,6 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static com.crazicrafter1.lootcrates.Lang.L;
 
 class CmdArg {
 
@@ -43,9 +40,10 @@ class CmdArg {
         //args.put("locale", new CmdArg((sender, args) ->
         //        feedback(sender,"Locale: " + ((Player)sender).getLocale()), null));
 
+        /*
         args.put("lang", new CmdArg((sender, args, flags) -> {
             if (args.length == 0) {
-                return info(sender, L("Currently ") + Main.get().lang.translations.size() + L(" languages are loaded)") + "\n" + Main.get().lang.translations.keySet());
+                return info(sender, String.format("Currently ") + Main.get().lang.translations.size() + L(" languages are loaded)") + "\n" + Main.get().lang.translations.keySet());
             }
 
             boolean success;
@@ -123,11 +121,12 @@ class CmdArg {
                 return getMatches(args[1], Main.get().lang.translations.keySet());
             return new ArrayList<>();
         }));
+         */
 
         args.put("populate", new CmdArg((sender, args, flags) -> {
             plugin.saveConfig();
             plugin.data = new Data();
-            return info(sender, L("Populating config with built-ins"));
+            return info(sender, Lang.POPULATING);
         }, null));
 
         args.put("gradient", new CmdArg((sender, args, flags) -> {
@@ -166,50 +165,51 @@ class CmdArg {
 
         args.put("save", new CmdArg((sender, args, flags) -> {
             plugin.saveConfig();
-            return info(sender, L("Saved config to disk"));
+            return info(sender, Lang.CONFIG_SAVED);
         }, null));
 
         args.put("crate", new CmdArg((sender, args, flags) -> {
             Crate crate = LootCratesAPI.getCrateByID(args[0]);
 
             if (crate == null)
-                return error(sender, L("That crate doesn't exist"));
+                return error(sender, Lang.ERR_CRATE_UNKNOWN);
 
             if (args.length == 1) {
                 if (!(sender instanceof Player))
-                    return error(sender, L("You must be a player to give yourself a crate"));
+                    return error(sender, Lang.ERR_PLAYER_CRATE);
                 Util.giveItemToPlayer((Player) sender, crate.itemStack((Player) sender, true));
-                return info(sender, L("Gave yourself 1 ") + crate.id + L(" crate"));
+                return info(sender, String.format(Lang.SELF_GIVE_CRATE, crate.id));
             }
 
             if (args[1].equals("*")) {
                 int given = 0;
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     Util.giveItemToPlayer(p, crate.itemStack(p, true));
-                    if (p != sender && !(flags.contains("s") || flags.contains("silent"))) info(p, L("You received 1 ") + crate.id + L(" crate"));
+                    if (p != sender && !(flags.contains("s") || flags.contains("silent")))
+                        info(p, String.format(Lang.RECEIVE_CRATE, crate.id));
                     given++;
                 }
 
                 if (given == 0)
-                    return info(sender, L("No players online"));
+                    return error(sender, Lang.ERR_NONE_ONLINE);
 
-                return info(sender, L("Gave a ") + crate.id + L(" crate to all players (") + ChatColor.LIGHT_PURPLE + Bukkit.getOnlinePlayers().size() + ChatColor.GRAY + L(" online)"));
+                return info(sender, String.format(Lang.GIVE_CRATE_ALL, crate.id, Bukkit.getOnlinePlayers().size()));
             }
 
             Player p = Bukkit.getServer().getPlayer(args[1]);
             if (p == null)
-                return error(sender, L("That player cannot be found"));
+                return error(sender, Lang.ERR_PLAYER_UNKNOWN);
 
             Util.giveItemToPlayer(p, crate.itemStack(p, true));
 
             // Redundant spam
             if (p != sender) {
                 if (!(flags.contains("s") || flags.contains("silent")))
-                    info(p, L("You received 1 ") + crate.id + L(" crate"));
-                return info(sender, L("Gave a ") + crate.id + L(" crate to ") + ChatColor.GOLD + p.getName());
+                    info(p, String.format(Lang.RECEIVE_CRATE, crate.id));
+                return info(sender, String.format(Lang.GIVE_CRATE_ALL, crate.id, Bukkit.getOnlinePlayers().size()));
             }
 
-            return info(sender, L("Gave yourself 1 ") + crate.id + " crate");
+            return info(sender, String.format(Lang.SELF_GIVE_CRATE, crate.id));
         }, (sender, args) -> {
             if (args.length == 1) {
                 return getMatches(args[0], Main.get().data.crates.keySet());
@@ -235,12 +235,12 @@ class CmdArg {
         args.put("reset", new CmdArg((sender, args, flags) -> {
             Main.get().saveDefaultConfig(true);
             Main.get().reloadConfig();
-            return info(sender, L("Loaded default config"));
+            return info(sender, Lang.CONFIG_LOADED_DEFAULT);
         }, null));
 
         args.put("reload", new CmdArg((sender, args, flags) -> {
             Main.get().reloadConfig();
-            return info(sender, L("Loaded config from disk"));
+            return info(sender, Lang.CONFIG_LOADED_DISK);
         }, null));
 
         args.put("editor", new CmdArg((sender, args, flags) -> {
@@ -250,8 +250,8 @@ class CmdArg {
                 PlayerStat stat = plugin.getStat(p.getUniqueId());
                 if (!stat.editorMessaged) {
 
-                    p.sendTitle(ChatColor.RED + L("Warning"),
-                            ChatColor.YELLOW + L("Editor might be buggy"),
+                    p.sendTitle(ChatColor.RED + "Warning",
+                            ChatColor.YELLOW + "Editor might be buggy",
                             5, 20 * 2, 5);
 
                     new BukkitRunnable() {
@@ -259,7 +259,7 @@ class CmdArg {
                         public void run() {
                             p.resetTitle();
                             p.sendTitle(" ",
-                                    ChatColor.YELLOW + L("Submit bugs/requests to my Github"),
+                                    ChatColor.YELLOW + "Submit bugs/requests to my Github",
                                     5, 20 * 2, 5);
 
                             p.sendMessage("" + ChatColor.DARK_GRAY + ChatColor.UNDERLINE + "https://github.com/PeriodicSeizures/LootCrates");
@@ -271,7 +271,7 @@ class CmdArg {
 
                                     p.resetTitle();
                                     p.sendTitle(" ",
-                                            ChatColor.GOLD + L("Constructive feedback is appreciated!"),
+                                            ChatColor.GOLD + "Constructive feedback is appreciated!",
                                             5, 20 * 2, 5);
 
                                     new BukkitRunnable() {
@@ -299,12 +299,12 @@ class CmdArg {
                 return true;
             }
 
-            return error(sender, L("Can only be executed by a player"));
+            return error(sender, Lang.ERR_NEED_PLAYER);
         }, null));
 
         args.put("detect", new CmdArg((sender, args, flags) -> {
             if (!(sender instanceof Player))
-                return error(sender, L("Only a player can execute this argument"));
+                return error(sender, Lang.ERR_NEED_PLAYER);
 
             Player p = (Player) sender;
 
@@ -312,12 +312,12 @@ class CmdArg {
             if (itemStack.getType() != Material.AIR) {
                 Crate crate = LootCratesAPI.extractCrateFromItem(itemStack);
                 if (crate != null) {
-                    return info(sender, L("Item is a crate (" + crate.id + ")"));
+                    return info(sender, String.format(Lang.IS_CRATE, crate.id));
                 } else {
-                    return info(sender, L("Item is a not a crate"));
+                    return info(sender, Lang.NOT_CRATE);
                 }
             }
-            return error(sender, L("Must hold an item to detect"));
+            return error(sender, Lang.REQUIRE_HELD);
         }, null));
     }
 

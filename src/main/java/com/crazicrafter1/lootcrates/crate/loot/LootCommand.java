@@ -19,8 +19,6 @@ import javax.annotation.Nonnull;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static com.crazicrafter1.lootcrates.Lang.L;
-
 public class LootCommand implements ILoot {
 
     public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.PAPER).name("&7Add command...").build();
@@ -59,7 +57,7 @@ public class LootCommand implements ILoot {
     @NotNull
     @Override
     public String getMenuDesc(@NotNull Player p) {
-        return "&7" + L(p, command) + ": &f" + command;
+        return String.format(Lang.LOOT_COMMAND, command);
     }
 
     @Override
@@ -76,17 +74,17 @@ public class LootCommand implements ILoot {
     public AbstractMenu.Builder getMenuBuilder() {
         return new ItemModifyMenu()
                 .build(item.build(), input -> (this.item = ItemBuilder.mutable(input)).build())
-                .childButton(5, 2, p -> ItemBuilder.copyOf(Material.PAPER).name("&6" + L(p, Lang.A.Edit_command)).lore("&7" + L(Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new TextMenu.TBuilder()
-                        .title(p -> L(p, Lang.A.Edit_command))
+                .childButton(5, 2, p -> ItemBuilder.copyOf(Material.PAPER).name("&6" + Lang.EDIT_COMMAND).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
+                        .title(p -> Lang.EDIT_COMMAND)
                         .onClose((player) -> Result.PARENT())
                         .leftRaw(p ->  command)
-                        .right(p ->  L(p, Lang.A.Input_command), p -> L(p, Lang.A.support_PAPI))
+                        .right(p -> Lang.INPUT_COMMAND, p -> Lang.SUPPORT_PAPI)
                         .onComplete((p, s, b) -> {
                             if (!s.isEmpty()) {
                                 this.command = s;
                                 return Result.PARENT();
                             }
-                            return Result.TEXT(L(p, Lang.A.Invalid));
+                            return Result.TEXT(Lang.ERR_INVALID);
                         }));
     }
 

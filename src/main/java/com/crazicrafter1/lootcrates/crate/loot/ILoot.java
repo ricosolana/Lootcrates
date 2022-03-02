@@ -20,7 +20,7 @@ public interface ILoot extends ConfigurationSerializable {
      * @return ItemStack
      */
     @Nonnull
-    ItemStack getIcon(@Nullable Player p);
+    ItemStack getRenderIcon(@Nonnull Player p);
 
     /**
      * The actual loot action to do on click
@@ -38,4 +38,15 @@ public interface ILoot extends ConfigurationSerializable {
      */
     @Nonnull
     AbstractMenu.Builder getMenuBuilder();
+
+    /**
+     * Return the visible icon as an {@link ItemStack} that the player
+     * will see as a representation of loot in a menu when showed
+     * @return ItemStack
+     */
+    @Nonnull
+    ItemStack getMenuIcon(@Nonnull Player p);
+
+    @Nonnull
+    String getMenuDesc(@Nonnull Player p);
 }

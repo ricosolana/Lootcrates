@@ -10,7 +10,9 @@ import com.crazicrafter1.lootcrates.crate.Crate;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -43,18 +45,26 @@ public class LootItemCrate extends AbstractLootItem {
         this.id = crate.id;
     }
 
+    @Nonnull
     @Override
-    public ItemStack getIcon(Player p) {
+    public ItemStack getRenderIcon(@Nonnull Player p) {
         Crate crate = Main.get().data.crates.get(id);
         return Objects.requireNonNull(crate,
                 "Referred a crate by name (" + id + ") " +
-                        "which doesn't have a definition in config").itemStack(p);
+                        "which doesn't have a definition in config").itemStack(p, true);
     }
 
+    @NotNull
     @Override
-    public String toString() {
+    public ItemStack getMenuIcon(@NotNull Player p) {
+        return Main.get().data.crates.get(id).itemStack(p, false);
+    }
+
+    @NotNull
+    @Override
+    public String getMenuDesc(@NotNull Player p) {
         return "&7crate: &f" + id + "\n" +
-                super.toString();
+                super.getMenuDesc(p);
     }
 
     @Override
@@ -75,7 +85,7 @@ public class LootItemCrate extends AbstractLootItem {
                     for (Map.Entry<String, Crate> entry : Main.get().data.crates.entrySet()) {
                         Crate crate = entry.getValue();
 
-                        ItemStack icon = ItemBuilder.copyOf(Material.LOOM).combine(crate.itemStack(null)).glow(crate.id.equals(id)).build();
+                        ItemStack icon = ItemBuilder.copyOf(Material.LOOM).combine(crate.itemStack(null, false)).glow(crate.id.equals(id)).build();
 
                         result.add(new Button.Builder()
                                 .icon(p -> icon)

@@ -135,7 +135,6 @@ public class Main extends JavaPlugin
         ConfigurationSerialization.registerClass(Data.class, "Data");
         ConfigurationSerialization.registerClass(LootSet.class, "LootSet");
         ConfigurationSerialization.registerClass(Crate.class, "Crate");
-        ConfigurationSerialization.registerClass(MinItemStack.class, "MinItemStack");
 
         // api for easy
         LootCratesAPI.registerLoot(LootItemCrate.class);

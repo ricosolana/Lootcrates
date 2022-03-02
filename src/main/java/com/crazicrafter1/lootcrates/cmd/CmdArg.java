@@ -178,14 +178,14 @@ class CmdArg {
             if (args.length == 1) {
                 if (!(sender instanceof Player))
                     return error(sender, L("You must be a player to give yourself a crate"));
-                Util.giveItemToPlayer((Player) sender, crate.itemStack((Player) sender));
+                Util.giveItemToPlayer((Player) sender, crate.itemStack((Player) sender, true));
                 return info(sender, L("Gave yourself 1 ") + crate.id + L(" crate"));
             }
 
             if (args[1].equals("*")) {
                 int given = 0;
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    Util.giveItemToPlayer(p, crate.itemStack(p));
+                    Util.giveItemToPlayer(p, crate.itemStack(p, true));
                     if (p != sender && !(flags.contains("s") || flags.contains("silent"))) info(p, L("You received 1 ") + crate.id + L(" crate"));
                     given++;
                 }
@@ -200,7 +200,7 @@ class CmdArg {
             if (p == null)
                 return error(sender, L("That player cannot be found"));
 
-            Util.giveItemToPlayer(p, crate.itemStack(p));
+            Util.giveItemToPlayer(p, crate.itemStack(p, true));
 
             // Redundant spam
             if (p != sender) {

@@ -477,7 +477,7 @@ public class Lang {
             for (Map.Entry<String, LootSet> entry : plugin.data.lootSets.entrySet()) {
                 LootSet.Language ll = new LootSet.Language();
 
-                builder = ItemBuilder.copyOf(entry.getValue().itemStack).transcribe("auto", language);
+                builder = ItemBuilder.copyOf(entry.getValue().item).transcribe("auto", language);
                 ll.itemStackDisplayName = builder.getName();
                 ll.itemStackLore = builder.getLoreString();
 
@@ -488,7 +488,7 @@ public class Lang {
             for (Map.Entry<String, Crate> entry : plugin.data.crates.entrySet()) {
                 Crate.Language cl = new Crate.Language();
 
-                builder = ItemBuilder.copyOf(entry.getValue().itemStack).transcribe("auto", language);
+                builder = ItemBuilder.copyOf(entry.getValue().item).transcribe("auto", language);
                 cl.itemStackDisplayName = builder.getName();
                 cl.itemStackLore = builder.getLoreString();
                 cl.title = GOOG.translate(entry.getValue().title, "auto", language);

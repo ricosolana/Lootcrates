@@ -10,7 +10,6 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
@@ -22,8 +21,8 @@ public class Data implements ConfigurationSerializable {
     public long cleanAfterDays;
     public int speed;
 
-    public ItemStack unSelectedItem;
-    public ItemStack selectedItem;
+    public ItemBuilder unSelectedItem;
+    public ItemBuilder selectedItem;
     public FireworkEffect fireworkEffect;
 
     public LinkedHashMap<String, Crate> crates;
@@ -35,8 +34,8 @@ public class Data implements ConfigurationSerializable {
     public Data() {
         cleanAfterDays = 7; // Cleanup config files older than a week
         speed = 4;
-        unSelectedItem = ItemBuilder.copyOf(Material.CHEST).name("&f&l???").lore("&7&oChoose 4 mystery chests, and\n&7&oyour loot will be revealed!").build();
-        selectedItem = ItemBuilder.fromModernMaterial("WHITE_STAINED_GLASS_PANE").name("&7&l???").lore("&7You have selected this mystery chest").build();
+        unSelectedItem = ItemBuilder.copyOf(Material.CHEST).name("&f&l???").lore("&7&oChoose 4 mystery chests, and\n&7&oyour loot will be revealed!");
+        selectedItem = ItemBuilder.fromModernMaterial("WHITE_STAINED_GLASS_PANE").name("&7&l???").lore("&7You have selected this mystery chest");
 
         lootSets = new LinkedHashMap<>();
         LootSet lootSet = new LootSet(
@@ -83,11 +82,11 @@ public class Data implements ConfigurationSerializable {
             speed = (int) args.getOrDefault("speed", 4);
 
             if (rev < 2) {
-                unSelectedItem = (ItemStack) args.get("unSelectedItem");
-                selectedItem = (ItemStack) args.get("selectedItem");
+                unSelectedItem = (ItemBuilder) args.get("unSelectedItem");
+                selectedItem = (ItemBuilder) args.get("selectedItem");
             } else if (rev == 2) {
-                unSelectedItem = ((MinItemStack) args.get("unSelectedItem")).get().build();
-                selectedItem = ((MinItemStack) args.get("selectedItem")).get().build();
+                unSelectedItem = ((ItemBuilder) args.get("unSelectedItem"));
+                selectedItem = ((ItemBuilder) args.get("selectedItem"));
             }
 
             // load in the same way, but need to pass name somehow
@@ -102,7 +101,7 @@ public class Data implements ConfigurationSerializable {
                 Crate crate = entry.getValue();
 
                 crate.id = id;
-                crate.itemStack = LootCratesAPI.makeCrate(crate.itemStack, id);
+                crate.item = ItemBuilder.mutable(LootCratesAPI.makeCrate(crate.item.build(), id));
 
                 // initialize weights
                 crate.sumsToWeights();
@@ -115,7 +114,7 @@ public class Data implements ConfigurationSerializable {
         }
     }
 
-    public ItemStack unSelectedItem(Player p) {
+    public ItemBuilder unSelectedItem(Player p) {
         Lang.Unit dlu = Main.get().lang.getUnit(p);
 
         if (dlu == null) {
@@ -124,11 +123,10 @@ public class Data implements ConfigurationSerializable {
 
         return ItemBuilder.copyOf(unSelectedItem)
                 .name(dlu.unSelectedDisplayName)
-                .lore(dlu.unSelectedLore)
-                .build();
+                .lore(dlu.unSelectedLore);
     }
 
-    public ItemStack selectedItem(Player p) {
+    public ItemBuilder selectedItem(Player p) {
         Lang.Unit dlu = Main.get().lang.getUnit(p);
 
         if (dlu == null) {
@@ -137,8 +135,7 @@ public class Data implements ConfigurationSerializable {
 
         return ItemBuilder.copyOf(selectedItem)
                 .name(dlu.selectedDisplayName)
-                .lore(dlu.selectedLore)
-                .build();
+                .lore(dlu.selectedLore);
     }
 
     @Override
@@ -151,8 +148,8 @@ public class Data implements ConfigurationSerializable {
             result.put("cleanAfterDays", cleanAfterDays);
             result.put("speed", speed);
 
-            result.put("unSelectedItem", new MinItemStack(unSelectedItem));
-            result.put("selectedItem", new MinItemStack(selectedItem));
+            result.put("unSelectedItem", unSelectedItem);
+            result.put("selectedItem", selectedItem);
 
             result.put("lootSets", lootSets);
 

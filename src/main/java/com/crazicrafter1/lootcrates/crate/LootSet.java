@@ -27,21 +27,21 @@ public class LootSet implements ConfigurationSerializable {
     }
 
     public String id;
-    public ItemStack itemStack;
+    public ItemBuilder item;
     public ArrayList<ILoot> loot;
 
-    public LootSet(String id, ItemStack itemStack, ArrayList<ILoot> loot) {
+    public LootSet(String id, ItemStack item, ArrayList<ILoot> loot) {
         this.id = id;
-        this.itemStack = itemStack;
+        this.item = ItemBuilder.mutable(item);
         this.loot = loot;
     }
 
     public LootSet(Map<String, Object> args) {
         int rev = Main.get().rev;
         if (rev < 2) {
-            itemStack = (ItemStack) args.get("itemStack");
+            item = ItemBuilder.mutable((ItemStack) args.get("itemStack"));
         } else if (rev == 2) {
-            itemStack = ((MinItemStack) args.get("itemStack")).get().build();
+            item = ((ItemBuilder) args.get("item"));
         }
         loot = (ArrayList<ILoot>) args.get("loot");
     }
@@ -50,12 +50,12 @@ public class LootSet implements ConfigurationSerializable {
         Lang.Unit unit = Main.get().lang.getUnit(p);
 
         if (unit == null) {
-            return itemStack;
+            return item.build();
         }
 
         Language lang = unit.lootSets.get(id);
 
-        return ItemBuilder.copyOf(itemStack)
+        return ItemBuilder.copyOf(item)
                 .name(lang.itemStackDisplayName)
                 .lore(lang.itemStackLore)
                 .build();
@@ -79,7 +79,7 @@ public class LootSet implements ConfigurationSerializable {
     public Map<String, Object> serialize() {
         Map<String, Object> result = new LinkedHashMap<>();
 
-        result.put("itemStack", new MinItemStack(itemStack));
+        result.put("item", item);
         result.put("loot", loot);
 
         return result;
@@ -92,7 +92,7 @@ public class LootSet implements ConfigurationSerializable {
                 .addAll((self1, p00) -> {
                     ArrayList<Button> result1 = new ArrayList<>();
                     for (ILoot a : loot) {
-                        ItemStack copy = a.getIcon(null);
+                        ItemStack copy = a.getMenuIcon(null);
 
                         AbstractMenu.Builder menu = a.getMenuBuilder().title(p -> a.getClass().getSimpleName());
 
@@ -111,8 +111,8 @@ public class LootSet implements ConfigurationSerializable {
                     }
                     return result1;
                 })
-                .childButton(3, 5, p -> ItemBuilder.copyOf(itemStack).name(L(Lang.A.Edit)).build(), new ItemModifyMenu()
-                        .build(this.itemStack, itemStack -> this.itemStack = itemStack))
+                .childButton(3, 5, p -> ItemBuilder.copyOf(item).name(L(Lang.A.Edit)).build(), new ItemModifyMenu()
+                        .build(this.item.build(), itemStack -> (this.item = ItemBuilder.mutable(itemStack)).build()))
                 .childButton(5, 5, p -> ItemBuilder.copyOf(Material.NETHER_STAR).name("&6" + L(Lang.A.New)).build(), new ParallaxMenu.PBuilder()
                         .title(p -> L(Lang.A.New_LootSet))
                         .parentButton(4, 5)

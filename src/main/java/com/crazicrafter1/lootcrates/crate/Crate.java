@@ -92,7 +92,7 @@ public class Crate implements ConfigurationSerializable {
     // then attempt a translation
 
     public String id;
-    public ItemStack itemStack;
+    public ItemBuilder item;
     public String title;
     public int columns;
     public int picks;
@@ -104,7 +104,7 @@ public class Crate implements ConfigurationSerializable {
 
     public Crate(String id, ItemStack itemStack, String title, int columns, int picks, Sound sound) {
         this.id = id;
-        this.itemStack = LootCratesAPI.makeCrate(itemStack, id);
+        this.item = ItemBuilder.copyOf(LootCratesAPI.makeCrate(itemStack, id));
         this.title = ColorUtil.render(title);
         this.columns = columns;
         this.picks = picks;
@@ -120,9 +120,9 @@ public class Crate implements ConfigurationSerializable {
 
         int rev = Main.get().rev;
         if (rev < 2)
-            itemStack = (ItemStack) args.get("itemStack");
+            item = ItemBuilder.mutable((ItemStack) args.get("itemStack"));
         else if (rev == 2)
-            itemStack = ((MinItemStack) args.get("itemStack")).get().build();
+            item = ((ItemBuilder) args.get("item"));
     }
 
     /**
@@ -156,28 +156,24 @@ public class Crate implements ConfigurationSerializable {
      * @param p player
      * @return the formatted item
      */
-    public ItemStack itemStack(@Nullable Player p) {
-        ItemBuilder item = ItemBuilder.copyOf(itemStack);
+    public ItemStack itemStack(@Nullable Player p, boolean renderAll) {
+        ItemBuilder item = ItemBuilder.copyOf(this.item);
 
         Lang.Unit unit = Main.get().lang.getUnit(p);
 
-        if (unit == null) {
-            return item
-                    .macro("%", "lc_picks", "" + picks)
-                    .macro("%", "lc_id", "" + id)
-                    .macro("%", "lc_lscount", "" + lootBySum.size())
-                    .placeholders(p).build();
-        }
-
-        Language lang = unit.crates.get(id);
-
-        return item
-                .macro("%", "lc_picks", "" + picks)
+        item.macro("%", "lc_picks", "" + picks)
                 .macro("%", "lc_id", "" + id)
                 .macro("%", "lc_lscount", "" + lootBySum.size())
-                .placeholders(p)
-                .name(lang.itemStackDisplayName)
-                .lore(lang.itemStackLore)
+                .placeholders(p);
+
+        if (unit != null) {
+            Language lang = unit.crates.get(id);
+            item.name(lang.itemStackDisplayName)
+                    .lore(lang.itemStackLore);
+        }
+
+        return item
+                .renderAll(renderAll)
                 .build();
     }
 
@@ -195,7 +191,7 @@ public class Crate implements ConfigurationSerializable {
 
     @Override
     public String toString() {
-        return "itemStack: " + itemStack + "\n" +
+        return "itemStack: " + item + "\n" +
                 "title: " + title + "\n" +
                 "size: " + title + "\n" +
                 "picks: " + picks + "\n" +
@@ -207,7 +203,7 @@ public class Crate implements ConfigurationSerializable {
     public Map<String, Object> serialize() {
         Map<String, Object> result = new LinkedHashMap<>();
 
-        result.put("itemStack", new MinItemStack(itemStack));
+        result.put("item", item);
         result.put("title", title);
         result.put("columns", columns);
         result.put("picks", picks);
@@ -225,15 +221,15 @@ public class Crate implements ConfigurationSerializable {
                 // *   *   *
                 // Edit Crate ItemStack
                 // *   *   *
-                .childButton(1, 1, p -> ItemBuilder.copyOf(itemStack.getType()).name("&8&n" + L(p, Lang.A.ItemStack)).lore("&7" + L(p, Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new ItemModifyMenu()
-                        .build(itemStack.clone(), (itemStack -> {
+                .childButton(1, 1, p -> ItemBuilder.copyOf(item.getMaterial()).name("&8&n" + L(p, Lang.A.ItemStack)).lore("&7" + L(p, Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new ItemModifyMenu()
+                        .build(item.build(), (itemStack -> {
                             // This will break NBT if the server is not reloaded
                             //this.itemStack = itemStack;
 
                             // Several options here
                             // Should the name and lore be merged along also?
                             // or just the material?
-                            return ItemBuilder.mutable(this.itemStack).combine(itemStack).material(itemStack.getType()).build();
+                            return ItemBuilder.mutable(this.item).combine(itemStack).material(itemStack.getType()).build();
                             //this.itemStack.setType(itemStack.getType());
                         }))
                 )
@@ -265,7 +261,7 @@ public class Crate implements ConfigurationSerializable {
                             for (LootSet lootSet : Main.get().data.lootSets.values()) {
                                 Integer weight = lootByWeight.get(lootSet);
                                 Button.Builder btn = new Button.Builder();
-                                ItemBuilder b = ItemBuilder.copyOf(lootSet.itemStack.getType()).name("&8" + lootSet.id);
+                                ItemBuilder b = ItemBuilder.copyOf(lootSet.item.getMaterial()).name("&8" + lootSet.id);
                                 if (weight != null) {
                                     b.lore("&7" + getFormattedFraction(lootSet) + "\n" +
                                             "&7" + getFormattedPercent(lootSet) + "\n" +

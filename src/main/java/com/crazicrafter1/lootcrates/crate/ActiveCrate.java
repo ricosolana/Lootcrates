@@ -75,7 +75,7 @@ public final class ActiveCrate {
         if (slots.containsKey(slot))
             return;
 
-        inventory.setItem(slot, data.selectedItem(player));
+        inventory.setItem(slot, data.selectedItem(player).build());
 
         ILoot randomLoot = lootChances[slot].getRandomLoot();
         slots.put(slot, new QSlot(randomLoot));
@@ -164,7 +164,7 @@ public final class ActiveCrate {
     private boolean flipSlot(int slot, QSlot qSlot) {
         if (!qSlot.isHidden) return false;
 
-        ItemStack visual = qSlot.randomLoot.getIcon(player);
+        ItemStack visual = qSlot.randomLoot.getRenderIcon(player);
 
         inventory.setItem(slot, visual);
         qSlot.isHidden = false;
@@ -178,7 +178,7 @@ public final class ActiveCrate {
             for (Map.Entry<Integer, QSlot> entry : slots.entrySet()) {
                 if (entry.getValue().randomLoot.execute(this)) {
                     if (entry.getValue().isHidden)
-                        Util.giveItemToPlayer(player, entry.getValue().randomLoot.getIcon(player));
+                        Util.giveItemToPlayer(player, entry.getValue().randomLoot.getRenderIcon(player));
                     else
                         Util.giveItemToPlayer(player, inventory.getItem(entry.getKey()));
                 }
@@ -193,7 +193,7 @@ public final class ActiveCrate {
 
     private void fill() {
         for (int i = 0; i < size; i++)
-            inventory.setItem(i, data.unSelectedItem(player));
+            inventory.setItem(i, data.unSelectedItem(player).build());
     }
 
     public Player getPlayer() {

@@ -9,7 +9,9 @@ import com.crazicrafter1.lootcrates.*;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 
 import static com.crazicrafter1.lootcrates.Lang.L;
@@ -18,13 +20,13 @@ public final class LootItem extends AbstractLootItem {
 
     public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.GOLD_NUGGET).name("&6Add item...").build();
 
-    public ItemStack itemStack;
+    public ItemBuilder item;
 
     /**
      * Default ctor
      */
     public LootItem() {
-        this.itemStack = new ItemStack(Material.STONE);
+        this.item = ItemBuilder.copyOf(Material.STONE);
     }
 
     public LootItem(Map<String, Object> args) {
@@ -32,33 +34,44 @@ public final class LootItem extends AbstractLootItem {
 
         int rev = Main.get().rev;
         if (rev < 2)
-            this.itemStack = (ItemStack) args.get("itemStack");
+            this.item = ItemBuilder.mutable((ItemStack) args.get("itemStack"));
         else if (rev == 2)
-            this.itemStack = ((MinItemStack) args.get("itemStack")).get().build();
-
-        if (itemStack == null || itemStack.getType() == Material.AIR) {
-            //Main.get().error(args.toString());
-            throw new NullPointerException("Item must not be null or air");
-        }
+            this.item = ((ItemBuilder) args.get("item"));
     }
 
+    @Nonnull
     @Override
-    public ItemStack getIcon(Player p) {
-        return super.ofRange(p, itemStack);
+    public ItemStack getRenderIcon(@Nonnull Player p) {
+        return super.ofRange(p, item.build());
     }
 
+    @Nonnull
+    @Override
+    public ItemStack getMenuIcon(@Nonnull Player p) {
+        return item.build();
+    }
+
+    @NotNull
+    @Override
+    public String getMenuDesc(@NotNull Player p) {
+
+        return super.getMenuDesc(p);
+    }
+
+    @Nonnull
     @Override
     public Map<String, Object> serialize() {
         Map<String, Object> result = super.serialize();
-        result.put("itemStack", new MinItemStack(itemStack));
+        result.put("item", item);
         return result;
     }
 
+    @Nonnull
     @Override
     public AbstractMenu.Builder getMenuBuilder() {
         //Button.Builder inOutline = new Button.Builder().icon(() -> new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name("&7Set to").toItem());
         return new ItemModifyMenu()
-                .build(itemStack, input -> this.itemStack = input)
+                .build(item.build(), input -> (this.item = ItemBuilder.mutable(input)).build())
                 // Min
                 .button(5, 2, new Button.Builder()
                         .lmb(interact -> {
@@ -76,12 +89,12 @@ public final class LootItem extends AbstractLootItem {
                 .button(7, 2, new Button.Builder()
                         .lmb(interact -> {
                             int change = interact.shift ? 5 : 1;
-                            max = Util.clamp(max - change, min, itemStack.getMaxStackSize());
+                            max = Util.clamp(max - change, min, item.getMaxSize());
                             return Result.REFRESH();
                         })
                         .rmb(interact -> {
                             int change = interact.shift ? 5 : 1;
-                            max = Util.clamp(max + change, min, itemStack.getMaxStackSize());
+                            max = Util.clamp(max + change, min, item.getMaxSize());
                             return Result.REFRESH();
                         })
                         .icon(p -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name("&8&n" + L(p, Lang.A.Maximum)).skull(Editor.BASE64_INC).lore(L(Lang.A.LMB) + " &c-\n" +  L(Lang.A.RMB) + " &a+\n&7" + L(Lang.A.SHIFT_Mul) + "&r&7: x5").amount(max).build()));

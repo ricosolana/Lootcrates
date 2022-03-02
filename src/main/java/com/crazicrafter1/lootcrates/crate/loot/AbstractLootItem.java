@@ -7,6 +7,7 @@ import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nonnull;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -28,16 +29,16 @@ public abstract class AbstractLootItem implements ILoot {
             throw new IllegalArgumentException("failed to assert: min <= max");
     }
 
-    protected ItemStack ofRange(Player p, ItemStack itemStack) {
-        return ItemBuilder.copyOf(itemStack).amount(Util.randomRange(min, max)).placeholders(p).build();
-    }
+    @Nonnull
+    public abstract ItemStack getRenderIcon(@Nonnull Player p);
 
     @Override
-    public final boolean execute(ActiveCrate activeCrate) {
+    public final boolean execute(@Nonnull ActiveCrate activeCrate) {
         return true;
     }
 
-    public String toString(Player p) {
+    @Nonnull
+    public String getMenuDesc(@Nonnull Player p) {
         StringBuilder sb = new StringBuilder();
         if (min == max)
             sb.append("&7").append(Lang.L(p, Lang.A.count)).append(": &f").append(min);
@@ -46,11 +47,12 @@ public abstract class AbstractLootItem implements ILoot {
         return sb.toString();
     }
 
-    @Override
-    public String toString() {
-        return toString(null);
+    @Nonnull
+    protected ItemStack ofRange(@Nonnull Player p, @Nonnull ItemStack itemStack) {
+        return ItemBuilder.copyOf(itemStack).amount(Util.randomRange(min, max)).placeholders(p).renderAll().build();
     }
 
+    @Nonnull
     @Override
     public Map<String, Object> serialize() {
         Map<String, Object> result = new LinkedHashMap<>();

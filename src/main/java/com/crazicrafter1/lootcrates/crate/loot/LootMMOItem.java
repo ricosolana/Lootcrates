@@ -11,7 +11,9 @@ import net.Indyuce.mmoitems.api.player.PlayerData;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -58,8 +60,9 @@ public class LootMMOItem extends AbstractLootItem {
         }
     }
 
+    @Nonnull
     @Override
-    public ItemStack getIcon(Player p) {
+    public ItemStack getRenderIcon(@Nonnull Player p) {
         if (mode == 0) { // exact
             ItemTier itemTier = MMOItems.plugin.getTiers().getOrThrow(tier);
             return ofRange(p, MMOItems.plugin.getItem(
@@ -73,10 +76,19 @@ public class LootMMOItem extends AbstractLootItem {
         }
     }
 
+    @NotNull
     @Override
-    public String toString() {
+    public ItemStack getMenuIcon(@NotNull Player p) {
+        ItemTier itemTier = MMOItems.plugin.getTiers().getOrThrow(tier);
+        return MMOItems.plugin.getItem(
+                MMOItems.plugin.getTypes().get(type), name, level, itemTier);
+    }
+
+    @NotNull
+    @Override
+    public String getMenuDesc(@NotNull Player p) {
         return "&8MMOItem: &f" + type + ":" + name + "\n" +
-                super.toString();
+                super.getMenuDesc(p);
     }
 
     @Override
@@ -122,18 +134,18 @@ public class LootMMOItem extends AbstractLootItem {
                 .button(5, 1, new Button.Builder()
                         .lmb(interact -> {
                             int change = interact.shift ? 5 : 1;
-                            max = Util.clamp(max - change, min, getIcon(null).getMaxStackSize());
+                            max = Util.clamp(max - change, min, getRenderIcon(null).getMaxStackSize());
                             return Result.REFRESH();
                         })
                         .rmb(interact -> {
                             int change = interact.shift ? 5 : 1;
-                            max = Util.clamp(max + change, min, getIcon(null).getMaxStackSize());
+                            max = Util.clamp(max + change, min, getRenderIcon(null).getMaxStackSize());
                             return Result.REFRESH();
                         })
                         .icon((p) -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name("&8&n" + L(p, Lang.A.Maximum)).skull(BASE64_INC).lore(L(Lang.A.LMB) + " &c-\n" + L(Lang.A.RMB) + " &a+\n&7" + L(Lang.A.SHIFT_Mul) + "&r&7: x5").amount(max).build()))
 
                 // Type/Name menu:
-                .childButton(4, 1, (p) -> ItemBuilder.mutable(getIcon(null)).amount(1).name("&7" + L(p, Lang.A.MMO_Manually_assign)).lore(type + ":" + name).build(), new TextMenu.TBuilder()
+                .childButton(4, 1, (p) -> ItemBuilder.mutable(getRenderIcon(null)).amount(1).name("&7" + L(p, Lang.A.MMO_Manually_assign)).lore(type + ":" + name).build(), new TextMenu.TBuilder()
                     .title(p -> L(p, Lang.A.MMO_Manually_assign))
                     .leftRaw(p -> type + ":" + name, null, ColorMode.STRIP)
                     .right(p -> L(p, Lang.A.MMO_Enter))

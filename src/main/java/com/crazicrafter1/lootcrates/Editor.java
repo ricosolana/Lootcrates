@@ -88,7 +88,7 @@ public class Editor {
                                         Crate crate = entry.getValue();
                                         result.add(new Button.Builder()
                                                 // https://regexr.com/6fdsi
-                                                .icon(p -> ItemBuilder.copyOf(crate.itemStack).lore("&8" + L(Lang.A.id) + ": " + crate.id + "\n&7" + L(Lang.A.LMB) + ": &a" + L(Lang.A.Edit) + "\n&7" + L(Lang.A.RMB) + ": &c" + L(Lang.A.Delete)).build())
+                                                .icon(p -> ItemBuilder.copyOf(crate.item).lore("&8" + L(Lang.A.id) + ": " + crate.id + "\n&7" + L(Lang.A.LMB) + ": &a" + L(Lang.A.Edit) + "\n&7" + L(Lang.A.RMB) + ": &c" + L(Lang.A.Delete)).build())
                                                 .child(self, crate.getBuilder(),
                                                         /// RMB - delete crate
                                                         interact -> {
@@ -113,7 +113,7 @@ public class Editor {
                                  * List all LootSets
                                  */
                                 result.add(new Button.Builder()
-                                        .icon(p -> ItemBuilder.copyOf(lootSet.itemStack).lore("&8" + L(Lang.A.id) + ": " + lootSet.id + "\n" + "&8" + lootSet.loot.size() + " " + L(Lang.A.Elements) + "\n&7" + L(Lang.A.LMB) + ": &a" + L(Lang.A.Edit) + "\n&7" + L(Lang.A.RMB) + ": &c" + L(Lang.A.Delete)).build())
+                                        .icon(p -> ItemBuilder.copyOf(lootSet.item).lore("&8" + L(Lang.A.id) + ": " + lootSet.id + "\n" + "&8" + lootSet.loot.size() + " " + L(Lang.A.Elements) + "\n&7" + L(Lang.A.LMB) + ": &a" + L(Lang.A.Edit) + "\n&7" + L(Lang.A.RMB) + ": &c" + L(Lang.A.Delete)).build())
                                         .child(self, lootSet.getBuilder(),
                                                 // RMB - delete lootSet
                                                 interact -> {

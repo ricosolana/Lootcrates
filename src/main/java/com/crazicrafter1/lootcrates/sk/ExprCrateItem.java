@@ -30,7 +30,7 @@ public class ExprCrateItem extends SimpleExpression<ItemStack> {
         if (crateName != null) {
             return new ItemStack[] {
                     LootCratesAPI.getCrateByID(crateName)
-                            .itemStack.clone()};
+                            .item.buildCopy(true)};
         }
         return null;
     }

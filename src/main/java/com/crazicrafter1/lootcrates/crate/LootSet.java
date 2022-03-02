@@ -6,10 +6,7 @@ import com.crazicrafter1.gapi.AbstractMenu;
 import com.crazicrafter1.gapi.Button;
 import com.crazicrafter1.gapi.ParallaxMenu;
 import com.crazicrafter1.gapi.Result;
-import com.crazicrafter1.lootcrates.ItemModifyMenu;
-import com.crazicrafter1.lootcrates.Lang;
-import com.crazicrafter1.lootcrates.LootCratesAPI;
-import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -40,7 +37,12 @@ public class LootSet implements ConfigurationSerializable {
     }
 
     public LootSet(Map<String, Object> args) {
-        itemStack = (ItemStack) args.get("itemStack");
+        int rev = Main.get().rev;
+        if (rev < 2) {
+            itemStack = (ItemStack) args.get("itemStack");
+        } else if (rev == 2) {
+            itemStack = ((MinItemStack) args.get("itemStack")).get().build();
+        }
         loot = (ArrayList<ILoot>) args.get("loot");
     }
 
@@ -77,7 +79,7 @@ public class LootSet implements ConfigurationSerializable {
     public Map<String, Object> serialize() {
         Map<String, Object> result = new LinkedHashMap<>();
 
-        result.put("itemStack", itemStack);
+        result.put("itemStack", new MinItemStack(itemStack));
         result.put("loot", loot);
 
         return result;

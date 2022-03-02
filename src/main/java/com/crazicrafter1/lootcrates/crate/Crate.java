@@ -5,9 +5,7 @@ import com.crazicrafter1.crutils.ColorUtil;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.gapi.*;
-import com.crazicrafter1.lootcrates.ItemModifyMenu;
-import com.crazicrafter1.lootcrates.Lang;
-import com.crazicrafter1.lootcrates.LootCratesAPI;
+import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.lootcrates.Main;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -107,19 +105,24 @@ public class Crate implements ConfigurationSerializable {
     public Crate(String id, ItemStack itemStack, String title, int columns, int picks, Sound sound) {
         this.id = id;
         this.itemStack = LootCratesAPI.makeCrate(itemStack, id);
-        this.title = ColorUtil.color(title);
+        this.title = ColorUtil.render(title);
         this.columns = columns;
         this.picks = picks;
         this.sound = sound;
     }
 
     public Crate(Map<String, Object> args) {
-        title = ColorUtil.color((String) args.get("title"));
+        title = ColorUtil.render((String) args.get("title"));
         columns = (int) args.get("columns");
         picks = (int) args.get("picks");
         sound = Sound.valueOf((String) args.get("sound"));
         lootBySum = sortByValue((LinkedHashMap<LootSet, Integer>) args.get("weights"));
-        itemStack = (ItemStack) args.get("itemStack");
+
+        int rev = Main.get().rev;
+        if (rev < 2)
+            itemStack = (ItemStack) args.get("itemStack");
+        else if (rev == 2)
+            itemStack = ((MinItemStack) args.get("itemStack")).get().build();
     }
 
     /**
@@ -204,7 +207,7 @@ public class Crate implements ConfigurationSerializable {
     public Map<String, Object> serialize() {
         Map<String, Object> result = new LinkedHashMap<>();
 
-        result.put("itemStack", itemStack);
+        result.put("itemStack", new MinItemStack(itemStack));
         result.put("title", title);
         result.put("columns", columns);
         result.put("picks", picks);
@@ -230,19 +233,19 @@ public class Crate implements ConfigurationSerializable {
                             // Several options here
                             // Should the name and lore be merged along also?
                             // or just the material?
-                            return ItemBuilder.mutable(this.itemStack).apply(itemStack).material(itemStack.getType()).build();
+                            return ItemBuilder.mutable(this.itemStack).combine(itemStack).material(itemStack.getType()).build();
                             //this.itemStack.setType(itemStack.getType());
                         }))
                 )
                 // Edit Inventory Title
                 .childButton(3, 1, p -> ItemBuilder.copyOf(Material.PAPER).name("&e&n" + L(p, Lang.A.Title) + "&r&e: " + title).lore("&7" + L(p, Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new TextMenu.TBuilder()
                         .title(p -> L(p, Lang.A.Title))
-                        .leftRaw(p -> ColorMode.REVERT.a(title))
+                        .leftRaw(p -> ColorMode.INVERT.a(title))
                         .onClose((player) -> Result.PARENT())
                         .right(p -> ColorDem)
                         .onComplete((p, s, b) -> {
                             if (!s.isEmpty()) {
-                                title = ColorMode.COLOR.a(s);
+                                title = ColorMode.RENDER.a(s);
                                 return Result.PARENT();
                             }
 
@@ -252,7 +255,7 @@ public class Crate implements ConfigurationSerializable {
                 // *   *   *
                 // Edit LootSets
                 // *   *   *
-                .childButton(5, 1, p -> ItemBuilder.of("EXPERIENCE_BOTTLE").name("&6&n" + L(p, Lang.A.Loot)).lore("&7" + L(p, Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new ParallaxMenu.PBuilder()
+                .childButton(5, 1, p -> ItemBuilder.fromModernMaterial("EXPERIENCE_BOTTLE").name("&6&n" + L(p, Lang.A.Loot)).lore("&7" + L(p, Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new ParallaxMenu.PBuilder()
                         .title(p -> L(p, Lang.A.Loot))
                         .parentButton(4, 5)
                         .onClose((player) -> Result.PARENT())

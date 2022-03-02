@@ -117,7 +117,7 @@ public class LootMMOItem extends AbstractLootItem {
                             min = Util.clamp(min + change, 1, max);
                             return Result.REFRESH();
                         })
-                        .icon((p) -> ItemBuilder.of("PLAYER_HEAD").name("&8&n" + L(p, Lang.A.Minimum)).skull(BASE64_DEC).lore(L(Lang.A.LMB) + " &c-\n" +  L(Lang.A.RMB) + " &a+\n&7" + L(Lang.A.SHIFT_Mul) + "&r&7: x5").amount(min).build()))
+                        .icon((p) -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name("&8&n" + L(p, Lang.A.Minimum)).skull(BASE64_DEC).lore(L(Lang.A.LMB) + " &c-\n" +  L(Lang.A.RMB) + " &a+\n&7" + L(Lang.A.SHIFT_Mul) + "&r&7: x5").amount(min).build()))
                 // Max
                 .button(5, 1, new Button.Builder()
                         .lmb(interact -> {
@@ -130,7 +130,7 @@ public class LootMMOItem extends AbstractLootItem {
                             max = Util.clamp(max + change, min, getIcon(null).getMaxStackSize());
                             return Result.REFRESH();
                         })
-                        .icon((p) -> ItemBuilder.of("PLAYER_HEAD").name("&8&n" + L(p, Lang.A.Maximum)).skull(BASE64_INC).lore(L(Lang.A.LMB) + " &c-\n" + L(Lang.A.RMB) + " &a+\n&7" + L(Lang.A.SHIFT_Mul) + "&r&7: x5").amount(max).build()))
+                        .icon((p) -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name("&8&n" + L(p, Lang.A.Maximum)).skull(BASE64_INC).lore(L(Lang.A.LMB) + " &c-\n" + L(Lang.A.RMB) + " &a+\n&7" + L(Lang.A.SHIFT_Mul) + "&r&7: x5").amount(max).build()))
 
                 // Type/Name menu:
                 .childButton(4, 1, (p) -> ItemBuilder.mutable(getIcon(null)).amount(1).name("&7" + L(p, Lang.A.MMO_Manually_assign)).lore(type + ":" + name).build(), new TextMenu.TBuilder()

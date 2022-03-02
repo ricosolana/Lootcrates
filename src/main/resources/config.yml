@@ -2,7 +2,6 @@
 # 1976: 1.14.4
 data:
   ==: Data
-  rev: 1
   cleanAfterDays: 7 # in days now
   speed: 4
   #give-message: "&aYou were given a %lc_id% crate by"

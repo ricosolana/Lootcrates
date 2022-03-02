@@ -63,7 +63,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                 // Edit Name
                 .childButton(6, 1, p -> ItemBuilder.copyOf(Material.NAME_TAG).name("&e" + L(p, Name)).lore("&7" + L(p, Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new TextMenu.TBuilder()
                         .title(p -> L(p, Name))
-                        .leftRaw(p -> builder.getNameOrLocaleName(), null, ColorMode.REVERT)
+                        .leftRaw(p -> builder.getNameOrLocaleName(), null, ColorMode.INVERT)
                         .right(p -> "&8" + L(p, Input_name), p -> ColorDem)
                         .onClose((player) -> Result.PARENT())
                         .onComplete((player, s, b) -> {
@@ -79,7 +79,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                 // Edit Lore
                 .childButton(6, 3, p -> ItemBuilder.copyOf(Material.MAP).name("&7" + L(p, Lang.A.Lore)).lore("&7" + L(p, Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.A.Lore)
-                        .leftRaw(p -> Util.strDef(builder.getLoreString(), Lang.A.Lorem_ipsum), null, ColorMode.REVERT)
+                        .leftRaw(p -> Util.strDef(builder.getLoreString(), Lang.A.Lorem_ipsum), null, ColorMode.INVERT)
                         .right(p -> "&8" + L(p, Input_lore), p -> ColorDem + "&7\n'\\n': &f" + L(p, Newline))
                         .onClose((player) -> Result.PARENT())
                         .onComplete((player, s, b) -> {
@@ -93,7 +93,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             return Result.PARENT();
                         }))
                 // Edit CustomModelData
-                .childButton(6, 2, p -> ItemBuilder.of("PLAYER_HEAD").skull(BASE64_CUSTOM_MODEL_DATA).name("&8" + L(p, Lang.A.Custom_model_data)).lore("&7" + L(p, Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new TextMenu.TBuilder()
+                .childButton(6, 2, p -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").skull(BASE64_CUSTOM_MODEL_DATA).name("&8" + L(p, Lang.A.Custom_model_data)).lore("&7" + L(p, Lang.A.LMB) + ": &a" + L(p, Lang.A.Edit)).build(), new TextMenu.TBuilder()
                         .title(p -> L(p, Lang.A.Custom_model_data))
                         .leftRaw(p -> {
                             ItemMeta meta = builder.getMeta();

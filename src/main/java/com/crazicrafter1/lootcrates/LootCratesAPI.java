@@ -72,9 +72,6 @@ public class LootCratesAPI {
         nbt.setString("Crate", crate);
         nmsStack.setTag(nbt);
 
-        Main.get().info("Crate: " +
-            nbt.getString("Crate"));
-
         return nmsStack.getItemStack();
     }
 

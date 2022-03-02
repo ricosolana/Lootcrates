@@ -1,9 +1,6 @@
 package com.crazicrafter1.lootcrates;
 
-import com.crazicrafter1.crutils.ColorMode;
-import com.crazicrafter1.crutils.ColorUtil;
-import com.crazicrafter1.crutils.GoogleTranslate;
-import com.crazicrafter1.crutils.ItemBuilder;
+import com.crazicrafter1.crutils.*;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootSet;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -118,13 +115,13 @@ public class Lang {
     @Nonnull
     public String getUnitText(@Nullable String unitCode, @Nonnull String keyMsg) {
 
-        String key = ColorUtil.color(keyMsg);
+        String key = ColorUtil.render(keyMsg);
         if (!keyMsg.equals(key))
-            throw new RuntimeException("Must not contain formatted colors: " + key + " (" + ColorMode.REVERT.a(key) + ")");
+            throw new RuntimeException("Must not contain formatted colors: " + key + " (" + ColorMode.INVERT.a(key) + ")");
 
         key = ColorUtil.strip(keyMsg);
         if (!keyMsg.equals(key))
-            throw new RuntimeException("Must not contain color codes: " + key + " (" + ColorMode.REVERT.a(key) + ")");
+            throw new RuntimeException("Must not contain color codes: " + key + " (" + ColorMode.INVERT.a(key) + ")");
 
         key = keyMsg.trim().replace(" ", "_");
         key = Editor.TRANSLATION_STRIPPER_PATTERN.matcher(key).replaceAll("").toLowerCase();
@@ -444,13 +441,19 @@ public class Lang {
             }
 
             // Save will create parent directories
-            langConfig.save(new File(langFolder, unit.LANGUAGE + ".yml"));
+            // make a backup of the previous
 
-            return true;
+            File saveTo = new File(langFolder, unit.LANGUAGE + ".yml");
+
+            if (Util.backupZip(saveTo, new File(langConfigFile.getParentFile(), unit.LANGUAGE + ".zip"))) {
+                langConfig.save(saveTo);
+                return true;
+            }
         } catch (Exception e) {
+            Main.get().error("Failed to save language " + unit.LANGUAGE + " (translating immediately after a crate/lootset addition might fix this)");
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
 
     /**

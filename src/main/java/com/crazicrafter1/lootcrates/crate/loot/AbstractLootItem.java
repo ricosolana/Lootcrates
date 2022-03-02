@@ -25,7 +25,7 @@ public abstract class AbstractLootItem implements ILoot {
         this.max = (int) args.get("max");
 
         if (min > max)
-            throw new IndexOutOfBoundsException("failed to assert: min <= max");
+            throw new IllegalArgumentException("failed to assert: min <= max");
     }
 
     protected ItemStack ofRange(Player p, ItemStack itemStack) {

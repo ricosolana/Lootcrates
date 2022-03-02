@@ -27,10 +27,10 @@ public class Editor {
 
     /// TODO make this butchery mess somehow translatable
     public static String ColorDem = "&7'&a' " + (Version.AT_LEAST_v1_16.a() ?
-            "or '#&123456': &#2367fbc&#3f83fbo&#5a9ffcl&#76bbfco&#91d7fcr&#acf2fds" : ": &fcolors") +
+            "or '&#123456': &#2367fbc&#3f83fbo&#5a9ffcl&#76bbfco&#91d7fcr&#acf2fds" : ": &fcolors") +
             "\n&7Macros: &6%lc_picks%&7, &6%lc_id%\n&7Supports PlaceholderAPI";
 
-    public static final Button.Builder IN_OUTLINE = new Button.Builder().icon(p -> ItemBuilder.of(
+    public static final Button.Builder IN_OUTLINE = new Button.Builder().icon(p -> ItemBuilder.fromModernMaterial(
             "GRAY_STAINED_GLASS_PANE").name("&7" + Lang.L(p, Lang.A.Set_to)).build());
 
     public static final String BASE64_DEC = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWM1YThhYThhNGMwMzYwMGEyYjVhNGViNmJlYjUxZDU5MDI2MGIwOTVlZTFjZGFhOTc2YjA5YmRmZTU2NjFjNiJ9fX0=";
@@ -103,7 +103,7 @@ public class Editor {
                         /*
                          * View LootSets
                          */
-                ).childButton(3, 1, p -> ItemBuilder.of("EXPERIENCE_BOTTLE").name("&6&l" + L(Lang.A.LootSets)).build(), new ParallaxMenu.PBuilder()
+                ).childButton(3, 1, p -> ItemBuilder.fromModernMaterial("EXPERIENCE_BOTTLE").name("&6&l" + L(Lang.A.LootSets)).build(), new ParallaxMenu.PBuilder()
                         .title(p -> L(Lang.A.LootSets))
                         .parentButton(4, 5)
                         .addAll((self, p1) -> {
@@ -152,7 +152,7 @@ public class Editor {
                 /*
                  * Global Fireworks Edit
                  */
-                .childButton(5, 1, p -> ItemBuilder.of("FIREWORK_ROCKET").name("&e&l" + L(Lang.A.Firework)).build(), new SimpleMenu.SBuilder(5)
+                .childButton(5, 1, p -> ItemBuilder.fromModernMaterial("FIREWORK_ROCKET").name("&e&l" + L(Lang.A.Firework)).build(), new SimpleMenu.SBuilder(5)
                         .title(p -> L(Lang.A.Firework))
                         .background()
                         .button(4, 0, IN_OUTLINE)
@@ -160,9 +160,9 @@ public class Editor {
                         .button(5, 1, IN_OUTLINE)
                         .button(4, 2, IN_OUTLINE)
                         .button(1, 1, new Button.Builder()
-                                .icon(p -> ItemBuilder.of("FIREWORK_STAR").fireworkEffect(Main.get().data.fireworkEffect).build()))
+                                .icon(p -> ItemBuilder.fromModernMaterial("FIREWORK_STAR").fireworkEffect(Main.get().data.fireworkEffect).build()))
                         .button(4, 1, new Button.Builder()
-                                .icon(p -> ItemBuilder.of("FIREWORK_STAR").fireworkEffect(Main.get().data.fireworkEffect).build())
+                                .icon(p -> ItemBuilder.fromModernMaterial("FIREWORK_STAR").fireworkEffect(Main.get().data.fireworkEffect).build())
                                 .lmb(interact -> {
                                     if (interact.heldItem != null) {
                                         //if (interact.heldItem.getItemMeta() instanceof FireworkEffectMeta meta && meta.hasEffect()) {
@@ -183,7 +183,7 @@ public class Editor {
                 /*
                  * Language settings
                  */
-                .childButton(7, 1, p -> ItemBuilder.of("IRON_HORSE_ARMOR").name("&6&l" + L(Lang.A.Language) + " &r&8(" + Main.get().lang.translations.size() + ")").build(), new ParallaxMenu.PBuilder()
+                .childButton(7, 1, p -> ItemBuilder.fromModernMaterial("IRON_HORSE_ARMOR").name("&6&l" + L(Lang.A.Language) + " &r&8(" + Main.get().lang.translations.size() + ")").build(), new ParallaxMenu.PBuilder()
                         .addAll((menu00, p00) -> {
                             ArrayList<Button> buttons = new ArrayList<>();
 

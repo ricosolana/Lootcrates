@@ -1,11 +1,13 @@
 package com.crazicrafter1.lootcrates.cmd;
 
+import com.crazicrafter1.crutils.ColorUtil;
 import com.crazicrafter1.crutils.TriFunction;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -126,6 +128,40 @@ class CmdArg {
             plugin.saveConfig();
             plugin.data = new Data();
             return info(sender, L("Populating config with built-ins"));
+        }, null));
+
+        args.put("gradient", new CmdArg((sender, args, flags) -> {
+            if (args.length == 0)
+                return error(sender, "Usage: crates gradient \"<#883388>Inertia is a property of matter</#1144FF>\"");
+
+            return info(sender, ColorUtil.renderAll(args[0]));
+        }, null));
+
+        args.put("rev", new CmdArg((sender, args, flags) -> {
+            if (args[0].equalsIgnoreCase("latest")) {
+                Main.get().rev = Main.REV_LATEST;
+                Main.get().reloadConfig();
+                return info(sender, "Read config using latest revision (" + Main.REV_LATEST + ")");
+            } else {
+                try {
+                    int rev = Integer.parseInt(args[0]);
+                    if (rev > Main.REV_LATEST) {
+                        // err
+                        return error(sender, "Revision " + rev + " is not yet implemented");
+                    } if (rev < 0)
+                        throw new RuntimeException();
+
+                    Main.get().rev = rev;
+                    Main.get().reloadConfig();
+                    Main.get().rev = Main.REV_LATEST;
+
+                    CmdArg.args.remove("rev");
+
+                    return info(sender, "Read config using revision " + rev);
+                } catch (Exception e) {
+                    return error(sender, "Revision must be a integer (x>=0) or 'latest'");
+                }
+            }
         }, null));
 
         args.put("save", new CmdArg((sender, args, flags) -> {
@@ -265,8 +301,6 @@ class CmdArg {
 
             return error(sender, L("Can only be executed by a player"));
         }, null));
-
-        args.put("version", new CmdArg((sender, args, flags) -> info(sender, L("LootCrates version: ") + plugin.getDescription().getVersion()), null));
 
         args.put("detect", new CmdArg((sender, args, flags) -> {
             if (!(sender instanceof Player))

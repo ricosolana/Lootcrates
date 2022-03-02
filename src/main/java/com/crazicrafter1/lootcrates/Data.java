@@ -18,7 +18,6 @@ import java.util.*;
  * Legacy data configurator
  */
 public class Data implements ConfigurationSerializable {
-    private static final int REV_LATEST = 1;
 
     public long cleanAfterDays;
     public int speed;
@@ -36,13 +35,13 @@ public class Data implements ConfigurationSerializable {
     public Data() {
         cleanAfterDays = 7; // Cleanup config files older than a week
         speed = 4;
-        unSelectedItem = ItemBuilder.copyOf(Material.CHEST).name("&f&l???").lore("&7Choose 4 mystery chests, and\n&7your loot will be revealed!").build();
-        selectedItem = ItemBuilder.of("WHITE_STAINED_GLASS_PANE").name("&7&l???").lore("&7You have selected this mystery chest").build();
+        unSelectedItem = ItemBuilder.copyOf(Material.CHEST).name("&f&l???").lore("&7&oChoose 4 mystery chests, and\n&7&oyour loot will be revealed!").build();
+        selectedItem = ItemBuilder.fromModernMaterial("WHITE_STAINED_GLASS_PANE").name("&7&l???").lore("&7You have selected this mystery chest").build();
 
         lootSets = new LinkedHashMap<>();
         LootSet lootSet = new LootSet(
                 "common",
-                ItemBuilder.of("WHITE_STAINED_GLASS_PANE").name("&f&lCommon Reward").build(),
+                ItemBuilder.fromModernMaterial("WHITE_STAINED_GLASS_PANE").name("&f&lCommon Reward").build(),
                 new ArrayList<>(Collections.singletonList(new LootItem())));
         lootSets.put("common", lootSet);
 
@@ -63,41 +62,57 @@ public class Data implements ConfigurationSerializable {
     }
 
     public Data(Map<String, Object> args) {
-        int rev = (int) args.getOrDefault("rev", 0); // for legacy unmarked revisions
+        try {
+            // Try to load revision from config
+            // This only works for rev 0 or 1
+            // If not found, load default, which is 2
+            int rev = Main.get().rev; //(int) args.get("rev"); // for legacy unmarked revisions
 
-        if (rev == 0) {
-            // 2/20/2022 and before
-            cleanAfterDays = (int) args.getOrDefault("cleanHour", 7) / 24;
-            Main.get().lang.translate = (boolean) args.getOrDefault("translate", false);
-        } else if (rev == 1) {
-            // after 2/20/22
-            cleanAfterDays = (int) args.getOrDefault("cleanAfterDays", 7);
+            //if (Main.get().rev >= 2)
+            //    rev = Main.get().rev;
+
+            if (rev == 0) {
+                // 2/20/2022 and before
+                cleanAfterDays = (int) args.getOrDefault("cleanHour", 7) / 24;
+                Main.get().lang.translate = (boolean) args.getOrDefault("translate", false);
+            } else if (rev == 1) {
+                // after 2/20/22
+                cleanAfterDays = (int) args.getOrDefault("cleanAfterDays", 7);
+            }
+
+            speed = (int) args.getOrDefault("speed", 4);
+
+            if (rev < 2) {
+                unSelectedItem = (ItemStack) args.get("unSelectedItem");
+                selectedItem = (ItemStack) args.get("selectedItem");
+            } else if (rev == 2) {
+                unSelectedItem = ((MinItemStack) args.get("unSelectedItem")).get().build();
+                selectedItem = ((MinItemStack) args.get("selectedItem")).get().build();
+            }
+
+            // load in the same way, but need to pass name somehow
+            lootSets = (LinkedHashMap<String, LootSet>) args.get("lootSets");
+            for (Map.Entry<String, LootSet> entry : lootSets.entrySet()) {
+                entry.getValue().id = entry.getKey();
+            }
+
+            crates = (LinkedHashMap<String, Crate>) args.get("crates");
+            for (Map.Entry<String, Crate> entry : crates.entrySet()) {
+                String id = entry.getKey();
+                Crate crate = entry.getValue();
+
+                crate.id = id;
+                crate.itemStack = LootCratesAPI.makeCrate(crate.itemStack, id);
+
+                // initialize weights
+                crate.sumsToWeights();
+            }
+
+            fireworkEffect = (FireworkEffect) args.get("fireworkEffect");
+        } catch (Exception e) {
+            Main.get().error("Failed to load config: " + e.getMessage());
+            Main.get().error("You can try to fix this manually (good luck) or reset the config with </crates reset>");
         }
-
-        speed = (int) args.getOrDefault("speed", 4);
-
-        unSelectedItem = (ItemStack) args.get("unSelectedItem");
-        selectedItem = (ItemStack) args.get("selectedItem");
-
-        // load in the same way, but need to pass name somehow
-        lootSets = (LinkedHashMap<String, LootSet>) args.get("lootSets");
-        for (Map.Entry<String, LootSet> entry : lootSets.entrySet()) {
-            entry.getValue().id = entry.getKey();
-        }
-
-        crates = (LinkedHashMap<String, Crate>) args.get("crates");
-        for (Map.Entry<String, Crate> entry : crates.entrySet()) {
-            String id = entry.getKey();
-            Crate crate = entry.getValue();
-
-            crate.id = id;
-            crate.itemStack = LootCratesAPI.makeCrate(crate.itemStack, id);
-
-            // initialize weights
-            crate.sumsToWeights();
-        }
-
-        fireworkEffect = (FireworkEffect) args.get("fireworkEffect");
     }
 
     public ItemStack unSelectedItem(Player p) {
@@ -128,21 +143,27 @@ public class Data implements ConfigurationSerializable {
 
     @Override
     public final Map<String, Object> serialize() {
-        Map<String, Object> result = new LinkedHashMap<>();
+        try {
+            Map<String, Object> result = new LinkedHashMap<>();
 
-        result.put("rev", REV_LATEST);
-        result.put("cleanAfterDays", cleanAfterDays);
-        result.put("speed", speed);
+            Main.get().info("Saving inner data");
 
-        result.put("unSelectedItem", unSelectedItem);
-        result.put("selectedItem", selectedItem);
+            result.put("cleanAfterDays", cleanAfterDays);
+            result.put("speed", speed);
 
-        result.put("lootSets", lootSets);
+            result.put("unSelectedItem", new MinItemStack(unSelectedItem));
+            result.put("selectedItem", new MinItemStack(selectedItem));
 
-        result.put("crates", crates);
+            result.put("lootSets", lootSets);
 
-        result.put("fireworkEffect", fireworkEffect);
+            result.put("crates", crates);
 
-        return result;
+            result.put("fireworkEffect", fireworkEffect);
+
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
     }
 }

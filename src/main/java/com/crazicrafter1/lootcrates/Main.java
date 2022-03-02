@@ -2,10 +2,7 @@ package com.crazicrafter1.lootcrates;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
-import com.crazicrafter1.crutils.ColorUtil;
-import com.crazicrafter1.crutils.GitUtils;
-import com.crazicrafter1.crutils.Metrics;
-import com.crazicrafter1.crutils.Version;
+import com.crazicrafter1.crutils.*;
 import com.crazicrafter1.lootcrates.cmd.Cmd;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import com.crazicrafter1.lootcrates.crate.Crate;
@@ -17,6 +14,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -25,20 +23,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nonnull;
 import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 public class Main extends JavaPlugin
 {
+    public static final int REV_LATEST = 2;
     private final File configFile = new File(getDataFolder(), "config.yml");
     private final File playerFile = new File(getDataFolder(), "player_stats.yml");
     private final File backupPath = new File(getDataFolder(), "backup");
+    private final File revFile = new File(getDataFolder(), "rev.yml");
     private FileConfiguration config = null;
 
     /*
@@ -55,6 +51,7 @@ public class Main extends JavaPlugin
     public Data data;
     public Lang lang;
     private final HashMap<UUID, PlayerStat> playerStats = new HashMap<>();
+    public int rev = -1;
 
     @Nonnull
     public PlayerStat getStat(UUID uuid) {
@@ -114,7 +111,7 @@ public class Main extends JavaPlugin
             GitUtils.checkForUpdateAsync(this, "PeriodicSeizures", "Lootcrates", (result, tag) -> popup("Update " + tag + " is available"));
         }
 
-        String COLOR = ColorUtil.color(SPLASH);
+        String COLOR = ColorUtil.render(SPLASH);
 
         if (Version.AT_LEAST_v1_16.a())
             Bukkit.getConsoleSender().sendMessage("\n\n\n\n" + COLOR + "\n\n\n\n");
@@ -138,6 +135,7 @@ public class Main extends JavaPlugin
         ConfigurationSerialization.registerClass(Data.class, "Data");
         ConfigurationSerialization.registerClass(LootSet.class, "LootSet");
         ConfigurationSerialization.registerClass(Crate.class, "Crate");
+        ConfigurationSerialization.registerClass(MinItemStack.class, "MinItemStack");
 
         // api for easy
         LootCratesAPI.registerLoot(LootItemCrate.class);
@@ -161,11 +159,20 @@ public class Main extends JavaPlugin
         if (supportMMOItems)
             LootCratesAPI.registerLoot(LootMMOItem.class);
 
+        // Issues with automatic revision detection:
+        // revision file does not exist before rev2
+        // revision exists in config in rev2
+
+        // If there is no rev file, this could mean two things:
+        // the plugin is a fresh deployment (or config does not exist)
+        // the config is rev 1 or older revision
+        //
+
         reloadConfig();
 
-        if (data == null) {
-            return;
-        }
+        //if (data == null) {
+        //    return;
+        //}
 
         /*
          * bStats metrics init
@@ -186,7 +193,36 @@ public class Main extends JavaPlugin
         new ListenerOnInventoryDrag(this);
         new ListenerOnPlayerInteract(this);
         new ListenerOnPlayerInteract(this);
-        new ListenerOnPlayerQuit(this);
+        new ListenerOnPlayerJoinQuit(this);
+    }
+
+    // -1 on indefinite revision
+    private boolean findRev() {
+        if (rev >= 0)
+            return true;
+
+        // look for config
+        if (!configFile.exists()) {
+            rev = REV_LATEST;
+            return true;
+        }
+
+        if (revFile.exists()) {
+            FileConfiguration revConfig = new YamlConfiguration();
+            try {
+                revConfig.load(revFile);
+                rev = revConfig.getInt("rev", REV_LATEST);
+            } catch (IOException ignored) {}
+            catch (InvalidConfigurationException e) {
+                error("Unable to parse " + revFile.getName() + ": " + e.getMessage());
+                rev = REV_LATEST;
+            }
+            return true;
+        }
+
+        rev = -1;
+
+        return false;
     }
 
     private static final String SPLASH =
@@ -195,29 +231,6 @@ public class Main extends JavaPlugin
                     "&#adf3fd\\ &#aaf0fd\\ &#a7eefd\\&#a4ebfd_&#a1e9fd_&#9ee6fd_&#9ae3fd\\ &#97e1fd\\ &#94defd\\&#91dcfd/&#8ed9fd\\ &#8bd7fd\\ &#88d4fd\\ &#85d1fd\\&#82cffc/&#7fccfc\\ &#7bcafc\\&#78c7fc/&#75c4fc_&#72c2fc/&#6fbffc\\ &#6cbdfc\\&#69bafc\\ &#66b8fc\\ &#63b5fc\\&#60b2fc_&#5db0fc_&#59adfc_&#56abfc\\ &#53a8fc\\  &#50a5fc_&#4da3fc_&#4aa0fc<&#479efc\\ &#449bfc\\  &#4199fc_&#3e96fc_ &#3b93fc\\&#3791fc/&#348efc_&#318cfb/&#2e89fb\\ &#2b86fb\\&#2884fb\\ &#2581fb\\  &#227ffb_&#1f7cfb_&#1c7afb\\&#1877fb\\ &#1574fb\\&#1272fb_&#0f6ffb_&#0c6dfb_  &#096afb\\  \n" +
                     " &#adf3fd\\ &#aaf1fd\\&#a8effd_&#a5edfd_&#a3ebfd_&#a0e8fd_&#9ee6fd_&#9be4fd\\ &#99e2fd\\&#96e0fd_&#94defd_&#91dcfd_&#8fdafd_&#8cd8fd_&#8ad5fd\\ &#87d3fd\\&#85d1fd_&#82cffc_&#80cdfc_&#7dcbfc_&#7bc9fc_&#78c7fc\\ &#75c5fc\\ &#73c3fc\\&#70c0fc_&#6ebefc\\&#6bbcfc\\ &#69bafc\\&#66b8fc_&#64b6fc_&#61b4fc_&#5fb2fc_&#5cb0fc_&#5aadfc\\ &#57abfc\\&#55a9fc_&#52a7fc\\ &#50a5fc\\&#4da3fc_&#4ba1fc\\ &#489ffc\\&#469dfc_&#439afc\\ &#4198fc\\&#3e96fc_&#3b94fc\\ &#3992fc\\ &#3690fc\\&#348efc_&#318cfb\\&#2f8afb\\ &#2c88fb\\&#2a85fb_&#2783fb_&#2581fb_&#227ffb_&#207dfb_&#1d7bfb\\&#1b79fb/&#1877fb\\&#1675fb_&#1372fb_&#1170fb_&#0e6efb_&#0c6cfb_&#096afb\\ \n" +
                     "  &#adf3fd\\&#abf1fd/&#a8effd_&#a6edfd_&#a4ebfd_&#a1e9fd_&#9fe7fd_&#9de5fd/&#9ae3fd\\&#98e1fd/&#96dffd_&#93ddfd_&#91dcfd_&#8fdafd_&#8cd8fd_&#8ad6fd/&#88d4fd\\&#85d2fd/&#83d0fc_&#80cefc_&#7eccfc_&#7ccafc_&#79c8fc_&#77c6fc/  &#75c4fc\\&#72c2fc/&#70c0fc_&#6ebefc/ &#6bbcfc\\&#69bafc/&#67b8fc_&#64b6fc_&#62b4fc_&#60b2fc_&#5db0fc_&#5baffc/&#59adfc\\&#56abfc/&#54a9fc_&#52a7fc/ &#4fa5fc/&#4da3fc_&#4ba1fc/&#489ffc\\&#469dfc/&#449bfc_&#4199fc/&#3f97fc\\&#3d95fc/&#3a93fc_&#3891fc/  &#368ffc\\&#338dfc/&#318bfb_&#2e89fb/ &#2c87fb\\&#2a85fb/&#2783fb_&#2581fb_&#2380fb_&#207efb_&#1e7cfb_&#1c7afb/&#1978fb\\&#1776fb/&#1574fb_&#1272fb_&#1070fb_&#0e6efb_&#0b6cfb_&#096afb/ ";
-
-
-    //private static final String FLAME_SPLASH =
-    //        "\n" +
-    //                "                              &#A51101)`·.                                                                                                                                                                  &#A51101)`·.                                                      '                                                                                                                                        ’                               &#A51101)`·.           \n" +
-    //                "                  &#A51101/(      &#BD2B02.·´    (                                  &#A51101)`·.                                         &#A51101)`·.                                                                   &#A51101/(      &#BD2B02.·´    &#BD2B02(                        &#A51101'                                                                                                                         &#A51101(`·.                    &#A51101)`·._.·´(        &#A51101)`·.                   &#A51101/(      &#BD2B02.·´    (           \n" +
-    //                "          &#A51101)\\      &#BD2B02)  `·._):::.    )’'                   &#A51101/(      &#BD2B02.·´    (                             &#A51101/(      &#BD2B02.·´    (                    &#A51101(`·.                  &#A51101)\\               &#A51101)\\      &#BD2B02)  `·._):::.    &#E34D00)        &#A51101’'            &#A51101(`·.               &#A51101)\\'                            &#A51101)\\       &#A51101)\\                            &#A51101(`·.                  &#A51101)\\            &#BD2B02\\::`·._)`·.     &#A51101)\\.·´::...  .::)   &#BD2B02.·´   ./           &#A51101)\\      &#BD2B02)  `·._):::.    &#E34D00)        ’'\n" +
-    //                "    &#A51101)\\ .·´ .:`·.(:;;  --  ' '\\:. :(             &#A51101)\\      &#BD2B02)  `·._):::.    )        &#A51101'’          &#A51101)\\      &#BD2B02)  `·._):::.    )        &#A51101'’            &#BD2B02)  `·.      &#BD2B02.·´( .·´  (        &#A51101)\\ &#BD2B02.·´ .:`·.(:;;  --  ' '\\:. :(.·´)    &#BD2B02)\\              &#BD2B02)  `·.   &#A51101.·´( .·´  (     &#A51101/('                 &#BD2B02.·´  /  .·´.:/           &#A51101.·´(                &#BD2B02)  `·.      .·´( .·´  (      &#E34D00.·´(   )::. ..:::).·´;· --  ´ ´\\::.`·.(::...:(’       &#A51101)\\ .·´ .:`·.(:;;  --  ' '\\:. :(.·´)    &#A51101)\\ \n" +
-    //                ".·´  (,): --  ' '              \\:·´       &#A51101)\\ .·´ .:`·.(:;;  --  ' '\\:. :(.·´)    &#BD2B02)\\     &#BD2B02)\\ .·´ .:`·.(:;;  --  ' '\\:. :(.·´)    &#BD2B02)\\     &#E34D00.·´( .·´:..::(,__(::..--  ' &#E34D00'\\:·´('.·´  (,): --  ' '              \\....:::`·.(  (     .·´( .·´:..::(,(::--  ' '\\::.`·._) &#BD2B02`·.’     &#A51101.·´(     ):.::`·.)::::)    &#A51101)\\     &#BD2B02)   `·.     &#E34D00.·´( .·´:..::(,__(::..--  ' '\\:·´('  ):..\\(;;::--  ´ ´               ’\\:::::::...::)   .·´  (,): --  ' '              \\....:::`·.(  (\n" +
-    //                "):.::/\\                ,..::´/       .·´  (,): --  ' '              \\....:::`·.(  (.·´  (,): --  ' '              \\....:::`·.(  (   D);; :--  ' ’                  _\\::/):.::/\\                        ¯¯¯` · ::·´’     );; :--   '               \\::....:::::)   &#E34D00(  &#BD2B02.:::`·./::;,  --  ' '\\/(.·´.::).·´:   .::)   D);; :--  ' ’                  _\\::/(::...:/\\                          ’¯¯¯¯¯¯/'    ):.::/\\                        ¯¯¯`·’ ::·´ \n" +
-    //                "`·:/::::\\...:´/       /:::::/        ):.::/\\                        ¯¯¯` · ::·´’):.::/\\                        ¯¯¯` · ::·´’.·´/\\                   ,.. : ´:::'/:’ ’`·:/::::\\...:´/       ____          \\       .·´/\\                ,...__ ¯¯¯` ·:·´’.·´.;);;--  ' '               '\\:::::.    .:::·´'.·´/\\                   ,.. : ´:::'/:’ ’  `·:/::::\\...:´/        ___________'/      `·:/::::\\...:´/       ____          \\     \n" +
-    //                "   \\::::/::::/      /;:::-'     '     `·:/::::\\...:´/       ____          \\     `·:/::::\\...:´/       ____          \\     )/:::'\\__..:´/       /::::::::::/   ' '   \\::::/::::/      /::::::::/\\         I\"     )/:::'\\...:´/       /:::::::::::/     /   I:::/\\                         `` ··:::::·´   ’')/:::'\\__..:´/       /::::::::::/   ' '     \\::::/::::/        /:::::::::;; --  ´ ´\\     ’    \\::::/::::/      /::::::::/\\         'I’   \n" +
-    //                "     \\/;::-'/      /              '      \\::::/::::/      /::::::::/I        /    ’'   \\::::/::::/      /::::::::/I        /    ’' \\:::/:::::·'/       /:::;;::· ´'            \\/;::-'/’     /::::::::/:::I       /        \\:::/::::/       /;;::;;´-··´´     /  '  )/::::'\\..:´/       /`::-..,         `./      '  \\:::/:::::·'/       /:::;;::· ´'              \\/;::-'/        /;;::·-  ´ ´         _\\    '      \\/;::-'/      /::::::::/:::I       ’/    \n" +
-    //                "          /      /                        \\/;::-'/      /::::::::/:/       /'           \\/;::-'/      /::::::::/:/       /'        '\\/;::::-'/       /· ´                          /’     /¯¯¯¯¯\\::'/..-::::/          '\\/;::-'/               ,...::::´/     ' '\\:::'/::::/       /,::-·· ' '         /           '\\/;::::-'/       /· ´                            /                      .,.,·:::::'/   ’'           /I      I¯¯¯¯¯\\::'/..-::::/    ’'\n" +
-    //                "        '/      /       &#A51101)`·.         '          /      /¯¯¯¯¯'I/       /''                 /      /¯¯¯¯¯'I/       /''          (`·.)':/       /'                            ’/     /__.·´(    I:/::::::/                 /       ,, -,      \\::::::/    '     \\/;::-'/       ,...-:::' '/        /         '    (`·.)':/       /'                      )`·.    '/         _ ,.,.,·:::::::::::::::/     '         /::I       ` * · . ____           \n" +
-    //                "   .·´/I       I     .·´ ..(.·´(    '         '/      /          /       /         '        '/      /          /       /         '     ):./       /'                '        .·´/I'       I `·::__)  /;;::- '´           .·´( '/       /:::/::\\      \\:· ´                /       /:::::::::/        /                 ):./       /'                '     (::..:(.·/         /:::::::::::::::::::--  ´      ’        I:::/`:::·...              /’   '      \n" +
-    //                "   )/::I,       ` ·’.):::...:::/.·´:('       /I      'I         /       /'      '           /I      'I         /       /'      '        '\\:/       /'                          )/::I,       ` · .                       ’'_) ::/       '/;;:/::::'\\      '\\          ’'     '/       /;::: ·- '/        '/           '      '\\:/       /'                        `·::..'/          `·__:::::· ’\\:   .·´                   I:/::::::::::::·-,       ’/'           \n" +
-    //                "   I:::::::.,         ¯¯¯¯¯¯’.·´/     /::/`· ,    ` ·,_'/       /’                 /::/`· ,    ` ·,_'/       /’                 /       /'                 '          I:::::::.,         ¯¯¯.·´/              )..::/       /    '\\::::::'\\      '\\             /____/.·´)    (/        '/            '       /       /'                 '            )/`·.                        \\(              ’         ` ·::;;::- ··  ´´      /'         '   \n" +
-    //                "   I::::::::::::.. ______.·´:::/’    I:/::::::::` · , ___,.·:/'             '    I:/::::::::` · , ___,.·:/'             '   '/,..::·´/'                             I::::::::::::.. __.·´:::/               ’`·:/____ /       '\\::::::\\____\\         /::::::::/;;  --  ´´      .·´/                  '/,..::·´/'                              /::::::`·._____ ...·::::::/                  /\\¯¯¯¯         ,,  -:::::'/'              \n" +
-    //                "    ' ·:::;:::::::/::::::::::/::::·´'      `·:;::::::::::/:::::/:::/'      '             `·:;::::::::::/:::::/:::/'      '         '/:::::::'/                                ' ·:::;:::::::/::/::::·´                 ' /::::::::/           '\\::::/:::::::/       /::::::::/':-.., .,..-:::'/::::/                 '/:::::::'/                                `·:::::::/::::::::/:::::::::/                 ’/::::\\,,  -::::´´::::::::::::/''               \n" +
-    //                "         ' ·::::'/::::::::::/::·´               ` ·:;:::/:::::/;·´'             '             ` ·:;:::/:::::/;·´'             '   /:;:: · ´'                       '               ' ·::::'/::/::·´                     /::::::::/              '\\/:::::::'/     '    ¯¯¯¯/::::::/:::::::/:::·´                  /:;:: · ´'                       '              `·::/::::::::/::::: ·´´                   ’\\:::/:::::::::::::::;;::-·´´'                 '\n" +
-    //                "                ¯¯¯¯¯¯      '                     ¯¯¯ ’                                      ¯¯¯ ’                      ¯                                   ’'                  ¯                        ’'¯¯¯¯¯                 ¯¯¯¯          ’       '` ·::;/::;::-·· ´´                   '   ¯                                   ’'            ¯¯¯¯¯                               '\\/::::::;;::-· ´´'                           \n";
-
 
     @Override
     public void onDisable() {
@@ -251,6 +264,13 @@ public class Main extends JavaPlugin
         this.config = new YamlConfiguration();
         this.lang = new Lang();
 
+        if (!findRev()) {
+            // then we have a problem
+            // must ask for revision
+            error("Unable to detect revision");
+            return;
+        }
+
         loadPlayerStats();
 
         try {
@@ -259,7 +279,7 @@ public class Main extends JavaPlugin
             config.load(configFile);
             data = (Data) config.get("data");
         } catch (Exception e) {
-            error(e.getMessage());
+            //error(e.getMessage());
             try {
                 popup("Attempt 2: Loading default config");
 
@@ -267,7 +287,7 @@ public class Main extends JavaPlugin
                 config.load(configFile);
                 data = (Data) config.get("data");
             } catch (Exception e1) {
-                error(e1.getMessage());
+                //error(e1.getMessage());
                 try {
                     warn("Attempt 3: Populating config with defaults");
 
@@ -295,28 +315,24 @@ public class Main extends JavaPlugin
 
         info("Making a backup of the config");
 
-        try {
-            backupFile.getParentFile().mkdirs();
-
-            ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(backupFile));
-            zipOut.putNextEntry(new ZipEntry(configFile.getName()));
-
-            byte[] bytes = config.saveToString().getBytes();
-            zipOut.write(bytes, 0, bytes.length);
-
-            zipOut.close();
-
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return false;
+        return Util.backupZip(configFile, backupFile);
     }
 
     @Override
     public void saveConfig() {
         // if a backup was successfully made, then save
+
+        if (rev == -1)
+            return;
+
+        // save
+        FileConfiguration revConfig = new YamlConfiguration();
+        revConfig.set("rev", REV_LATEST);
+        try {
+            revConfig.save(revFile);
+        } catch (IOException e) {
+            error("Unable to save " + revFile.getName() + ": " + e.getMessage());
+        }
 
         lang.saveLanguageFiles();
 
@@ -332,7 +348,7 @@ public class Main extends JavaPlugin
                 error("Failed to save config");
                 e.printStackTrace();
             }
-        }
+        } else error("Config was not backed up");
 
         deleteOldBackups();
     }

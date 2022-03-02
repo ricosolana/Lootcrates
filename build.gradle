@@ -35,7 +35,8 @@ repositories {
 
 dependencies {
     compileOnly "org.spigotmc:spigot-api:${project.spigot_version}"
-    implementation 'com.github.PeriodicSeizures:CRUtils:main-SNAPSHOT'
+    //implementation 'com.github.PeriodicSeizures:CRUtils:main-SNAPSHOT'
+    implementation files('C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.18.1 paper\\plugins\\CRUtils.jar')
     implementation 'com.github.PeriodicSeizures:Gapi:main-SNAPSHOT'
     implementation 'me.zombie_striker:QualityArmory:2.0.6-SNAPSHOT'
     implementation 'com.github.SkriptLang:Skript:2.6.1'
@@ -57,6 +58,10 @@ tasks.withType(JavaCompile).configureEach {
     if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
         options.release = targetJavaVersion
     }
+}
+
+tasks.withType(Jar) {
+    destinationDirectory = file("C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.18.1 paper\\plugins\\")
 }
 
 jar {

@@ -1,273 +1,215 @@
-# 2730: 1.17.1
-# 1976: 1.14.4
+# Default config
+# Automatically converted from rev1 to rev2
 data:
-  ==: Data
-  cleanAfterDays: 7 # in days now
+  ==: com.crazicrafter1.lootcrates.Data
+  cleanAfterDays: 7
   speed: 4
-  #give-message: "&aYou were given a %lc_id% crate by"
   unSelectedItem:
-    ==: org.bukkit.inventory.ItemStack
-    v: 1976
+    ==: com.crazicrafter1.crutils.ItemBuilder
     type: CHEST
-    meta:
-      ==: ItemMeta
-      meta-type: TILE_ENTITY
-      display-name: §f§l???
-      lore:
-        - §7§oChoose 4 mystery chests, and
-        - §7§oyour loot will be revealed!
-      blockMaterial: CHEST
+    name: '&f&l???'
+    lore:
+      - '&7&oChoose 4 mystery chests, and'
+      - '&7&oyour loot will be revealed!'
   selectedItem:
-    ==: org.bukkit.inventory.ItemStack
-    v: 1976
+    ==: com.crazicrafter1.crutils.ItemBuilder
     type: WHITE_STAINED_GLASS_PANE
-    meta:
-      ==: ItemMeta
-      meta-type: UNSPECIFIC
-      display-name: §f§l???
-      lore:
-        - §7You have selected this mystery chest
+    name: '&f&l???'
+    lore:
+      - '&7You have selected this mystery chest'
   lootSets:
     common: &id003
-      ==: LootSet
-      itemStack:
-        ==: org.bukkit.inventory.ItemStack
-        v: 1976
+      ==: com.crazicrafter1.lootcrates.crate.LootSet
+      item:
+        ==: com.crazicrafter1.crutils.ItemBuilder
         type: WHITE_STAINED_GLASS_PANE
-        meta:
-          ==: ItemMeta
-          meta-type: UNSPECIFIC
-          display-name: §f§lCommon Reward
-          lore:
-            - §7Click to redeem!
+        name: '&f&lCommon Reward'
+        lore:
+          - '&7Click to redeem!'
       loot:
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 1
           max: 31
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: TNT
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 32
           max: 32
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: TNT
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 16
           max: 16
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: DIAMOND
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 64
           max: 64
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: CACTUS
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 1
           max: 31
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: COAL
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 1
           max: 31
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: BLAZE_ROD
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 32
           max: 32
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: OBSIDIAN
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 4
           max: 4
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: DIAMOND_BLOCK
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 1
           max: 15
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: POTATO
     regular: &id002
-      ==: LootSet
-      itemStack:
-        ==: org.bukkit.inventory.ItemStack
-        v: 1976
+      ==: com.crazicrafter1.lootcrates.crate.LootSet
+      item:
+        ==: com.crazicrafter1.crutils.ItemBuilder
         type: YELLOW_STAINED_GLASS_PANE
-        meta:
-          ==: ItemMeta
-          meta-type: UNSPECIFIC
-          display-name: §e§lRegular Reward
-          lore:
-            - §7Click to redeem!
+        name: '&e&lRegular Reward'
+        lore:
+          - '&7Click to redeem!'
       loot:
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 8
           max: 8
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: GOLD_BLOCK
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 1
           max: 31
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: OBSIDIAN
-        - ==: LootItemCrate
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItemCrate
           min: 1
           max: 1
           crate: peasant
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 16
           max: 16
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: DIAMOND
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 1
           max: 31
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: CACTUS
     ultra: &id001
-      ==: LootSet
-      itemStack:
-        ==: org.bukkit.inventory.ItemStack
-        v: 1976
+      ==: com.crazicrafter1.lootcrates.crate.LootSet
+      item:
+        ==: com.crazicrafter1.crutils.ItemBuilder
         type: BLUE_STAINED_GLASS_PANE
-        meta:
-          ==: ItemMeta
-          meta-type: UNSPECIFIC
-          display-name: §b§lUltra Reward
-          lore:
-            - §7Click to redeem!
+        name: '&b&lUltra Reward'
+        lore:
+          - '&7Click to redeem!'
       loot:
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 6
           max: 6
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: DIAMOND_BLOCK
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 64
           max: 64
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: OBSIDIAN
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 1
           max: 1
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: DIAMOND_CHESTPLATE
     rare: &id004
-      ==: LootSet
-      itemStack:
-        ==: org.bukkit.inventory.ItemStack
-        v: 1976
+      ==: com.crazicrafter1.lootcrates.crate.LootSet
+      item:
+        ==: com.crazicrafter1.crutils.ItemBuilder
         type: PURPLE_STAINED_GLASS_PANE
-        meta:
-          ==: ItemMeta
-          meta-type: UNSPECIFIC
-          display-name: §d§lRare Reward
-          lore:
-            - §7Click to redeem!
+        name: '&d&lRare Reward'
+        lore:
+          - '&7Click to redeem!'
       loot:
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 1
           max: 31
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: TNT
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 16
           max: 16
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: DIAMOND
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 1
           max: 31
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: CACTUS
     legendary: &id005
-      ==: LootSet
-      itemStack:
-        ==: org.bukkit.inventory.ItemStack
-        v: 1976
+      ==: com.crazicrafter1.lootcrates.crate.LootSet
+      item:
+        ==: com.crazicrafter1.crutils.ItemBuilder
         type: RED_STAINED_GLASS_PANE
-        meta:
-          ==: ItemMeta
-          meta-type: UNSPECIFIC
-          display-name: §c§lLegendary Reward
-          lore:
-            - §7Click to redeem!
+        name: '&c&lLegendary Reward'
+        lore:
+          - '&7Click to redeem!'
       loot:
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 1
           max: 1
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: DIAMOND_LEGGINGS
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 1
           max: 1
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: DIAMOND_HELMET
-        - ==: LootItem
+        - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 8
           max: 8
-          itemStack:
-            ==: org.bukkit.inventory.ItemStack
-            v: 1976
+          item:
+            ==: com.crazicrafter1.crutils.ItemBuilder
             type: GOLDEN_APPLE
   crates:
     peasant:
-      ==: Crate
-      itemStack:
-        ==: org.bukkit.inventory.ItemStack
-        v: 1976
+      ==: com.crazicrafter1.lootcrates.crate.Crate
+      item:
+        ==: com.crazicrafter1.crutils.ItemBuilder
         type: CHEST
-        meta:
-          ==: ItemMeta
-          meta-type: TILE_ENTITY
-          display-name: §f§lPeasant Loot §r§7(Tier 1)
-          lore:
-            - §7Right click on this item to unlock
-            - §7four pieces of loot!
-          internal: H4sIAAAAAAAA/+NiYOBgYHUuSixJZWAvSE0sTswrYQAAGUjyDhUAAAA=
-          blockMaterial: CHEST
-      title: §7Choose your loot ...
+        name: '&f&lPeasant Loot &7(Tier 1)'
+        lore:
+          - '&7Right click on this item to unlock'
+          - '&7four pieces of loot!'
+      title: ยง7Choose your loot ...
       columns: 3
       picks: 4
       sound: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -276,21 +218,15 @@ data:
         *id002: 14
         *id003: 56
     knight:
-      ==: Crate
-      itemStack:
-        ==: org.bukkit.inventory.ItemStack
-        v: 1976
+      ==: com.crazicrafter1.lootcrates.crate.Crate
+      item:
+        ==: com.crazicrafter1.crutils.ItemBuilder
         type: CHEST
-        meta:
-          ==: ItemMeta
-          meta-type: TILE_ENTITY
-          display-name: §b§lKnight Plunder §r§7(Tier 2)
-          lore:
-            - §7Right click on this item to unlock
-            - §7four pieces of loot!
-          internal: H4sIAAAAAAAA/+NiYOBgYHUuSixJZWDLzstMzyhhAAA/nIHiFAAAAA==
-          blockMaterial: CHEST
-      title: §7Choose your loot ...
+        name: '&b&lKnight Plunder &7(Tier 2)'
+        lore:
+          - '&7Right click on this item to unlock'
+          - '&7four pieces of loot!'
+      title: ยง7Choose your loot ...
       columns: 3
       picks: 3
       sound: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -300,21 +236,15 @@ data:
         *id004: 35
         *id005: 42
     king:
-      ==: Crate
-      itemStack:
-        ==: org.bukkit.inventory.ItemStack
-        v: 1976
+      ==: com.crazicrafter1.lootcrates.crate.Crate
+      item:
+        ==: com.crazicrafter1.crutils.ItemBuilder
         type: CHEST
-        meta:
-          ==: ItemMeta
-          meta-type: TILE_ENTITY
-          display-name: §c§lKing Bounty §r§7(Tier 3)
-          lore:
-            - §7Right click on this item to unlock
-            - §7four pieces of loot!
-          internal: H4sIAAAAAAAA/+NiYOBgYHUuSixJZWDJzsxLZwAApQ9CFhIAAAA=
-          blockMaterial: CHEST
-      title: §7Choose your loot ...
+        name: '&c&lKing Bounty &7(Tier 3)'
+        lore:
+          - '&7Right click on this item to unlock'
+          - '&7four pieces of loot!'
+      title: ยง7Choose your loot ...
       columns: 4
       picks: 3
       sound: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -346,4 +276,3 @@ data:
         BLUE: 26
         GREEN: 81
     type: BURST
-

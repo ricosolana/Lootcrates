@@ -7,6 +7,7 @@ import com.crazicrafter1.gapi.SimpleMenu;
 import com.crazicrafter1.gapi.TextMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -17,10 +18,10 @@ import static com.crazicrafter1.lootcrates.Editor.*;
 public class ItemModifyMenu extends SimpleMenu.SBuilder {
 
     public ItemModifyMenu() {
-        super(5);
+        super(2);
     }
 
-    public static final String BASE64_CUSTOM_MODEL_DATA = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzQ2NDg3NGRmNDUyYzFkNzE3ZWRkZDBmYjNiODQ4MjAyYWQxNTU3MTI0NWFmNmZhZGUyZWNmNTE0ZjNjODBiYiJ9fX0=";
+    public static final String BASE64_CUSTOM_MODEL_DATA = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjU2NTJlYzMzYmI4YWJjNjMxNTA5M2Q1ZGZlMGYzNGQ0NzRjMjc3ZGE5YjBmMmE3MjZkNTA0ODY0ZTMxMDA5MyJ9fX0=";
 
     private ItemBuilder builder;
 
@@ -28,36 +29,35 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
         builder = ItemBuilder.copyOf(it);
         return (ItemModifyMenu) title(p -> Lang.Edit_item)
                 .background()
-                .parentButton(4, 4)
-                .button(2, 1, IN_OUTLINE)
-                .button(3, 2, IN_OUTLINE)
-                .button(2, 3, IN_OUTLINE)
-                .button(1, 2, IN_OUTLINE)
-                .button(1, 1, new Button.Builder()
-                        .icon(p -> builder.copy().name(builder.getName(), ColorMode.INVERT_RENDERED)
-                                .lore(builder.getLoreString(), ColorMode.INVERT_RENDERED)
+                .parentButton(4, 1)
+
+                // Completely inverted raw text
+                .button(8, 0, new Button.Builder()
+                        .icon(p -> builder.copy().name(ChatColor.GRAY + ColorUtil.invert(builder.getName()), ColorMode.AS_IS)
+                                .lore(ChatColor.GRAY + ColorUtil.invert(builder.getLoreString()), ColorMode.AS_IS)
                                 .build())
                 )
-                .button(1, 3, new Button.Builder()
+                // RENDER_ALL text
+                .button(8, 1, new Button.Builder()
                         .icon(p -> builder.copy().renderAll().build())
                 )
-                // Edit ItemStack
-                .button(2, 2, new Button.Builder()
-                        .icon(p -> builder.copy().build())
+
+                // The item AS-IS
+                .button(6, 0, new Button.Builder()
+                        .icon(p -> builder.copy().name("&7" + builder.getName()).build())
                         .lmb((interact) -> {
                             if (interact.heldItem == null) {
                                 return Result.MESSAGE(Lang.Must_swap);
                             }
-                            builder = ItemBuilder.copyOf(interact.heldItem);
 
-                            // reapply a new item result for fancy consistency
-                            builder = ItemBuilder.copyOf(itemStackFunction.apply(builder.build()));
+                            builder = ItemBuilder.copyOf(itemStackFunction.apply(interact.heldItem));
 
                             return Result.GRAB();
                         }))
+
                 // Edit Name
-                .childButton(6, 1, p -> ItemBuilder.copyOf(Material.NAME_TAG).name("&e" + Lang.Name).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
-                        .title(p -> Lang.Name)
+                .childButton(0, 1, p -> ItemBuilder.copyOf(Material.NAME_TAG).name(Lang.NAME).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
+                        .title(p -> Lang.NAME)
                         .leftRaw(p -> builder.getNameOrLocaleName(), ColorMode.INVERT_RENDERED, null, ColorMode.AS_IS)
                         .right(p -> "Special formatting", ColorMode.AS_IS, p -> COLORS, ColorMode.AS_IS)
                         .onClose((player) -> Result.PARENT())
@@ -71,9 +71,9 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
 
                             return Result.PARENT();
                         }))
-                // Edit Lore
-                .childButton(6, 3, p -> ItemBuilder.copyOf(Material.MAP).name(Lang.EDIT_LORE).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
-                        .title(p -> Lang.EDIT_LORE)
+                // Edit Lore                                                                                // terrible name
+                .childButton(1, 1, p -> ItemBuilder.copyOf(Material.GLOBE_BANNER_PATTERN).hideFlags(ItemFlag.HIDE_POTION_EFFECTS).name(Lang.LORE).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
+                        .title(p -> Lang.LORE)
                         .leftRaw(p -> Util.def(builder.getLoreString(), Lang.LOREM_IPSUM).replace("\n", "\\n"), ColorMode.INVERT_RENDERED, null, ColorMode.AS_IS)
                         .right(p -> "Special formatting", ColorMode.AS_IS, p -> COLORS, ColorMode.AS_IS)
                         .onClose((player) -> Result.PARENT())
@@ -88,7 +88,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             return Result.PARENT();
                         }))
                 // Edit CustomModelData
-                .childButton(6, 2, p -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").skull(BASE64_CUSTOM_MODEL_DATA).name("&8" + Lang.CUSTOM_MODEL).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
+                .childButton(2, 1, p -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").skull(BASE64_CUSTOM_MODEL_DATA).name(Lang.CUSTOM_MODEL).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.CUSTOM_MODEL)
                         .leftRaw(p -> {
                             ItemMeta meta = builder.getMeta();

@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
@@ -81,9 +82,10 @@ public class Data implements ConfigurationSerializable {
             speed = (int) args.getOrDefault("speed", 4);
 
             if (rev < 2) {
-                unSelectedItem = (ItemBuilder) args.get("unSelectedItem");
-                selectedItem = (ItemBuilder) args.get("selectedItem");
+                unSelectedItem = ItemBuilder.mutable((ItemStack) args.get("unSelectedItem"));
+                selectedItem = ItemBuilder.mutable((ItemStack) args.get("selectedItem"));
             } else if (rev == 2) {
+                // after 3/2/22
                 unSelectedItem = ((ItemBuilder) args.get("unSelectedItem"));
                 selectedItem = ((ItemBuilder) args.get("selectedItem"));
             }
@@ -110,6 +112,7 @@ public class Data implements ConfigurationSerializable {
         } catch (Exception e) {
             Main.get().error("Failed to load config: " + e.getMessage());
             Main.get().error("You can try to fix this manually (good luck) or reset the config with </crates reset>");
+            e.printStackTrace();
         }
     }
 

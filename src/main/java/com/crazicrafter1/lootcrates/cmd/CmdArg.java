@@ -40,88 +40,13 @@ class CmdArg {
         //args.put("locale", new CmdArg((sender, args) ->
         //        feedback(sender,"Locale: " + ((Player)sender).getLocale()), null));
 
-        /*
         args.put("lang", new CmdArg((sender, args, flags) -> {
-            if (args.length == 0) {
-                return info(sender, String.format("Currently ") + Main.get().lang.translations.size() + L(" languages are loaded)") + "\n" + Main.get().lang.translations.keySet());
-            }
 
-            boolean success;
-            if ((args.length == 1 || args[1].equalsIgnoreCase("confirm"))
-                && (args[0].equalsIgnoreCase("save") || args[0].equalsIgnoreCase("load"))) {
+            String lang = args[0];
+            Lang.load(lang);
 
-                if (args.length == 1)
-                    return warn(sender, L("Are you sure you want to save/load all language files? If so, append") + " 'CONFIRM'" + L(" to the command"));
-
-                switch (args[0].toLowerCase()) {
-                    case "save": {
-                        success = Main.get().lang.saveLanguageFiles();
-                        break;
-                    }
-                    case "load": {
-                        success = Main.get().lang.loadLanguageFiles();
-                        break;
-                    }
-                    default:
-                        return error(sender, L("Unknown argument"));
-                }
-            } else {
-                String lang = args[1];
-                switch (args[0].toLowerCase()) {
-                    case "save": {
-                        success = Main.get().lang.saveLanguageFile(lang);
-                        break;
-                    }
-                    case "load": {
-                        success = Main.get().lang.loadLanguageFile(lang);
-                        break;
-                    }
-                    case "translate": {
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                final long start = System.currentTimeMillis();
-                                Lang.Unit unit = Main.get().lang.createLanguageFile(lang);
-                                final long end = System.currentTimeMillis();
-
-
-
-                                new BukkitRunnable() {
-                                    @Override
-                                    public void run() {
-                                        if (unit != null) {
-                                            info(sender, "Successfully created language");
-                                            info(sender, String.format(L("Operation took") + " %.02fs", (float) (end - start) / 1000.f));
-                                            Main.get().lang.translations.put(lang, unit);
-                                        }
-                                        else
-                                            error(sender, L("Operation failed (see console)"));
-                                    }
-                                }.runTaskLater(Main.get(), 0);
-
-
-
-                            }
-                        }.runTaskAsynchronously(Main.get());
-
-                        return info(sender, L("Asynchronously creating language ") + lang);
-                    }
-                    default:
-                        return error(sender, L("Unknown argument"));
-                }
-            }
-
-            return success ?
-                    info(sender, L("Operation success")) :
-                    error(sender, L("Operation failed (see console)"));
-        }, (sender, args) -> {
-            if (args.length == 1) {
-                return getMatches(args[0], Arrays.asList("save", "load", "translate"));
-            } else if (args.length == 2 && args[0].equalsIgnoreCase("save") || args[0].equalsIgnoreCase("load"))
-                return getMatches(args[1], Main.get().lang.translations.keySet());
-            return new ArrayList<>();
-        }));
-         */
+            return info(sender, "Loading language");
+        }, null));
 
         args.put("populate", new CmdArg((sender, args, flags) -> {
             plugin.saveConfig();

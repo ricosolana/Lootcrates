@@ -35,6 +35,7 @@ public class Main extends JavaPlugin
     private final File playerFile = new File(getDataFolder(), "player_stats.yml");
     private final File backupPath = new File(getDataFolder(), "backup");
     private final File revFile = new File(getDataFolder(), "rev.yml");
+    private final File langFile = new File(getDataFolder(), "lang.yml");
     private FileConfiguration config = null;
 
     /*
@@ -49,6 +50,7 @@ public class Main extends JavaPlugin
     public SkriptAddon addon;
 
     public Data data;
+    public String language;
     private final HashMap<UUID, PlayerStat> playerStats = new HashMap<>();
     public int rev = -1;
 
@@ -199,12 +201,6 @@ public class Main extends JavaPlugin
         if (rev >= 0)
             return true;
 
-        // look for config
-        if (!configFile.exists()) {
-            rev = REV_LATEST;
-            return true;
-        }
-
         if (revFile.exists()) {
             FileConfiguration revConfig = new YamlConfiguration();
             try {
@@ -215,6 +211,12 @@ public class Main extends JavaPlugin
                 error("Unable to parse " + revFile.getName() + ": " + e.getMessage());
                 rev = REV_LATEST;
             }
+            return true;
+        }
+
+        // look for config
+        if (!configFile.exists()) {
+            rev = REV_LATEST;
             return true;
         }
 
@@ -269,6 +271,22 @@ public class Main extends JavaPlugin
         }
 
         loadPlayerStats();
+
+        // load language from file if possible
+        try {
+            // load default language en
+            Lang.save("en_default");
+
+            YamlConfiguration langConfig = new YamlConfiguration();
+            langConfig.load(langFile);
+            language = (String) langConfig.get("language", "en");
+            if (!language.equals("en")) {
+                Lang.load(language);
+            }
+        } catch (IOException ignored) {}
+        catch (InvalidConfigurationException e) {
+            e.printStackTrace();
+        }
 
         try {
             info("Attempt 1: Loading config");
@@ -328,6 +346,15 @@ public class Main extends JavaPlugin
             revConfig.save(revFile);
         } catch (IOException e) {
             error("Unable to save " + revFile.getName() + ": " + e.getMessage());
+        }
+
+        try {
+            YamlConfiguration langConfig = new YamlConfiguration();
+            langConfig.set("language", language);
+            langConfig.save(langFile);
+            //Lang.save(language);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         savePlayerStats();

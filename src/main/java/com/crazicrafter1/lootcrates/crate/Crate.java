@@ -195,15 +195,17 @@ public class Crate implements ConfigurationSerializable {
                 // *   *   *
                 // Edit Crate ItemStack
                 // *   *   *
-                .childButton(1, 1, p -> ItemBuilder.copyOf(item.getMaterial()).name(Lang.EDIT_ITEM).lore(Lang.LMB_EDIT).build(), new ItemModifyMenu()
+                .childButton(1, 1, p -> ItemBuilder.copyOf(item).name(Lang.EDIT_ITEM).lore(Lang.LMB_EDIT).build(), new ItemModifyMenu()
                         .build(item.build(), (itemStack -> {
-                            // This will break NBT if the server is not reloaded
-                            //this.itemStack = itemStack;
-
                             // Several options here
                             // Should the name and lore be merged along also?
                             // or just the material?
-                            return ItemBuilder.mutable(this.item).combine(itemStack).material(itemStack.getType()).build();
+                            this.item.material(itemStack.getType());
+
+                            String base64 = ItemBuilder.mutable(itemStack).getSkull();
+                            if (base64 != null)
+                                this.item.skull(base64);
+                            return this.item.combine(itemStack).build();
                             //this.itemStack.setType(itemStack.getType());
                         }))
                 )

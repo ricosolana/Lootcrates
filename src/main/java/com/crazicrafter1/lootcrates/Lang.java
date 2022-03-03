@@ -1,5 +1,11 @@
 package com.crazicrafter1.lootcrates;
 
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+
+import java.io.File;
+import java.lang.reflect.Field;
+
 public class Lang {
 
     public static final String LOREM_IPSUM = "Lorem ipsum";
@@ -27,10 +33,7 @@ public class Lang {
 
     static final String Edit_item = "Edit item";
     static final String Must_swap = "Must swap with an item";
-    static final String Name = "Name";
-    static final String Input_name = "Input custom item name";
-    static final String Input_lore = "Input custom item lore";
-    static final String Newline = "newline";
+    static final String NAME = "&eName";
     static final String Input_integer = "Input an integer";
 
     public static String LMB_EDIT = "&7LMB: &aEdit";
@@ -39,12 +42,11 @@ public class Lang {
     public static String RMB_INC = "&7RMB: &a+";
     public static String MMB_TOGGLE = "&fMMB: &7toggle";
     public static String SHIFT_MUL = "&7Shift: &r&7x5";
-    public static String BUTTON_COLUMNS = "&8&nColumns: &r&7%d";
-    public static String BUTTON_PICKS = "&8&nPicks: &r&7%d";
-    public static String BUTTON_SOUND = "&a&nSound: &r&7%s";
+    public static String BUTTON_COLUMNS = "&8&nColumns&r&8: &7%d";
+    public static String BUTTON_PICKS = "&8&nPicks&r&8: &7%d";
+    public static String BUTTON_SOUND = "&a&nSound&r&8: &7%s";
     public static String TITLE_SOUND = "Sound";
     public static String INPUT_SOUND = "Input a sound";
-    public static String PLACE_HERE = "&7Put item here";
 
     public static String DUPLICATE = "Invalid or duplicate";
     //public static String CRATE_ID = "&8id: %s";
@@ -63,9 +65,9 @@ public class Lang {
     public static String SET_BY_NAME = "&eSet item by name";
     public static String MMO_ENTER = "Enter as type:name";
 
-    public static String EDIT_LORE = "Lore";
+    public static String LORE = "&bLore";
 
-    public static String CUSTOM_MODEL = "Custom model data";
+    public static String CUSTOM_MODEL = "&6Custom model";
 
     public static String MMO_FORMAT = "&8Format";
     public static String MMO_FORMAT_LORE = "&7 - exact level and tier\nrandom level and tier\nscale with player\nExample usage:";
@@ -76,6 +78,8 @@ public class Lang {
 
     public static String ITEM_COUNT = "&7Count: &f%d";
     public static String ITEM_RANGE = "&7Range: &f[%d, %d]";
+
+    public static String SPECIAL_FORMATTING = "&7&lSpecial formatting";
 
     public static String LMB_NEW = "&7LMB: &6New";
     public static String NEW_LOOTSET = "New LootSet";
@@ -110,11 +114,54 @@ public class Lang {
     public static String TITLE = "Title";
     public static String EDIT_ITEM = "&8&nItemStack";
 
-    public static String EDIT_TITLE = "&e&nEdit title&r&e: %s";
+    public static String EDIT_TITLE = "&e&nTitle&r&e: %s";
 
     public static String LOOT = "&6&nLoot";
 
     public static String ERR_INVALID = "Invalid input";
 
+    private static File langDir = new File(Main.get().getDataFolder(), "lang/");
+
+    public static void load(String language) {
+        try {
+            langDir.mkdirs();
+            File file = new File(langDir, language + ".yml");
+            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+
+            for (String key : config.getKeys(false)) {
+                // get field by that name
+                try {
+                    Field field = Lang.class.getDeclaredField(key);
+                    if (field.getType() == String.class) {
+                        field.set(null, config.getString(key).replace("\\n", "\n"));
+                    }
+                } catch (Exception ignored) {}
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void save(String language) {
+        try {
+            langDir.mkdirs();
+
+            FileConfiguration config = new YamlConfiguration();
+
+            for (Field field : Lang.class.getDeclaredFields()) {
+                try {
+                    if (field.getType() == String.class) {
+                        config.set(field.getName(), ((String)field.get(null)).replace("\n", "\\n"));
+                    }
+                } catch (Exception ignored) {}
+            }
+
+            File file = new File(langDir, language + ".yml");
+            config.save(file);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

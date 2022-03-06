@@ -1,9 +1,6 @@
 package com.crazicrafter1.lootcrates.crate;
 
-import com.crazicrafter1.crutils.ColorMode;
-import com.crazicrafter1.crutils.ColorUtil;
-import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.crutils.Util;
+import com.crazicrafter1.crutils.*;
 import com.crazicrafter1.gapi.*;
 import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.lootcrates.Main;
@@ -73,17 +70,9 @@ public class Crate implements ConfigurationSerializable {
         this.totalWeights = prevSum;
     }
 
-    // Any translation applicable values below
-    // such as title, and itemStack name
-    // are defaulted to English (en_us).
-
-    // so a check will involve checking whether
-    // the player language is en_us, and if not,
-    // then attempt a translation
-
     public String id;
     public ItemBuilder item;
-    public String title;
+    public String title; // stored in RENDER_MARKERS form
     public int columns;
     public int picks;
     public Sound sound;
@@ -95,14 +84,17 @@ public class Crate implements ConfigurationSerializable {
     public Crate(String id, ItemStack itemStack, String title, int columns, int picks, Sound sound) {
         this.id = id;
         this.item = ItemBuilder.copyOf(LootCratesAPI.makeCrate(itemStack, id));
-        this.title = ColorUtil.render(title);
+        this.title = ColorUtil.renderMarkers(title);
         this.columns = columns;
         this.picks = picks;
         this.sound = sound;
     }
 
     public Crate(Map<String, Object> args) {
-        title = ColorUtil.render((String) args.get("title"));
+        Main.get().info("map title:" + args.get("title"));
+        title = ColorUtil.renderMarkers((String) args.get("title"));
+        Main.get().info("post title:" + title);
+
         columns = (int) args.get("columns");
         picks = (int) args.get("picks");
         sound = Sound.valueOf((String) args.get("sound"));
@@ -120,12 +112,9 @@ public class Crate implements ConfigurationSerializable {
      * unknown whether config map retains original order
      */
     LootSet getRandomLootSet() {
-        int rand = Util.randomRange(0, totalWeights-1);
+        int rand = ProbabilityUtil.randomRange(0, totalWeights-1);
 
-        /// could use binary search, which is faster for larger sets,
-        /// where the random weight is closer to the upper bound
-        /// current search: O(random weight - max weight)
-        /// binary search: O(random weight
+        /// TODO use binary search for large sets
         for (Map.Entry<LootSet, Integer> entry : this.lootBySum.entrySet()) {
             if (entry.getValue() > rand) return entry.getKey();
         }
@@ -149,9 +138,9 @@ public class Crate implements ConfigurationSerializable {
     public ItemStack itemStack(@Nullable Player p, boolean renderAll) {
         ItemBuilder item = ItemBuilder.copyOf(this.item);
 
-        item.macro("%", "lc_picks", "" + picks)
-                .macro("%", "lc_id", "" + id)
-                .macro("%", "lc_lscount", "" + lootBySum.size())
+        item.replace("lc_picks", "" + picks, '%')
+                .replace("lc_id", "" + id, '%')
+                .replace("lc_lscount", "" + lootBySum.size(), '%')
                 .placeholders(p);
 
         return item
@@ -159,8 +148,8 @@ public class Crate implements ConfigurationSerializable {
                 .build();
     }
 
-    public String title(@Nonnull Player p) {
-        return Util.placeholders(p, title);
+    public String getTitle(@Nonnull Player p) {
+        return Util.placeholders(p, this.title);
     }
 
     @Override
@@ -178,7 +167,7 @@ public class Crate implements ConfigurationSerializable {
         Map<String, Object> result = new LinkedHashMap<>();
 
         result.put("item", item);
-        result.put("title", title);
+        result.put("title", ColorUtil.invertRendered(title));
         result.put("columns", columns);
         result.put("picks", picks);
         result.put("sound", sound.name());
@@ -205,19 +194,22 @@ public class Crate implements ConfigurationSerializable {
                             String base64 = ItemBuilder.mutable(itemStack).getSkull();
                             if (base64 != null)
                                 this.item.skull(base64);
-                            return this.item.combine(itemStack).build();
+                            return this.item.apply(itemStack).build();
                             //this.itemStack.setType(itemStack.getType());
                         }))
                 )
                 // Edit Inventory Title
-                .childButton(3, 1, p -> ItemBuilder.copyOf(Material.PAPER).name(String.format(Lang.EDIT_TITLE, title)).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
+                .childButton(3, 1, p -> {
+                    Main.get().info("title:" + title);
+                        return ItemBuilder.copyOf(Material.PAPER).name(String.format(Lang.EDIT_TITLE, title)).lore(Lang.LMB_EDIT).build();
+                    }, new TextMenu.TBuilder()
                         .title(p -> Lang.TITLE)
-                        .leftRaw(p -> ColorMode.INVERT_RENDERED.a(title))
+                        .leftRaw(p -> title)
                         .onClose((player) -> Result.PARENT())
-                        .right(p -> "Special formatting", ColorMode.AS_IS, p -> Editor.COLORS, ColorMode.AS_IS)
+                        .right(p -> Lang.SPECIAL_FORMATTING, p -> Editor.getColorDem(), ColorUtil.AS_IS)
                         .onComplete((p, s, b) -> {
                             if (!s.isEmpty()) {
-                                title = ColorMode.RENDER_MARKERS.a(s);
+                                title = ColorUtil.RENDER_MARKERS.a(s);
                                 return Result.PARENT();
                             }
 
@@ -254,7 +246,7 @@ public class Crate implements ConfigurationSerializable {
                                         // decrement
                                         int change = interact.shift ? 5 : 1;
 
-                                        lootByWeight.put(lootSet, Util.clamp(weight - change, 1, Integer.MAX_VALUE));
+                                        lootByWeight.put(lootSet, MathUtil.clamp(weight - change, 1, Integer.MAX_VALUE));
                                         weightsToSums();
 
                                         return Result.REFRESH();
@@ -262,7 +254,7 @@ public class Crate implements ConfigurationSerializable {
                                         // decrement
                                         int change = interact.shift ? 5 : 1;
 
-                                        lootByWeight.put(lootSet, Util.clamp(weight + change, 1, Integer.MAX_VALUE));
+                                        lootByWeight.put(lootSet, MathUtil.clamp(weight + change, 1, Integer.MAX_VALUE));
                                         weightsToSums();
 
                                         return Result.REFRESH();
@@ -288,12 +280,12 @@ public class Crate implements ConfigurationSerializable {
                         .icon(p -> ItemBuilder.copyOf(Material.LADDER).name(String.format(Lang.BUTTON_COLUMNS, columns)).lore(Lang.LMB_DEC + "\n" + Lang.RMB_INC).amount(columns).build())
                         .lmb(interact -> {
                             // decrease
-                            columns = Util.clamp(columns - 1, 1, 6);
+                            columns = MathUtil.clamp(columns - 1, 1, 6);
                             return Result.REFRESH();
                         })
                         .rmb(interact -> {
                             // decrease
-                            columns = Util.clamp(columns + 1, 1, 6);
+                            columns = MathUtil.clamp(columns + 1, 1, 6);
                             return Result.REFRESH();
                         }))
                 // *   *   *
@@ -303,12 +295,12 @@ public class Crate implements ConfigurationSerializable {
                         .icon(p -> ItemBuilder.copyOf(Material.MELON_SEEDS).name(String.format(Lang.BUTTON_PICKS, picks)).lore(Lang.LMB_DEC + "\n" + Lang.RMB_INC).amount(picks).build())
                         .lmb(interact -> {
                             // decrease
-                            picks = Util.clamp(picks - 1, 1, columns*9);
+                            picks = MathUtil.clamp(picks - 1, 1, columns*9);
                             return Result.REFRESH();
                         })
                         .rmb(interact -> {
                             // decrease
-                            picks = Util.clamp(picks + 1, 1, columns*9);
+                            picks = MathUtil.clamp(picks + 1, 1, columns*9);
                             return Result.REFRESH();
                         }))
                 // *   *   *
@@ -317,7 +309,7 @@ public class Crate implements ConfigurationSerializable {
                 .childButton(6, 3, p -> ItemBuilder.copyOf(Material.JUKEBOX).name(String.format(Lang.BUTTON_SOUND, sound)).lore(Lang.LMB_EDIT).build(),
                         new TextMenu.TBuilder()
                                 .title(p -> Lang.TITLE_SOUND)
-                                .leftRaw(p -> "Lorem ipsum")
+                                .leftRaw(p -> Editor.LOREM_IPSUM)
                                 .right(p -> Lang.INPUT_SOUND)
                                 .onClose((player) -> Result.PARENT())
                                 .onComplete((p, s, b) -> {

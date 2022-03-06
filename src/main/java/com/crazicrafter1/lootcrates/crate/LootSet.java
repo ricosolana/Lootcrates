@@ -74,7 +74,7 @@ public class LootSet implements ConfigurationSerializable {
                 .addAll((self1, p00) -> {
                     ArrayList<Button> result1 = new ArrayList<>();
                     for (ILoot a : loot) {
-                        ItemStack copy = a.getMenuIcon(null);
+                        ItemStack copy = a.getMenuIcon(p00);
 
                         AbstractMenu.Builder menu = a.getMenuBuilder().title(p -> a.getClass().getSimpleName());
 

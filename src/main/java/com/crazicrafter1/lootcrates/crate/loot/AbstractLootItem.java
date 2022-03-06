@@ -1,6 +1,7 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.crutils.ItemBuilder;
+import com.crazicrafter1.crutils.ProbabilityUtil;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.Lang;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
@@ -49,7 +50,7 @@ public abstract class AbstractLootItem implements ILoot {
 
     @Nonnull
     protected ItemStack ofRange(@Nonnull Player p, @Nonnull ItemStack itemStack) {
-        return ItemBuilder.copyOf(itemStack).amount(Util.randomRange(min, max)).placeholders(p).renderAll().build();
+        return ItemBuilder.copyOf(itemStack).amount(ProbabilityUtil.randomRange(min, max)).placeholders(p).renderAll().build();
     }
 
     @Nonnull

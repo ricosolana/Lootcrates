@@ -13,15 +13,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.function.Function;
 
-import static com.crazicrafter1.lootcrates.Editor.*;
-
 public class ItemModifyMenu extends SimpleMenu.SBuilder {
 
     public ItemModifyMenu() {
         super(2);
     }
 
-    public static final String BASE64_CUSTOM_MODEL_DATA = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjU2NTJlYzMzYmI4YWJjNjMxNTA5M2Q1ZGZlMGYzNGQ0NzRjMjc3ZGE5YjBmMmE3MjZkNTA0ODY0ZTMxMDA5MyJ9fX0=";
+    private static final String BASE64_CUSTOM_MODEL_DATA = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjU2NTJlYzMzYmI4YWJjNjMxNTA5M2Q1ZGZlMGYzNGQ0NzRjMjc3ZGE5YjBmMmE3MjZkNTA0ODY0ZTMxMDA5MyJ9fX0=";
 
     private ItemBuilder builder;
 
@@ -33,9 +31,14 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
 
                 // Completely inverted raw text
                 .button(8, 0, new Button.Builder()
-                        .icon(p -> builder.copy().name(ChatColor.GRAY + ColorUtil.invert(builder.getName()), ColorMode.AS_IS)
-                                .lore(ChatColor.GRAY + ColorUtil.invert(builder.getLoreString()), ColorMode.AS_IS)
-                                .build())
+                        .icon(p -> {
+                            String lore = ColorUtil.invertRendered(builder.getLoreString());
+                            return builder.copy().name(ChatColor.GRAY + ColorUtil.invertRendered(builder.getName()), ColorUtil.AS_IS)
+                                // GRAY will only be applied to the first line
+                                // How to fix this
+                                .lore(lore != null ? ChatColor.GRAY + String.join("\n" + ChatColor.GRAY, lore.split("\n")) : null, ColorUtil.AS_IS)
+                                .build();
+                        })
                 )
                 // RENDER_ALL text
                 .button(8, 1, new Button.Builder()
@@ -58,12 +61,12 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                 // Edit Name
                 .childButton(0, 1, p -> ItemBuilder.copyOf(Material.NAME_TAG).name(Lang.NAME).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.NAME)
-                        .leftRaw(p -> builder.getNameOrLocaleName(), ColorMode.INVERT_RENDERED, null, ColorMode.AS_IS)
-                        .right(p -> "Special formatting", ColorMode.AS_IS, p -> COLORS, ColorMode.AS_IS)
+                        .leftRaw(p -> builder.getNameOrLocaleName())
+                        .right(p -> Lang.SPECIAL_FORMATTING, p -> Editor.getColorDem(), ColorUtil.AS_IS)
                         .onClose((player) -> Result.PARENT())
                         .onComplete((player, s, b) -> {
                             if (s.isEmpty()) {
-                                builder.resetName();
+                                builder.removeName();
                             } else
                                 builder.name(s);
 
@@ -74,12 +77,12 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                 // Edit Lore                                                                                // terrible name
                 .childButton(1, 1, p -> ItemBuilder.copyOf(Material.GLOBE_BANNER_PATTERN).hideFlags(ItemFlag.HIDE_POTION_EFFECTS).name(Lang.LORE).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.LORE)
-                        .leftRaw(p -> Util.def(builder.getLoreString(), Lang.LOREM_IPSUM).replace("\n", "\\n"), ColorMode.INVERT_RENDERED, null, ColorMode.AS_IS)
-                        .right(p -> "Special formatting", ColorMode.AS_IS, p -> COLORS, ColorMode.AS_IS)
+                        .leftRaw(p -> Util.def(builder.getLoreString(), Editor.LOREM_IPSUM).replace("\n", "\\n"))
+                        .right(p -> Lang.SPECIAL_FORMATTING, p -> Editor.getColorDem(), ColorUtil.AS_IS)
                         .onClose((player) -> Result.PARENT())
                         .onComplete((player, s, b) -> {
                             if (s.isEmpty()) {
-                                builder.resetLore();
+                                builder.removeLore();
                             } else
                                 builder.lore(s.replace("\\n", "\n"));
 
@@ -94,7 +97,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             ItemMeta meta = builder.getMeta();
                             if (meta != null && meta.hasCustomModelData())
                                 return "" + meta.getCustomModelData();
-                            return Lang.LOREM_IPSUM;
+                            return Editor.LOREM_IPSUM;
                         })
                         .right(p -> "&7" + Lang.Input_integer)
                         .onClose((player) -> Result.PARENT())

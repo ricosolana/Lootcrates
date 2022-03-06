@@ -1,10 +1,12 @@
 package com.crazicrafter1.lootcrates.cmd;
 
 import com.crazicrafter1.crutils.ColorUtil;
+import com.crazicrafter1.crutils.MutableString;
 import com.crazicrafter1.crutils.TriFunction;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.lootcrates.crate.Crate;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -12,6 +14,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -54,12 +57,46 @@ class CmdArg {
             return info(sender, Lang.POPULATING);
         }, null));
 
-        args.put("gradient", new CmdArg((sender, args, flags) -> {
+        args.put("colors", new CmdArg((sender, args, flags) -> {
             if (args.length == 0)
-                return error(sender, "Usage: crates gradient \"<#883388>Inertia is a property of matter</#1144FF>\"");
+                return error(sender, "Usage: crates colors <#883388>Inertia is a property of matter</#1144FF>");
 
-            return info(sender, ColorUtil.renderAll(args[0]));
-        }, null));
+            return info(sender, ColorUtil.renderAll(String.join(" ", args)));
+        }, (sender, args) -> {
+
+            String s = String.join(" ", args);
+
+            MutableString m = new MutableString(s);
+
+            int lastOpen = m.lastIndexOf('<');
+            if (lastOpen != -1) {
+                MutableString color = MutableString.mutable(m).subRight('<', lastOpen);
+
+                // #RRGGBB
+                // /#RRGGBB
+                if (!color.startsWith('#')) {
+
+                    // GR
+                    int lastClose = color.indexOf('>');
+                    if (lastClose == -1) {
+
+                        int slashIndex = m.indexOf('/', lastOpen);
+
+                        // determine whether this is contained within a closing gradient (either implicitly or explicitly)
+                        // closing bracket detection is difficult
+                        // without scanning the entire string prior for
+
+                        // then get matches for the unclosed
+                        return getMatches(color.subLeft('/').toString(), ColorUtil.COLORS.keySet(),
+                                m.subLeft('<',lastOpen, 1, true)
+                                        .subRight(' ', 0, args.length - 1).append(slashIndex != -1 ? "/" : "").append("%s").toString()
+                        );
+                    }
+                }
+            }
+
+            return new ArrayList<>();
+        }));
 
         args.put("rev", new CmdArg((sender, args, flags) -> {
             if (args[0].equalsIgnoreCase("latest")) {
@@ -102,14 +139,14 @@ class CmdArg {
             if (args.length == 1) {
                 if (!(sender instanceof Player))
                     return error(sender, Lang.ERR_PLAYER_CRATE);
-                Util.giveItemToPlayer((Player) sender, crate.itemStack((Player) sender, true));
+                Util.give((Player) sender, crate.itemStack((Player) sender, true));
                 return info(sender, String.format(Lang.SELF_GIVE_CRATE, crate.id));
             }
 
             if (args[1].equals("*")) {
                 int given = 0;
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    Util.giveItemToPlayer(p, crate.itemStack(p, true));
+                    Util.give(p, crate.itemStack(p, true));
                     if (p != sender && !(flags.contains("s") || flags.contains("silent")))
                         info(p, String.format(Lang.RECEIVE_CRATE, crate.id));
                     given++;
@@ -125,7 +162,7 @@ class CmdArg {
             if (p == null)
                 return error(sender, Lang.ERR_PLAYER_UNKNOWN);
 
-            Util.giveItemToPlayer(p, crate.itemStack(p, true));
+            Util.give(p, crate.itemStack(p, true));
 
             // Redundant spam
             if (p != sender) {
@@ -203,7 +240,7 @@ class CmdArg {
                                         @Override
                                         public void run() {
                                             //new MainMenu().show(p);
-                                            new Editor(p).open();
+                                            new Editor().open(p);
                                         }
                                     }.runTaskLater(plugin, 20 * 2 + 10);
 
@@ -216,7 +253,7 @@ class CmdArg {
                     }.runTaskLater(plugin, 20 * 2 + 10);
 
                 } else {
-                    new Editor(p).open();
+                    new Editor().open(p);
                 }
 
                 stat.editorMessaged = true;
@@ -258,21 +295,20 @@ class CmdArg {
         return Main.get().error(sender, message);
     }
 
+    //static List<String> getNonDestructiveMatches(String arg, Collection<String> samples, String)
+
     static List<String> getMatches(String arg, Collection<String> samples) {
-        List<String> matches = new ArrayList<>();
+        return getMatches(arg, samples, "%s");
+    }
 
-        // limit returned result set to 8 entries
-        int c = 0;
-        for (String s : samples) {
-            if (c > 8)
-                break;
+    static List<String> getMatches(String arg, Collection<String> samples, String format) {
 
-            if (s.toLowerCase().replace(" ", "").startsWith(arg.toLowerCase())) {
-                matches.add(s);
-                c++;
-            }
-        }
+        //Stream<SimilarString> similar = samples.stream().map(s -> new SimilarString(s, arg));
 
-        return matches;
+        return samples.parallelStream().filter(s -> s.toLowerCase().startsWith(arg.toLowerCase()))
+                .limit(10).map(s -> String.format(format, s)).collect(Collectors.toList());
+
+        //return similar.filter(s -> s.s.toLowerCase().replace(" ", "").contains(arg.toLowerCase()))
+        //        .sorted().limit(10).map(s -> String.format(format, s)).collect(Collectors.toList());
     }
 }

@@ -1,5 +1,7 @@
 package com.crazicrafter1.lootcrates;
 
+import com.crazicrafter1.crutils.ColorUtil;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -8,7 +10,8 @@ import java.lang.reflect.Field;
 
 public class Lang {
 
-    public static final String LOREM_IPSUM = "Lorem ipsum";
+    public static String CUSTOM_MACROS = "&9Custom macros: ";
+    public static String SEPARATE_LORE = "&eSeparate lore lines: ";
 
     public static String TITLE_EDITOR = "Editor";
 
@@ -53,7 +56,7 @@ public class Lang {
     public static String LOOT_COMMAND = "&7Command: &f%s";
     public static String EDIT_COMMAND = "Edit command";
     public static String INPUT_COMMAND = "Input the command";
-    public static String SUPPORT_PAPI = "Supports PlaceholderAPI";
+    public static String SUPPORT_PLUGIN_X = "&6Supports %s";
 
     public static String MINIMUM = "&8&nMinimum";
     public static String MAXIMUM = "&8&nMaximum";
@@ -80,6 +83,8 @@ public class Lang {
     public static String ITEM_RANGE = "&7Range: &f[%d, %d]";
 
     public static String SPECIAL_FORMATTING = "&7&lSpecial formatting";
+
+    //public static String LOOT_MMO_ITEM_SPECIAL_TITLE
 
     public static String LMB_NEW = "&7LMB: &6New";
     public static String NEW_LOOTSET = "New LootSet";

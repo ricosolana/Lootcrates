@@ -1,5 +1,6 @@
 package com.crazicrafter1.lootcrates.crate;
 
+import com.crazicrafter1.crutils.ColorUtil;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.Data;
 import com.crazicrafter1.lootcrates.Main;
@@ -56,7 +57,7 @@ public final class ActiveCrate {
         this.sound = crate.sound;
         this.lootChances = new LootSet[size];
 
-        this.inventory = Bukkit.createInventory(p, size, crate.title(p));
+        this.inventory = Bukkit.createInventory(p, size, ColorUtil.renderAll(crate.getTitle(p)));
         this.lockSlot = lockSlot;
 
         this.populate(crate);
@@ -178,9 +179,9 @@ public final class ActiveCrate {
             for (Map.Entry<Integer, QSlot> entry : slots.entrySet()) {
                 if (entry.getValue().randomLoot.execute(this)) {
                     if (entry.getValue().isHidden)
-                        Util.giveItemToPlayer(player, entry.getValue().randomLoot.getRenderIcon(player));
+                        Util.give(player, entry.getValue().randomLoot.getRenderIcon(player));
                     else
-                        Util.giveItemToPlayer(player, inventory.getItem(entry.getKey()));
+                        Util.give(player, inventory.getItem(entry.getKey()));
                 }
             }
         }

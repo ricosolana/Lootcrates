@@ -1,6 +1,7 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.crutils.ItemBuilder;
+import com.crazicrafter1.crutils.MathUtil;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.gapi.AbstractMenu;
 import com.crazicrafter1.gapi.Button;
@@ -74,12 +75,12 @@ public final class LootItem extends AbstractLootItem {
                 .button(5, 2, new Button.Builder()
                         .lmb(interact -> {
                             int change = interact.shift ? 5 : 1;
-                            min = Util.clamp(min - change, 1, min);
+                            min = MathUtil.clamp(min - change, 1, min);
                             return Result.REFRESH();
                         })
                         .rmb(interact -> {
                             int change = interact.shift ? 5 : 1;
-                            min = Util.clamp(min + change, 1, max);
+                            min = MathUtil.clamp(min + change, 1, max);
                             return Result.REFRESH();
                         })
                         .icon(p -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name(Lang.MINIMUM).skull(Editor.BASE64_DEC).lore(Lang.LMB_DEC + "\n" + Lang.RMB_INC + "\n" + Lang.SHIFT_MUL).amount(min).build()))
@@ -87,12 +88,12 @@ public final class LootItem extends AbstractLootItem {
                 .button(7, 2, new Button.Builder()
                         .lmb(interact -> {
                             int change = interact.shift ? 5 : 1;
-                            max = Util.clamp(max - change, min, item.getMaxSize());
+                            max = MathUtil.clamp(max - change, min, item.getMaxSize());
                             return Result.REFRESH();
                         })
                         .rmb(interact -> {
                             int change = interact.shift ? 5 : 1;
-                            max = Util.clamp(max + change, min, item.getMaxSize());
+                            max = MathUtil.clamp(max + change, min, item.getMaxSize());
                             return Result.REFRESH();
                         })
                         .icon(p -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name(Lang.MAXIMUM).skull(Editor.BASE64_INC).lore(Lang.LMB_DEC + "\n" + Lang.RMB_INC + "\n" + Lang.SHIFT_MUL).amount(max).build()));

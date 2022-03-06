@@ -112,12 +112,12 @@ public class Main extends JavaPlugin
             GitUtils.checkForUpdateAsync(this, "PeriodicSeizures", "Lootcrates", (result, tag) -> popup("Update " + tag + " is available"));
         }
 
-        String COLOR = ColorUtil.render(SPLASH);
+        String COLOR = ColorUtil.renderMarkers(SPLASH);
 
         if (Version.AT_LEAST_v1_16.a())
             Bukkit.getConsoleSender().sendMessage("\n\n\n\n" + COLOR + "\n\n\n\n");
         else {
-            String STRIP = ColorUtil.strip(COLOR);
+            String STRIP = ColorUtil.stripRendered(COLOR);
             int i = STRIP.indexOf("\n") / 3;
 
             Bukkit.getConsoleSender().sendMessage("\n\n\n\n"
@@ -329,7 +329,7 @@ public class Main extends JavaPlugin
 
         info("Making a backup of the config");
 
-        return Util.backupZip(configFile, backupFile);
+        return Util.zip(configFile, backupFile);
     }
 
     @Override

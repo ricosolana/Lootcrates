@@ -1,6 +1,6 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
-import com.crazicrafter1.crutils.ColorMode;
+import com.crazicrafter1.crutils.ColorUtil;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.gapi.*;
 import com.crazicrafter1.lootcrates.Lang;
@@ -69,10 +69,10 @@ public class LootItemQA extends AbstractLootItem {
         return new ParallaxMenu.PBuilder()
                 .parentButton(4, 5)
                 //.childButton(2, 5, () -> new ItemBuilder(Material.COMPASS).name("&eSearch..."), new )
-                .button(3, 5, new Button.Builder().icon((p) -> getMenuIcon(null)))
+                .button(3, 5, new Button.Builder().icon(this::getMenuIcon))
                 .childButton(5, 5, p -> ItemBuilder.copyOf(Material.COMPASS).name(Lang.ASSIGN_EXACT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.ASSIGN_EXACT)
-                        .leftRaw(p -> name, ColorMode.STRIP_RENDERED, null, ColorMode.STRIP_RENDERED)
+                        .leftRaw(p -> name)
                         .right(p -> Lang.SET_BY_NAME)
                         .onClose((player) -> Result.PARENT())
                         .onComplete((p, s, b) -> {
@@ -90,7 +90,7 @@ public class LootItemQA extends AbstractLootItem {
                     QualityArmory.getCustomItems().forEachRemaining(customBaseObject -> {
                         if (customBaseObject.getName().equals(this.name)) {
                             result.add(new Button.Builder()
-                                    .icon((p) -> ItemBuilder.copyOf(getRenderIcon(null)).build())
+                                    .icon(p -> ItemBuilder.copyOf(getMenuIcon(p)).build())
                                     .get());
                         } else {
                             result.add(new Button.Builder()

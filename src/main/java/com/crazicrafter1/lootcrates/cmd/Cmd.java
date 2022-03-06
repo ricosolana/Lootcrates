@@ -47,7 +47,8 @@ public class Cmd implements CommandExecutor, TabCompleter {
             return error(sender, Lang.ERR_ARG_UNKNOWN);
 
         try {
-            String[] smartArgs = smartParse(Arrays.copyOfRange(args, 1, args.length)).toArray(new String[0]);
+            //String[] smartArgs = smartParse(Arrays.copyOfRange(args, 1, args.length)).toArray(new String[0]);
+            String[] smartArgs = Arrays.copyOfRange(args, 1, args.length);
             cmdArg.exe.apply(sender,
                     smartArgs,
                     Arrays.stream(smartArgs).filter(arg -> arg.length() >= 2 && arg.startsWith("-")).map(arg -> arg.substring(1)).collect(Collectors.toSet()));
@@ -62,6 +63,7 @@ public class Cmd implements CommandExecutor, TabCompleter {
      * Intelligently parse the args to include spaces only when quotes follow
      *
      */
+    @Deprecated
     static ArrayList<String> smartParse(String[] args) {
         String combined = String.join(" ", args);
 
@@ -115,6 +117,8 @@ public class Cmd implements CommandExecutor, TabCompleter {
         if (arg == null || arg.tab == null)
             return new ArrayList<>();
 
-        return arg.tab.apply(sender, Arrays.copyOfRange(args, 1, args.length));
+        //String[] smartArgs = smartParse(Arrays.copyOfRange(args, 1, args.length)).toArray(new String[0]);
+        String[] smartArgs = Arrays.copyOfRange(args, 1, args.length);
+        return arg.tab.apply(sender, smartArgs);
     }
 }

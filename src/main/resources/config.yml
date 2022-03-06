@@ -209,7 +209,7 @@ data:
         lore:
           - '&7Right click on this item to unlock'
           - '&7four pieces of loot!'
-      title: ยง7Choose your loot ...
+      title: '&7Choose your loot ...'
       columns: 3
       picks: 4
       sound: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -226,7 +226,7 @@ data:
         lore:
           - '&7Right click on this item to unlock'
           - '&7four pieces of loot!'
-      title: ยง7Choose your loot ...
+      title: '&7Choose your loot ...'
       columns: 3
       picks: 3
       sound: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -244,7 +244,7 @@ data:
         lore:
           - '&7Right click on this item to unlock'
           - '&7four pieces of loot!'
-      title: ยง7Choose your loot ...
+      title: '&7Choose your loot ...'
       columns: 4
       picks: 3
       sound: ENTITY_EXPERIENCE_ORB_PICKUP

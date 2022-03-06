@@ -1,7 +1,8 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
-import com.crazicrafter1.crutils.ColorMode;
+import com.crazicrafter1.crutils.ColorUtil;
 import com.crazicrafter1.crutils.ItemBuilder;
+import com.crazicrafter1.crutils.MathUtil;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.gapi.*;
 import com.crazicrafter1.lootcrates.Lang;
@@ -120,12 +121,12 @@ public class LootMMOItem extends AbstractLootItem {
                 .button(3, 1, new Button.Builder()
                         .lmb(interact -> {
                             int change = interact.shift ? 5 : 1;
-                            min = Util.clamp(min - change, 1, min);
+                            min = MathUtil.clamp(min - change, 1, min);
                             return Result.REFRESH();
                         })
                         .rmb(interact -> {
                             int change = interact.shift ? 5 : 1;
-                            min = Util.clamp(min + change, 1, max);
+                            min = MathUtil.clamp(min + change, 1, max);
                             return Result.REFRESH();
                         })
                         .icon((p) -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name(Lang.MINIMUM).skull(BASE64_DEC).lore(Lang.LMB_DEC + "\n" + Lang.RMB_INC + "\n" + Lang.SHIFT_MUL).amount(min).build()))
@@ -133,12 +134,12 @@ public class LootMMOItem extends AbstractLootItem {
                 .button(5, 1, new Button.Builder()
                         .lmb(interact -> {
                             int change = interact.shift ? 5 : 1;
-                            max = Util.clamp(max - change, min, getRenderIcon(null).getMaxStackSize());
+                            max = MathUtil.clamp(max - change, min, getRenderIcon(null).getMaxStackSize());
                             return Result.REFRESH();
                         })
                         .rmb(interact -> {
                             int change = interact.shift ? 5 : 1;
-                            max = Util.clamp(max + change, min, getRenderIcon(null).getMaxStackSize());
+                            max = MathUtil.clamp(max + change, min, getRenderIcon(null).getMaxStackSize());
                             return Result.REFRESH();
                         })
                         .icon((p) -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name(Lang.MAXIMUM).skull(BASE64_INC).lore(Lang.LMB_DEC + "\n" + Lang.RMB_INC + "\n" + Lang.SHIFT_MUL).amount(max).build()))
@@ -146,7 +147,7 @@ public class LootMMOItem extends AbstractLootItem {
                 // Type/Name menu:
                 .childButton(4, 1, (p) -> ItemBuilder.mutable(getRenderIcon(null)).amount(1).name(Lang.ASSIGN_EXACT).lore(type + ":" + name).build(), new TextMenu.TBuilder()
                     .title(p -> Lang.ASSIGN_EXACT)
-                    .leftRaw(p -> type + ":" + name, ColorMode.STRIP_RENDERED, null, ColorMode.STRIP_RENDERED)
+                    .leftRaw(p -> type + ":" + name)
                     .right(p -> Lang.MMO_ENTER)
                     .onClose((player) -> Result.PARENT())
                     .onComplete((p, s, b) -> {
@@ -174,7 +175,7 @@ public class LootMMOItem extends AbstractLootItem {
                 // 2: Scale with player
                 .childButton(7, 1, (p) -> ItemBuilder.copyOf(Material.PAINTING).amount(1).name(Lang.MMO_EDIT_TIERS).lore(getFormatString()).build(), new TextMenu.TBuilder()
                         .title(p -> "")
-                        .leftRaw((p) -> this.getFormatString(), ColorMode.STRIP_RENDERED, null, ColorMode.STRIP_RENDERED)
+                        .leftRaw((p) -> this.getFormatString())
                         .right(p -> Lang.MMO_FORMAT, p -> Lang.MMO_FORMAT_LORE + ":\n&7- exact:2,RARE\n &7- random\n &7- scale")
                         .onClose((player) -> Result.PARENT())
                         .onComplete((p, s, b) -> {

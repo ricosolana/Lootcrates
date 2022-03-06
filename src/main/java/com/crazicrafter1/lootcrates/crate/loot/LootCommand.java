@@ -78,7 +78,7 @@ public class LootCommand implements ILoot {
                         .title(p -> Lang.EDIT_COMMAND)
                         .onClose((player) -> Result.PARENT())
                         .leftRaw(p ->  command)
-                        .right(p -> Lang.INPUT_COMMAND, p -> Lang.SUPPORT_PAPI)
+                        .right(p -> Lang.INPUT_COMMAND, p -> String.format(Lang.SUPPORT_PLUGIN_X, "PlaceholderAPI"))
                         .onComplete((p, s, b) -> {
                             if (!s.isEmpty()) {
                                 this.command = s;

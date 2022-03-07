@@ -56,16 +56,17 @@ public class LootSkriptEvent implements ILoot {
 
     @NotNull
     @Override
-    public ItemStack getMenuIcon(@NotNull Player p) {
+    public ItemStack getMenuIcon() {
         return item.buildCopy();
     }
 
     @NotNull
     @Override
-    public String getMenuDesc(@NotNull Player p) {
+    public String getMenuDesc() {
         return "&7tag: &f" + tag;
     }
 
+    @Nonnull
     @Override
     public AbstractMenu.Builder getMenuBuilder() {
         return new ItemModifyMenu()

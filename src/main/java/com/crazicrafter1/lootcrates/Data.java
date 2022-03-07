@@ -1,6 +1,7 @@
 package com.crazicrafter1.lootcrates;
 
 import com.crazicrafter1.crutils.ItemBuilder;
+import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootSet;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
@@ -12,6 +13,8 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 
 /**
@@ -63,13 +66,7 @@ public class Data implements ConfigurationSerializable {
 
     public Data(Map<String, Object> args) {
         try {
-            // Try to load revision from config
-            // This only works for rev 0 or 1
-            // If not found, load default, which is 2
-            int rev = Main.get().rev; //(int) args.get("rev"); // for legacy unmarked revisions
-
-            //if (Main.get().rev >= 2)
-            //    rev = Main.get().rev;
+            int rev = Main.get().rev;
 
             if (rev == 0) {
                 // 2/20/2022 and before
@@ -116,20 +113,26 @@ public class Data implements ConfigurationSerializable {
         }
     }
 
-    public ItemBuilder unSelectedItem(Player p) {
-        return unSelectedItem;
+    public ItemStack unSelectedItemStack(@Nonnull Player p, @Nonnull Crate crate) {
+        return unSelectedItem.copy()
+                .replace("crate_picks", "" + crate.picks, '%')
+                .placeholders(p)
+                .renderAll()
+                .build();
     }
 
-    public ItemBuilder selectedItem(Player p) {
-        return selectedItem;
+    public ItemStack selectedItemStack(@Nonnull Player p, @Nonnull Crate crate) {
+        return selectedItem.copy()
+                .replace("crate_picks", "" + crate.picks, '%')
+                .placeholders(p)
+                .renderAll()
+                .build();
     }
 
     @Override
     public final Map<String, Object> serialize() {
         try {
             Map<String, Object> result = new LinkedHashMap<>();
-
-            Main.get().info("Saving inner data");
 
             result.put("cleanAfterDays", cleanAfterDays);
             result.put("speed", speed);

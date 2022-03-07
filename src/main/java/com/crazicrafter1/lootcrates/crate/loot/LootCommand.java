@@ -45,18 +45,20 @@ public class LootCommand implements ILoot {
     @Nonnull
     @Override
     public ItemStack getRenderIcon(@Nonnull Player p) {
-        return ItemBuilder.copyOf(item).placeholders(p).renderAll().build();
+        return item.copy()
+                .placeholders(p)
+                .renderAll().build();
     }
 
     @NotNull
     @Override
-    public ItemStack getMenuIcon(@NotNull Player p) {
-        return item.placeholders(p).build();
+    public ItemStack getMenuIcon() {
+        return item.buildCopy();
     }
 
     @NotNull
     @Override
-    public String getMenuDesc(@NotNull Player p) {
+    public String getMenuDesc() {
         return String.format(Lang.LOOT_COMMAND, command);
     }
 

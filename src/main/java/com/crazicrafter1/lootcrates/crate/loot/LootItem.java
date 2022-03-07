@@ -46,15 +46,9 @@ public final class LootItem extends AbstractLootItem {
 
     @Nonnull
     @Override
-    public ItemStack getMenuIcon(@Nonnull Player p) {
-        return item.build();
-    }
-
-    @NotNull
-    @Override
-    public String getMenuDesc(@NotNull Player p) {
-
-        return super.getMenuDesc(p);
+    public ItemStack getMenuIcon() {
+        // set count if min==max
+        return item.copy().amount(min == max ? min : 1).build();
     }
 
     @Nonnull
@@ -67,35 +61,10 @@ public final class LootItem extends AbstractLootItem {
 
     @Nonnull
     @Override
-    public AbstractMenu.Builder getMenuBuilder() {
-        //Button.Builder inOutline = new Button.Builder().icon(() -> new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name("&7Set to").toItem());
-        return new ItemModifyMenu()
-                .build(item.build(), input -> (this.item = ItemBuilder.mutable(input)).build())
-                // Min
-                .button(5, 2, new Button.Builder()
-                        .lmb(interact -> {
-                            int change = interact.shift ? 5 : 1;
-                            min = MathUtil.clamp(min - change, 1, min);
-                            return Result.REFRESH();
-                        })
-                        .rmb(interact -> {
-                            int change = interact.shift ? 5 : 1;
-                            min = MathUtil.clamp(min + change, 1, max);
-                            return Result.REFRESH();
-                        })
-                        .icon(p -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name(Lang.MINIMUM).skull(Editor.BASE64_DEC).lore(Lang.LMB_DEC + "\n" + Lang.RMB_INC + "\n" + Lang.SHIFT_MUL).amount(min).build()))
-                // Max
-                .button(7, 2, new Button.Builder()
-                        .lmb(interact -> {
-                            int change = interact.shift ? 5 : 1;
-                            max = MathUtil.clamp(max - change, min, item.getMaxSize());
-                            return Result.REFRESH();
-                        })
-                        .rmb(interact -> {
-                            int change = interact.shift ? 5 : 1;
-                            max = MathUtil.clamp(max + change, min, item.getMaxSize());
-                            return Result.REFRESH();
-                        })
-                        .icon(p -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name(Lang.MAXIMUM).skull(Editor.BASE64_INC).lore(Lang.LMB_DEC + "\n" + Lang.RMB_INC + "\n" + Lang.SHIFT_MUL).amount(max).build()));
+    public ItemModifyMenu getMenuBuilder() {
+        Main.get().info("LootItem: " + item.getName());
+        return (ItemModifyMenu) rangeButtons(new ItemModifyMenu()
+                .build(item.build(), input -> (this.item = ItemBuilder.mutable(input)).build()),
+                item.build(), 3, 0, 5, 0);
     }
 }

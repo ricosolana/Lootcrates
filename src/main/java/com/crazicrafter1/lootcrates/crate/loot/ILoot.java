@@ -45,8 +45,8 @@ public interface ILoot extends ConfigurationSerializable {
      * @return ItemStack
      */
     @Nonnull
-    ItemStack getMenuIcon(@Nonnull Player p);
+    ItemStack getMenuIcon();
 
     @Nonnull
-    String getMenuDesc(@Nonnull Player p);
+    String getMenuDesc();
 }

@@ -34,7 +34,7 @@ public final class ActiveCrate {
 
     // Constants
     private final Player player;
-    private final String id;
+    private final Crate crate;
     private final int size;
     private final int picks;
     private final Sound sound;
@@ -51,7 +51,7 @@ public final class ActiveCrate {
 
     public ActiveCrate(Player p, Crate crate, int lockSlot) {
         this.player = p;
-        this.id = crate.id;
+        this.crate = crate;
         this.size = crate.columns * 9;
         this.picks = crate.picks;
         this.sound = crate.sound;
@@ -76,7 +76,7 @@ public final class ActiveCrate {
         if (slots.containsKey(slot))
             return;
 
-        inventory.setItem(slot, data.selectedItem(player).build());
+        inventory.setItem(slot, data.selectedItemStack(player, crate));
 
         ILoot randomLoot = lootChances[slot].getRandomLoot();
         slots.put(slot, new QSlot(randomLoot));
@@ -186,7 +186,7 @@ public final class ActiveCrate {
             }
         }
 
-        Main.get().getStat(player.getUniqueId()).crateInc(this.id);
+        Main.get().getStat(player.getUniqueId()).crateInc(this.crate.id);
 
         if (state == State.REVEALING)
             Main.get().getServer().getScheduler().cancelTask(taskID);
@@ -194,7 +194,7 @@ public final class ActiveCrate {
 
     private void fill() {
         for (int i = 0; i < size; i++)
-            inventory.setItem(i, data.unSelectedItem(player).build());
+            inventory.setItem(i, data.unSelectedItemStack(player, crate));
     }
 
     public Player getPlayer() {

@@ -78,17 +78,17 @@ public class LootMMOItem extends AbstractLootItem {
 
     @NotNull
     @Override
-    public ItemStack getMenuIcon(@NotNull Player p) {
+    public ItemStack getMenuIcon() {
         ItemTier itemTier = MMOItems.plugin.getTiers().getOrThrow(tier);
         return MMOItems.plugin.getItem(
-                MMOItems.plugin.getTypes().get(type), name, level, itemTier);
+                MMOItems.plugin.getTypes().get(type), name);
     }
 
     @NotNull
     @Override
-    public String getMenuDesc(@NotNull Player p) {
+    public String getMenuDesc() {
         return "&8MMOItem: &f" + type + ":" + name + "\n" +
-                super.getMenuDesc(p);
+                super.getMenuDesc();
     }
 
     @Override
@@ -174,9 +174,9 @@ public class LootMMOItem extends AbstractLootItem {
                 // 1: Random
                 // 2: Scale with player
                 .childButton(7, 1, (p) -> ItemBuilder.copyOf(Material.PAINTING).amount(1).name(Lang.MMO_EDIT_TIERS).lore(getFormatString()).build(), new TextMenu.TBuilder()
-                        .title(p -> "")
+                        .title(p -> Lang.LOOT_MMO_EDIT_TITLE)
                         .leftRaw((p) -> this.getFormatString())
-                        .right(p -> Lang.MMO_FORMAT, p -> Lang.MMO_FORMAT_LORE + ":\n&7- exact:2,RARE\n &7- random\n &7- scale")
+                        .right(p -> Lang.MMO_FORMAT, p -> Lang.MMO_FORMAT_LORE + "\n&7- exact:2,RARE\n &7- random\n &7- scale")
                         .onClose((player) -> Result.PARENT())
                         .onComplete((p, s, b) -> {
                             s = s.replace(" ", "");

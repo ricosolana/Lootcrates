@@ -37,20 +37,20 @@ public class LootItemQA extends AbstractLootItem {
     @NotNull
     @Override
     public ItemStack getRenderIcon(@NotNull Player p) {
-        return ItemBuilder.mutable(QualityArmory.getCustomItemAsItemStack(name)).build();
+        return ofRange(p, QualityArmory.getCustomItemAsItemStack(name));
     }
 
     @NotNull
     @Override
-    public ItemStack getMenuIcon(@NotNull Player p) {
-        return getRenderIcon(p);
+    public ItemStack getMenuIcon() {
+        return QualityArmory.getCustomItemAsItemStack(name);
     }
 
     @NotNull
     @Override
-    public String getMenuDesc(@NotNull Player p) {
+    public String getMenuDesc() {
         return "&8Quality armory: &f" + name + "\n" +
-                super.getMenuDesc(p);
+                super.getMenuDesc();
     }
 
     @Nonnull
@@ -66,10 +66,10 @@ public class LootItemQA extends AbstractLootItem {
     @Nonnull
     @Override
     public AbstractMenu.Builder getMenuBuilder() {
-        return new ParallaxMenu.PBuilder()
+        return rangeButtons(new ParallaxMenu.PBuilder()
                 .parentButton(4, 5)
                 //.childButton(2, 5, () -> new ItemBuilder(Material.COMPASS).name("&eSearch..."), new )
-                .button(3, 5, new Button.Builder().icon(this::getMenuIcon))
+                .button(3, 5, new Button.Builder().icon(p -> getMenuIcon()))
                 .childButton(5, 5, p -> ItemBuilder.copyOf(Material.COMPASS).name(Lang.ASSIGN_EXACT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.ASSIGN_EXACT)
                         .leftRaw(p -> name)
@@ -90,7 +90,7 @@ public class LootItemQA extends AbstractLootItem {
                     QualityArmory.getCustomItems().forEachRemaining(customBaseObject -> {
                         if (customBaseObject.getName().equals(this.name)) {
                             result.add(new Button.Builder()
-                                    .icon(p -> ItemBuilder.copyOf(getMenuIcon(p)).build())
+                                    .icon(p -> getMenuIcon())
                                     .get());
                         } else {
                             result.add(new Button.Builder()
@@ -105,6 +105,6 @@ public class LootItemQA extends AbstractLootItem {
                     });
 
                     return result;
-                });
+                }), getMenuIcon(), 1, 5, 2, 5);
     }
 }

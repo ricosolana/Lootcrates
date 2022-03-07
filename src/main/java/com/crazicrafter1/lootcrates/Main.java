@@ -86,7 +86,7 @@ public class Main extends JavaPlugin
             return;
         }
 
-        info("Join the " + ChatColor.DARK_GRAY + ChatColor.BOLD + "Discord " + ChatColor.RESET + "for help or whatever " + ChatColor.UNDERLINE + "https://discord.gg/2JkFBnyvNQ");
+        info("Join the " + ChatColor.DARK_GRAY + ChatColor.BOLD + "Discord " + ChatColor.RESET + "for help and more " + ChatColor.UNDERLINE + "https://discord.gg/2JkFBnyvNQ");
 
         // Check for updates
         // Look for a file named NO_UPDATE
@@ -94,6 +94,7 @@ public class Main extends JavaPlugin
         File noUpdateFile = new File(getDataFolder(), "NO_UPDATE.txt");
         boolean update = !(noUpdateFile.exists() && noUpdateFile.isFile());
         if (update) try {
+                info("Updating can be disabled by creating a file called 'NO_UPDATE.txt'");
                 StringBuilder outTag = new StringBuilder();
                 if (GitUtils.updatePlugin(this, "PeriodicSeizures", "Lootcrates", "Lootcrates.jar", outTag)) {
                     warn("Updated to " + outTag + "; restart server to use");
@@ -274,15 +275,14 @@ public class Main extends JavaPlugin
 
         // load language from file if possible
         try {
-            // load default language en
-            Lang.save("en_default");
+            // Save default template
+            Lang.save("en", false);
 
             YamlConfiguration langConfig = new YamlConfiguration();
             langConfig.load(langFile);
             language = (String) langConfig.get("language", "en");
-            if (!language.equals("en")) {
-                Lang.load(language);
-            }
+
+            Lang.load(language);
         } catch (IOException ignored) {}
         catch (InvalidConfigurationException e) {
             e.printStackTrace();
@@ -407,8 +407,6 @@ public class Main extends JavaPlugin
 
             for (Map.Entry<UUID, PlayerStat> entry : playerStats.entrySet()) {
                 String uuid = entry.getKey().toString();
-                playerConfig.set(uuid + ".editorMessaged",
-                        entry.getValue().editorMessaged);
                 for (Map.Entry<String, Integer> entry1 : entry.getValue().openedCrates.entrySet()) {
                     playerConfig.set(uuid + ".crates." + entry1.getKey(),
                             entry1.getValue());
@@ -432,7 +430,6 @@ public class Main extends JavaPlugin
             for (String uuid : playerConfig.getKeys(false)) {
                 PlayerStat stat = new PlayerStat();
                 playerStats.put(UUID.fromString(uuid), stat);
-                stat.editorMessaged = playerConfig.getBoolean(uuid + ".editorMessaged");
                 ConfigurationSection section = playerConfig.getConfigurationSection(uuid + ".crates");
                 if (section != null)
                     for (String id : section.getKeys(false)) {

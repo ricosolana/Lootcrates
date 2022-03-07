@@ -27,10 +27,10 @@ public class Cmd implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command c, String s, String[] args) {
         if (args.length == 0) {
             if (Main.get().rev == -1) {
-                return Main.get().error(sender, Lang.ASSIGN_REV + ChatColor.UNDERLINE + "/crates rev");
+                return Main.get().error(sender, String.format(Lang.ASSIGN_REV, ChatColor.UNDERLINE + "/crates rev"));
             }
-            Main.get().popup(sender, Lang.VERSION + Main.get().getDescription().getVersion());
-            Main.get().popup(sender, Lang.REV + Main.get().rev);
+            Main.get().popup(sender, String.format(Lang.VERSION, Main.get().getDescription().getVersion()));
+            Main.get().popup(sender, String.format(Lang.REV, Main.get().rev));
             return Main.get().popup(sender, Lang.USAGE + "/crates ["
                     + String.join(", ", CmdArg.args.keySet())
                     + "]");
@@ -38,7 +38,7 @@ public class Cmd implements CommandExecutor, TabCompleter {
 
         if (Main.get().rev == -1
                 && !args[0].equalsIgnoreCase("rev")) {
-            return error(sender, Lang.ASSIGN_REV + ChatColor.UNDERLINE + "/crates rev");
+            return error(sender, String.format(Lang.ASSIGN_REV, ChatColor.UNDERLINE + "/crates rev"));
         }
 
         CmdArg cmdArg = CmdArg.args.get(args[0].toLowerCase());
@@ -55,7 +55,7 @@ public class Cmd implements CommandExecutor, TabCompleter {
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
             // Just ensure index with an error print
-            return error(sender, Lang.ERR_ARG_MORE + e.getMessage());
+            return error(sender, String.format(Lang.ERR_ARG_MORE, e.getMessage()));
         }
     }
 

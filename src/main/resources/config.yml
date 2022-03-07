@@ -2,15 +2,15 @@
 # Automatically converted from rev1 to rev2
 data:
   ==: com.crazicrafter1.lootcrates.Data
-  cleanAfterDays: 7
+  cleanAfterDays: 0
   speed: 4
   unSelectedItem:
     ==: com.crazicrafter1.crutils.ItemBuilder
     type: CHEST
     name: '&f&l???'
     lore:
-      - '&7&oChoose 4 mystery chests, and'
-      - '&7&oyour loot will be revealed!'
+      - '&7Choose %crate_picks% mystery chests, and'
+      - '&7your loot will be revealed!'
   selectedItem:
     ==: com.crazicrafter1.crutils.ItemBuilder
     type: WHITE_STAINED_GLASS_PANE
@@ -103,8 +103,6 @@ data:
             ==: com.crazicrafter1.crutils.ItemBuilder
             type: OBSIDIAN
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItemCrate
-          min: 1
-          max: 1
           crate: peasant
         - ==: com.crazicrafter1.lootcrates.crate.loot.LootItem
           min: 16
@@ -207,8 +205,8 @@ data:
         type: CHEST
         name: '&f&lPeasant Loot &7(Tier 1)'
         lore:
-          - '&7Right click on this item to unlock'
-          - '&7four pieces of loot!'
+          - '&7Right-click on this item to unlock'
+          - '&7%crate_picks% pieces of loot!'
       title: '&7Choose your loot ...'
       columns: 3
       picks: 4
@@ -224,8 +222,8 @@ data:
         type: CHEST
         name: '&b&lKnight Plunder &7(Tier 2)'
         lore:
-          - '&7Right click on this item to unlock'
-          - '&7four pieces of loot!'
+          - '&7Right-click on this item to unlock'
+          - '&7%crate_picks% pieces of loot!'
       title: '&7Choose your loot ...'
       columns: 3
       picks: 3
@@ -240,10 +238,10 @@ data:
       item:
         ==: com.crazicrafter1.crutils.ItemBuilder
         type: CHEST
-        name: '&c&lKing Bounty &7(Tier 3)'
+        name: '&c&lLegendary Crate &7(Tier 5)'
         lore:
-          - '&7Right click on this item to unlock'
-          - '&7four pieces of loot!'
+          - '&7Right-click on this item to'
+          - '&7%crate_picks% pieces of loot!'
       title: '&7Choose your loot ...'
       columns: 4
       picks: 3
@@ -253,6 +251,21 @@ data:
         *id001: 20
         *id004: 40
         *id005: 50
+    drop_party:
+      ==: com.crazicrafter1.lootcrates.crate.Crate
+      item:
+        ==: com.crazicrafter1.crutils.ItemBuilder
+        type: CHEST
+        name: '&a&lDrop Party Supply Crate &7(Right Click)'
+        lore:
+          - '&7Right-click on this item to unlock'
+          - '&7%crate_picks% pieces of loot!'
+      title: select loot
+      columns: 3
+      picks: 4
+      sound: ENTITY_EXPERIENCE_ORB_PICKUP
+      weights:
+        *id003: 1
   fireworkEffect:
     ==: Firework
     flicker: false

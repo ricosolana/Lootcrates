@@ -13,6 +13,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -39,8 +40,11 @@ public class LootSet implements ConfigurationSerializable {
         loot = (ArrayList<ILoot>) args.get("loot");
     }
 
-    public ItemStack itemStack(Player p) {
-        return item.copy().renderAll().build();
+    public ItemStack itemStack(@Nonnull Player p) {
+        return item.copy()
+                .placeholders(p)
+                .renderAll()
+                .build();
     }
 
     public ILoot getRandomLoot() {
@@ -74,12 +78,12 @@ public class LootSet implements ConfigurationSerializable {
                 .addAll((self1, p00) -> {
                     ArrayList<Button> result1 = new ArrayList<>();
                     for (ILoot a : loot) {
-                        ItemStack copy = a.getMenuIcon(p00);
+                        ItemStack copy = a.getMenuIcon();
 
                         AbstractMenu.Builder menu = a.getMenuBuilder().title(p -> a.getClass().getSimpleName());
 
                         result1.add(new Button.Builder()
-                                .icon(p -> ItemBuilder.copyOf(copy).lore(a + "\n" + Lang.LMB_EDIT + "\n" + Lang.RMB_DELETE).build())
+                                .icon(p -> ItemBuilder.copyOf(copy).lore(a.getMenuDesc() + "\n" + Lang.LMB_EDIT + "\n" + Lang.RMB_DELETE).build())
 
                                 .child(self1, menu, interact -> {
                                     if (loot.size() > 1) {
@@ -93,10 +97,10 @@ public class LootSet implements ConfigurationSerializable {
                     }
                     return result1;
                 })
-                .childButton(3, 5, p -> ItemBuilder.copyOf(item).name(Lang.LMB_EDIT).build(), new ItemModifyMenu()
+                .childButton(3, 5, p -> item.copy().name(Lang.EDIT_ICON).lore(Lang.LMB_EDIT).build(), new ItemModifyMenu()
                         .build(this.item.build(), itemStack -> (this.item = ItemBuilder.mutable(itemStack)).build()))
                 .childButton(5, 5, p -> ItemBuilder.copyOf(Material.NETHER_STAR).name(Lang.LMB_NEW).build(), new ParallaxMenu.PBuilder()
-                        .title(p -> Lang.NEW_LOOTSET)
+                        .title(p -> Lang.NEW_LOOT_SET)
                         .parentButton(4, 5)
                         .addAll((self1, p00) -> {
                             ArrayList<Button> result1 = new ArrayList<>();

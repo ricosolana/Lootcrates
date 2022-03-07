@@ -76,6 +76,8 @@ public class Lang {
     public static String MMO_FORMAT_LORE = "&7 - exact level and tier\nrandom level and tier\nscale with player\nExample usage:";
     public static String MMO_EDIT_TIERS = "&8&lEdit tiers";
 
+    public static String LOOT_MMO_EDIT_TITLE = "Edit scales";
+
     public static String SKRIPT_EVENT_TAG = "Event tag";
     public static String SKRIPT_INPUT_TAG = "Input a tag";
 
@@ -84,19 +86,21 @@ public class Lang {
 
     public static String SPECIAL_FORMATTING = "&7&lSpecial formatting";
 
-    //public static String LOOT_MMO_ITEM_SPECIAL_TITLE
-
     public static String LMB_NEW = "&7LMB: &6New";
-    public static String NEW_LOOTSET = "New LootSet";
+    public static String NEW_LOOT_SET = "New LootSet";
     public static String FORMAT_ID = "&8id: %s";
 
-    public static String ASSIGN_REV = "Must assign revision: ";
-    public static String VERSION = "Using version: ";
-    public static String REV = "Using revision: ";
+    public static String ASSIGN_REV = "Must assign revision: %s";
+    public static String VERSION = "Using version: %s";
+    public static String REV = "Using revision: %d";
     public static String USAGE = "Usage: ";
     public static String ERR_ARG_UNKNOWN = "Unknown argument";
-    public static String ERR_ARG_MORE = "Input more arguments: ";
+    public static String ERR_ARG_MORE = "Input more arguments: %s";
     public static String POPULATING = "Populating config with built-ins";
+    public static String REV_UNSUPPORTED = "Revision %d is not yet implemented";
+    public static String READ_W_REV = "Read config using revision %d";
+    public static String REV_REQUIRE_INT = "Revision must be a integer (x>=0) or 'latest'";
+    public static String READ_W_LATEST_REV = "Read config using latest revision (%d)";
 
     public static String CONFIG_SAVED = "Saved config to disk";
     public static String ERR_CRATE_UNKNOWN = "That crate doesn't exist";
@@ -118,8 +122,9 @@ public class Lang {
 
     public static String TITLE = "Title";
     public static String EDIT_ITEM = "&8&nItemStack";
-
     public static String EDIT_TITLE = "&e&nTitle&r&e: %s";
+
+    public static String EDIT_ICON = "&2Edit icon";
 
     public static String LOOT = "&6&nLoot";
 
@@ -127,11 +132,13 @@ public class Lang {
 
     private static File langDir = new File(Main.get().getDataFolder(), "lang/");
 
-    public static void load(String language) {
+    public static boolean load(String language) {
         try {
             langDir.mkdirs();
             File file = new File(langDir, language + ".yml");
-            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+
+            FileConfiguration config = new YamlConfiguration();
+            config.load(file);
 
             for (String key : config.getKeys(false)) {
                 // get field by that name
@@ -143,30 +150,40 @@ public class Lang {
                 } catch (Exception ignored) {}
             }
 
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        return false;
     }
 
-    public static void save(String language) {
+    public static boolean save(String language, boolean override) {
         try {
-            langDir.mkdirs();
-
-            FileConfiguration config = new YamlConfiguration();
-
-            for (Field field : Lang.class.getDeclaredFields()) {
-                try {
-                    if (field.getType() == String.class) {
-                        config.set(field.getName(), ((String)field.get(null)).replace("\n", "\\n"));
-                    }
-                } catch (Exception ignored) {}
-            }
-
             File file = new File(langDir, language + ".yml");
-            config.save(file);
+            if (override || !file.exists()) {
+
+                langDir.mkdirs();
+
+                FileConfiguration config = new YamlConfiguration();
+
+                for (Field field : Lang.class.getDeclaredFields()) {
+                    try {
+                        if (field.getType() == String.class) {
+                            config.set(field.getName(), ((String) field.get(null)).replace("\n", "\\n"));
+                        }
+                    } catch (Exception ignored) {
+                    }
+                }
+
+                config.save(file);
+            }
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        return false;
     }
 
 }

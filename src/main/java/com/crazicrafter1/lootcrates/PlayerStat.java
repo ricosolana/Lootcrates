@@ -6,7 +6,6 @@ public class PlayerStat {
 
     // get crate open information and other stuff to analyze possible duping or whatever
     public HashMap<String, Integer> openedCrates = new HashMap<>();
-    public boolean editorMessaged = false;
 
     public void crateInc(String id) {
         Integer i = openedCrates.get(id);

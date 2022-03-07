@@ -6,7 +6,6 @@ import com.crazicrafter1.crutils.TriFunction;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.lootcrates.crate.Crate;
-import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -14,7 +13,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -40,15 +38,12 @@ class CmdArg {
     static Map<String, CmdArg> args = new HashMap<>();
 
     static {
-        //args.put("locale", new CmdArg((sender, args) ->
-        //        feedback(sender,"Locale: " + ((Player)sender).getLocale()), null));
-
         args.put("lang", new CmdArg((sender, args, flags) -> {
-
             String lang = args[0];
-            Lang.load(lang);
 
-            return info(sender, "Loading language");
+            if (Lang.load(lang))
+                return info(sender, "Successfully loaded language");
+            return error(sender, "Failed to load language");
         }, null));
 
         args.put("populate", new CmdArg((sender, args, flags) -> {
@@ -102,13 +97,13 @@ class CmdArg {
             if (args[0].equalsIgnoreCase("latest")) {
                 Main.get().rev = Main.REV_LATEST;
                 Main.get().reloadConfig();
-                return info(sender, "Read config using latest revision (" + Main.REV_LATEST + ")");
+                return info(sender, String.format(Lang.READ_W_LATEST_REV, Main.REV_LATEST));
             } else {
                 try {
                     int rev = Integer.parseInt(args[0]);
                     if (rev > Main.REV_LATEST) {
                         // err
-                        return error(sender, "Revision " + rev + " is not yet implemented");
+                        return error(sender, String.format(Lang.REV_UNSUPPORTED, rev));
                     } if (rev < 0)
                         throw new RuntimeException();
 
@@ -118,9 +113,9 @@ class CmdArg {
 
                     CmdArg.args.remove("rev");
 
-                    return info(sender, "Read config using revision " + rev);
+                    return info(sender, String.format(Lang.READ_W_REV, rev));
                 } catch (Exception e) {
-                    return error(sender, "Revision must be a integer (x>=0) or 'latest'");
+                    return error(sender, Lang.REV_REQUIRE_INT);
                 }
             }
         }, null));
@@ -139,14 +134,14 @@ class CmdArg {
             if (args.length == 1) {
                 if (!(sender instanceof Player))
                     return error(sender, Lang.ERR_PLAYER_CRATE);
-                Util.give((Player) sender, crate.itemStack((Player) sender, true));
+                Util.give((Player) sender, crate.itemStack((Player) sender));
                 return info(sender, String.format(Lang.SELF_GIVE_CRATE, crate.id));
             }
 
             if (args[1].equals("*")) {
                 int given = 0;
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    Util.give(p, crate.itemStack(p, true));
+                    Util.give(p, crate.itemStack(p));
                     if (p != sender && !(flags.contains("s") || flags.contains("silent")))
                         info(p, String.format(Lang.RECEIVE_CRATE, crate.id));
                     given++;
@@ -162,7 +157,7 @@ class CmdArg {
             if (p == null)
                 return error(sender, Lang.ERR_PLAYER_UNKNOWN);
 
-            Util.give(p, crate.itemStack(p, true));
+            Util.give(p, crate.itemStack(p));
 
             // Redundant spam
             if (p != sender) {
@@ -209,54 +204,7 @@ class CmdArg {
             if (sender instanceof Player) {
                 // title, subtitle, fadein, stay, fadeout
                 Player p = (Player) sender;
-                PlayerStat stat = plugin.getStat(p.getUniqueId());
-                if (!stat.editorMessaged) {
-
-                    p.sendTitle(ChatColor.RED + "Warning",
-                            ChatColor.YELLOW + "Editor might be buggy",
-                            5, 20 * 2, 5);
-
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            p.resetTitle();
-                            p.sendTitle(" ",
-                                    ChatColor.YELLOW + "Submit bugs/requests to my Github",
-                                    5, 20 * 2, 5);
-
-                            p.sendMessage("" + ChatColor.DARK_GRAY + ChatColor.UNDERLINE + "https://github.com/PeriodicSeizures/LootCrates");
-
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-
-
-                                    p.resetTitle();
-                                    p.sendTitle(" ",
-                                            ChatColor.GOLD + "Constructive feedback is appreciated!",
-                                            5, 20 * 2, 5);
-
-                                    new BukkitRunnable() {
-                                        @Override
-                                        public void run() {
-                                            //new MainMenu().show(p);
-                                            new Editor().open(p);
-                                        }
-                                    }.runTaskLater(plugin, 20 * 2 + 10);
-
-
-                                }
-                            }.runTaskLater(plugin, 20 * 2 + 10);
-
-
-                        }
-                    }.runTaskLater(plugin, 20 * 2 + 10);
-
-                } else {
-                    new Editor().open(p);
-                }
-
-                stat.editorMessaged = true;
+                new Editor().open(p);
 
                 return true;
             }

@@ -23,18 +23,18 @@ public class Editor {
 
     public static final String LOREM_IPSUM = "Lorem ipsum";
     /// TODO make this butchery mess somehow translatable
-    private static final String COLORS = ColorUtil.renderMarkers("&a" + LOREM_IPSUM) +                                 "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "&a" + LOREM_IPSUM +                                    "\n"
-            +   ColorUtil.renderMarkers("&#456789" + LOREM_IPSUM) +                                                    "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "&#456789" + LOREM_IPSUM +                              "\n"
-            +   ColorUtil.renderAll("<#aa7744>" + LOREM_IPSUM + "</#abcdef>") +                                 "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "<#aa7744>" + LOREM_IPSUM + "</#abcdef>" +              "\n"
-            +   ColorUtil.renderAll("<DEEP_CHESTNUT>" + LOREM_IPSUM + "</DARK_KHAKI>") +                        "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "<DEEP_CHESTNUT>" + LOREM_IPSUM + "</DARK_KHAKI>" +     "\n"
-            +   ColorUtil.renderAll("<CHERRY_BLOSSOM_PINK>" + LOREM_IPSUM + "</#bb4477>") +                      "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "<CHERRY_BLOSSOM_PINK>" + LOREM_IPSUM + "</bb4477>"   + "\n"
-            +   ColorUtil.renderAll("<#555555>&8-------&7------&f---</#bbbbbb><#bbbbbb>&f---&7------&8-------</#555555>")                                                                   + "\n"
+    private static final String COLORS = ColorUtil.renderMarkers("&a" + LOREM_IPSUM) +                                  "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "&a" + LOREM_IPSUM +                                    "\n"
+            +   ColorUtil.renderMarkers("&#456789" + LOREM_IPSUM) +                                                     "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "&#456789" + LOREM_IPSUM +                              "\n"
+            +   ColorUtil.renderAll("<#aa7744>" + LOREM_IPSUM + "</#abcdef>") +                                         "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "<#aa7744>" + LOREM_IPSUM + "</#abcdef>" +              "\n"
+            +   ColorUtil.renderAll("<DEEP_CHESTNUT>" + LOREM_IPSUM + "</DARK_KHAKI>") +                                "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "<DEEP_CHESTNUT>" + LOREM_IPSUM + "</DARK_KHAKI>" +     "\n"
+            +   ColorUtil.renderAll("<CHERRY_BLOSSOM_PINK>" + LOREM_IPSUM + "</#bb4477>") +                             "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "<CHERRY_BLOSSOM_PINK>" + LOREM_IPSUM + "</#bb4477>" +  "\n"
+            +   ColorUtil.renderAll("<#555555>&8-------&7------&f---</#bbbbbb><#bbbbbb>&f---&7------&8-------</#555555>") +                                                                                                         "\n"
             ;
 
     public static String getColorDem() {
         return COLORS
-                +   ColorUtil.renderAll(String.format(Lang.SUPPORT_PLUGIN_X, "PlaceholderAPI") + "\n"
-                +   Lang.CUSTOM_MACROS + "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "%lc_picks%" + "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "%lc_id%"                                                     + "\n"
+                +   ColorUtil.renderAll(String.format(Lang.SUPPORT_PLUGIN_X, "PlaceholderAPI") +            "\n"
+                +   Lang.CUSTOM_MACROS + "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "%crate_picks%" + "\n"
                 +   Lang.SEPARATE_LORE + "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "\\n")
                 ;
     }
@@ -57,7 +57,7 @@ public class Editor {
                 * Global Crate List *
                 *                   *
                 \* *************** */
-                .childButton(1, 1, p -> ItemBuilder.copyOf(Material.CHEST).name(Lang.BUTTON_CRATES).build(), new ParallaxMenu.PBuilder()
+                .childButton(2, 1, p -> ItemBuilder.copyOf(Material.CHEST).name(Lang.BUTTON_CRATES).build(), new ParallaxMenu.PBuilder()
                                 .title(p -> Lang.TITLE_CRATES)
                                 .parentButton(4, 5)
                                 // *       *      *
@@ -104,7 +104,7 @@ public class Editor {
                         /*
                          * View LootSets
                          */
-                ).childButton(3, 1, p -> ItemBuilder.fromModernMaterial("EXPERIENCE_BOTTLE").name(Lang.BUTTON_LOOT_SETS).build(), new ParallaxMenu.PBuilder()
+                ).childButton(4, 1, p -> ItemBuilder.fromModernMaterial("EXPERIENCE_BOTTLE").name(Lang.BUTTON_LOOT_SETS).build(), new ParallaxMenu.PBuilder()
                         .title(p -> Lang.TITLE_LOOT_SETS)
                         .parentButton(4, 5)
                         .addAll((self, p1) -> {
@@ -153,7 +153,7 @@ public class Editor {
                 /*
                  * Global Fireworks Edit
                  */
-                .childButton(5, 1, p -> ItemBuilder.fromModernMaterial("FIREWORK_ROCKET").name(Lang.BUTTON_EDIT_FIREWORK).build(), new SimpleMenu.SBuilder(5)
+                .childButton(6, 1, p -> ItemBuilder.fromModernMaterial("FIREWORK_ROCKET").name(Lang.BUTTON_EDIT_FIREWORK).build(), new SimpleMenu.SBuilder(5)
                         .title(p -> Lang.TITLE_FIREWORK)
                         .background()
                         .button(4, 0, IN_OUTLINE)

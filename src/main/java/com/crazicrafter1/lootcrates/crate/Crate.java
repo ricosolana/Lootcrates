@@ -91,9 +91,7 @@ public class Crate implements ConfigurationSerializable {
     }
 
     public Crate(Map<String, Object> args) {
-        Main.get().info("map title:" + args.get("title"));
         title = ColorUtil.renderMarkers((String) args.get("title"));
-        Main.get().info("post title:" + title);
 
         columns = (int) args.get("columns");
         picks = (int) args.get("picks");
@@ -135,21 +133,19 @@ public class Crate implements ConfigurationSerializable {
      * @param p player
      * @return the formatted item
      */
-    public ItemStack itemStack(@Nullable Player p, boolean renderAll) {
-        ItemBuilder item = ItemBuilder.copyOf(this.item);
-
-        item.replace("lc_picks", "" + picks, '%')
-                .replace("lc_id", "" + id, '%')
-                .replace("lc_lscount", "" + lootBySum.size(), '%')
-                .placeholders(p);
-
-        return item
-                .renderAll(renderAll)
+    public ItemStack itemStack(@Nonnull Player p) {
+        return this.item.copy()
+                .replace("crate_picks", "" + picks, '%')
+                .placeholders(p)
+                .renderAll()
                 .build();
     }
 
     public String getTitle(@Nonnull Player p) {
-        return Util.placeholders(p, this.title);
+        return ColorUtil.renderAll(Util
+                .placeholders(p, this.title
+                        .replace("%crate_picks%", "" + picks)
+                ));
     }
 
     @Override
@@ -189,20 +185,18 @@ public class Crate implements ConfigurationSerializable {
                             // Several options here
                             // Should the name and lore be merged along also?
                             // or just the material?
-                            this.item.material(itemStack.getType());
-
-                            String base64 = ItemBuilder.mutable(itemStack).getSkull();
-                            if (base64 != null)
-                                this.item.skull(base64);
-                            return this.item.apply(itemStack).build();
+                            return this.item.apply(itemStack, ItemBuilder.FLAG_NAME | ItemBuilder.FLAG_LORE | ItemBuilder.FLAG_SKULL | ItemBuilder.FLAG_MATERIAL).build();
+                            //this.item.material(itemStack.getType());
+//
+                            //String base64 = ItemBuilder.mutable(itemStack).getSkull();
+                            //if (base64 != null)
+                            //    this.item.skull(base64);
+                            //return this.item.apply(itemStack).build();
                             //this.itemStack.setType(itemStack.getType());
                         }))
                 )
                 // Edit Inventory Title
-                .childButton(3, 1, p -> {
-                    Main.get().info("title:" + title);
-                        return ItemBuilder.copyOf(Material.PAPER).name(String.format(Lang.EDIT_TITLE, title)).lore(Lang.LMB_EDIT).build();
-                    }, new TextMenu.TBuilder()
+                .childButton(3, 1, p -> ItemBuilder.copyOf(Material.PAPER).name(String.format(Lang.EDIT_TITLE, title)).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.TITLE)
                         .leftRaw(p -> title)
                         .onClose((player) -> Result.PARENT())

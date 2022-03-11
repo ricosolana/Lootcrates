@@ -38,6 +38,10 @@ class CmdArg {
     static Map<String, CmdArg> args = new HashMap<>();
 
     static {
+        args.put("throw", new CmdArg((sender, args, flags) -> {
+            throw new RuntimeException("Test exception");
+        }, null));
+
         args.put("lang", new CmdArg((sender, args, flags) -> {
             String lang = args[0];
 

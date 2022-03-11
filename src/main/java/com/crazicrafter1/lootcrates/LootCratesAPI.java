@@ -65,12 +65,11 @@ public class LootCratesAPI {
         return getCrateByID(nbt.getString("Crate"));
     }
 
-    public static ItemStack makeCrate(final ItemStack itemStack, final String crate) {
+    public static ItemStack makeCrate(final ItemStack itemStack, final String id) {
         ItemStackMirror nmsStack = new ItemStackMirror(itemStack);
 
         NBTTagCompoundMirror nbt = nmsStack.getOrCreateTag();
-        nbt.setString("Crate", crate);
-        nmsStack.setTag(nbt);
+        nbt.setString("Crate", id);
 
         return nmsStack.getItemStack();
     }

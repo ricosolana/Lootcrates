@@ -61,6 +61,8 @@ public class Lang {
     public static String MINIMUM = "&8&nMinimum";
     public static String MAXIMUM = "&8&nMaximum";
 
+    public static String ADD_LOOT = "Add loot";
+
     public static String ERR_NO_CRATES = "No crates are registered";
 
     public static String ASSIGN_EXACT = "Search or assign";

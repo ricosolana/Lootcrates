@@ -150,7 +150,8 @@ public class Crate implements ConfigurationSerializable {
 
     @Override
     public String toString() {
-        return "itemStack: " + item + "\n" +
+        return "id: " + id + "\n" +
+                "itemStack: " + item + "\n" +
                 "title: " + title + "\n" +
                 "size: " + title + "\n" +
                 "picks: " + picks + "\n" +

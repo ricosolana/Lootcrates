@@ -100,7 +100,7 @@ public class LootSet implements ConfigurationSerializable {
                 .childButton(3, 5, p -> item.copy().name(Lang.EDIT_ICON).lore(Lang.LMB_EDIT).build(), new ItemModifyMenu()
                         .build(this.item.build(), itemStack -> (this.item = ItemBuilder.mutable(itemStack)).build()))
                 .childButton(5, 5, p -> ItemBuilder.copyOf(Material.NETHER_STAR).name(Lang.LMB_NEW).build(), new ParallaxMenu.PBuilder()
-                        .title(p -> Lang.NEW_LOOT_SET)
+                        .title(p -> Lang.ADD_LOOT)
                         .parentButton(4, 5)
                         .addAll((self1, p00) -> {
                             ArrayList<Button> result1 = new ArrayList<>();

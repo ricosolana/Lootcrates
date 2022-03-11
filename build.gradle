@@ -63,7 +63,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 tasks.withType(Jar) {
-    destinationDirectory = file("C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.18.1 paper\\plugins\\")
+    destinationDirectory = file("C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.18.2 paper\\plugins\\")
 }
 
 jar {

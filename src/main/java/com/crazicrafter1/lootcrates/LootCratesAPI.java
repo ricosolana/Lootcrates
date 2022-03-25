@@ -6,80 +6,75 @@ import com.crazicrafter1.crutils.refl.NBTTagCompoundMirror;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
+import com.crazicrafter1.nmsapi.NMSAPI;
+import com.crazicrafter1.nmsapi.nbt.INBTTagCompound;
+import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
 public class LootCratesAPI {
-
-    //static Set<Class<? extends ILoot>> lootClasses = new HashSet<>();
     public static Map<Class<? extends ILoot>, ItemStack> lootClasses = new HashMap<>();
 
-    //@Deprecated
-    //static void registerLoot(Class<? extends ILoot> lootClass, String alias) {
-    //    registerLoot(lootClass,
-    //            ItemBuilder.copyOf(Material.GOLD_INGOT)
-    //                    .name(lootClass.getSimpleName())
-    //                    .build(),
-    //            alias);
-    //}
-
-    //@Deprecated
-    //static void registerLoot(Class<? extends ILoot> lootClass, ItemStack itemStack, String alias) {
-    //    lootClasses.put(lootClass, itemStack);
-    //    ConfigurationSerialization.registerClass(lootClass, alias);
-    //}
-
-    //static void registerLoot(Class<? extends ILoot> lootClass) {
-    //    registerLoot(lootClass,
-    //            ItemBuilder.copyOf(Material.GOLD_INGOT)
-    //                    .name(lootClass.getSimpleName())
-    //                    .build());
-    //}
-
-    static void registerLoot(Class<? extends ILoot> lootClass) {
+    static void registerLoot(@Nonnull Class<? extends ILoot> lootClass) {
         lootClasses.put(lootClass, (ItemStack) ReflectionUtil.getFieldInstance(ReflectionUtil.getField(lootClass, "EDITOR_ICON"), null));
         ConfigurationSerialization.registerClass(lootClass, lootClass.getSimpleName());
         Main.get().info("Registering " + lootClass.getSimpleName());
     }
 
-    public static Crate getCrateByID(String id) {
+    @Nullable
+    public static Crate getCrateByID(@Nonnull String id) {
         return Main.get().data.crates.get(id);
     }
 
-    public static Crate extractCrateFromItem(final ItemStack itemStack) {
+    @Nullable
+    public static Crate extractCrateFromItem(@Nullable final ItemStack itemStack) {
         if (itemStack == null || itemStack.getType() == Material.AIR)
             return null;
 
-        ItemStackMirror nmsStack = new ItemStackMirror(itemStack);
-
-        NBTTagCompoundMirror nbt = nmsStack.getTag();
-
-        if (nbt == null)
-            return null;
-
+        INBTTagCompound nbt = NMSAPI.getNBT(itemStack);
+        if (nbt == null) return null;
         return getCrateByID(nbt.getString("Crate"));
+
+        //ItemStackMirror nmsStack = new ItemStackMirror(itemStack);
+        //NBTTagCompoundMirror nbt = nmsStack.getTag();
+        //if (nbt == null) return null;
+        //return getCrateByID(nbt.getString("Crate"));
     }
 
-    public static ItemStack makeCrate(final ItemStack itemStack, final String id) {
-        ItemStackMirror nmsStack = new ItemStackMirror(itemStack);
+    @Nonnull
+    public static ItemStack makeCrate(@Nonnull final ItemStack itemStack, @Nonnull final String id) {
+        Validate.notNull(id);
 
-        NBTTagCompoundMirror nbt = nmsStack.getOrCreateTag();
+        INBTTagCompound nbt = NMSAPI.getOrCreateNBT(itemStack);
         nbt.setString("Crate", id);
+        return nbt.setNBT(itemStack);
 
-        return nmsStack.getItemStack();
+        //ItemStackMirror nmsStack = new ItemStackMirror(itemStack);
+        //NBTTagCompoundMirror nbt = nmsStack.getOrCreateTag();
+        //nbt.setString("Crate", id);
+        //return nmsStack.getItemStack();
     }
 
     /**
-     * Opens a crate by id to a player
+     * Show a crate to a player
+     * @param p {@link Player} instance
+     * @param id crate id
+     * @return whether the open was successful
      */
-    public static boolean openCrate(Player p, String name, int lock_slot) {
-        Crate crate = getCrateByID(name);
-        if (crate != null) {
+    public static boolean openCrate(@Nonnull Player p, @Nonnull String id) {
+        return openCrate(p, id, -1);
+    }
+
+    public static boolean openCrate(@Nonnull Player p, @Nonnull String id, int lock_slot) {
+        Crate crate = getCrateByID(id);
+        if (crate != null && !Main.get().openCrates.containsKey(p.getUniqueId())) {
             Main.get().openCrates.put(p.getUniqueId(),
                     new ActiveCrate(p, crate, lock_slot));
             return true;
@@ -89,10 +84,17 @@ public class LootCratesAPI {
     }
 
     /**
-     * Close a crate to a player
+     * Close a player currently opened crate
+     * @param p {@link Player} instance
+     * @return whether the close was successful
      */
-    public static void closeCrate(Player p) {
-        Main.get().openCrates.remove(p.getUniqueId()).close();
+    public static boolean closeCrate(@Nonnull Player p) {
+        ActiveCrate activeCrate = Main.get().openCrates.remove(p.getUniqueId());
+        if (activeCrate != null) {
+            activeCrate.close();
+            return true;
+        }
+        return false;
     }
 
 }

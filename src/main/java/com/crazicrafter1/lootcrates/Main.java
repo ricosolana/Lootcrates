@@ -139,9 +139,10 @@ public class Main extends JavaPlugin
         ConfigurationSerialization.registerClass(Crate.class, "Crate");
 
         // api for easy
-        LootCratesAPI.registerLoot(LootItemCrate.class);
-        LootCratesAPI.registerLoot(LootItem.class);
         LootCratesAPI.registerLoot(LootCommand.class);
+        LootCratesAPI.registerLoot(LootItem.class);
+        LootCratesAPI.registerLoot(LootItemCrate.class);
+        LootCratesAPI.registerLoot(LootNBTItem.class);
 
         if (supportQualityArmory)
             LootCratesAPI.registerLoot(LootItemQA.class);
@@ -160,34 +161,12 @@ public class Main extends JavaPlugin
         if (supportMMOItems)
             LootCratesAPI.registerLoot(LootMMOItem.class);
 
-        // Issues with automatic revision detection:
-        // revision file does not exist before rev2
-        // revision exists in config in rev2
-
-        // If there is no rev file, this could mean two things:
-        // the plugin is a fresh deployment (or config does not exist)
-        // the config is rev 1 or older revision
-        //
-
         reloadConfig();
 
-        //if (data == null) {
-        //    return;
-        //}
-
-        /*
-         * bStats metrics init
-         */
         MetricWrap.init(this, update);
 
-        /*
-         * Command init
-         */
         new Cmd(this);
 
-        /*
-         * Listener init
-         */
         new ListenerOnEntityDamageByEntity(this);
         new ListenerOnInventoryClick(this);
         new ListenerOnInventoryClose(this);
@@ -294,7 +273,7 @@ public class Main extends JavaPlugin
             config.load(configFile);
             data = (Data) config.get("data");
         } catch (Exception e) {
-            //error(e.getMessage());
+            error(e.getMessage());
             try {
                 popup("Attempt 2: Loading default config");
 
@@ -302,7 +281,7 @@ public class Main extends JavaPlugin
                 config.load(configFile);
                 data = (Data) config.get("data");
             } catch (Exception e1) {
-                //error(e1.getMessage());
+                error(e1.getMessage());
                 try {
                     warn("Attempt 3: Populating config with defaults");
 

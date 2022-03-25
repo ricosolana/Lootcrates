@@ -80,7 +80,7 @@ public class Lang {
 
     public static String LOOT_MMO_EDIT_TITLE = "Edit scales";
 
-    public static String SKRIPT_EVENT_TAG = "Event tag";
+    public static String SKRIPT_EVENT_TAG = "&2Event tag";
     public static String SKRIPT_INPUT_TAG = "Input a tag";
 
     public static String ITEM_COUNT = "&7Count: &f%d";

@@ -71,7 +71,7 @@ public class LootSkriptEvent implements ILoot {
     public AbstractMenu.Builder getMenuBuilder() {
         return new ItemModifyMenu()
                 .build(item.build(), input -> (this.item = ItemBuilder.mutable(input)).build())
-                .childButton(5, 2, p -> ItemBuilder.copyOf(Material.PAPER).name(Lang.SKRIPT_EVENT_TAG).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
+                .childButton(1, 0, p -> ItemBuilder.copyOf(Material.PAPER).name(Lang.SKRIPT_EVENT_TAG).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.SKRIPT_EVENT_TAG)
                         .onClose((player) -> Result.PARENT())
                         .leftRaw(p -> tag)
@@ -90,7 +90,7 @@ public class LootSkriptEvent implements ILoot {
         Map<String, Object> result = new LinkedHashMap<>();
 
         result.put("tag", tag);
-        result.put("itemStack", item);
+        result.put("item", item);
 
         return result;
     }

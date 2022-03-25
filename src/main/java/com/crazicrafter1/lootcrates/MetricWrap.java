@@ -8,7 +8,7 @@ public class MetricWrap {
         try {
             Metrics metrics = new Metrics(plugin, 10395);
 
-            metrics.addCustomChart(new Metrics.SimplePie("updater",
+            metrics.addCustomChart(new Metrics.SimplePie("update",
                     () -> "" + update));
 
             metrics.addCustomChart(new Metrics.SimplePie("crates",
@@ -16,6 +16,9 @@ public class MetricWrap {
 
             metrics.addCustomChart(new Metrics.SimplePie("loot",
                     () -> "" + LootCratesAPI.lootClasses.size()));
+
+            metrics.addCustomChart(new Metrics.SimplePie("language",
+                    () -> plugin.language));
 
         } catch (Exception e) {
             plugin.error("Unable to enable bStats Metrics (" + e.getMessage() + ")");

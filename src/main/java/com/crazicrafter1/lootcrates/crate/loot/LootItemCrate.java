@@ -85,10 +85,10 @@ public class LootItemCrate implements ILoot {
                     for (Map.Entry<String, Crate> entry : Main.get().data.crates.entrySet()) {
                         Crate crate = entry.getValue();
 
-                        ItemStack icon = ItemBuilder.copyOf(Material.LOOM).apply(crate.item).glow(crate.id.equals(id)).build();
+                        //ItemStack icon = ItemBuilder.copyOf(Material.LOOM).apply(crate.item).glow(crate.id.equals(id)).build();
 
                         result.add(new Button.Builder()
-                                .icon(p -> icon)
+                                .icon(p -> crate.item.copy().glow(crate.id.equals(id)).build())
                                 .lmb(interact -> {
                                     // select as active
                                     id = crate.id;

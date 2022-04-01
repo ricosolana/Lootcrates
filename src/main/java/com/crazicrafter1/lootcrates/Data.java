@@ -22,7 +22,7 @@ import java.util.*;
  */
 public class Data implements ConfigurationSerializable {
 
-    public long cleanAfterDays;
+    //public long cleanAfterDays;
     public int speed;
 
     public ItemBuilder unSelectedItem;
@@ -36,7 +36,7 @@ public class Data implements ConfigurationSerializable {
      * Default constructor in the case of a normal config not being available
      */
     public Data() {
-        cleanAfterDays = 7; // Cleanup config files older than a week
+        //cleanAfterDays = 7; // Cleanup config files older than a week
         speed = 4;
         unSelectedItem = ItemBuilder.copyOf(Material.CHEST).name("&f&l???").lore("&7&oChoose 4 mystery chests, and\n&7&oyour loot will be revealed!");
         selectedItem = ItemBuilder.fromModernMaterial("WHITE_STAINED_GLASS_PANE").name("&7&l???").lore("&7You have selected this mystery chest");
@@ -68,12 +68,14 @@ public class Data implements ConfigurationSerializable {
         try {
             int rev = Main.get().rev;
 
+            // TODO remove this from here after a later revision
+            //  where it is unlikely that any old versions will be used
             if (rev == 0) {
                 // 2/20/2022 and before
-                cleanAfterDays = (int) args.getOrDefault("cleanHour", 7) / 24;
-            } else if (rev == 1) {
+                Main.get().cleanAfterDays = (int) args.getOrDefault("cleanHour", 7) / 24;
+            } else if (rev <= 2) {
                 // after 2/20/22
-                cleanAfterDays = (int) args.getOrDefault("cleanAfterDays", 7);
+                Main.get().cleanAfterDays = (int) args.getOrDefault("cleanAfterDays", 7);
             }
 
             speed = (int) args.getOrDefault("speed", 4);
@@ -81,7 +83,7 @@ public class Data implements ConfigurationSerializable {
             if (rev < 2) {
                 unSelectedItem = ItemBuilder.mutable((ItemStack) args.get("unSelectedItem"));
                 selectedItem = ItemBuilder.mutable((ItemStack) args.get("selectedItem"));
-            } else if (rev == 2) {
+            } else {
                 // after 3/2/22
                 unSelectedItem = ((ItemBuilder) args.get("unSelectedItem"));
                 selectedItem = ((ItemBuilder) args.get("selectedItem"));
@@ -134,7 +136,7 @@ public class Data implements ConfigurationSerializable {
         try {
             Map<String, Object> result = new LinkedHashMap<>();
 
-            result.put("cleanAfterDays", cleanAfterDays);
+            //result.put("cleanAfterDays", cleanAfterDays);
             result.put("speed", speed);
 
             result.put("unSelectedItem", unSelectedItem);

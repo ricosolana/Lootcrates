@@ -13,8 +13,11 @@ public class ListenerOnInventoryDrag extends BaseListener {
 
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent e) {
+        if (plugin.rev == -1)
+            return;
+
         Player p = (Player)e.getWhoClicked();
-        if (Main.get().openCrates.containsKey(p.getUniqueId())) {
+        if (plugin.openCrates.containsKey(p.getUniqueId())) {
             e.setCancelled(true);
         } /*else {
             if (LootCratesAPI.extractCrateFromItem(e.getCursor()) != null)

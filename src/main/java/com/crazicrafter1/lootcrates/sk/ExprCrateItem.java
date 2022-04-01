@@ -7,7 +7,9 @@ import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
+import com.crazicrafter1.lootcrates.crate.Crate;
 import org.bukkit.event.Event;
+import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class ExprCrateItem extends SimpleExpression<ItemStack> {
@@ -28,9 +30,13 @@ public class ExprCrateItem extends SimpleExpression<ItemStack> {
     protected ItemStack[] get(Event event) {
         String crateName = crateExpr.getSingle(event);
         if (crateName != null) {
-            return new ItemStack[] {
-                    LootCratesAPI.getCrateByID(crateName)
-                            .item.copy().renderAll().build()};
+            Crate crate = LootCratesAPI.getCrateByID(crateName);
+            if (crate == null) return null;
+            if (event instanceof PlayerEvent)
+                return new ItemStack[] { crate.itemStack(((PlayerEvent) event).getPlayer()) };
+
+            // else the raw item is returned
+            return new ItemStack[] { crate.itemStack(null) };
         }
         return null;
     }

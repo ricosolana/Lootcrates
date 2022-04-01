@@ -1,7 +1,5 @@
 package com.crazicrafter1.lootcrates;
 
-import com.crazicrafter1.crutils.ColorUtil;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -132,12 +130,12 @@ public class Lang {
 
     public static String ERR_INVALID = "Invalid input";
 
-    private static File langDir = new File(Main.get().getDataFolder(), "lang/");
+    public static final File langPath = new File(Main.get().getDataFolder(), "lang/");
 
-    public static boolean load(String language) {
+    public static void load(String language) {
         try {
-            langDir.mkdirs();
-            File file = new File(langDir, language + ".yml");
+            langPath.mkdirs();
+            File file = new File(langPath, language + ".yml");
 
             FileConfiguration config = new YamlConfiguration();
             config.load(file);
@@ -151,21 +149,17 @@ public class Lang {
                     }
                 } catch (Exception ignored) {}
             }
-
-            return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-
-        return false;
     }
 
     public static boolean save(String language, boolean override) {
         try {
-            File file = new File(langDir, language + ".yml");
+            File file = new File(langPath, language + ".yml");
             if (override || !file.exists()) {
 
-                langDir.mkdirs();
+                langPath.mkdirs();
 
                 FileConfiguration config = new YamlConfiguration();
 

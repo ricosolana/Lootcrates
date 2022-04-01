@@ -36,9 +36,9 @@ public class LootSkriptEvent implements ILoot {
         tag = (String) result.get("tag");
 
         int rev = Main.get().rev;
-        if (rev < 2) {
+        if (rev < 2)
             item = ItemBuilder.mutable((ItemStack) result.get("itemStack"));
-        } else
+        else
             item = (ItemBuilder) result.get("item");
     }
 

@@ -1,8 +1,7 @@
 # Default config
-# Automatically converted from rev1 to rev2
+# rev3
 data:
   ==: com.crazicrafter1.lootcrates.Data
-  cleanAfterDays: 0
   speed: 4
   unSelectedItem:
     ==: com.crazicrafter1.crutils.ItemBuilder

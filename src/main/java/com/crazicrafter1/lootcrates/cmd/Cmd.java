@@ -7,6 +7,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +19,10 @@ import static com.crazicrafter1.lootcrates.cmd.CmdArg.error;
 
 public class Cmd implements CommandExecutor, TabCompleter {
 
+    private Main plugin;
+
     public Cmd(Main plugin) {
+        this.plugin = plugin;
         plugin.getCommand("crates").setExecutor(this);
         plugin.getCommand("crates").setTabCompleter(this);
     }
@@ -101,7 +105,7 @@ public class Cmd implements CommandExecutor, TabCompleter {
     // An efficient tab complete algorithm would involve a tree map
     // only worth it for many matches
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command c, String s, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command c, @NotNull String s, String[] args) {
         if (args.length == 0)
             return new ArrayList<>();
 

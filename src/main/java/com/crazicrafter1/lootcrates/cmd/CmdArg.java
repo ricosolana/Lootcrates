@@ -7,12 +7,10 @@ import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -45,13 +43,16 @@ class CmdArg {
         args.put("lang", new CmdArg((sender, args, flags) -> {
             String lang = args[0];
 
-            if (Lang.load(lang))
+            try {
+                Lang.load(lang);
                 return info(sender, "Successfully loaded language");
-            return error(sender, "Failed to load language");
+            } catch (Exception e) {
+                return error(sender, "Failed to load language: " + e.getMessage());
+            }
         }, null));
 
         args.put("populate", new CmdArg((sender, args, flags) -> {
-            plugin.saveConfig();
+            plugin.saveConfig(sender);
             plugin.data = new Data();
             return info(sender, Lang.POPULATING);
         }, null));
@@ -99,8 +100,9 @@ class CmdArg {
 
         args.put("rev", new CmdArg((sender, args, flags) -> {
             if (args[0].equalsIgnoreCase("latest")) {
-                Main.get().rev = Main.REV_LATEST;
-                Main.get().reloadConfig();
+                plugin.rev = Main.REV_LATEST;
+                plugin.reloadConfig(sender);
+                plugin.reloadOtherConfigs(sender);
                 return info(sender, String.format(Lang.READ_W_LATEST_REV, Main.REV_LATEST));
             } else {
                 try {
@@ -111,9 +113,10 @@ class CmdArg {
                     } if (rev < 0)
                         throw new RuntimeException();
 
-                    Main.get().rev = rev;
-                    Main.get().reloadConfig();
-                    Main.get().rev = Main.REV_LATEST;
+                    plugin.rev = rev;
+                    plugin.reloadConfig(sender);
+                    plugin.reloadOtherConfigs(sender);
+                    plugin.rev = Main.REV_LATEST;
 
                     CmdArg.args.remove("rev");
 
@@ -122,10 +125,18 @@ class CmdArg {
                     return error(sender, Lang.REV_REQUIRE_INT);
                 }
             }
-        }, null));
+        }, (sender, args) -> {
+            ArrayList<String> ret = new ArrayList<>();
+            for (int i=0; i < Main.REV_LATEST; i++) {
+                ret.add("" + i);
+            }
+            ret.add("latest");
+            return ret;
+        }));
 
         args.put("save", new CmdArg((sender, args, flags) -> {
-            plugin.saveConfig();
+            plugin.saveConfig(sender);
+            plugin.saveOtherConfigs(sender);
             return info(sender, Lang.CONFIG_SAVED);
         }, null));
 
@@ -194,14 +205,22 @@ class CmdArg {
         }));
 
         args.put("reset", new CmdArg((sender, args, flags) -> {
-            Main.get().saveDefaultConfig(true);
-            Main.get().reloadConfig();
+            plugin.saveDefaultConfig(sender, true);
+            plugin.reloadConfig(sender);
             return info(sender, Lang.CONFIG_LOADED_DEFAULT);
         }, null));
 
         args.put("reload", new CmdArg((sender, args, flags) -> {
-            Main.get().reloadConfig();
+            plugin.reloadConfig(sender);
+            plugin.reloadOtherConfigs(sender);
             return info(sender, Lang.CONFIG_LOADED_DISK);
+        }, null));
+
+        args.put("dbg-opened", new CmdArg((sender, args, flags) -> {
+            return info(sender, "Open crates: " + String.join(", ",
+                    plugin.openCrates.values().stream().map(e -> e.getPlayer().getName()).collect(Collectors.toList()).toArray(new String[0])
+            ));
+            //return info(sender, "Updated");
         }, null));
 
         args.put("editor", new CmdArg((sender, args, flags) -> {

@@ -1,8 +1,6 @@
 package com.crazicrafter1.lootcrates;
 
 import com.crazicrafter1.crutils.ReflectionUtil;
-import com.crazicrafter1.crutils.refl.ItemStackMirror;
-import com.crazicrafter1.crutils.refl.NBTTagCompoundMirror;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
@@ -75,8 +73,7 @@ public class LootCratesAPI {
     public static boolean openCrate(@Nonnull Player p, @Nonnull String id, int lock_slot) {
         Crate crate = getCrateByID(id);
         if (crate != null && !Main.get().openCrates.containsKey(p.getUniqueId())) {
-            Main.get().openCrates.put(p.getUniqueId(),
-                    new ActiveCrate(p, crate, lock_slot));
+            new ActiveCrate(p, crate, lock_slot).open();
             return true;
         }
 

@@ -35,11 +35,10 @@ public class LootCommand implements ILoot {
         command = (String) result.get("command");
 
         int rev = Main.get().rev;
-        if (rev < 2) {
+        if (rev < 2)
             item = ItemBuilder.mutable((ItemStack) result.get("itemStack"));
-        } else if (rev == 2) {
+        else
             item = (ItemBuilder) result.get("item");
-        }
     }
 
     @Nonnull

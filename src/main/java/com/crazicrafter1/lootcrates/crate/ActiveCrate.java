@@ -63,7 +63,12 @@ public final class ActiveCrate {
         this.populate(crate);
 
         this.fill();
-        p.openInventory(inventory);
+        //p.openInventory(inventory);
+    }
+
+    public void open() {
+        Main.get().openCrates.put(player.getUniqueId(), this);
+        player.openInventory(inventory);
     }
 
     private void populate(Crate crate) {

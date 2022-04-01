@@ -15,11 +15,14 @@ public class ListenerOnInventoryClick extends BaseListener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent e)
     {
+        if (plugin.rev == -1)
+            return;
+
         Player p = (Player) e.getWhoClicked();
 
         // If player is opening crate
-        if (Main.get().openCrates.containsKey(p.getUniqueId())) {
-            Main.get().openCrates.get(p.getUniqueId()).onInventoryClick(e);
+        if (plugin.openCrates.containsKey(p.getUniqueId())) {
+            plugin.openCrates.get(p.getUniqueId()).onInventoryClick(e);
         }/* else if (e.getClickedInventory() != null) {
             if (LootCratesAPI.extractCrateFromItem(e.getCursor()) != null) {
 

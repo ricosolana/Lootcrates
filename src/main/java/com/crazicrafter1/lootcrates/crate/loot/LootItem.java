@@ -35,7 +35,7 @@ public class LootItem extends AbstractLootItem {
         int rev = Main.get().rev;
         if (rev < 2)
             this.item = ItemBuilder.mutable((ItemStack) args.get("itemStack"));
-        else if (rev == 2)
+        else
             this.item = ((ItemBuilder) args.get("item"));
     }
 

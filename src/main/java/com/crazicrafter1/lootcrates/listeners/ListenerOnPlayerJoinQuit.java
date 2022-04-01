@@ -1,7 +1,10 @@
 package com.crazicrafter1.lootcrates.listeners;
 
+import com.crazicrafter1.crutils.Version;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
 import com.crazicrafter1.lootcrates.Main;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,19 +21,28 @@ public class ListenerOnPlayerJoinQuit extends BaseListener {
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
 
-        if (Main.get().rev == -1 &&
-                p.hasPermission("lootcrates.admin")) {
-            Main.get().warn(p, "Unable to detect config revision");
-            Main.get().warn(p, "Run " + ChatColor.UNDERLINE +"/crates rev <[int] | latest>" + ChatColor.RESET + ChatColor.YELLOW + " to fix this");
+        if (!p.hasPermission("lootcrates.admin"))
+            return;
+
+        if (plugin.rev == -1) {
+            plugin.warn(p, ChatColor.GRAY + "Unable to detect config revision");
+            TextComponent message = new TextComponent(ChatColor.GRAY + "To fix this, run: " + ChatColor.DARK_GRAY + "/crates rev <value> " + ChatColor.GOLD + ChatColor.BOLD + "[CLICK]");
+
+            message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/crates rev "));
+            p.spigot().sendMessage(message);
+
         }
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e)
     {
+        if (plugin.rev == -1)
+            return;
+
         Player p = e.getPlayer();
 
-        if (Main.get().openCrates.containsKey(p.getUniqueId())) {
+        if (plugin.openCrates.containsKey(p.getUniqueId())) {
             LootCratesAPI.closeCrate(p);
         }
     }

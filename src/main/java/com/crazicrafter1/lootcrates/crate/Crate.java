@@ -101,7 +101,7 @@ public class Crate implements ConfigurationSerializable {
         int rev = Main.get().rev;
         if (rev < 2)
             item = ItemBuilder.mutable((ItemStack) args.get("itemStack"));
-        else if (rev == 2)
+        else
             item = ((ItemBuilder) args.get("item"));
     }
 
@@ -133,7 +133,7 @@ public class Crate implements ConfigurationSerializable {
      * @param p player
      * @return the formatted item
      */
-    public ItemStack itemStack(@Nonnull Player p) {
+    public ItemStack itemStack(@Nullable Player p) {
         return this.item.copy()
                 .replace("crate_picks", "" + picks, '%')
                 .placeholders(p)
@@ -141,7 +141,7 @@ public class Crate implements ConfigurationSerializable {
                 .build();
     }
 
-    public String getTitle(@Nonnull Player p) {
+    public String getTitle(@Nullable Player p) {
         return ColorUtil.renderAll(Util
                 .placeholders(p, this.title
                         .replace("%crate_picks%", "" + picks)

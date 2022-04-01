@@ -26,7 +26,7 @@ public class LootNBTItem extends LootItem {
         super(args);
 
         int rev = Main.get().rev;
-        if (rev == 2)
+        if (rev >= 2)
             this.item = ItemBuilder.mutable(NMSAPI.getNBT((String) args.get("nbt")).setNBT(this.item.build()));
     }
 

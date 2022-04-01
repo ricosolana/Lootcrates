@@ -15,9 +15,12 @@ public class ListenerOnInventoryClose extends BaseListener {
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent e)
     {
+        if (plugin.rev == -1)
+            return;
+
         Player p = (Player)e.getPlayer();
 
-        if (Main.get().openCrates.containsKey(p.getUniqueId())) {
+        if (plugin.openCrates.containsKey(p.getUniqueId())) {
             LootCratesAPI.closeCrate(p);
         }
     }

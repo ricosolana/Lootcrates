@@ -32,11 +32,10 @@ public class LootSet implements ConfigurationSerializable {
 
     public LootSet(Map<String, Object> args) {
         int rev = Main.get().rev;
-        if (rev < 2) {
+        if (rev < 2)
             item = ItemBuilder.mutable((ItemStack) args.get("itemStack"));
-        } else if (rev == 2) {
+        else
             item = ((ItemBuilder) args.get("item"));
-        }
         loot = (ArrayList<ILoot>) args.get("loot");
     }
 

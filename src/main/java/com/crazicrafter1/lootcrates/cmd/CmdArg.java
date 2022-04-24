@@ -143,9 +143,27 @@ class CmdArg {
         args.put("crate", new CmdArg((sender, args, flags) -> {
             Crate crate = LootCratesAPI.getCrateByID(args[0]);
 
+            // the best way to represent this command structure would be with a treemap
+            // crates -> display plugin info
+            //  - crate
+            //      - <crate>
+
+            // STATIC and WILDCARD are more like specifiers
+            //  STATIC is an expected arg among predetermined args
+            //  WILDCARD is an unpredictable arg
+
+            // flags:
+            // flags could take a class type to construct
+            //  - NUMBER_OR_STRING
+            //  - NUMBER strict
+            //  - STRING
+            //  - PLAYER (online)
+            //  - ANY_PLAYER (online/offline)
+
             if (crate == null)
                 return error(sender, Lang.ERR_CRATE_UNKNOWN);
 
+            // /crates crate common
             if (args.length == 1) {
                 if (!(sender instanceof Player))
                     return error(sender, Lang.ERR_PLAYER_CRATE);
@@ -153,6 +171,7 @@ class CmdArg {
                 return info(sender, String.format(Lang.SELF_GIVE_CRATE, crate.id));
             }
 
+            // crates crate common *
             if (args[1].equals("*")) {
                 int given = 0;
                 for (Player p : Bukkit.getOnlinePlayers()) {
@@ -168,11 +187,14 @@ class CmdArg {
                 return info(sender, String.format(Lang.GIVE_CRATE_ALL, crate.id, Bukkit.getOnlinePlayers().size()));
             }
 
+            // crates crate common crazicrafter1
             Player p = Bukkit.getServer().getPlayer(args[1]);
             if (p == null)
                 return error(sender, Lang.ERR_PLAYER_UNKNOWN);
 
             Util.give(p, crate.itemStack(p));
+
+            // now test quantity with args
 
             // Redundant spam
             if (p != sender) {

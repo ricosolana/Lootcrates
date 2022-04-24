@@ -4,6 +4,7 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
 import com.crazicrafter1.crutils.*;
 import com.crazicrafter1.lootcrates.cmd.Cmd;
+import com.crazicrafter1.lootcrates.cmd.CmdTestParser;
 import com.crazicrafter1.lootcrates.crate.ActiveCrate;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootSet;
@@ -127,6 +128,8 @@ public class Main extends JavaPlugin
 
         reloadConfig(null);
 
+        boolean check = rev == -1 || !update;
+
         if (rev != -1) {
             if (update) try {
                 StringBuilder outTag = new StringBuilder();
@@ -140,14 +143,14 @@ public class Main extends JavaPlugin
                 warn("Error while updating");
                 e.printStackTrace();
             }
-            else {
-                GitUtils.checkForUpdateAsync(this, "PeriodicSeizures", "Lootcrates",
-                        (result, tag) -> {
-                            if (result) popup("Update " + tag + " is available");
-                            else info("Using latest version");
-                        });
-            }
         }
+
+        if (check)
+            GitUtils.checkForUpdateAsync(this, "PeriodicSeizures", "Lootcrates",
+                    (result, tag) -> {
+                        if (result) popup("Update " + tag + " is available");
+                        else info("Using latest version");
+                    });
 
         if (Version.AT_LEAST_v1_16.a()) {
             long c = System.currentTimeMillis();
@@ -180,7 +183,7 @@ public class Main extends JavaPlugin
         supportMMOItems = Bukkit.getPluginManager().isPluginEnabled("MMOItems");
 
         // Register serializable
-        ConfigurationSerialization.registerClass(Data.class, "Data"); // TODO remove serialize
+        ConfigurationSerialization.registerClass(Data.class, "Data"); // TODO try to stray away from this serialize method somehow
         ConfigurationSerialization.registerClass(LootSet.class, "LootSet");
         ConfigurationSerialization.registerClass(Crate.class, "Crate");
 
@@ -206,6 +209,7 @@ public class Main extends JavaPlugin
         MetricWrap.init(this);
 
         new Cmd(this);
+        new CmdTestParser(this);
 
         new ListenerOnEntityDamageByEntity(this);
         new ListenerOnInventoryClick(this);

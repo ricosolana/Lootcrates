@@ -22,7 +22,6 @@ import java.util.regex.Pattern;
 public class Editor {
 
     public static final String LOREM_IPSUM = "Lorem ipsum";
-    /// TODO make this butchery mess somehow translatable
     private static final String COLORS = ColorUtil.renderMarkers("&a" + LOREM_IPSUM) +                                  "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "&a" + LOREM_IPSUM +                                    "\n"
             +   ColorUtil.renderMarkers("&#456789" + LOREM_IPSUM) +                                                     "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "&#456789" + LOREM_IPSUM +                              "\n"
             +   ColorUtil.renderAll("<#aa7744>" + LOREM_IPSUM + "</#abcdef>") +                                         "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "<#aa7744>" + LOREM_IPSUM + "</#abcdef>" +              "\n"
@@ -39,7 +38,7 @@ public class Editor {
                 ;
     }
 
-    // TODO remove and redo firework menu
+    // TODO Improve firework menu (tacky and plain ATM)
     public static final Button.Builder IN_OUTLINE = new Button.Builder().icon(p -> ItemBuilder.fromModernMaterial(
             "GRAY_STAINED_GLASS_PANE").name(" ").build());
 

@@ -68,8 +68,7 @@ public class Data implements ConfigurationSerializable {
         try {
             int rev = Main.get().rev;
 
-            // TODO remove this from here after a later revision
-            //  where it is unlikely that any old versions will be used
+            // TODO remove this after most servers start using the latest LootCrates versions
             if (rev == 0) {
                 // 2/20/2022 and before
                 Main.get().cleanAfterDays = (int) args.getOrDefault("cleanHour", 7) / 24;

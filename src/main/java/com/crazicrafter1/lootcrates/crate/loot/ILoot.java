@@ -34,6 +34,7 @@ public interface ILoot extends ConfigurationSerializable {
      *  TODO Important: Must not assign a onClose(...) function to the menu
      *      This results in unexpected menu behaviour
      *      I have no idea how to fix this issue ATM.
+     *      BIG RECURRING MAJOR MINOR ISSUE (hard to explain)
      * @return {@link AbstractMenu.Builder} instance
      */
     @Nonnull

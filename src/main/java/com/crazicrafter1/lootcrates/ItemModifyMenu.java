@@ -53,25 +53,25 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                         .icon(p -> builder.copy().renderAll().build())
                 )
 
+                // TODO implement item material search
                 //.childButton(4, 0, p -> ItemBuilder.copyOf(Material.COMPASS).name("Assign material").lore("Search").build(), new TextMenu.TBuilder()
                 //        .title(p -> "Material search")
                 //        .onClose((player) -> Result.PARENT())
                 //        .
                 //)
 
-                // remove this
-                // The item AS-IS
-                //.button(2, 0, new Button.Builder()
-                //        // if no custom name, don't even name
-                //        // just skip? or make an override to do nothing when null
-                //        .icon(p -> builder.copy().name(builder.getName(), ColorUtil.RENDER_ALL, "" + ChatColor.GRAY).build())
-                //        .lmb((interact) -> {
-                //            if (interact.heldItem == null) {
-                //                return Result.MESSAGE(Lang.Must_swap);
-                //            }
-                //            builder = ItemBuilder.copyOf(itemStackFunction.apply(interact.heldItem));
-                //            return Result.GRAB();
-                //        }))
+                // TODO Remove swap functionality
+                .button(2, 0, new Button.Builder()
+                        // if no custom name, don't even name
+                        // just skip? or make an override to do nothing when null
+                        .icon(p -> builder.copy().name(builder.getName(), ColorUtil.RENDER_ALL, "" + ChatColor.GRAY).build())
+                        .lmb((interact) -> {
+                            if (interact.heldItem == null) {
+                                return Result.MESSAGE(Lang.Must_swap);
+                            }
+                            builder = ItemBuilder.copyOf(itemStackFunction.apply(interact.heldItem));
+                            return Result.GRAB();
+                        }))
 
                 // Edit Name
                 .childButton(3, 1, p -> ItemBuilder.copyOf(Material.NAME_TAG).name(Lang.NAME).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()

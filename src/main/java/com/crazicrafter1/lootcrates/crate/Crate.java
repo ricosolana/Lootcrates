@@ -4,6 +4,7 @@ import com.crazicrafter1.crutils.*;
 import com.crazicrafter1.gapi.*;
 import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.lootcrates.Main;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -16,7 +17,7 @@ import java.util.*;
 
 public class Crate implements ConfigurationSerializable {
 
-    /// TODO Use this instead
+    /// TODO Use random unordered weighted search
     /// https://stackoverflow.com/questions/1761626/weighted-random-numbers
 
     // can be used to sort any given lootgroup map
@@ -112,7 +113,7 @@ public class Crate implements ConfigurationSerializable {
     LootSet getRandomLootSet() {
         int rand = ProbabilityUtil.randomRange(0, totalWeights-1);
 
-        /// TODO use binary search for large sets
+        /// TODO use binary search for large sets?
         for (Map.Entry<LootSet, Integer> entry : this.lootBySum.entrySet()) {
             if (entry.getValue() > rand) return entry.getKey();
         }
@@ -177,6 +178,11 @@ public class Crate implements ConfigurationSerializable {
         return new SimpleMenu.SBuilder(5)
                 .title(p -> id)
                 .background()
+                //.onOpen(p -> p.setGameMode(GameMode.CREATIVE))
+                //.onClose(p -> {
+                //    p.setGameMode();
+                //    return Result.PARENT();
+                //})
                 .parentButton(4, 4)
                 // *   *   *
                 // Edit Crate ItemStack

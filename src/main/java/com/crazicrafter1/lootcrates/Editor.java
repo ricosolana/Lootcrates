@@ -38,7 +38,7 @@ public class Editor {
                 ;
     }
 
-    // TODO Improve firework menu (tacky and plain ATM)
+    // TODO improve firework menu (tacky and plain ATM)
     public static final Button.Builder IN_OUTLINE = new Button.Builder().icon(p -> ItemBuilder.fromModernMaterial(
             "GRAY_STAINED_GLASS_PANE").name(" ").build());
 
@@ -73,9 +73,7 @@ public class Editor {
 
                                             Crate crate = new Crate(s, ItemBuilder.copyOf(Material.ENDER_CHEST).name("my new crate").build(), "select loot", 3, 4, Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
 
-                                            crate.lootBySum = new LinkedHashMap<>();
-                                            crate.lootBySum.put(Main.get().data.lootSets.values().iterator().next(), 1);
-                                            crate.sumsToWeights();
+                                            crate.loot.add(Main.get().data.lootSets.values().iterator().next(), 1);
 
                                             Main.get().data.crates.put(s, crate);
 
@@ -120,9 +118,7 @@ public class Editor {
                                                     if (Main.get().data.lootSets.size() > 1) {
                                                         Main.get().data.lootSets.remove(lootSet.id);
                                                         for (Crate crate : Main.get().data.crates.values()) {
-                                                            Integer removed = crate.lootByWeight.remove(lootSet);
-                                                            if (removed != null)
-                                                                crate.weightsToSums();
+                                                            crate.loot.remove(lootSet);
                                                         }
                                                         return Result.REFRESH();
                                                     }

@@ -73,7 +73,7 @@ public final class ActiveCrate {
 
     private void populate(Crate crate) {
         for (int i = 0; i < size; i++) {
-            this.lootChances[i] = crate.getRandomLootSet();
+            this.lootChances[i] = crate.loot.getRandom();
         }
     }
 

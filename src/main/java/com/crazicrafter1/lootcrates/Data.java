@@ -57,9 +57,7 @@ public class Data implements ConfigurationSerializable {
                 Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
         crates.put("peasant", crate);
 
-        crate.lootByWeight = new HashMap<>();
-        crate.lootByWeight.put(lootSet, 10);
-        crate.weightsToSums();
+        crate.loot.add(lootSet, 10);
 
         fireworkEffect = FireworkEffect.builder().withColor(Color.RED, Color.BLUE, Color.WHITE).with(FireworkEffect.Type.BURST).build();
     }
@@ -68,7 +66,7 @@ public class Data implements ConfigurationSerializable {
         try {
             int rev = Main.get().rev;
 
-            // TODO remove this after most servers start using the latest LootCrates versions
+            // TODO eventually remove older revisions
             if (rev == 0) {
                 // 2/20/2022 and before
                 Main.get().cleanAfterDays = (int) args.getOrDefault("cleanHour", 7) / 24;
@@ -103,7 +101,7 @@ public class Data implements ConfigurationSerializable {
                 crate.item = ItemBuilder.mutable(LootCratesAPI.makeCrate(crate.item.build(), id));
 
                 // initialize weights
-                crate.sumsToWeights();
+                //crate.sumsToWeights();
             }
 
             fireworkEffect = (FireworkEffect) args.get("fireworkEffect");

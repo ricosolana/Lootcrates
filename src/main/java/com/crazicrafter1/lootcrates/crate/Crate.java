@@ -10,77 +10,20 @@ import org.bukkit.Sound;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
 public class Crate implements ConfigurationSerializable {
-
-    /// TODO Use random unordered weighted search
-    /// https://stackoverflow.com/questions/1761626/weighted-random-numbers
-
-    // can be used to sort any given lootgroup map
-    private static <T> LinkedHashMap<T, Integer> sortByValue(HashMap<T, Integer> hm) {
-        // Create a list from elements of HashMap
-        List<Map.Entry<T, Integer> > list =
-                new LinkedList<>(hm.entrySet());
-
-        // Sort the list
-        list.sort(Map.Entry.comparingByValue());
-
-        // put data from sorted list to hashmap
-        LinkedHashMap<T, Integer> temp = new LinkedHashMap<>();
-        for (Map.Entry<T, Integer> aa : list) {
-            temp.put(aa.getKey(), aa.getValue());
-        }
-        return temp;
-    }
-
-    /**
-     * [[[weights -> sums]]]
-     */
-    public void weightsToSums() {
-        lootBySum = sortByValue(lootByWeight);
-
-        int last = 0;
-        for (Map.Entry<LootSet, Integer> entry : lootBySum.entrySet()) {
-            entry.setValue(last + entry.getValue());
-            last = entry.getValue();
-        }
-
-        this.totalWeights = last;
-    }
-
-    /**
-     * [[[sums -> weights]]]
-     */
-    public void sumsToWeights() {
-        // reset
-        lootByWeight = new LinkedHashMap<>();
-
-        int prevSum = 0;
-        for (Map.Entry<LootSet, Integer> entry : lootBySum.entrySet()) {
-            int weight = entry.getValue() - prevSum;
-
-            lootByWeight.put(entry.getKey(), weight);
-
-            prevSum = entry.getValue();
-        }
-
-        this.totalWeights = prevSum;
-    }
-
     public String id;
     public ItemBuilder item;
-    public String title; // stored in RENDER_MARKERS form
+    public String title;
     public int columns;
     public int picks;
     public Sound sound;
-
-    public LinkedHashMap<LootSet, Integer> lootBySum;
-    public HashMap<LootSet, Integer> lootByWeight;
-    public int totalWeights;
+    public WeightedRandomContainer<LootSet> loot;
 
     public Crate(String id, ItemStack itemStack, String title, int columns, int picks, Sound sound) {
         this.id = id;
@@ -89,6 +32,7 @@ public class Crate implements ConfigurationSerializable {
         this.columns = columns;
         this.picks = picks;
         this.sound = sound;
+        this.loot = new WeightedRandomContainer<>();
     }
 
     public Crate(Map<String, Object> args) {
@@ -97,36 +41,26 @@ public class Crate implements ConfigurationSerializable {
         columns = (int) args.get("columns");
         picks = (int) args.get("picks");
         sound = Sound.valueOf((String) args.get("sound"));
-        lootBySum = sortByValue((LinkedHashMap<LootSet, Integer>) args.get("weights"));
 
-        int rev = Main.get().rev;
+        // TODO eventually remove older revisions
+        final int rev = Main.get().rev;
         if (rev < 2)
             item = ItemBuilder.mutable((ItemStack) args.get("itemStack"));
         else
             item = ((ItemBuilder) args.get("item"));
-    }
 
-    /**
-     * Assumes that the map is cumulative-weight sorted in config
-     * unknown whether config map retains original order
-     */
-    LootSet getRandomLootSet() {
-        int rand = ProbabilityUtil.randomRange(0, totalWeights-1);
-
-        /// TODO use binary search for large sets?
-        for (Map.Entry<LootSet, Integer> entry : this.lootBySum.entrySet()) {
-            if (entry.getValue() > rand) return entry.getKey();
-        }
-
-        return null;
+        if (rev < 4) {
+            loot = WeightedRandomContainer.cumulative((LinkedHashMap<LootSet, Integer>) args.get("weights"));
+        } else
+            loot = new WeightedRandomContainer<>((Map<LootSet, Integer>) args.get("weights"));
     }
 
     public String getFormattedPercent(LootSet lootGroup) {
-        return String.format("%.02f%%", 100.f * ((float) lootByWeight.get(lootGroup)/(float)totalWeights));
+        return String.format("%.02f%%", 100.f * ((float) loot.get(lootGroup)/(float)loot.getWeight()));
     }
 
     public String getFormattedFraction(LootSet lootGroup) {
-        return String.format("%d/%d", lootByWeight.get(lootGroup), totalWeights);
+        return String.format("%d/%d", loot.get(lootGroup), loot.getWeight());
     }
 
     /**
@@ -157,9 +91,10 @@ public class Crate implements ConfigurationSerializable {
                 "size: " + title + "\n" +
                 "picks: " + picks + "\n" +
                 "sound: " + sound + "\n" +
-                "weights: " + lootBySum + "\n";
+                "weights: " + loot + "\n";
     }
 
+    @NotNull
     @Override
     public Map<String, Object> serialize() {
         Map<String, Object> result = new LinkedHashMap<>();
@@ -169,7 +104,7 @@ public class Crate implements ConfigurationSerializable {
         result.put("columns", columns);
         result.put("picks", picks);
         result.put("sound", sound.name());
-        result.put("weights", lootBySum);
+        result.put("weights", loot.getMap());
 
         return result;
     }
@@ -228,7 +163,7 @@ public class Crate implements ConfigurationSerializable {
                             ArrayList<Button> result1 = new ArrayList<>();
 
                             for (LootSet lootSet : Main.get().data.lootSets.values()) {
-                                Integer weight = lootByWeight.get(lootSet);
+                                Integer weight = loot.get(lootSet);
                                 Button.Builder btn = new Button.Builder();
                                 ItemBuilder b = ItemBuilder.copyOf(lootSet.item.getMaterial()).name("&8" + lootSet.id);
                                 if (weight != null) {
@@ -240,31 +175,27 @@ public class Crate implements ConfigurationSerializable {
                                             Lang.SHIFT_MUL).glow(true);
                                     btn.mmb(interact -> {
                                         // toggle inclusion
-                                        lootByWeight.remove(lootSet);
-                                        weightsToSums();
+                                        loot.remove(lootSet);
                                         return Result.REFRESH();
                                     }).lmb(interact -> {
-                                        // decrement
+                                        // capped decrement
                                         int change = interact.shift ? 5 : 1;
 
-                                        lootByWeight.put(lootSet, MathUtil.clamp(weight - change, 1, Integer.MAX_VALUE));
-                                        weightsToSums();
+                                        loot.add(lootSet, MathUtil.clamp(weight - change, 1, Integer.MAX_VALUE));
 
                                         return Result.REFRESH();
                                     }).rmb(interact -> {
-                                        // decrement
+                                        // capped increment
                                         int change = interact.shift ? 5 : 1;
 
-                                        lootByWeight.put(lootSet, MathUtil.clamp(weight + change, 1, Integer.MAX_VALUE));
-                                        weightsToSums();
+                                        loot.add(lootSet, MathUtil.clamp(weight + change, 1, Integer.MAX_VALUE));
 
                                         return Result.REFRESH();
                                     });
                                 } else {
                                     b.lore(Lang.MMB_TOGGLE);
                                     btn.mmb(interact -> {
-                                        lootByWeight.put(lootSet, 1);
-                                        weightsToSums();
+                                        loot.add(lootSet, 1);
                                         return Result.REFRESH();
                                     });
                                 }

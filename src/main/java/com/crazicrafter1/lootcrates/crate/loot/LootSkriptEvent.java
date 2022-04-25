@@ -35,6 +35,7 @@ public class LootSkriptEvent implements ILoot {
         // idk
         tag = (String) result.get("tag");
 
+        // TODO eventually remove older revisions
         int rev = Main.get().rev;
         if (rev < 2)
             item = ItemBuilder.mutable((ItemStack) result.get("itemStack"));

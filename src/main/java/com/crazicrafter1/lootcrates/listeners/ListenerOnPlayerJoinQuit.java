@@ -21,7 +21,7 @@ public class ListenerOnPlayerJoinQuit extends BaseListener {
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
 
-        if (!p.hasPermission("lootcrates.admin"))
+        if (!p.hasPermission(Main.get().PERM_ADMIN))
             return;
 
         if (plugin.rev == -1) {
@@ -30,7 +30,6 @@ public class ListenerOnPlayerJoinQuit extends BaseListener {
 
             message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/crates rev "));
             p.spigot().sendMessage(message);
-
         }
     }
 

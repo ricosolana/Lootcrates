@@ -90,6 +90,7 @@ public class Lang {
     public static String NEW_LOOT_SET = "New LootSet";
     public static String FORMAT_ID = "&8id: %s";
 
+    public static String UNKNOWN_REV = "Unable to determine plugin save revision";
     public static String ASSIGN_REV = "Must assign revision: %s";
     public static String VERSION = "Using version: %s";
     public static String REV = "Using revision: %d";
@@ -129,6 +130,37 @@ public class Lang {
     public static String LOOT = "&6&nLoot";
 
     public static String ERR_INVALID = "Invalid input";
+
+    public static String GAPI_REQUIRED = "Plugin Gapi required as a dependency";
+    public static String GAPI_INSTALL = "Install it from here &n%s&r ";
+    public static String GAPI_FAILED = "Gapi failed to enable";
+    public static String JOIN_DISCORD = "Join the &8&lDiscord &rfor help and more &n%s&r ";
+
+    public static String UPDATED = "Updated to %s";
+    public static String RECOMMEND_RESTART = "Restarting is recommended to avoid issues";
+    public static String LATEST_VERSION = "Using the latest version";
+    public static String UPDATE_FAIL = "Error while updating";
+    public static String UPDATE_AVAILABLE = "Update %s is available";
+
+    public static String CONFIG_SAVE = "Saving config...";
+    public static String CONFIG_LOAD_FAIL = "Failed to load config: %s";
+    public static String CONFIG_SAVE_FAIL = "Failed to save config";
+    public static String CONFIG_BACKUP_FAIL = "Failed to make a config backup";
+    public static String CONFIG_PURGE_DISABLED = "Config purging is disabled";
+    public static String CONFIG_PURGES = "Deleted %d old configurations";
+    public static String NO_CONFIG_PURGES = "No configurations were deleted";
+    public static String CONFIG_PURGES_FAIL = "Error deleting old backups: %s";
+
+    public static String STATS_SAVE_FAIL = "Error saving player stats: %s";
+    public static String STATS_LOAD_FAIL = "Error loading player stats: %s";
+
+    public static String REWARDS_BACKUP = "Making a backup of rewards.yml";
+    public static String REWARDS_1 = "Attempt 1: Loading rewards.yml";
+    public static String REWARDS_2 = "Attempt 2: Loading default rewards.yml";
+    public static String REWARDS_3 = "Attempt 3: Populating with default rewards";
+    public static String REWARDS_SUCCESS = "Successfully loaded rewards.yml";
+    public static String REWARDS_FAIL = "All fallback attempts failed";
+    public static String REWARDS_REPORT = "Please report this at %s";
 
     public static final File langPath = new File(Main.get().getDataFolder(), "lang/");
 

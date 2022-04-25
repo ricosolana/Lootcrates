@@ -34,6 +34,7 @@ public class LootCommand implements ILoot {
     public LootCommand(Map<String, Object> result) {
         command = (String) result.get("command");
 
+        // TODO eventually remove older revisions
         int rev = Main.get().rev;
         if (rev < 2)
             item = ItemBuilder.mutable((ItemStack) result.get("itemStack"));

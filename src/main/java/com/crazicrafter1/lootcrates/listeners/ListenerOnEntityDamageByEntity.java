@@ -13,6 +13,7 @@ public class ListenerOnEntityDamageByEntity extends BaseListener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
+        // TODO remove this, and instead make class register on successful revision
         if (plugin.rev == -1)
             return;
 

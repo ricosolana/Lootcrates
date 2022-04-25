@@ -32,6 +32,7 @@ public class LootItem extends AbstractLootItem {
     public LootItem(Map<String, Object> args) {
         super(args);
 
+        // TODO eventually remove older revisions
         int rev = Main.get().rev;
         if (rev < 2)
             this.item = ItemBuilder.mutable((ItemStack) args.get("itemStack"));

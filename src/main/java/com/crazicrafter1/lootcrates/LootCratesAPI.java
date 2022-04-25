@@ -66,6 +66,7 @@ public class LootCratesAPI {
      * @param id crate id
      * @return whether the open was successful
      */
+    @Deprecated
     public static boolean openCrate(@Nonnull Player p, @Nonnull String id) {
         return openCrate(p, id, -1);
     }
@@ -78,6 +79,12 @@ public class LootCratesAPI {
         }
 
         return false;
+    }
+
+    public static void previewCrate(@Nonnull Player p, @Nonnull String id) {
+        Crate crate = getCrateByID(id);
+        if (crate != null)
+            crate.getPreview().open(p);
     }
 
     /**

@@ -4,6 +4,7 @@ import com.crazicrafter1.crutils.*;
 import com.crazicrafter1.gapi.*;
 import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -255,6 +256,24 @@ public class Crate implements ConfigurationSerializable {
                                     }
                                 })
                 );
+    }
+
+    public AbstractMenu.Builder getPreview() {
+        return new ParallaxMenu.PBuilder()
+                .title(p -> "Preview")
+                .addAll((self, p) -> {
+                    List<Button> buttons = new ArrayList<>();
+
+                    for (Map.Entry<LootSet, Integer> entry : loot.getMap().entrySet()) {
+                        LootSet lootSet = entry.getKey();
+                        int weight = entry.getValue();
+                        double chance = ((double)weight / (double)loot.getWeight()) * 100.;
+                        buttons.add(new Button.Builder()
+                                .icon(p00 -> ItemBuilder.copyOf(lootSet.item).lore(String.format("&8%.02f%%", chance)).build()).get());
+                    }
+
+                    return buttons;
+                });
     }
 
 }

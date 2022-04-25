@@ -14,6 +14,9 @@ permissions:
   lootcrates.open:
     description: Allow for users to open crates
     default: true
+  lootcrates.preview:
+    description: Allow crates to be previewed
+    default: true
   lootcrates.admin:
     description: Allows access to /crates command
     default: op

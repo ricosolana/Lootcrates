@@ -26,7 +26,11 @@ public class ListenerOnPlayerInteract extends BaseListener {
             return;
 
         Action a = e.getAction();
-        if (!(a == Action.RIGHT_CLICK_AIR || a == Action.RIGHT_CLICK_BLOCK))
+        //if (!(a == Action.RIGHT_CLICK_AIR || a == Action.RIGHT_CLICK_BLOCK))
+//            return;
+
+        // PHYSICAL describes stepping onto pressure plate or tripwire...
+        if (a == Action.PHYSICAL)
             return;
 
         if (e.useItemInHand() == Event.Result.DENY)
@@ -43,11 +47,14 @@ public class ListenerOnPlayerInteract extends BaseListener {
         if (crate != null)
             e.setCancelled(true);
 
-        if (crate == null || !p.hasPermission("lootcrates.open"))
+        if (crate == null)
             return;
 
         if (!plugin.openCrates.containsKey(p.getUniqueId())) {
-            LootCratesAPI.openCrate(p, crate.id, p.getInventory().getHeldItemSlot());
+            if (p.hasPermission("lootcrates.open") && (a == Action.RIGHT_CLICK_AIR || a == Action.RIGHT_CLICK_BLOCK))
+                LootCratesAPI.openCrate(p, crate.id, p.getInventory().getHeldItemSlot());
+            else if (p.hasPermission("lootcrates.preview") && (a == Action.LEFT_CLICK_AIR || a == Action.LEFT_CLICK_BLOCK))
+                LootCratesAPI.previewCrate(p, crate.id);
         } else {
             plugin.errorAdmin("Either a player is exploitative or LootCrates has bugged out: " + p.getName());
             plugin.errorAdmin("If you think this is expected behaviour, contact dev");

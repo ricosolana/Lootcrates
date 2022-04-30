@@ -33,7 +33,7 @@ public class Lang {
 
 
     static final String Edit_item = "Edit item";
-    static final String Must_swap = "Must swap with an item";
+    static final String PLACE_ITEM = "Must swap with an item";
     static final String NAME = "&eName";
     static final String Input_integer = "Input an integer";
 

@@ -71,8 +71,7 @@ public class Editor {
                                             if (!PRIMARY_KEY_PATTERN.matcher(s).matches() || Main.get().data.crates.containsKey(s))
                                                 return Result.TEXT(Lang.DUPLICATE);
 
-                                            Crate crate = new Crate(s, ItemBuilder.copyOf(Material.ENDER_CHEST).name("my new crate").build(), "select loot", 3, 4, Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
-
+                                            Crate crate = new Crate(s);
                                             crate.loot.add(Main.get().data.lootSets.values().iterator().next(), 1);
 
                                             Main.get().data.crates.put(s, crate);

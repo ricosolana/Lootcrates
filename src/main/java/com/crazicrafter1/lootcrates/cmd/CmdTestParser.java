@@ -19,6 +19,8 @@ public class CmdTestParser implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command c, @NotNull String l, @NotNull String[] args) {
 
+        //new Flowchain("")
+
         //new CmdParser(sender, args)
         //        .exact("crate", // crate
         //                parser -> parser.exact(plugin.data.crates.keySet(), // peasant, knight, king

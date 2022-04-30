@@ -24,16 +24,25 @@ public class Crate implements ConfigurationSerializable {
     public int columns;
     public int picks;
     public Sound sound;
-    public WeightedRandomContainer<LootSet> loot;
+    public WeightedRandomContainer<LootSet> loot = new WeightedRandomContainer<>();
 
-    public Crate(String id, ItemStack itemStack, String title, int columns, int picks, Sound sound) {
+    //public Crate(String id, ItemStack itemStack, String title, int columns, int picks, Sound sound) {
+    //    this.id = id;
+    //    this.item = ItemBuilder.copyOf(LootCratesAPI.makeCrate(itemStack, id));
+    //    this.title = ColorUtil.renderMarkers(title);
+    //    this.columns = columns;
+    //    this.picks = picks;
+    //    this.sound = sound;
+    //    this.loot = new WeightedRandomContainer<>();
+    //}
+
+    public Crate(String id) {
         this.id = id;
-        this.item = ItemBuilder.copyOf(LootCratesAPI.makeCrate(itemStack, id));
-        this.title = ColorUtil.renderMarkers(title);
-        this.columns = columns;
-        this.picks = picks;
-        this.sound = sound;
-        this.loot = new WeightedRandomContainer<>();
+        this.item = ItemBuilder.copyOf(Material.ENDER_CHEST).name("my new crate");
+        this.title = "select loot";
+        this.columns = 3;
+        this.picks = 4;
+        this.sound = Sound.ENTITY_EXPERIENCE_ORB_PICKUP;
     }
 
     public Crate(Map<String, Object> args) {
@@ -48,11 +57,11 @@ public class Crate implements ConfigurationSerializable {
         if (rev < 2)
             item = ItemBuilder.mutable((ItemStack) args.get("itemStack"));
         else
-            item = ((ItemBuilder) args.get("item"));
+            item = (ItemBuilder) args.get("item");
 
-        if (rev < 4) {
+        if (rev < 4)
             loot = WeightedRandomContainer.cumulative((LinkedHashMap<LootSet, Integer>) args.get("weights"));
-        } else
+        else
             loot = new WeightedRandomContainer<>((Map<LootSet, Integer>) args.get("weights"));
     }
 
@@ -70,7 +79,7 @@ public class Crate implements ConfigurationSerializable {
      * @return the formatted item
      */
     public ItemStack itemStack(@Nullable Player p) {
-        return this.item.copy()
+        return item.copy()
                 .replace("crate_picks", "" + picks, '%')
                 .placeholders(p)
                 .renderAll()
@@ -124,19 +133,11 @@ public class Crate implements ConfigurationSerializable {
                 // Edit Crate ItemStack
                 // *   *   *
                 .childButton(1, 1, p -> ItemBuilder.copyOf(item).name(Lang.EDIT_ITEM).lore(Lang.LMB_EDIT).build(), new ItemModifyMenu()
-                        .build(item.build(), (itemStack -> {
-                            // Several options here
-                            // Should the name and lore be merged along also?
-                            // or just the material?
-                            return this.item.apply(itemStack, ItemBuilder.FLAG_NAME | ItemBuilder.FLAG_LORE | ItemBuilder.FLAG_SKULL | ItemBuilder.FLAG_MATERIAL).build();
-                            //this.item.material(itemStack.getType());
-//
-                            //String base64 = ItemBuilder.mutable(itemStack).getSkull();
-                            //if (base64 != null)
-                            //    this.item.skull(base64);
-                            //return this.item.apply(itemStack).build();
-                            //this.itemStack.setType(itemStack.getType());
-                        }))
+                        .build(item.build(), itemStack ->
+                                item
+                                .apply(itemStack,
+                                        ItemBuilder.FLAG_NAME | ItemBuilder.FLAG_LORE | ItemBuilder.FLAG_SKULL | ItemBuilder.FLAG_MATERIAL)
+                                .build())
                 )
                 // Edit Inventory Title
                 .childButton(3, 1, p -> ItemBuilder.copyOf(Material.PAPER).name(String.format(Lang.EDIT_TITLE, title)).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()

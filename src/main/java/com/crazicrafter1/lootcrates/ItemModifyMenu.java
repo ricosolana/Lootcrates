@@ -20,6 +20,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
     }
 
     private static final String BASE64_CUSTOM_MODEL_DATA = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjU2NTJlYzMzYmI4YWJjNjMxNTA5M2Q1ZGZlMGYzNGQ0NzRjMjc3ZGE5YjBmMmE3MjZkNTA0ODY0ZTMxMDA5MyJ9fX0=";
+    private static final String BASE64_ARROW = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDRmN2JjMWZhODIxN2IxOGIzMjNhZjg0MTM3MmEzZjdjNjAyYTQzNWM4MjhmYWE0MDNkMTc2YzZiMzdiNjA1YiJ9fX0=";
 
     private ItemBuilder builder;
 
@@ -54,7 +55,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                 )
 
                 .childButton(4, 0, p -> ItemBuilder.copyOf(Material.COMPASS).name("&8Set material").lore("&7Search...").build(), new TextMenu.TBuilder()
-                        .title(p -> "Input material name")
+                        .title(p -> "Material search")
                         .leftRaw(p -> builder.getModernMaterial().toLowerCase())
                         .onClose((player) -> Result.PARENT())
                         .onComplete(((player, s, tBuilder) -> {
@@ -70,17 +71,18 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                         }))
                 )
 
-                //.button(2, 0, new Button.Builder()
-                //        // if no custom name, don't even name
-                //        // just skip? or make an override to do nothing when null
-                //        .icon(p -> builder.copy().name(builder.getName(), ColorUtil.RENDER_ALL, "" + ChatColor.GRAY).build())
-                //        .lmb((interact) -> {
-                //            if (interact.heldItem == null) {
-                //                return Result.MESSAGE(Lang.Must_swap);
-                //            }
-                //            builder = ItemBuilder.copyOf(itemStackFunction.apply(interact.heldItem));
-                //            return Result.GRAB();
-                //        }))
+                .button(2, 0, new Button.Builder()
+                        // if no custom name, don't even name
+                        // just skip? or make an override to do nothing when null
+                        //.icon(p -> builder.copy().name(builder.getName(), ColorUtil.RENDER_ALL, "" + ChatColor.GRAY).build())
+                        .icon(p -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name("&c&l[Item here]").build())
+                        .lmb(interact -> {
+                            if (interact.heldItem == null) {
+                                return Result.MESSAGE(Lang.PLACE_ITEM);
+                            }
+                            builder = ItemBuilder.copyOf(itemStackFunction.apply(interact.heldItem));
+                            return Result.REFRESH_GRAB(); // TODO this is untested
+                        }))
 
                 // Edit Name
                 .childButton(3, 1, p -> ItemBuilder.copyOf(Material.NAME_TAG).name(Lang.NAME).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()

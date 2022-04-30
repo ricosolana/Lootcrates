@@ -38,6 +38,11 @@ public class LootSet implements ConfigurationSerializable {
         else
             item = ((ItemBuilder) args.get("item"));
         loot = (ArrayList<ILoot>) args.get("loot");
+        for (int i=0; i < loot.size(); i++) {
+            if (loot.get(i) == null) {
+                Main.get().error("Item in rewards.yml is null (" + i + ")");
+            }
+        }
     }
 
     public ItemStack itemStack(@Nonnull Player p) {

@@ -46,16 +46,11 @@ public class Data implements ConfigurationSerializable {
                 "common",
                 ItemBuilder.fromModernMaterial("WHITE_STAINED_GLASS_PANE").name("&f&lCommon Reward").build(),
                 new ArrayList<>(Collections.singletonList(new LootItem())));
-        lootSets.put("common", lootSet);
+        lootSets.put(lootSet.id, lootSet);
 
         crates = new LinkedHashMap<>();
-        Crate crate = new Crate("peasant",
-                ItemBuilder.copyOf(Material.CHEST).name("&f&lPeasant Crate").build(),
-                "select loot",
-                3,
-                4,
-                Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
-        crates.put("peasant", crate);
+        Crate crate = new Crate("peasant");
+        crates.put(crate.id, crate);
 
         crate.loot.add(lootSet, 10);
 

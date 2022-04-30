@@ -24,16 +24,16 @@ public class CmdParser {
 
     /**
      * Get the next expect type captured by optional()
-     * @param expect The {@link Expect} static instance
+     * @param type The {@link Type} static instance
      * @param <T> The generic
      * @return The generic arg
      * @throws RuntimeException
      */
     @Nullable
-    public <T> T get(Expect<T> expect) throws RuntimeException {
+    public <T> T get(Type<T> type) throws RuntimeException {
         // iterate the set
         //noinspection unchecked
-        Set<T> f = (Set<T>) saved.get(expect.getType());
+        Set<T> f = (Set<T>) saved.get(type.getType());
 
         Iterator<T> itr = f.iterator();
 
@@ -53,7 +53,7 @@ public class CmdParser {
         // if no player fallthrough, capture this
 
         try {
-            return get(Expect.PLAYER);
+            return get(Type.PLAYER);
         } catch (RuntimeException e) {
             if (orSender) return (Player) sender;
             throw new RuntimeException("Must be a player to execute this command");
@@ -61,12 +61,16 @@ public class CmdParser {
     }
 
     public String getString() throws RuntimeException {
-        return get(Expect.STRING);
+        return get(Type.STRING);
     }
 
     public Number getNumber() throws RuntimeException {
-        return get(Expect.NUMBER);
+        return get(Type.NUMBER);
     }
+
+
+
+
 
 
 
@@ -135,13 +139,13 @@ public class CmdParser {
     }
 
     private <T> void token(int mode,
-                            @Nonnull Expect<T> expect,
+                            @Nonnull Type<T> type,
                             @Nonnull Consumer<CmdParser> successFunction) {
         //token(expect, null, successFunction);
     }
 
     private <T> void token(int mode,
-                            @Nonnull Expect<T> expect,
+                            @Nonnull Type<T> type,
                             @Nullable Consumer<String> errorHandler,
                             @Nonnull Consumer<CmdParser> successFunction) {
         if (args.isEmpty()) {
@@ -149,7 +153,7 @@ public class CmdParser {
         } else {
             // try to parse to expect
             try {
-                expect.get(args.poll());
+                type.get(args.poll());
                 successFunction.accept(this);
             } catch (Exception e) {
                 if (errorHandler != null) errorHandler.accept("Illegal argument");
@@ -204,12 +208,12 @@ public class CmdParser {
         }
     }
 
-    public <T> void isToken(@Nonnull Expect<T> expect,
+    public <T> void isToken(@Nonnull Type<T> type,
                             @Nonnull Consumer<CmdParser> successFunction) {
-        isToken(expect, null, successFunction);
+        isToken(type, null, successFunction);
     }
 
-    public <T> void isToken(@Nonnull Expect<T> expect,
+    public <T> void isToken(@Nonnull Type<T> type,
                             @Nullable Consumer<String> errorHandler,
                             @Nonnull Consumer<CmdParser> successFunction) {
         if (args.isEmpty()) {
@@ -217,7 +221,7 @@ public class CmdParser {
         } else {
             // try to parse to expect
             try {
-                expect.get(args.poll());
+                type.get(args.poll());
                 successFunction.accept(this);
             } catch (Exception e) {
                 if (errorHandler != null) errorHandler.accept("Illegal argument");
@@ -227,10 +231,10 @@ public class CmdParser {
 
 
 
-    public <T> CmdParser optional(Expect<T> expect, Consumer<CmdParser> successFunction) {
+    public <T> CmdParser optional(Type<T> type, Consumer<CmdParser> successFunction) {
         try {
-            T exp = expect.get(args.get(0));
-            saved.put(expect.getType(), exp);
+            T exp = type.get(args.get(0));
+            saved.put(type.getType(), exp);
             args.remove(0);
             Main.get().info("Expected: " + exp);
         } catch (Exception ignored) {

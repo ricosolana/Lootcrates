@@ -38,6 +38,9 @@ public class LootItem extends AbstractLootItem {
             this.item = ItemBuilder.mutable((ItemStack) args.get("itemStack"));
         else
             this.item = ((ItemBuilder) args.get("item"));
+
+        if (item == null)
+            Main.get().error("A LootItem is null in config");
     }
 
     @Nonnull

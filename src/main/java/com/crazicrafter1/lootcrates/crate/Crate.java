@@ -53,7 +53,7 @@ public class Crate implements ConfigurationSerializable {
         sound = Sound.valueOf((String) args.get("sound"));
 
         // TODO eventually remove older revisions
-        final int rev = Main.get().rev;
+        int rev = Main.get().rev;
         if (rev < 2)
             item = ItemBuilder.mutable((ItemStack) args.get("itemStack"));
         else

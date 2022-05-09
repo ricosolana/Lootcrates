@@ -28,6 +28,7 @@ import javax.annotation.Nullable;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,12 +41,13 @@ public class Main extends JavaPlugin
             " \\ \\_____\\  \\ \\_____\\  \\ \\_____\\    \\ \\_\\  \\ \\_____\\  \\ \\_\\ \\_\\  \\ \\_\\ \\_\\    \\ \\_\\  \\ \\_____\\  \\/\\_____\\ \n" +
             "  \\/_____/   \\/_____/   \\/_____/     \\/_/   \\/_____/   \\/_/ /_/   \\/_/\\/_/     \\/_/   \\/_____/   \\/_____/";
 
-    public static final int REV_LATEST = 4;
+    public static final int REV_LATEST = 5;
     public final String PERM_ADMIN = "lootcrates.admin";
     private final File rewardsConfigFile = new File(getDataFolder(), "rewards.yml");
-    private final File playerStatsFile = new File(getDataFolder(), "player_stats.yml");
-    private final File backupPath = new File(getDataFolder(), "backup");
+    //private final File playerStatsFile = new File(getDataFolder(), "player_stats.yml");
     private final File configFile = new File(getDataFolder(), "config.yml");
+    private final File backupPath = new File(getDataFolder(), "backup");
+    private final File playerStatsPath = new File(getDataFolder(), "players");
 
     private FileConfiguration config = null;
     private FileConfiguration rewardsConfig = null;
@@ -233,9 +235,6 @@ public class Main extends JavaPlugin
 
     @Override
     public void onDisable() {
-        if (instance == null)
-            return;
-
         this.saveConfig(null);
         this.saveOtherConfigs(null);
     }
@@ -284,9 +283,6 @@ public class Main extends JavaPlugin
 
 
     public void reloadConfig(CommandSender sender) {
-        if (rev == -1)
-            return;
-
         try {
             // TODO eventually remove older revisions
             if (rev <= 2) {
@@ -306,12 +302,13 @@ public class Main extends JavaPlugin
                 this.language = config.getString("language", "en");
                 this.update = config.getBoolean("update", false);
                 this.cleanAfterDays = config.getInt("clean-after-days", 7);
-            } else if (rev == 4) {
+            } else { // 4 and above
                 config = YamlConfiguration.loadConfiguration(configFile);
 
-                this.rev = config.getInt("rev");
+                //this.rev = config.getInt("rev"); // TODO remove findRev() soon to reduce confusion and complexity
                 this.language = config.getString("language");
                 this.update = config.getBoolean("update");
+                this.cleanAfterDays = config.getInt("clean-after-days", 7);
             }
         } catch (Exception e) {
             error(sender, String.format(Lang.CONFIG_LOAD_FAIL, e.getMessage()));
@@ -319,9 +316,6 @@ public class Main extends JavaPlugin
     }
 
     public void reloadOtherConfigs(CommandSender sender) {
-        if (rev == -1)
-            return;
-
         loadPlayerStats(sender);
 
         // TODO eventually remove older revisions
@@ -389,6 +383,7 @@ public class Main extends JavaPlugin
 
         try {
             config = new YamlConfiguration();
+            config.options().header("Using rev: " + rev);
             config.set("rev", REV_LATEST);
             config.set("language", language);
             config.set("update", update);
@@ -458,17 +453,14 @@ public class Main extends JavaPlugin
 
     private void savePlayerStats(CommandSender sender) {
         try {
-            YamlConfiguration playerConfig = new YamlConfiguration();
-
             for (Map.Entry<UUID, PlayerStat> entry : playerStats.entrySet()) {
-                String uuid = entry.getKey().toString();
-                for (Map.Entry<String, Integer> entry1 : entry.getValue().openedCrates.entrySet()) {
-                    playerConfig.set(uuid + ".crates." + entry1.getKey(),
-                            entry1.getValue());
+                String rawUUID = entry.getKey().toString();
+                YamlConfiguration playerConfig = new YamlConfiguration();
+                for (Map.Entry<String, List<String>> entry1 : entry.getValue().openedCrates.entrySet()) {
+                    playerConfig.set(entry1.getKey(), entry1.getValue());
                 }
+                playerConfig.save(new File(playerStatsPath, rawUUID + ".yml"));
             }
-
-            playerConfig.save(playerStatsFile);
         } catch (Exception e) {
             error(sender, String.format(Lang.STATS_SAVE_FAIL, e.getMessage()));
         }
@@ -476,20 +468,30 @@ public class Main extends JavaPlugin
 
     private void loadPlayerStats(CommandSender sender) {
         try {
-            if (!playerStatsFile.exists())
+            if (rev < 5)
                 return;
 
-            YamlConfiguration playerConfig = new YamlConfiguration();
-            playerConfig.load(playerStatsFile);
+            if (!playerStatsPath.exists() || !playerStatsPath.isDirectory())
+                return;
 
-            for (String uuid : playerConfig.getKeys(false)) {
-                PlayerStat stat = new PlayerStat();
-                playerStats.put(UUID.fromString(uuid), stat);
-                ConfigurationSection section = playerConfig.getConfigurationSection(uuid + ".crates");
-                if (section != null)
-                    for (String id : section.getKeys(false)) {
-                        stat.openedCrates.put(id, playerConfig.getInt(uuid + ".crates." + id));
-                    }
+            // playerStatsPath.mkdirs();
+
+            File[] files = playerStatsPath.listFiles();
+
+            for (File file : files) {
+                try {
+                    String rawUUID = file.getName().replace(".yml", "");
+                    UUID uuid = UUID.fromString(rawUUID);
+
+                    YamlConfiguration playerConfig = new YamlConfiguration();
+                    playerConfig.load(file);
+
+                    PlayerStat stat = new PlayerStat();
+                    playerStats.put(uuid, stat);
+                    for (String id : playerConfig.getKeys(false))
+                        stat.openedCrates.put(id, playerConfig.getStringList(id));
+
+                } catch (Exception ignored) {}
             }
         } catch (Exception e) {
             error(sender, String.format(Lang.STATS_LOAD_FAIL, e.getMessage()));

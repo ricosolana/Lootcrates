@@ -12,6 +12,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -86,7 +87,6 @@ public final class ActiveCrate {
         ILoot randomLoot = lootChances[slot].getRandomLoot();
         slots.put(slot, new QSlot(randomLoot));
 
-
         if (sound != null)
             getPlayer().playSound(getPlayer().getLocation(), sound, 1, 1);
 
@@ -100,7 +100,7 @@ public final class ActiveCrate {
                 itemStack.setAmount(itemStack.getAmount() - 1);
             }
 
-            // Free locked crate slot
+            // Free the locked crate slot
             lockSlot = -1;
 
             state = State.REVEALING;
@@ -139,7 +139,14 @@ public final class ActiveCrate {
 
         if (data.fireworkEffect != null) explosion();
 
-        state = State.REVEALED;
+        // fixme this might be causing the spam click bug
+        // putting into a runnable might fix
+        //new BukkitRunnable() {
+        //    @Override
+        //    public void run() {
+                state = State.REVEALED;
+        //    }
+        //}.runTask(Main.get());
     }
 
     private void explosion() {
@@ -168,7 +175,9 @@ public final class ActiveCrate {
      * A panel was clicked, show it
      */
     private boolean flipSlot(int slot, QSlot qSlot) {
-        if (!qSlot.isHidden) return false;
+        if (!qSlot.isHidden) {
+            return false;
+        }
 
         ItemStack visual = qSlot.randomLoot.getRenderIcon(player);
 
@@ -213,7 +222,9 @@ public final class ActiveCrate {
     public void onInventoryClick(InventoryClickEvent e) {
         e.setCancelled(true);
 
-        if (!e.isShiftClick() && e.isLeftClick()) {
+        if (e.getClick() != ClickType.DOUBLE_CLICK
+                && !e.isShiftClick()
+                && e.isLeftClick()) {
             int slot = e.getSlot();
 
             // If crate GUI clicked on
@@ -228,11 +239,16 @@ public final class ActiveCrate {
                     case REVEALED: {
                         // If slot is selected
                         QSlot qSlot = slots.get(slot);
+
+                        // If slot does not exist
+                        // If there was an item on mouse virtual slot
                         if (qSlot == null
-                                || flipSlot(slot, qSlot)
-                                || getPlayer().getItemOnCursor().getType() != Material.AIR) {
+                                || getPlayer().getItemOnCursor().getType() != Material.AIR)
                             return;
-                        }
+
+                        // If the slot was flipped, do nothing else
+                        if (flipSlot(slot, qSlot))
+                            return;
 
                         // Give item
                         if (qSlot.randomLoot.execute(this)) {

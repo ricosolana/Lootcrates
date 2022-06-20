@@ -38,7 +38,8 @@ public class Crate implements ConfigurationSerializable {
 
     public Crate(String id) {
         this.id = id;
-        this.item = ItemBuilder.copyOf(Material.ENDER_CHEST).name("my new crate");
+        // ItemBuilder.copyOf(Material.ENDER_CHEST).name("my new crate").build()
+        this.item = ItemBuilder.copyOf(LootCratesAPI.makeCrate(new ItemStack(Material.ENDER_CHEST), id)).name("my new crate");
         this.title = "select loot";
         this.columns = 3;
         this.picks = 4;

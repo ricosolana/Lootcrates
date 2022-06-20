@@ -101,7 +101,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             return Result.PARENT();
                         }))
                 // Edit Lore                                                                                // terrible name
-                .childButton(4, 1, p -> ItemBuilder.copyOf(Material.GLOBE_BANNER_PATTERN).hideFlags(ItemFlag.HIDE_POTION_EFFECTS).name(Lang.LORE).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
+                .childButton(4, 1, p -> ItemBuilder.copyOf(ItemBuilder.fromModernMaterial("WRITABLE_BOOK")).hideFlags(ItemFlag.HIDE_POTION_EFFECTS).name(Lang.LORE).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.LORE)
                         .leftRaw(p -> Util.def(builder.getLoreString(), Editor.LOREM_IPSUM).replace("\n", "\\n"))
                         .right(p -> Lang.SPECIAL_FORMATTING, p -> Editor.getColorDem(), ColorUtil.AS_IS)

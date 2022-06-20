@@ -21,6 +21,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public final class ActiveCrate {
 
@@ -225,10 +226,14 @@ public final class ActiveCrate {
         if (e.getClick() != ClickType.DOUBLE_CLICK
                 && !e.isShiftClick()
                 && e.isLeftClick()) {
+
             int slot = e.getSlot();
 
             // If crate GUI clicked on
-            if (e.getClickedInventory() == inventory) {
+            // On Mohist and certain versions, '==' does not work, meaning that the same representing
+            // object does not share the same address space (so not same object but still could be same inventory)
+            if (Objects.equals(e.getClickedInventory(), inventory)) {
+
                 switch (state) {
                     case SELECTING:
                         selectSlot(slot);
@@ -237,6 +242,7 @@ public final class ActiveCrate {
                         //do nothing
                         break;
                     case REVEALED: {
+
                         // If slot is selected
                         QSlot qSlot = slots.get(slot);
 

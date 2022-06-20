@@ -12,6 +12,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -38,6 +39,43 @@ class CmdArg {
     static {
         args.put("throw", new CmdArg((sender, args, flags) -> {
             throw new RuntimeException("Test exception");
+        }, null));
+
+        args.put("class", new CmdArg((sender, args, flags) -> {
+            try {
+                Class<?> clazz = Class.forName(args[0]);
+                try {
+                    plugin.info("Package: " + clazz.getPackage().getName());
+                } catch (Exception e) {
+                    plugin.info("In default package?");
+                }
+                return info(sender, "Found: " + clazz.getName());
+            } catch (Exception e) {
+                e.printStackTrace();
+                return error(sender, e.getMessage());
+            }
+        }, null));
+
+        args.put("method", new CmdArg((sender, args, flags) -> {
+            try {
+                Class<?> clazz = Class.forName(args[0]);
+                try {
+                    plugin.info("Package: " + clazz.getPackage().getName());
+                } catch (Exception e) {
+                    plugin.info("In default package?");
+                }
+
+                plugin.info("Methods:");
+                for (Method method : clazz.getMethods()) {
+                    if (method.getName().startsWith(args[1]))
+                        plugin.info(" - " + method.getName());
+                }
+
+                return info(sender, "Found: " + clazz.getName());
+            } catch (Exception e) {
+                e.printStackTrace();
+                return error(sender, e.getMessage());
+            }
         }, null));
 
         args.put("lang", new CmdArg((sender, args, flags) -> {
@@ -176,15 +214,16 @@ class CmdArg {
                 int given = 0;
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     Util.give(p, crate.itemStack(p));
-                    if (p != sender && !(flags.contains("s") || flags.contains("silent")))
+                    if (p != sender && !(flags.contains("s") || flags.contains("silent"))) {
                         info(p, String.format(Lang.RECEIVE_CRATE, crate.id));
-                    given++;
+                        given++;
+                    }
                 }
 
                 if (given == 0)
                     return error(sender, Lang.ERR_NONE_ONLINE);
 
-                return info(sender, String.format(Lang.GIVE_CRATE_ALL, crate.id, Bukkit.getOnlinePlayers().size()));
+                return info(sender, String.format(Lang.GIVE_CRATE_ALL, crate.id, given));
             }
 
             // crates crate common crazicrafter1

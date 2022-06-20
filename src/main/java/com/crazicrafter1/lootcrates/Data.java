@@ -102,7 +102,14 @@ public class Data implements ConfigurationSerializable {
             fireworkEffect = (FireworkEffect) args.get("fireworkEffect");
         } catch (Exception e) {
             Main.get().error("Failed to load config: " + e.getMessage());
-            Main.get().error("You can try to fix this manually (good luck) or reset the config with </crates reset>");
+            Main.get().error("Possible issues/solutions: ");
+            Main.get().error(" - There are null values in config: ");
+            Main.get().error("     - This is likely caused by a prior plugin failure, try using an earlier backup");
+            Main.get().error(" - Chained errors when config being loaded: ");
+            Main.get().error("     - There might be null values in config, try the above");
+            Main.get().error(" - Material does not exist when config is being loaded: ");
+            Main.get().error("     - You are on a version that might not be supported by lootcrates, or the material is named badly");
+            Main.get().error("You can try to fix the config manually/restoring a backup, resetting the config with </crates reset>, or by doing </crates populate>");
             e.printStackTrace();
         }
     }

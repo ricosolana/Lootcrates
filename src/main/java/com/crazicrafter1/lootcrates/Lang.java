@@ -49,7 +49,9 @@ public class Lang {
     public static String TITLE_SOUND = "Sound";
     public static String INPUT_SOUND = "Input a sound";
 
-    public static String DUPLICATE = "Invalid or duplicate";
+    //public static String DUPLICATE = "Invalid or duplicate";
+    public static String INVALID_ID = "Invalid id";
+    public static String DUPLICATE_ID = "That id already exists";
     //public static String CRATE_ID = "&8id: %s";
     public static String LOOT_COMMAND = "&7Command: &f%s";
     public static String EDIT_COMMAND = "Edit command";

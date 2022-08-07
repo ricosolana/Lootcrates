@@ -13,10 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class Editor {
@@ -47,6 +44,8 @@ public class Editor {
 
     public static final Pattern PRIMARY_KEY_PATTERN = Pattern.compile("(?=.*[a-z])[a-z_]+");
 
+    public static final Pattern NON_ASCII_PATTERN = Pattern.compile("[^a-zA-Z0-9_.]+");
+
     public void open(Player p000) {
         new SimpleMenu.SBuilder(3)
                 .title(p -> Lang.TITLE_EDITOR)
@@ -68,8 +67,16 @@ public class Editor {
                                         .right(p -> Lang.CRATE_FORMAT, p -> Lang.CRATE_FORMAT_LORE)
                                         .onClose((player) -> Result.PARENT())
                                         .onComplete((player, s, b) -> {
-                                            if (!PRIMARY_KEY_PATTERN.matcher(s).matches() || Main.get().data.crates.containsKey(s))
-                                                return Result.TEXT(Lang.DUPLICATE);
+                                            s = NON_ASCII_PATTERN.matcher(s.replace(" ", "_")).replaceAll("").toLowerCase();
+
+                                            if (s.isEmpty())
+                                                return Result.TEXT(Lang.INVALID_ID);
+
+                                            if (Main.get().data.crates.containsKey(s))
+                                                return Result.TEXT(Lang.DUPLICATE_ID);
+
+                                            //if (!PRIMARY_KEY_PATTERN.matcher(s).matches() || Main.get().data.crates.containsKey(s))
+                                            //    return Result.TEXT(Lang.DUPLICATE);
 
                                             Crate crate = new Crate(s);
                                             crate.loot.add(Main.get().data.lootSets.values().iterator().next(), 1);
@@ -133,8 +140,16 @@ public class Editor {
                                 .leftRaw(p -> LOREM_IPSUM) // id
                                 .onClose((player) -> Result.PARENT())
                                 .onComplete((player, s, b) -> {
-                                    if (!PRIMARY_KEY_PATTERN.matcher(s).matches() || Main.get().data.lootSets.containsKey(s))
-                                        return Result.TEXT(Lang.DUPLICATE);
+                                    s = NON_ASCII_PATTERN.matcher(s.replace(" ", "_")).replaceAll("").toLowerCase();
+
+                                    if (s.isEmpty())
+                                        return Result.TEXT(Lang.INVALID_ID);
+
+                                    if (Main.get().data.crates.containsKey(s))
+                                        return Result.TEXT(Lang.DUPLICATE_ID);
+
+                                    //if (!PRIMARY_KEY_PATTERN.matcher(s).matches() || Main.get().data.lootSets.containsKey(s))
+                                    //    return Result.TEXT(Lang.DUPLICATE);
 
                                     Main.get().data.lootSets.put(s,
                                             new LootSet(s, new ItemStack(Material.GLOWSTONE_DUST),

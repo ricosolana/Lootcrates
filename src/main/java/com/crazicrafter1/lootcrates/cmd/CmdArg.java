@@ -79,15 +79,37 @@ class CmdArg {
         }, null));
 
         args.put("lang", new CmdArg((sender, args, flags) -> {
-            String lang = args[0];
+            //String lang = args[0];
 
-            try {
-                Lang.load(lang);
-                return info(sender, "Successfully loaded language");
-            } catch (Exception e) {
-                return error(sender, "Failed to load language: " + e.getMessage());
+            boolean ack = args.length >= 3 && args[2].equals("confirm");
+
+            switch (args[0].toLowerCase()) {
+                case "save":
+                    if (!Lang.save(args[1], ack)) {
+                        error(sender, "Failed to save language, this might be because the file already exists");
+                        error(sender, "you might have to confirm with '/crates lang save en confirm'");
+                    }
+                    break;
+                case "load":
+                    Lang.load(args[1]);
+                    break;
             }
-        }, null));
+
+            //try {
+            //    Lang.load(lang);
+            //    return info(sender, "Successfully loaded language");
+            //} catch (Exception e) {
+            //    return error(sender, "Failed to load language: " + e.getMessage());
+            //}
+            return true;
+        }, (sender, args) -> {
+            ArrayList<String> ret = new ArrayList<>();
+            if (args.length == 1) {
+                ret.add("save");
+                ret.add("load");
+            }
+            return ret;
+        }));
 
         args.put("populate", new CmdArg((sender, args, flags) -> {
             plugin.saveConfig(sender);

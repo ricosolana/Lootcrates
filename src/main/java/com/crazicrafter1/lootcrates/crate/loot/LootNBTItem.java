@@ -11,6 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import javax.annotation.Nonnull;
 import java.util.Map;
 
+// todo migrate post to LootItem
+@Deprecated
 public class LootNBTItem extends LootItem {
 
     public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.IRON_NUGGET).name("&bAdd NBT item...").lore("&7Use this to save all nbt tags").build();
@@ -19,40 +21,38 @@ public class LootNBTItem extends LootItem {
      * Default ctor
      */
     public LootNBTItem() {
-        this.item = ItemBuilder.copyOf(Material.STONE);
+        super();
     }
 
     public LootNBTItem(Map<String, Object> args) {
         super(args);
 
-        this.item = ItemBuilder.mutable(NMSAPI.getNBT((String) args.get("nbt")).setNBT(this.item.build()));
+        this.item = NMSAPI.getNBT((String) args.get("nbt")).setNBT(this.item);
     }
 
     @Nonnull
     @Override
     public ItemStack getRenderIcon(@Nonnull Player p) {
-        return super.ofRange(p, item.build());
+        return super.ofRange(p, item);
     }
 
     @Nonnull
     @Override
     public ItemStack getMenuIcon() {
-        return item.copy().amount(min == max ? min : 1).build();
+        return ItemBuilder.copy(item).amount(min == max ? min : 1).build();
     }
 
     @Nonnull
     @Override
     public Map<String, Object> serialize() {
-        Map<String, Object> result = super.serialize();
-        result.put("nbt", NMSAPI.getNBT(item.build()).serialize());
-        return result;
+        throw new UnsupportedOperationException("Do not use!");
     }
 
     @Nonnull
     @Override
     public ItemModifyMenu getMenuBuilder() {
         return (ItemModifyMenu) rangeButtons(new ItemModifyMenu()
-                        .build(item.build(), input -> (this.item = ItemBuilder.mutable(input)).build()),
-                item.build(), 3, 0, 5, 0);
+                        .build(item, input -> this.item = input),
+                item, 3, 0, 5, 0);
     }
 }

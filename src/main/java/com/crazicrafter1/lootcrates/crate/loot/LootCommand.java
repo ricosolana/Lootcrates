@@ -2,13 +2,11 @@ package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
-import com.crazicrafter1.gapi.AbstractMenu;
-import com.crazicrafter1.gapi.Result;
-import com.crazicrafter1.gapi.TextMenu;
+import com.crazicrafter1.crutils.ui.*;
 import com.crazicrafter1.lootcrates.ItemModifyMenu;
 import com.crazicrafter1.lootcrates.Lang;
 import com.crazicrafter1.lootcrates.Main;
-import com.crazicrafter1.lootcrates.crate.ActiveCrate;
+import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -63,7 +61,7 @@ public class LootCommand implements ILoot {
     }
 
     @Override
-    public boolean execute(ActiveCrate activeCrate) {
+    public boolean execute(CrateInstance activeCrate) {
         Bukkit.getServer().dispatchCommand(
                 Bukkit.getConsoleSender(),
                 Util.placeholders(activeCrate.getPlayer(), command)

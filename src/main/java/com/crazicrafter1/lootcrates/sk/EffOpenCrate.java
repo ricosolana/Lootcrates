@@ -6,7 +6,6 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
-import com.crazicrafter1.lootcrates.crate.Crate;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 

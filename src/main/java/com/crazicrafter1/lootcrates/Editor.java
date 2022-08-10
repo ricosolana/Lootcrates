@@ -2,13 +2,12 @@ package com.crazicrafter1.lootcrates;
 
 import com.crazicrafter1.crutils.ColorUtil;
 import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.gapi.*;
-import com.crazicrafter1.lootcrates.crate.Crate;
-import com.crazicrafter1.lootcrates.crate.LootSet;
+import com.crazicrafter1.crutils.ui.*;
+import com.crazicrafter1.lootcrates.crate.CrateSettings;
+import com.crazicrafter1.lootcrates.crate.LootSetSettings;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
@@ -72,31 +71,31 @@ public class Editor {
                                             if (s.isEmpty())
                                                 return Result.TEXT(Lang.INVALID_ID);
 
-                                            if (Main.get().data.crates.containsKey(s))
+                                            if (Main.get().rewardSettings.crates.containsKey(s))
                                                 return Result.TEXT(Lang.DUPLICATE_ID);
 
                                             //if (!PRIMARY_KEY_PATTERN.matcher(s).matches() || Main.get().data.crates.containsKey(s))
                                             //    return Result.TEXT(Lang.DUPLICATE);
 
-                                            Crate crate = new Crate(s);
-                                            crate.loot.add(Main.get().data.lootSets.values().iterator().next(), 1);
+                                            CrateSettings crate = new CrateSettings(s);
+                                            crate.loot.add(Main.get().rewardSettings.lootSets.values().iterator().next(), 1);
 
-                                            Main.get().data.crates.put(s, crate);
+                                            Main.get().rewardSettings.crates.put(s, crate);
 
                                             return Result.PARENT();
                                         })
                                 )
                                 .addAll((self, p00) -> {
                                     ArrayList<Button> result = new ArrayList<>();
-                                    for (Map.Entry<String, Crate> entry : Main.get().data.crates.entrySet()) {
-                                        Crate crate = entry.getValue();
+                                    for (Map.Entry<String, CrateSettings> entry : Main.get().rewardSettings.crates.entrySet()) {
+                                        CrateSettings crate = entry.getValue();
                                         result.add(new Button.Builder()
                                                 // https://regexr.com/6fdsi
                                                 .icon(p -> ItemBuilder.copyOf(crate.item).renderAll().lore(String.format(Lang.FORMAT_ID, crate.id) + "\n" + Lang.LMB_EDIT + "\n" + Lang.RMB_DELETE).build())
                                                 .child(self, crate.getBuilder(),
                                                         /// RMB - delete crate
                                                         interact -> {
-                                                            Main.get().data.crates.remove(crate.id);
+                                                            Main.get().rewardSettings.crates.remove(crate.id);
                                                             return Result.REFRESH();
                                                         }
                                                 ).get()
@@ -112,7 +111,7 @@ public class Editor {
                         .parentButton(4, 5)
                         .addAll((self, p1) -> {
                             ArrayList<Button> result = new ArrayList<>();
-                            for (LootSet lootSet : Main.get().data.lootSets.values()) {
+                            for (LootSetSettings lootSet : Main.get().rewardSettings.lootSets.values()) {
                                 /*
                                  * List all LootSets
                                  */
@@ -121,9 +120,9 @@ public class Editor {
                                         .child(self, lootSet.getBuilder(),
                                                 // RMB - delete lootSet
                                                 interact -> {
-                                                    if (Main.get().data.lootSets.size() > 1) {
-                                                        Main.get().data.lootSets.remove(lootSet.id);
-                                                        for (Crate crate : Main.get().data.crates.values()) {
+                                                    if (Main.get().rewardSettings.lootSets.size() > 1) {
+                                                        Main.get().rewardSettings.lootSets.remove(lootSet.id);
+                                                        for (CrateSettings crate : Main.get().rewardSettings.crates.values()) {
                                                             crate.loot.remove(lootSet);
                                                         }
                                                         return Result.REFRESH();
@@ -145,14 +144,14 @@ public class Editor {
                                     if (s.isEmpty())
                                         return Result.TEXT(Lang.INVALID_ID);
 
-                                    if (Main.get().data.crates.containsKey(s))
+                                    if (Main.get().rewardSettings.crates.containsKey(s))
                                         return Result.TEXT(Lang.DUPLICATE_ID);
 
                                     //if (!PRIMARY_KEY_PATTERN.matcher(s).matches() || Main.get().data.lootSets.containsKey(s))
                                     //    return Result.TEXT(Lang.DUPLICATE);
 
-                                    Main.get().data.lootSets.put(s,
-                                            new LootSet(s, new ItemStack(Material.GLOWSTONE_DUST),
+                                    Main.get().rewardSettings.lootSets.put(s,
+                                            new LootSetSettings(s, new ItemStack(Material.GLOWSTONE_DUST),
                                                     new ArrayList<>(Collections.singletonList(new LootItem()))));
 
                                     return Result.PARENT();
@@ -170,16 +169,16 @@ public class Editor {
                         .button(5, 1, IN_OUTLINE)
                         .button(4, 2, IN_OUTLINE)
                         .button(1, 1, new Button.Builder()
-                                .icon(p -> ItemBuilder.fromModernMaterial("FIREWORK_STAR").fireworkEffect(Main.get().data.fireworkEffect).build()))
+                                .icon(p -> ItemBuilder.fromModernMaterial("FIREWORK_STAR").fireworkEffect(Main.get().rewardSettings.fireworkEffect).build()))
                         .button(4, 1, new Button.Builder()
-                                .icon(p -> ItemBuilder.fromModernMaterial("FIREWORK_STAR").fireworkEffect(Main.get().data.fireworkEffect).build())
+                                .icon(p -> ItemBuilder.fromModernMaterial("FIREWORK_STAR").fireworkEffect(Main.get().rewardSettings.fireworkEffect).build())
                                 .lmb(interact -> {
                                     if (interact.heldItem != null) {
                                         //if (interact.heldItem.getItemMeta() instanceof FireworkEffectMeta meta && meta.hasEffect()) {
                                         if (interact.heldItem.getItemMeta() instanceof FireworkEffectMeta) {
                                             FireworkEffectMeta meta = (FireworkEffectMeta) interact.heldItem.getItemMeta();
                                             if (meta.hasEffect()) {
-                                                Main.get().data.fireworkEffect = meta.getEffect();
+                                                Main.get().rewardSettings.fireworkEffect = meta.getEffect();
                                                 return Result.REFRESH();
                                             }
                                         }

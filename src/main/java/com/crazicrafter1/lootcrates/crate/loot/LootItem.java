@@ -3,9 +3,7 @@ package com.crazicrafter1.lootcrates.crate.loot;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.MathUtil;
 import com.crazicrafter1.crutils.Util;
-import com.crazicrafter1.gapi.AbstractMenu;
-import com.crazicrafter1.gapi.Button;
-import com.crazicrafter1.gapi.Result;
+import com.crazicrafter1.crutils.ui.AbstractMenu;
 import com.crazicrafter1.lootcrates.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -20,13 +18,18 @@ public class LootItem extends AbstractLootItem {
 
     public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.GOLD_NUGGET).name("&6Add item...").build();
 
-    public ItemBuilder item;
+    public ItemStack item;
 
     /**
      * Default ctor
      */
     public LootItem() {
-        this.item = ItemBuilder.copyOf(Material.STONE);
+        this.item = ItemBuilder.copyOf(Material.STONE).build();
+    }
+
+    // todo remove post
+    public LootItem(ItemStack itemStack) {
+        this.item = itemStack;
     }
 
     public LootItem(Map<String, Object> args) {
@@ -35,9 +38,11 @@ public class LootItem extends AbstractLootItem {
         // TODO eventually remove older revisions
         int rev = Main.get().rev;
         if (rev < 2)
-            this.item = ItemBuilder.mutable((ItemStack) args.get("itemStack"));
+            this.item = (ItemStack) args.get("itemStack");
+        else if (rev < 6)
+            this.item = ((ItemBuilder) args.get("item")).build();
         else
-            this.item = ((ItemBuilder) args.get("item"));
+            this.item = (ItemStack) args.get("item");
 
         if (item == null)
             Main.get().error("A LootItem is null in config");
@@ -46,14 +51,14 @@ public class LootItem extends AbstractLootItem {
     @Nonnull
     @Override
     public ItemStack getRenderIcon(@Nonnull Player p) {
-        return super.ofRange(p, item.build());
+        return super.ofRange(p, item);
     }
 
     @Nonnull
     @Override
     public ItemStack getMenuIcon() {
         // set count if min==max
-        return item.copy().amount(min == max ? min : 1).build();
+        return ItemBuilder.copy(item).amount(min == max ? min : 1).build();
     }
 
     @Nonnull
@@ -68,7 +73,7 @@ public class LootItem extends AbstractLootItem {
     @Override
     public ItemModifyMenu getMenuBuilder() {
         return (ItemModifyMenu) rangeButtons(new ItemModifyMenu()
-                .build(item.build(), input -> (this.item = ItemBuilder.mutable(input)).build()),
-                item.build(), 3, 0, 5, 0);
+                .build(item, input -> this.item = input),
+                item, 3, 0, 5, 0);
     }
 }

@@ -1,12 +1,13 @@
 package com.crazicrafter1.lootcrates;
 
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.lang.reflect.Field;
 
 public class Lang {
+
+    public static String CRUTILS_MISSING = "&8CRUtils not found, install from &n&7" + Main.GITHUB_URL;
 
     public static String CUSTOM_MACROS = "&9Custom macros: ";
     public static String SEPARATE_LORE = "&eSeparate lore lines: ";
@@ -171,7 +172,7 @@ public class Lang {
             langPath.mkdirs();
             File file = new File(langPath, language + ".yml");
 
-            FileConfiguration config = new YamlConfiguration();
+            YamlConfiguration config = new YamlConfiguration();
             config.load(file);
 
             for (String key : config.getKeys(false)) {
@@ -195,7 +196,7 @@ public class Lang {
 
                 langPath.mkdirs();
 
-                FileConfiguration config = new YamlConfiguration();
+                YamlConfiguration config = new YamlConfiguration();
 
                 for (Field field : Lang.class.getDeclaredFields()) {
                     try {

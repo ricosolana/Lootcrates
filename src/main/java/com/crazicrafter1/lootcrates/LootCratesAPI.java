@@ -1,8 +1,8 @@
 package com.crazicrafter1.lootcrates;
 
 import com.crazicrafter1.crutils.ReflectionUtil;
-import com.crazicrafter1.lootcrates.crate.ActiveCrate;
-import com.crazicrafter1.lootcrates.crate.Crate;
+import com.crazicrafter1.lootcrates.crate.CrateInstance;
+import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import com.crazicrafter1.nmsapi.NMSAPI;
 import com.crazicrafter1.nmsapi.nbt.INBTTagCompound;
@@ -27,12 +27,12 @@ public class LootCratesAPI {
     }
 
     @Nullable
-    public static Crate getCrateByID(@Nonnull String id) {
-        return Main.get().data.crates.get(id);
+    public static CrateSettings getCrateByID(@Nonnull String id) {
+        return Main.get().rewardSettings.crates.get(id);
     }
 
     @Nullable
-    public static Crate extractCrateFromItem(@Nullable final ItemStack itemStack) {
+    public static CrateSettings extractCrateFromItem(@Nullable final ItemStack itemStack) {
         if (itemStack == null || itemStack.getType() == Material.AIR)
             return null;
 
@@ -72,9 +72,9 @@ public class LootCratesAPI {
     }
 
     public static boolean openCrate(@Nonnull Player p, @Nonnull String id, int lock_slot) {
-        Crate crate = getCrateByID(id);
+        CrateSettings crate = getCrateByID(id);
         if (crate != null && !Main.get().openCrates.containsKey(p.getUniqueId())) {
-            new ActiveCrate(p, crate, lock_slot).open();
+            new CrateInstance(p, crate, lock_slot).open();
             return true;
         }
 
@@ -82,7 +82,7 @@ public class LootCratesAPI {
     }
 
     public static void previewCrate(@Nonnull Player p, @Nonnull String id) {
-        Crate crate = getCrateByID(id);
+        CrateSettings crate = getCrateByID(id);
         if (crate != null)
             crate.getPreview().open(p);
     }
@@ -93,7 +93,7 @@ public class LootCratesAPI {
      * @return whether the close was successful
      */
     public static boolean closeCrate(@Nonnull Player p) {
-        ActiveCrate activeCrate = Main.get().openCrates.remove(p.getUniqueId());
+        CrateInstance activeCrate = Main.get().openCrates.remove(p.getUniqueId());
         if (activeCrate != null) {
             activeCrate.close();
             return true;

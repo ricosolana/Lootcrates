@@ -54,8 +54,9 @@ dependencies {
     //implementation 'com.github.PeriodicSeizures:CRUtils:main-SNAPSHOT'
     // Load from files during dev for no hour long delay for jit
     implementation files('C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.19 paper\\plugins\\CRUtils.jar')
+    //implementation files("C:\\Users\\Rico\\Documents\\MinecraftDev\\api\\CRUtils.jar");
     //implementation 'com.github.PeriodicSeizures:Gapi:main-SNAPSHOT'
-    implementation files('C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.19 paper\\plugins\\Gapi.jar')
+    //implementation files('C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.19 paper\\plugins\\Gapi.jar')
     implementation 'me.zombie_striker:QualityArmory:2.0.6-SNAPSHOT'
     implementation 'com.github.SkriptLang:Skript:2.6.1'
     implementation 'net.Indyuce:MMOItems:6.7.1-SNAPSHOT'

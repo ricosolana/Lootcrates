@@ -5,7 +5,7 @@ import ch.njol.skript.SkriptAddon;
 import com.crazicrafter1.crutils.*;
 import com.crazicrafter1.lootcrates.cmd.Cmd;
 import com.crazicrafter1.lootcrates.cmd.CmdTestParser;
-import com.crazicrafter1.lootcrates.crate.ActiveCrate;
+import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootSet;
 import com.crazicrafter1.lootcrates.crate.loot.*;
@@ -14,12 +14,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
-import org.bukkit.permissions.Permission;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,6 +32,7 @@ import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Main extends JavaPlugin
 {
@@ -41,10 +43,11 @@ public class Main extends JavaPlugin
             " \\ \\_____\\  \\ \\_____\\  \\ \\_____\\    \\ \\_\\  \\ \\_____\\  \\ \\_\\ \\_\\  \\ \\_\\ \\_\\    \\ \\_\\  \\ \\_____\\  \\/\\_____\\ \n" +
             "  \\/_____/   \\/_____/   \\/_____/     \\/_/   \\/_____/   \\/_/ /_/   \\/_/\\/_/     \\/_/   \\/_____/   \\/_____/";
 
-    public static final int REV_LATEST = 5;
+    public static final int REV_LATEST = 6;
+    public static final String DISCORD_URL = "https://discord.gg/2JkFBnyvNQ";
+    public static final String GITHUB_URL = "https://github.com/PeriodicSeizures/CRUtils/releases";
     public final String PERM_ADMIN = "lootcrates.admin";
     private final File rewardsConfigFile = new File(getDataFolder(), "rewards.yml");
-    //private final File playerStatsFile = new File(getDataFolder(), "player_stats.yml");
     private final File configFile = new File(getDataFolder(), "config.yml");
     private final File backupPath = new File(getDataFolder(), "backup");
     private final File playerStatsPath = new File(getDataFolder(), "players");
@@ -55,7 +58,7 @@ public class Main extends JavaPlugin
     /*
      * Runtime modifiable stuff
      */
-    public HashMap<UUID, ActiveCrate> openCrates = new HashMap<>();
+    public HashMap<UUID, CrateInstance> openCrates = new HashMap<>();
     public HashSet<UUID> crateFireworks = new HashSet<>();
     public boolean supportQualityArmory = false;
     public boolean supportSkript = false;
@@ -63,7 +66,7 @@ public class Main extends JavaPlugin
 
     public SkriptAddon addon;
 
-    public Data data;
+    public RewardSettings rewardSettings;
     public String language;
     public boolean update;
     public long cleanAfterDays;
@@ -72,6 +75,7 @@ public class Main extends JavaPlugin
 
     // -1 on indefinite revision
     // TODO eventually remove
+    @Deprecated
     private int findRev() {
         if (getDataFolder().listFiles().length == 0)
             return REV_LATEST;
@@ -116,24 +120,32 @@ public class Main extends JavaPlugin
     }
 
 
+    // TODO this is tacky
+
 
     @Override
     public void onEnable() {
         Main.instance = this;
 
-        Plugin GAPI = Bukkit.getPluginManager().getPlugin("Gapi");
-        if (GAPI == null || !GAPI.isEnabled()) {
-            if (GAPI == null) {
-                error(Lang.GAPI_REQUIRED);
-                error(ChatColor.translateAlternateColorCodes('&', String.format(Lang.GAPI_INSTALL, "https://github.com/PeriodicSeizures/Gapi/releases")));
-            } else
-                error(Lang.GAPI_FAILED);
+        if (Bukkit.getPluginManager().getPlugin("CRUtils") == null) {
+            String fmt = ChatColor.translateAlternateColorCodes('&', Lang.CRUTILS_MISSING);
 
-            Bukkit.getPluginManager().disablePlugin(this);
+            Bukkit.getConsoleSender().sendMessage(fmt);
+            Bukkit.broadcast(fmt, PERM_ADMIN);
+
+            Bukkit.getPluginManager().registerEvents(new Listener() {
+                @EventHandler
+                public void event(PlayerJoinEvent e) {
+                    Player p = e.getPlayer();
+                    if (p.hasPermission(PERM_ADMIN))
+                        p.sendMessage(fmt);
+                }
+            }, this);
+
             return;
         }
 
-        info(ColorUtil.renderAll(String.format(Lang.JOIN_DISCORD, "https://discord.gg/2JkFBnyvNQ")));
+        info(ColorUtil.renderAll(String.format(Lang.JOIN_DISCORD, DISCORD_URL)));
 
         //noinspection ResultOfMethodCallIgnored
         getDataFolder().mkdirs();
@@ -210,6 +222,7 @@ public class Main extends JavaPlugin
             try {
                 addon.loadClasses(getClass().getPackage().getName(), "sk");
             } catch (Exception e) {
+
                 e.printStackTrace();
             }
             LootCratesAPI.registerLoot(LootSkriptEvent.class);
@@ -219,7 +232,8 @@ public class Main extends JavaPlugin
         // Exception occurs when a skript class is loaded before the data is assigned
         reloadOtherConfigs(null);
 
-        MetricWrap.init(this);
+        //MetricWrap.init(this);
+        initMetrics();
 
         new Cmd(this);
         new CmdTestParser(this);
@@ -257,6 +271,35 @@ public class Main extends JavaPlugin
     @Deprecated
     public void saveConfig() {
         throw new RuntimeException("Do not call this method");
+    }
+
+
+
+    public void initMetrics() {
+        try {
+            Metrics metrics = new Metrics(this, 10395);
+
+            metrics.addCustomChart(new Metrics.SimplePie("update",
+                    () -> "" + update));
+
+            metrics.addCustomChart(new Metrics.SimplePie("language",
+                    () -> language));
+
+            metrics.addCustomChart(
+                    new Metrics.AdvancedPie("loot",
+                            () -> rewardSettings.lootSets.keySet().stream().map(
+                                    lootSet -> new AbstractMap.SimpleEntry<>(lootSet, 1)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
+            );
+
+            metrics.addCustomChart(
+                    new Metrics.AdvancedPie("crates",
+                            () -> rewardSettings.crates.keySet().stream().map(
+                                    crate -> new AbstractMap.SimpleEntry<>(crate, 1)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
+            );
+
+        } catch (Exception e) {
+            error("Unable to enable bStats Metrics (" + e.getMessage() + ")");
+        }
     }
 
 
@@ -318,7 +361,7 @@ public class Main extends JavaPlugin
     public void reloadOtherConfigs(CommandSender sender) {
         loadPlayerStats(sender);
 
-        // TODO eventually remove older revisions
+        // TODO remove post-rev removal
         if (rev <= 2) {
             final File rewardsConfigFile_REV2 = new File(getDataFolder(), "config.yml");
 
@@ -330,39 +373,48 @@ public class Main extends JavaPlugin
             rewardsConfig = YamlConfiguration.loadConfiguration(rewardsConfigFile);
         }
 
-        try {
-            info(sender, Lang.REWARDS_1);
-            data = Objects.requireNonNull((Data) rewardsConfig.get("data"));
-        } catch (Exception e) {
-            //error(sender, e.getMessage());
-            e.printStackTrace();
+        // TODO remove rev
+        if (rev >= 6) {
             try {
-                popup(sender, Lang.REWARDS_2);
-
-                saveDefaultFile(sender, rewardsConfigFile, true);
-                rewardsConfig.load(rewardsConfigFile);
-                data = Objects.requireNonNull((Data) rewardsConfig.get("data"));
+                this.rewardSettings = new RewardSettings(rewardsConfig);
             } catch (Exception e1) {
-                //error(sender, e1.getMessage());
+                e1.printStackTrace();
+            }
+        } else {
+            try {
+                info(sender, Lang.REWARDS_1);
+                rewardSettings = Objects.requireNonNull((Data) rewardsConfig.get("data")).getSettings();
+            } catch (Exception e) {
+                //error(sender, e.getMessage());
                 e.printStackTrace();
                 try {
-                    warn(sender, Lang.REWARDS_3);
+                    popup(sender, Lang.REWARDS_2);
 
-                    data = new Data();
-                } catch (Exception e2) {
-                    // Very severe, should theoretically never reach this point
-                    e2.printStackTrace();
+                    saveDefaultFile(sender, rewardsConfigFile, true);
+                    rewardsConfig.load(rewardsConfigFile);
+                    rewardSettings = new RewardSettings(rewardsConfig);
+                } catch (Exception e1) {
+                    //error(sender, e1.getMessage());
+                    e.printStackTrace();
+                    try {
+                        warn(sender, Lang.REWARDS_3);
+
+                        rewardSettings = new RewardSettings();
+                    } catch (Exception e2) {
+                        // Very severe, should theoretically never reach this point
+                        e2.printStackTrace();
+                    }
                 }
             }
         }
 
-        if (data != null) {
+        if (rewardSettings != null) {
             info(sender, Lang.REWARDS_SUCCESS);
             return;
         }
 
         severe(sender, Lang.REWARDS_FAIL);
-        severe(sender, String.format(Lang.REWARDS_REPORT, "https://discord.gg/2JkFBnyvNQ"));
+        severe(sender, String.format(Lang.REWARDS_REPORT, DISCORD_URL));
         Bukkit.getPluginManager().disablePlugin(this);
     }
 
@@ -404,7 +456,9 @@ public class Main extends JavaPlugin
 
         if (backupRewards(sender, false)) {
             info(sender, Lang.CONFIG_SAVE);
-            rewardsConfig.set("data", data);
+            //rewardsConfig.set("data", rewardSettings);
+            rewardsConfig = new YamlConfiguration();
+            rewardSettings.serialize(rewardsConfig);
 
             try {
                 rewardsConfig.save(rewardsConfigFile);

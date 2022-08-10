@@ -5,7 +5,7 @@ import com.crazicrafter1.crutils.MutableString;
 import com.crazicrafter1.crutils.TriFunction;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.*;
-import com.crazicrafter1.lootcrates.crate.Crate;
+import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -111,11 +111,11 @@ class CmdArg {
             return ret;
         }));
 
-        args.put("populate", new CmdArg((sender, args, flags) -> {
-            plugin.saveConfig(sender);
-            plugin.data = new Data();
-            return info(sender, Lang.POPULATING);
-        }, null));
+        //args.put("populate", new CmdArg((sender, args, flags) -> {
+        //    plugin.saveConfig(sender);
+        //    plugin.data = new Data();
+        //    return info(sender, Lang.POPULATING);
+        //}, null));
 
         args.put("colors", new CmdArg((sender, args, flags) -> {
             if (args.length == 0)
@@ -147,10 +147,7 @@ class CmdArg {
                         // without scanning the entire string prior for
 
                         // then get matches for the unclosed
-                        return getMatches(color.subLeft('/').toString(), ColorUtil.COLORS.keySet(),
-                                m.subLeft('<',lastOpen, 1, true)
-                                        .subRight(' ', 0, args.length - 1).append(slashIndex != -1 ? "/" : "").append("%s").toString()
-                        );
+                        return new ArrayList<>();
                     }
                 }
             }
@@ -201,7 +198,7 @@ class CmdArg {
         }, null));
 
         args.put("crate", new CmdArg((sender, args, flags) -> {
-            Crate crate = LootCratesAPI.getCrateByID(args[0]);
+            CrateSettings crate = LootCratesAPI.getCrateByID(args[0]);
 
             // the best way to represent this command structure would be with a treemap
             // crates -> display plugin info
@@ -267,7 +264,7 @@ class CmdArg {
             return info(sender, String.format(Lang.SELF_GIVE_CRATE, crate.id));
         }, (sender, args) -> {
             if (args.length == 1) {
-                return getMatches(args[0], Main.get().data.crates.keySet());
+                return getMatches(args[0], Main.get().rewardSettings.crates.keySet());
             }
             if (args.length == 2) {
                 return getMatches(args[1],
@@ -326,7 +323,7 @@ class CmdArg {
 
             ItemStack itemStack = p.getInventory().getItemInMainHand();
             if (itemStack.getType() != Material.AIR) {
-                Crate crate = LootCratesAPI.extractCrateFromItem(itemStack);
+                CrateSettings crate = LootCratesAPI.extractCrateFromItem(itemStack);
                 if (crate != null) {
                     return info(sender, String.format(Lang.IS_CRATE, crate.id));
                 } else {

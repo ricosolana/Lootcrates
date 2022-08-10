@@ -33,7 +33,7 @@ public class ExprCrates extends SimpleExpression<String> {
 
     @Override
     protected String[] get(Event event) {
-        List<String> list = new ArrayList<>(Main.get().data.crates.keySet());
+        List<String> list = new ArrayList<>(Main.get().rewardSettings.crates.keySet());
 
         return list.toArray(new String[0]);
     }

@@ -1,14 +1,12 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.gapi.AbstractMenu;
-import com.crazicrafter1.gapi.Button;
-import com.crazicrafter1.gapi.ParallaxMenu;
-import com.crazicrafter1.gapi.Result;
+import com.crazicrafter1.crutils.ui.*;
 import com.crazicrafter1.lootcrates.Lang;
 import com.crazicrafter1.lootcrates.Main;
-import com.crazicrafter1.lootcrates.crate.ActiveCrate;
+import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import com.crazicrafter1.lootcrates.crate.Crate;
+import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -27,7 +25,7 @@ public class LootItemCrate implements ILoot {
      */
     public LootItemCrate() {
         try {
-            id = Main.get().data.crates.keySet().iterator().next();
+            id = Main.get().rewardSettings.crates.keySet().iterator().next();
         } catch (NoSuchElementException e) {
             Main.get().error(Lang.ERR_NO_CRATES);
         }
@@ -42,14 +40,14 @@ public class LootItemCrate implements ILoot {
     }
 
     @Override
-    public boolean execute(@NotNull ActiveCrate activeCrate) {
+    public boolean execute(@NotNull CrateInstance activeCrate) {
         return true;
     }
 
     @Nonnull
     @Override
     public ItemStack getRenderIcon(@Nonnull Player p) {
-        Crate crate = Main.get().data.crates.get(id);
+        CrateSettings crate = Main.get().rewardSettings.crates.get(id);
         return Objects.requireNonNull(crate,
                 "Referred a crate by name (" + id + ") " +
                         "which doesn't have a definition in config").itemStack(p);
@@ -58,7 +56,7 @@ public class LootItemCrate implements ILoot {
     @NotNull
     @Override
     public ItemStack getMenuIcon() {
-        return Main.get().data.crates.get(id).item.buildCopy();
+        return Main.get().rewardSettings.crates.get(id).item.clone();
     }
 
     @NotNull
@@ -82,13 +80,13 @@ public class LootItemCrate implements ILoot {
                 .parentButton(4, 5)
                 .addAll((self, p00) -> {
                     ArrayList<Button> result = new ArrayList<>();
-                    for (Map.Entry<String, Crate> entry : Main.get().data.crates.entrySet()) {
-                        Crate crate = entry.getValue();
+                    for (Map.Entry<String, CrateSettings> entry : Main.get().rewardSettings.crates.entrySet()) {
+                        CrateSettings crate = entry.getValue();
 
                         //ItemStack icon = ItemBuilder.copyOf(Material.LOOM).apply(crate.item).glow(crate.id.equals(id)).build();
 
                         result.add(new Button.Builder()
-                                .icon(p -> crate.item.copy().glow(crate.id.equals(id)).build())
+                                .icon(p -> ItemBuilder.copy(crate.item).glow(crate.id.equals(id)).build())
                                 .lmb(interact -> {
                                     // select as active
                                     id = crate.id;

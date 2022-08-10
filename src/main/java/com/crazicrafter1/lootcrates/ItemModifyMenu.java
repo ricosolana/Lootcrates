@@ -1,10 +1,7 @@
 package com.crazicrafter1.lootcrates;
 
 import com.crazicrafter1.crutils.*;
-import com.crazicrafter1.gapi.Button;
-import com.crazicrafter1.gapi.Result;
-import com.crazicrafter1.gapi.SimpleMenu;
-import com.crazicrafter1.gapi.TextMenu;
+import com.crazicrafter1.crutils.ui.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;

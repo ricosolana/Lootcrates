@@ -1,13 +1,12 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
-import com.crazicrafter1.gapi.AbstractMenu;
-import com.crazicrafter1.lootcrates.crate.ActiveCrate;
+import com.crazicrafter1.crutils.ui.AbstractMenu;
+import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Must create a static method in class to get the Editor-representative item
@@ -27,7 +26,7 @@ public interface ILoot extends ConfigurationSerializable {
      * @param activeCrate the reference crate
      * @return whether the player should keep the clicked {@link ItemStack}
      */
-    boolean execute(@Nonnull ActiveCrate activeCrate);
+    boolean execute(@Nonnull CrateInstance activeCrate);
 
     /**
      * The utility menu to show in the editor to modify an ILoot instance

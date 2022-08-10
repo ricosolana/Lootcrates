@@ -1,28 +1,27 @@
 package com.crazicrafter1.lootcrates;
 
 import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.crate.Crate;
+import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import com.crazicrafter1.lootcrates.crate.LootSet;
+import com.crazicrafter1.lootcrates.crate.LootSetSettings;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Legacy data configurator
  */
+@Deprecated
 public class Data implements ConfigurationSerializable {
-
-    //public long cleanAfterDays;
     public int speed;
 
     public ItemBuilder unSelectedItem;
@@ -32,36 +31,11 @@ public class Data implements ConfigurationSerializable {
     public LinkedHashMap<String, Crate> crates;
     public LinkedHashMap<String, LootSet> lootSets;
 
-    /**
-     * Default constructor in the case of a normal config not being available
-     */
-    public Data() {
-        //cleanAfterDays = 7; // Cleanup config files older than a week
-        speed = 4;
-        unSelectedItem = ItemBuilder.copyOf(Material.CHEST).name("&f&l???").lore("&7&oChoose 4 mystery chests, and\n&7&oyour loot will be revealed!");
-        selectedItem = ItemBuilder.fromModernMaterial("WHITE_STAINED_GLASS_PANE").name("&7&l???").lore("&7You have selected this mystery chest");
-
-        lootSets = new LinkedHashMap<>();
-        LootSet lootSet = new LootSet(
-                "common",
-                ItemBuilder.fromModernMaterial("WHITE_STAINED_GLASS_PANE").name("&f&lCommon Reward").build(),
-                new ArrayList<>(Collections.singletonList(new LootItem())));
-        lootSets.put(lootSet.id, lootSet);
-
-        crates = new LinkedHashMap<>();
-        Crate crate = new Crate("peasant");
-        crates.put(crate.id, crate);
-
-        crate.loot.add(lootSet, 10);
-
-        fireworkEffect = FireworkEffect.builder().withColor(Color.RED, Color.BLUE, Color.WHITE).with(FireworkEffect.Type.BURST).build();
-    }
-
     public Data(Map<String, Object> args) {
         try {
             int rev = Main.get().rev;
 
-            // TODO eventually remove older revisions
+            // TODO remove post-migrate
             if (rev == 0) {
                 // 2/20/2022 and before
                 Main.get().cleanAfterDays = (int) args.getOrDefault("cleanHour", 7) / 24;
@@ -94,9 +68,6 @@ public class Data implements ConfigurationSerializable {
 
                 crate.id = id;
                 crate.item = ItemBuilder.mutable(LootCratesAPI.makeCrate(crate.item.build(), id));
-
-                // initialize weights
-                //crate.sumsToWeights();
             }
 
             fireworkEffect = (FireworkEffect) args.get("fireworkEffect");
@@ -114,6 +85,21 @@ public class Data implements ConfigurationSerializable {
         }
     }
 
+    @Override
+    public final Map<String, Object> serialize() {
+        throw new UnsupportedOperationException("Do not use!");
+    }
+
+    //todo remove post-migrate
+    public RewardSettings getSettings() {
+        Map<String, CrateSettings> crates = this.crates.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getSettings()));
+        Map<String, LootSetSettings> loot = this.lootSets.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getSettings()));
+
+        return new RewardSettings(speed, unSelectedItem.build(), selectedItem.build(), fireworkEffect, crates, loot);
+    }
+
     public ItemStack unSelectedItemStack(@Nonnull Player p, @Nonnull Crate crate) {
         return unSelectedItem.copy()
                 .replace("crate_picks", "" + crate.picks, '%')
@@ -128,29 +114,5 @@ public class Data implements ConfigurationSerializable {
                 .placeholders(p)
                 .renderAll()
                 .build();
-    }
-
-    @Override
-    public final Map<String, Object> serialize() {
-        try {
-            Map<String, Object> result = new LinkedHashMap<>();
-
-            //result.put("cleanAfterDays", cleanAfterDays);
-            result.put("speed", speed);
-
-            result.put("unSelectedItem", unSelectedItem);
-            result.put("selectedItem", selectedItem);
-
-            result.put("lootSets", lootSets);
-
-            result.put("crates", crates);
-
-            result.put("fireworkEffect", fireworkEffect);
-
-            return result;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
-        }
     }
 }

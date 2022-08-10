@@ -3,18 +3,12 @@ package com.crazicrafter1.lootcrates.crate.loot;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.MathUtil;
 import com.crazicrafter1.crutils.ProbabilityUtil;
-import com.crazicrafter1.crutils.Util;
-import com.crazicrafter1.gapi.AbstractMenu;
-import com.crazicrafter1.gapi.Button;
-import com.crazicrafter1.gapi.Result;
-import com.crazicrafter1.gapi.SimpleMenu;
+import com.crazicrafter1.crutils.ui.*;
 import com.crazicrafter1.lootcrates.Editor;
-import com.crazicrafter1.lootcrates.ItemModifyMenu;
 import com.crazicrafter1.lootcrates.Lang;
-import com.crazicrafter1.lootcrates.crate.ActiveCrate;
+import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.LinkedHashMap;
@@ -39,7 +33,7 @@ public abstract class AbstractLootItem implements ILoot {
     }
 
     @Override
-    public final boolean execute(@Nonnull ActiveCrate activeCrate) {
+    public final boolean execute(@Nonnull CrateInstance activeCrate) {
         return true;
     }
 

@@ -2,7 +2,7 @@ package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.crutils.ColorUtil;
 import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.gapi.*;
+import com.crazicrafter1.crutils.ui.*;
 import com.crazicrafter1.lootcrates.Lang;
 import me.zombie_striker.customitemmanager.CustomBaseObject;
 import me.zombie_striker.qg.api.QualityArmory;

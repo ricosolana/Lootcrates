@@ -4,6 +4,7 @@ import com.crazicrafter1.crutils.Version;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.Crate;
+import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -43,7 +44,7 @@ public class ListenerOnPlayerInteract extends BaseListener {
         if (item.getType() == Material.AIR && Version.AT_LEAST_v1_9.a())
             item = p.getInventory().getItemInOffHand();
 
-        Crate crate = LootCratesAPI.extractCrateFromItem(item);
+        CrateSettings crate = LootCratesAPI.extractCrateFromItem(item);
         if (crate != null)
             e.setCancelled(true);
 

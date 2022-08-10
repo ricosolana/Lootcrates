@@ -2,8 +2,8 @@ package com.crazicrafter1.lootcrates.crate;
 
 import com.crazicrafter1.crutils.ColorUtil;
 import com.crazicrafter1.crutils.Util;
-import com.crazicrafter1.lootcrates.Data;
 import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.RewardSettings;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public final class ActiveCrate {
+public final class CrateInstance {
 
     private static final class QSlot {
         boolean isHidden = true;
@@ -36,11 +36,11 @@ public final class ActiveCrate {
 
     // Constants
     private final Player player;
-    private final Crate crate;
+    private final CrateSettings crate;
     private final int size;
     private final int picks;
     private final Sound sound;
-    private final LootSet[] lootChances;
+    private final LootSetSettings[] lootChances;
     private final Inventory inventory;
 
     // Live variables
@@ -49,15 +49,15 @@ public final class ActiveCrate {
     private int taskID = -1;
     private int lockSlot;
 
-    private final Data data = Main.get().data;
+    private final RewardSettings data = Main.get().rewardSettings;
 
-    public ActiveCrate(Player p, Crate crate, int lockSlot) {
+    public CrateInstance(Player p, CrateSettings crate, int lockSlot) {
         this.player = p;
         this.crate = crate;
         this.size = crate.columns * 9;
         this.picks = crate.picks;
         this.sound = crate.sound;
-        this.lootChances = new LootSet[size];
+        this.lootChances = new LootSetSettings[size];
 
         this.inventory = Bukkit.createInventory(p, size, ColorUtil.renderAll(crate.getTitle(p)));
         this.lockSlot = lockSlot;
@@ -73,7 +73,7 @@ public final class ActiveCrate {
         player.openInventory(inventory);
     }
 
-    private void populate(Crate crate) {
+    private void populate(CrateSettings crate) {
         for (int i = 0; i < size; i++) {
             this.lootChances[i] = crate.loot.getRandom();
         }

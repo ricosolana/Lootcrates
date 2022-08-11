@@ -15,6 +15,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.crazicrafter1.lootcrates.cmd.CmdArg.info;
+import static com.crazicrafter1.lootcrates.cmd.CmdArg.warn;
 import static com.crazicrafter1.lootcrates.cmd.CmdArg.error;
 
 public class Cmd implements CommandExecutor, TabCompleter {
@@ -31,11 +33,11 @@ public class Cmd implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command c, String s, String[] args) {
         if (args.length == 0) {
             if (Main.get().rev == -1) {
-                return Main.get().error(sender, String.format(Lang.ASSIGN_REV, ChatColor.UNDERLINE + "/crates rev"));
+                return plugin.notifier.commandSevere(sender, String.format(Lang.ASSIGN_REV, ChatColor.UNDERLINE + "/crates rev"));
             }
-            Main.get().popup(sender, String.format(Lang.VERSION, Main.get().getDescription().getVersion()));
-            Main.get().popup(sender, String.format(Lang.REV, Main.get().rev));
-            return Main.get().popup(sender, Lang.USAGE + "/crates ["
+            info(sender, String.format(Lang.VERSION, Main.get().getDescription().getVersion()));
+            info(sender, String.format(Lang.REV, Main.get().rev));
+            return info(sender, Lang.USAGE + "/crates ["
                     + String.join(", ", CmdArg.args.keySet())
                     + "]");
         }
@@ -111,7 +113,7 @@ public class Cmd implements CommandExecutor, TabCompleter {
 
         if (args.length == 1) {
             if (Main.get().rev == -1) {
-                return Collections.singletonList("rev");
+                return Collections.singletonList("rev"); // todo remove post-migrate
             } else
                 return CmdArg.getMatches(args[0], CmdArg.args.keySet());
         }

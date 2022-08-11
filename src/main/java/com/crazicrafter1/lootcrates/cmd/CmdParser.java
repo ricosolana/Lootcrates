@@ -236,7 +236,7 @@ public class CmdParser {
             T exp = type.get(args.get(0));
             saved.put(type.getType(), exp);
             args.remove(0);
-            Main.get().info("Expected: " + exp);
+            //Main.get().info("Expected: " + exp);
         } catch (Exception ignored) {
             ignored.printStackTrace();
         }

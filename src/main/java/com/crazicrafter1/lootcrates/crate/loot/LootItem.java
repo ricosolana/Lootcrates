@@ -2,9 +2,11 @@ package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.MathUtil;
+import com.crazicrafter1.crutils.RandomUtil;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.crutils.ui.AbstractMenu;
 import com.crazicrafter1.lootcrates.*;
+import com.google.common.collect.Lists;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -12,7 +14,10 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Random;
 
 public class LootItem extends AbstractLootItem {
 
@@ -24,7 +29,8 @@ public class LootItem extends AbstractLootItem {
      * Default ctor
      */
     public LootItem() {
-        this.item = ItemBuilder.copyOf(Material.STONE).build();
+        //noinspection ConstantConditions
+        this.item = ItemBuilder.copy(RandomUtil.getRandom(Arrays.asList(Material.DIAMOND_PICKAXE, Material.GOLDEN_SWORD, Material.IRON_AXE))).build();
     }
 
     // todo remove post
@@ -44,8 +50,9 @@ public class LootItem extends AbstractLootItem {
         else
             this.item = (ItemStack) args.get("item");
 
-        if (item == null)
-            Main.get().error("A LootItem is null in config");
+        if (item == null) {
+            Main.get().notifier.severe("A LootItem is null in config");
+        }
     }
 
     @Nonnull

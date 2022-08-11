@@ -5,7 +5,6 @@ import ch.njol.skript.SkriptAddon;
 import com.crazicrafter1.crutils.*;
 import com.crazicrafter1.lootcrates.cmd.Cmd;
 import com.crazicrafter1.lootcrates.cmd.CmdTestParser;
-import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.LootSet;
 import com.crazicrafter1.lootcrates.crate.loot.*;
@@ -13,7 +12,6 @@ import com.crazicrafter1.lootcrates.listeners.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -25,11 +23,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.awt.*;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -43,10 +42,14 @@ public class Main extends JavaPlugin
             " \\ \\_____\\  \\ \\_____\\  \\ \\_____\\    \\ \\_\\  \\ \\_____\\  \\ \\_\\ \\_\\  \\ \\_\\ \\_\\    \\ \\_\\  \\ \\_____\\  \\/\\_____\\ \n" +
             "  \\/_____/   \\/_____/   \\/_____/     \\/_/   \\/_____/   \\/_/ /_/   \\/_/\\/_/     \\/_/   \\/_____/   \\/_____/";
 
+    public Notifier notifier;
+
     public static final int REV_LATEST = 6;
     public static final String DISCORD_URL = "https://discord.gg/2JkFBnyvNQ";
     public static final String GITHUB_URL = "https://github.com/PeriodicSeizures/CRUtils/releases";
-    public final String PERM_ADMIN = "lootcrates.admin";
+    public static final String PERM_ADMIN = "lootcrates.admin";
+    public static final String PERM_OPEN = "lootcrates.open";
+    public static final String PERM_PREVIEW = "lootcrates.preview";
     private final File rewardsConfigFile = new File(getDataFolder(), "rewards.yml");
     private final File configFile = new File(getDataFolder(), "config.yml");
     private final File backupPath = new File(getDataFolder(), "backup");
@@ -55,11 +58,6 @@ public class Main extends JavaPlugin
     private FileConfiguration config = null;
     private FileConfiguration rewardsConfig = null;
 
-    /*
-     * Runtime modifiable stuff
-     */
-    public HashMap<UUID, CrateInstance> openCrates = new HashMap<>();
-    public HashSet<UUID> crateFireworks = new HashSet<>();
     public boolean supportQualityArmory = false;
     public boolean supportSkript = false;
     public boolean supportMMOItems = false;
@@ -77,6 +75,7 @@ public class Main extends JavaPlugin
     // TODO eventually remove
     @Deprecated
     private int findRev() {
+        //noinspection ConstantConditions
         if (getDataFolder().listFiles().length == 0)
             return REV_LATEST;
 
@@ -85,11 +84,11 @@ public class Main extends JavaPlugin
             FileConfiguration revConfig = new YamlConfiguration();
             try {
                 revConfig.load(revFile);
-                revFile.delete();
+                Files.delete(revFile.toPath());
                 return revConfig.getInt("rev", REV_LATEST);
             } catch (Exception ignored) {
             }
-            revFile.delete();
+            //revFile.delete();
         }
 
         config = YamlConfiguration.loadConfiguration(configFile);
@@ -97,12 +96,12 @@ public class Main extends JavaPlugin
         if (r != -1)
             return r;
 
-        error(Lang.UNKNOWN_REV);
+        notifier.severe(Lang.UNKNOWN_REV);
         return -1;
     }
 
     @Nonnull
-    public PlayerStat getStat(UUID uuid) {
+    public PlayerStat getPlayerStat(UUID uuid) {
         // if not present add
 
         PlayerStat stat = playerStats.get(uuid);
@@ -118,10 +117,6 @@ public class Main extends JavaPlugin
     public static Main get() {
         return instance;
     }
-
-
-    // TODO this is tacky
-
 
     @Override
     public void onEnable() {
@@ -145,39 +140,63 @@ public class Main extends JavaPlugin
             return;
         }
 
-        info(ColorUtil.renderAll(String.format(Lang.JOIN_DISCORD, DISCORD_URL)));
+        notifier = new Notifier(ChatColor.WHITE + "[%sLC" + ChatColor.WHITE + "] %s%s", PERM_ADMIN);
 
-        //noinspection ResultOfMethodCallIgnored
-        getDataFolder().mkdirs();
+        notifier.info(ColorUtil.renderAll(String.format(Lang.JOIN_DISCORD, DISCORD_URL)));
 
-        this.rev = findRev(); //TODO remove in ~rev5
-
-        reloadConfig(null);
-
-        boolean check = rev == -1 || !update;
-
-        if (rev != -1) {
-            if (update) try {
-                StringBuilder outTag = new StringBuilder();
-                if (GitUtils.updatePlugin(this, "PeriodicSeizures", "Lootcrates", "Lootcrates.jar", outTag)) {
-                    warn(String.format(Lang.UPDATED, outTag));
-                    warn(Lang.RECOMMEND_RESTART);
-                } else {
-                    info(Lang.LATEST_VERSION);
-                }
-            } catch (IOException e) {
-                warn(Lang.UPDATE_FAIL);
-                e.printStackTrace();
-            }
+        try {
+            Files.createDirectories(getDataFolder().toPath());
+        } catch (IOException e) {
+            notifier.warn("Unable to create plugin data folder");
         }
 
-        if (check)
-            GitUtils.checkForUpdateAsync(this, "PeriodicSeizures", "Lootcrates",
-                    (result, tag) -> {
-                        if (result) popup(String.format(Lang.UPDATE_AVAILABLE, tag));
-                        else info(Lang.LATEST_VERSION);
-                    });
+        doSplash();
 
+        this.rev = findRev(); //TODO remove post-migrate
+        reloadConfig();
+        checkUpdates(); //TODO remove post-migrate
+        checkAddons();
+        reloadOtherConfigs(Bukkit.getConsoleSender()); // must be after skript
+        initMetrics();
+
+        new Cmd(this);
+        new CmdTestParser(this);
+
+        new ListenerOnEntityDamageByEntity(this);
+        new ListenerOnInventoryClick(this);
+        new ListenerOnInventoryClose(this);
+        new ListenerOnInventoryDrag(this);
+        new ListenerOnPlayerInteract(this);
+        new ListenerOnPlayerInteract(this);
+        new ListenerOnPlayerJoinQuit(this);
+    }
+
+    @Override
+    public void onDisable() {
+        this.saveConfig();
+        this.saveOtherConfigs(Bukkit.getConsoleSender());
+    }
+
+
+
+    @Override
+    public void saveDefaultConfig() {
+        saveDefaultConfig(Bukkit.getConsoleSender(), false);
+    }
+
+    @Override
+    public void reloadConfig() {
+        reloadConfig(Bukkit.getConsoleSender());
+    }
+
+    @Override
+    public void saveConfig() {
+        saveConfig(Bukkit.getConsoleSender());
+    }
+
+
+
+    private void doSplash() {
         if (Version.AT_LEAST_v1_16.a()) {
             long c = System.currentTimeMillis();
             final double mul = 1.d / (1000.d * 60.d);
@@ -201,81 +220,38 @@ public class Main extends JavaPlugin
 
             Bukkit.getConsoleSender().sendMessage("\n\n\n\n" + res + "\n\n\n\n");
         }
+    }
 
-        supportQualityArmory = Bukkit.getPluginManager().isPluginEnabled("QualityArmory");
-        supportSkript = Bukkit.getPluginManager().isPluginEnabled("Skript");
-        supportMMOItems = Bukkit.getPluginManager().isPluginEnabled("MMOItems");
 
-        // Register serializable
-        ConfigurationSerialization.registerClass(Data.class, "Data"); // TODO try to stray away from this serialize method somehow
-        ConfigurationSerialization.registerClass(LootSet.class, "LootSet");
-        ConfigurationSerialization.registerClass(Crate.class, "Crate");
 
-        // Register loot classes
-        LootCratesAPI.registerLoot(LootCommand.class);
-        LootCratesAPI.registerLoot(LootItem.class);
-        LootCratesAPI.registerLoot(LootItemCrate.class);
-        LootCratesAPI.registerLoot(LootNBTItem.class);
-        if (supportQualityArmory) LootCratesAPI.registerLoot(LootItemQA.class);
-        if (supportSkript) {
-            addon = Skript.registerAddon(this);
-            try {
-                addon.loadClasses(getClass().getPackage().getName(), "sk");
-            } catch (Exception e) {
+    private void checkUpdates() {
+        boolean checkForUpdate = rev == -1 || !update;
 
+        if (rev != -1) {
+            if (update) try {
+                StringBuilder outTag = new StringBuilder();
+                if (GitUtils.updatePlugin(this, "PeriodicSeizures", "Lootcrates", "Lootcrates.jar", outTag)) {
+                    notifier.warn(String.format(Lang.UPDATED, outTag));
+                    notifier.warn(Lang.RECOMMEND_RESTART);
+                } else {
+                    notifier.info(Lang.LATEST_VERSION);
+                }
+            } catch (IOException e) {
+                notifier.warn(Lang.UPDATE_FAIL);
                 e.printStackTrace();
             }
-            LootCratesAPI.registerLoot(LootSkriptEvent.class);
         }
-        if (supportMMOItems) LootCratesAPI.registerLoot(LootMMOItem.class);
 
-        // Exception occurs when a skript class is loaded before the data is assigned
-        reloadOtherConfigs(null);
-
-        //MetricWrap.init(this);
-        initMetrics();
-
-        new Cmd(this);
-        new CmdTestParser(this);
-
-        new ListenerOnEntityDamageByEntity(this);
-        new ListenerOnInventoryClick(this);
-        new ListenerOnInventoryClose(this);
-        new ListenerOnInventoryDrag(this);
-        new ListenerOnPlayerInteract(this);
-        new ListenerOnPlayerInteract(this);
-        new ListenerOnPlayerJoinQuit(this);
-    }
-
-    @Override
-    public void onDisable() {
-        this.saveConfig(null);
-        this.saveOtherConfigs(null);
+        if (checkForUpdate)
+            GitUtils.checkForUpdateAsync(this, "PeriodicSeizures", "Lootcrates",
+                    (result, tag) -> {
+                        if (result) notifier.info(String.format(Lang.UPDATE_AVAILABLE, tag));
+                        else notifier.info(Lang.LATEST_VERSION);
+                    });
     }
 
 
-
-    @Override
-    @Deprecated
-    public void saveDefaultConfig() {
-        throw new RuntimeException("Do not call this method");
-    }
-
-    @Override
-    @Deprecated
-    public void reloadConfig() {
-        throw new RuntimeException("Do not call this method");
-    }
-
-    @Override
-    @Deprecated
-    public void saveConfig() {
-        throw new RuntimeException("Do not call this method");
-    }
-
-
-
-    public void initMetrics() {
+    private void initMetrics() {
         try {
             Metrics metrics = new Metrics(this, 10395);
 
@@ -298,15 +274,45 @@ public class Main extends JavaPlugin
             );
 
         } catch (Exception e) {
-            error("Unable to enable bStats Metrics (" + e.getMessage() + ")");
+            notifier.severe("Unable to enable bStats Metrics (" + e.getMessage() + ")");
         }
     }
 
 
 
+    private void checkAddons() {
+        supportQualityArmory = Bukkit.getPluginManager().isPluginEnabled("QualityArmory");
+        supportSkript = Bukkit.getPluginManager().isPluginEnabled("Skript");
+        supportMMOItems = Bukkit.getPluginManager().isPluginEnabled("MMOItems");
+
+        // Register serializable
+        ConfigurationSerialization.registerClass(Data.class, "Data"); // TODO try to stray away from this serialize method somehow
+        ConfigurationSerialization.registerClass(LootSet.class, "LootSet");
+        ConfigurationSerialization.registerClass(Crate.class, "Crate");
+
+        // Register loot classes
+        LootCratesAPI.registerLoot(LootCommand.class);
+        LootCratesAPI.registerLoot(LootItem.class);
+        LootCratesAPI.registerLoot(LootItemCrate.class);
+        LootCratesAPI.registerLoot(LootNBTItem.class);
+        if (supportQualityArmory) LootCratesAPI.registerLoot(LootItemQA.class);
+        if (supportSkript) {
+            addon = Skript.registerAddon(this);
+            try {
+                addon.loadClasses(getClass().getPackage().getName(), "sk");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            LootCratesAPI.registerLoot(LootSkriptEvent.class);
+        }
+        if (supportMMOItems) LootCratesAPI.registerLoot(LootMMOItem.class);
+    }
+
+
+
     public void saveDefaultFile(CommandSender sender, File file, boolean replace) {
-        if (replace || !file.exists()) {
-            info(sender, "Saving default " + file.getName());
+        if (replace || !Files.exists(file.toPath())) {
+            notifier.info(sender, "Saving default " + file.getName());
             this.saveResource(file.getName(), true);
         }
     }
@@ -318,16 +324,16 @@ public class Main extends JavaPlugin
     public boolean backupRewards(CommandSender sender, boolean isBroken) {
         File backupFile = new File(backupPath, System.currentTimeMillis() + "_" + (isBroken ? "broken" : "old") + "_rewards.zip");
 
-        info(sender, Lang.REWARDS_BACKUP);
+        notifier.info(sender, Lang.REWARDS_BACKUP);
 
         return Util.zip(rewardsConfigFile, backupFile);
     }
 
 
 
-    public void reloadConfig(CommandSender sender) {
+    public void reloadConfig(@Nonnull CommandSender sender) {
         try {
-            // TODO eventually remove older revisions
+            //TODO remove older revisions
             if (rev <= 2) {
                 // load several
                 final File langFile = new File(getDataFolder(), "lang.yml");
@@ -335,10 +341,10 @@ public class Main extends JavaPlugin
                 File noUpdateFile = new File(getDataFolder(), "NO_UPDATE.txt");
 
                 this.language = langConfig.getString("language", "en");
-                this.update = !(noUpdateFile.exists() && noUpdateFile.isFile());
+                this.update = !(Files.exists(noUpdateFile.toPath()) && Files.isRegularFile(noUpdateFile.toPath()));
 
-                langFile.delete();
-                noUpdateFile.delete();
+                Files.delete(langFile.toPath()); // throws if missing
+                Files.deleteIfExists(noUpdateFile.toPath());
             } else if (rev == 3) {
                 config = YamlConfiguration.loadConfiguration(configFile);
 
@@ -348,25 +354,23 @@ public class Main extends JavaPlugin
             } else { // 4 and above
                 config = YamlConfiguration.loadConfiguration(configFile);
 
-                //this.rev = config.getInt("rev"); // TODO remove findRev() soon to reduce confusion and complexity
-                this.language = config.getString("language");
-                this.update = config.getBoolean("update");
+                //this.rev = config.getInt("rev"); //TODO remove findRev() soon to reduce confusion and complexity
+                this.language = config.getString("language", "en");
+                this.update = config.getBoolean("update", false);
                 this.cleanAfterDays = config.getInt("clean-after-days", 7);
             }
         } catch (Exception e) {
-            error(sender, String.format(Lang.CONFIG_LOAD_FAIL, e.getMessage()));
+            notifier.severe(sender, String.format(Lang.CONFIG_LOAD_FAIL, e.getMessage()));
         }
     }
 
-    public void reloadOtherConfigs(CommandSender sender) {
+    public void reloadOtherConfigs(@Nonnull CommandSender sender) {
         loadPlayerStats(sender);
 
         // TODO remove post-rev removal
         if (rev <= 2) {
-            final File rewardsConfigFile_REV2 = new File(getDataFolder(), "config.yml");
-
             // swap config.yml contents with rewards config in memory
-            rewardsConfig = YamlConfiguration.loadConfiguration(rewardsConfigFile_REV2);
+            rewardsConfig = YamlConfiguration.loadConfiguration(configFile);
         } else {
             saveDefaultFile(sender, rewardsConfigFile, false);
 
@@ -382,13 +386,13 @@ public class Main extends JavaPlugin
             }
         } else {
             try {
-                info(sender, Lang.REWARDS_1);
+                notifier.info(sender, Lang.REWARDS_1);
                 rewardSettings = Objects.requireNonNull((Data) rewardsConfig.get("data")).getSettings();
             } catch (Exception e) {
                 //error(sender, e.getMessage());
                 e.printStackTrace();
                 try {
-                    popup(sender, Lang.REWARDS_2);
+                    notifier.warn(sender, Lang.REWARDS_2);
 
                     saveDefaultFile(sender, rewardsConfigFile, true);
                     rewardsConfig.load(rewardsConfigFile);
@@ -397,7 +401,7 @@ public class Main extends JavaPlugin
                     //error(sender, e1.getMessage());
                     e.printStackTrace();
                     try {
-                        warn(sender, Lang.REWARDS_3);
+                        notifier.warn(sender, Lang.REWARDS_3);
 
                         rewardSettings = new RewardSettings();
                     } catch (Exception e2) {
@@ -409,29 +413,20 @@ public class Main extends JavaPlugin
         }
 
         if (rewardSettings != null) {
-            info(sender, Lang.REWARDS_SUCCESS);
+            notifier.info(sender, Lang.REWARDS_SUCCESS);
             return;
         }
 
-        severe(sender, Lang.REWARDS_FAIL);
-        severe(sender, String.format(Lang.REWARDS_REPORT, DISCORD_URL));
+        notifier.severe(sender, Lang.REWARDS_FAIL);
+        notifier.severe(sender, String.format(Lang.REWARDS_REPORT, DISCORD_URL));
         Bukkit.getPluginManager().disablePlugin(this);
     }
 
-    public void saveConfig(CommandSender sender) {
+    public void saveConfig(@Nonnull CommandSender sender) {
         // if a backup was successfully made, then save
 
         if (rev == -1)
             return;
-
-        // save
-        //FileConfiguration revConfig = new YamlConfiguration();
-        //revConfig.set("rev", REV_LATEST);
-        //try {
-        //    revConfig.save(revFile);
-        //} catch (IOException e) {
-        //    error(sender, "Unable to save " + revFile.getName() + ": " + e.getMessage());
-        //}
 
         try {
             config = new YamlConfiguration();
@@ -443,10 +438,11 @@ public class Main extends JavaPlugin
             config.save(configFile);
         } catch (IOException e) {
             e.printStackTrace();
+            notifier.severe(sender, "Failed to save config");
         }
     }
 
-    public void saveOtherConfigs(CommandSender sender) {
+    public void saveOtherConfigs(@Nonnull CommandSender sender) {
         // if a backup was successfully made, then save
 
         if (rev == -1)
@@ -455,7 +451,7 @@ public class Main extends JavaPlugin
         savePlayerStats(sender);
 
         if (backupRewards(sender, false)) {
-            info(sender, Lang.CONFIG_SAVE);
+            notifier.info(sender, Lang.CONFIG_SAVE);
             //rewardsConfig.set("data", rewardSettings);
             rewardsConfig = new YamlConfiguration();
             rewardSettings.serialize(rewardsConfig);
@@ -463,25 +459,24 @@ public class Main extends JavaPlugin
             try {
                 rewardsConfig.save(rewardsConfigFile);
             } catch (Exception e) {
-                error(sender, Lang.CONFIG_SAVE_FAIL);
+                notifier.severe(sender, Lang.CONFIG_SAVE_FAIL);
                 e.printStackTrace();
             }
-        } else error(sender, Lang.CONFIG_BACKUP_FAIL);
+        } else notifier.severe(sender, Lang.CONFIG_BACKUP_FAIL);
 
         deleteOldBackups(sender);
     }
 
     private static final Pattern BACKUP_PATTERN = Pattern.compile("([0-9])+_\\S+_rewards.zip");
-    private void deleteOldBackups(CommandSender sender) {
-
+    private void deleteOldBackups(@Nonnull CommandSender sender) {
         if (cleanAfterDays <= 0) {
-            info(Lang.CONFIG_PURGE_DISABLED);
+            notifier.info(Lang.CONFIG_PURGE_DISABLED);
             return;
         }
 
         try {
             int deletedCount = 0;
-            backupPath.mkdirs();
+            Files.createDirectories(backupPath.toPath());
 
             //noinspection ConstantConditions
             for (File file : backupPath.listFiles()) {
@@ -491,21 +486,21 @@ public class Main extends JavaPlugin
                     long create = Long.parseLong(name.substring(0, name.indexOf("_")));
                     if (create < System.currentTimeMillis() - (cleanAfterDays * 24 * 60 * 60 * 1000)) {
                         // delete it
-                        file.delete();
+                        Files.delete(file.toPath());
                         deletedCount++;
                     }
                 }
             }
 
             if (deletedCount > 0)
-                info(sender, String.format(Lang.CONFIG_PURGES, deletedCount));
-            else info(sender, Lang.NO_CONFIG_PURGES);
+                notifier.info(sender, String.format(Lang.CONFIG_DELETES, deletedCount));
+            else notifier.info(sender, Lang.NO_CONFIG_DELETES);
         } catch (Exception e) {
-            error(sender, String.format(Lang.CONFIG_PURGES_FAIL, e.getMessage()));
+            notifier.severe(sender, String.format(Lang.CONFIG_DELETES_FAIL, e.getMessage()));
         }
     }
 
-    private void savePlayerStats(CommandSender sender) {
+    private void savePlayerStats(@Nonnull CommandSender sender) {
         try {
             for (Map.Entry<UUID, PlayerStat> entry : playerStats.entrySet()) {
                 String rawUUID = entry.getKey().toString();
@@ -516,11 +511,11 @@ public class Main extends JavaPlugin
                 playerConfig.save(new File(playerStatsPath, rawUUID + ".yml"));
             }
         } catch (Exception e) {
-            error(sender, String.format(Lang.STATS_SAVE_FAIL, e.getMessage()));
+            notifier.severe(sender, String.format(Lang.STATS_SAVE_FAIL, e.getMessage()));
         }
     }
 
-    private void loadPlayerStats(CommandSender sender) {
+    private void loadPlayerStats(@Nonnull CommandSender sender) {
         try {
             if (rev < 5)
                 return;
@@ -530,7 +525,7 @@ public class Main extends JavaPlugin
 
             // playerStatsPath.mkdirs();
 
-            File[] files = playerStatsPath.listFiles();
+            File[] files = playerStatsPath.listFiles(); // TODO use Paths.walk
 
             for (File file : files) {
                 try {
@@ -548,7 +543,7 @@ public class Main extends JavaPlugin
                 } catch (Exception ignored) {}
             }
         } catch (Exception e) {
-            error(sender, String.format(Lang.STATS_LOAD_FAIL, e.getMessage()));
+            notifier.severe(sender, String.format(Lang.STATS_LOAD_FAIL, e.getMessage()));
         }
     }
 
@@ -558,116 +553,8 @@ public class Main extends JavaPlugin
     @Override
     public FileConfiguration getConfig() {
         if (this.config == null) {
-            this.reloadConfig(null);
+            this.reloadConfig();
         }
         return this.config;
     }
-
-
-
-    public void popupAdmin(String s) {
-        Bukkit.getOnlinePlayers().forEach( p -> {
-            if (p.hasPermission(PERM_ADMIN)) popup(p, s);
-        });
-    }
-
-    public void infoAdmin(String s) {
-        Bukkit.getOnlinePlayers().forEach( p -> {
-            if (p.hasPermission(PERM_ADMIN)) info(p, s);
-        });
-    }
-
-    public void warnAdmin(String s) {
-        Bukkit.getOnlinePlayers().forEach( p -> {
-            if (p.hasPermission(PERM_ADMIN)) warn(p, s);
-        });
-    }
-
-    public void errorAdmin(String s) {
-        Bukkit.getOnlinePlayers().forEach( p -> {
-            if (p.hasPermission(PERM_ADMIN)) error(p, s);
-        });
-    }
-
-    public void severeAdmin(String s) {
-        Bukkit.getOnlinePlayers().forEach( p -> {
-            if (p.hasPermission(PERM_ADMIN)) severe(p, s);
-        });
-    }
-
-    public void popup(String s) {
-        popup(null, s);
-    }
-
-    public void info(String s) {
-        info(null, s);
-    }
-
-    public void warn(String s) {
-        warn(null, s);
-    }
-
-    public void error(String s) {
-        error(null, s);
-    }
-
-    public void severe(String s) {
-        severe(null, s);
-    }
-
-    public boolean popup(@Nullable CommandSender sender, String s) {
-        //sender = Util.def(sender, Bukkit.getConsoleSender());
-        if (sender == null)
-            sender = Bukkit.getConsoleSender();
-        sender.sendMessage(
-                (sender instanceof ConsoleCommandSender ?
-                        ChatColor.WHITE + "[" + ChatColor.GREEN + "LC" + ChatColor.WHITE + "]" : "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "\u24D8") + " "
-                        + ChatColor.RESET + ChatColor.AQUA + s);
-        return true;
-    }
-
-    public boolean info(@Nullable CommandSender sender, String s) {
-        //sender = Util.def(sender, Bukkit.getConsoleSender());
-        if (sender == null)
-            sender = Bukkit.getConsoleSender();
-        sender.sendMessage(
-                (sender instanceof ConsoleCommandSender ?
-                        ChatColor.WHITE + "[" + ChatColor.BLUE + "LC" + ChatColor.WHITE + "]" : "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "\u24D8") + " "
-                        + ChatColor.RESET + s);
-        return true;
-    }
-
-    public boolean warn(@Nullable CommandSender sender, String s) {
-        //sender = Util.def(sender, Bukkit.getConsoleSender());
-        if (sender == null)
-            sender = Bukkit.getConsoleSender();
-        sender.sendMessage(
-                (sender instanceof ConsoleCommandSender ?
-                        ChatColor.WHITE + "[" + ChatColor.YELLOW + "LC" + ChatColor.WHITE + "]" : "" + ChatColor.GOLD + ChatColor.BOLD + "\u26A1") + " "
-                + ChatColor.RESET + ChatColor.YELLOW + s);
-        return true;
-    }
-
-    public boolean error(@Nullable CommandSender sender, String s) {
-        //sender = Util.def(sender, Bukkit.getConsoleSender());
-        if (sender == null)
-            sender = Bukkit.getConsoleSender();
-        sender.sendMessage(
-                (sender instanceof ConsoleCommandSender ?
-                        ChatColor.WHITE + "[" + ChatColor.RED + "LC" + ChatColor.WHITE + "]" : "" + ChatColor.DARK_RED + ChatColor.BOLD + "\u26A0") + " "
-                + ChatColor.RESET + ChatColor.RED + s);
-        return true;
-    }
-
-    public boolean severe(@Nullable CommandSender sender, String s) {
-        //sender = Util.def(sender, Bukkit.getConsoleSender());
-        if (sender == null)
-            sender = Bukkit.getConsoleSender();
-        sender.sendMessage(
-                (sender instanceof ConsoleCommandSender ?
-                        ChatColor.WHITE + "[" + ChatColor.DARK_RED + "LC" + ChatColor.WHITE + "]" : "" + ChatColor.DARK_RED + ChatColor.BOLD + "\u26A0") + " "
-                        + ChatColor.RESET + ChatColor.DARK_RED + s);
-        return true;
-    }
-
 }

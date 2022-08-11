@@ -40,7 +40,7 @@ public class LootSet implements ConfigurationSerializable {
         loot = (ArrayList<ILoot>) args.get("loot");
         for (int i=0; i < loot.size(); i++) {
             if (loot.get(i) == null) {
-                Main.get().error("Item in rewards.yml is null (" + i + ")");
+                Main.get().notifier.severe("Item in rewards.yml is null (" + i + ")");
             }
         }
     }

@@ -16,7 +16,7 @@ import javax.annotation.Nonnull;
 import java.util.*;
 
 public class LootItemCrate implements ILoot {
-    public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.CHEST).name("&eAdd crate...").build();
+    public static final ItemStack EDITOR_ICON = ItemBuilder.copy(Material.CHEST).name("&eAdd crate...").build();
 
     public String id;
 
@@ -27,7 +27,7 @@ public class LootItemCrate implements ILoot {
         try {
             id = Main.get().rewardSettings.crates.keySet().iterator().next();
         } catch (NoSuchElementException e) {
-            Main.get().error(Lang.ERR_NO_CRATES);
+            Main.get().notifier.severe(Lang.ERR_NO_CRATES);
         }
     }
 
@@ -35,7 +35,7 @@ public class LootItemCrate implements ILoot {
         id = (String) args.get("crate");
     }
 
-    public LootItemCrate(Crate crate) {
+    public LootItemCrate(CrateSettings crate) {
         this.id = crate.id;
     }
 

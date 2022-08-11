@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class CrateSettings {
+public class CrateSettings implements Cloneable {
     public final String id;
     public String title;
     public int columns;
@@ -24,6 +24,11 @@ public class CrateSettings {
     public Sound sound;
     public WeightedRandomContainer<LootSetSettings> loot;
     public ItemStack item;
+
+    @Override
+    protected Object clone() {
+        return new CrateSettings(id + CrateInstance.CRATES.size(), title, columns, picks, sound, loot, item.clone());
+    }
 
     //todo hmmm kinda ugly
     @Deprecated

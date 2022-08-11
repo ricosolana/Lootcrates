@@ -5,6 +5,7 @@ import com.crazicrafter1.crutils.MutableString;
 import com.crazicrafter1.crutils.TriFunction;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.*;
+import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -45,9 +46,9 @@ class CmdArg {
             try {
                 Class<?> clazz = Class.forName(args[0]);
                 try {
-                    plugin.info("Package: " + clazz.getPackage().getName());
+                    plugin.notifier.info("Package: " + clazz.getPackage().getName());
                 } catch (Exception e) {
-                    plugin.info("In default package?");
+                    plugin.notifier.info("In default package?");
                 }
                 return info(sender, "Found: " + clazz.getName());
             } catch (Exception e) {
@@ -60,15 +61,15 @@ class CmdArg {
             try {
                 Class<?> clazz = Class.forName(args[0]);
                 try {
-                    plugin.info("Package: " + clazz.getPackage().getName());
+                    plugin.notifier.info("Package: " + clazz.getPackage().getName());
                 } catch (Exception e) {
-                    plugin.info("In default package?");
+                    plugin.notifier.info("In default package?");
                 }
 
-                plugin.info("Methods:");
+                plugin.notifier.info("Methods:");
                 for (Method method : clazz.getMethods()) {
                     if (method.getName().startsWith(args[1]))
-                        plugin.info(" - " + method.getName());
+                        plugin.notifier.info(" - " + method.getName());
                 }
 
                 return info(sender, "Found: " + clazz.getName());
@@ -298,7 +299,7 @@ class CmdArg {
 
         args.put("dbg-opened", new CmdArg((sender, args, flags) -> {
             return info(sender, "Open crates: " + String.join(", ",
-                    plugin.openCrates.values().stream().map(e -> e.getPlayer().getName()).collect(Collectors.toList()).toArray(new String[0])
+                    CrateInstance.CRATES.values().stream().map(e -> e.getPlayer().getName()).collect(Collectors.toList()).toArray(new String[0])
             ));
             //return info(sender, "Updated");
         }, null));
@@ -307,7 +308,12 @@ class CmdArg {
             if (sender instanceof Player) {
                 // title, subtitle, fadein, stay, fadeout
                 Player p = (Player) sender;
-                new Editor().open(p);
+                // todo an opened crate holds a reference to the same object pointed to by CrateInstance.openCrates
+                //  when this object is modified (not reassigned), issues might occur?
+                //if (CrateInstance.openCrates.isEmpty())
+                    new Editor().open(p);
+                //else
+                //    error(sender, "Can only be used when no crates are open");
 
                 return true;
             }
@@ -335,15 +341,15 @@ class CmdArg {
     }
 
     static boolean info(CommandSender sender, String message) {
-        return Main.get().info(sender, message);
+        return plugin.notifier.commandInfo(sender, message);
     }
 
     static boolean warn(CommandSender sender, String message) {
-        return Main.get().warn(sender, message);
+        return plugin.notifier.commandWarn(sender, message);
     }
 
     static boolean error(CommandSender sender, String message) {
-        return Main.get().error(sender, message);
+        return plugin.notifier.commandSevere(sender, message);
     }
 
     //static List<String> getNonDestructiveMatches(String arg, Collection<String> samples, String)

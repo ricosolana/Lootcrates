@@ -1,8 +1,8 @@
 package com.crazicrafter1.lootcrates.listeners;
 
-import com.crazicrafter1.crutils.Version;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
 import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
@@ -25,7 +25,7 @@ public class ListenerOnPlayerJoinQuit extends BaseListener {
             return;
 
         if (plugin.rev == -1) {
-            plugin.warn(p, ChatColor.GRAY + "Unable to detect config revision");
+            plugin.notifier.warn(p, ChatColor.GRAY + "Unable to detect config revision");
             TextComponent message = new TextComponent(ChatColor.GRAY + "To fix this, run: " + ChatColor.DARK_GRAY + "/crates rev <value> " + ChatColor.GOLD + ChatColor.BOLD + "[CLICK]");
 
             message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/crates rev "));
@@ -41,7 +41,7 @@ public class ListenerOnPlayerJoinQuit extends BaseListener {
 
         Player p = e.getPlayer();
 
-        if (plugin.openCrates.containsKey(p.getUniqueId())) {
+        if (CrateInstance.CRATES.containsKey(p.getUniqueId())) {
             LootCratesAPI.closeCrate(p);
         }
     }

@@ -15,7 +15,7 @@ import java.util.Map;
 @Deprecated
 public class LootNBTItem extends LootItem {
 
-    public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.IRON_NUGGET).name("&bAdd NBT item...").lore("&7Use this to save all nbt tags").build();
+    public static final ItemStack EDITOR_ICON = ItemBuilder.copy(Material.IRON_NUGGET).name("&bAdd NBT item...").lore("&7Use this to save all nbt tags").build();
 
     /**
      * Default ctor

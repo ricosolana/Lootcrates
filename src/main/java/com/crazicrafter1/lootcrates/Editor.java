@@ -5,6 +5,7 @@ import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.ui.*;
 import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import com.crazicrafter1.lootcrates.crate.LootSetSettings;
+import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -35,7 +36,7 @@ public class Editor {
     }
 
     // TODO improve firework menu (tacky and plain ATM)
-    public static final Button.Builder IN_OUTLINE = new Button.Builder().icon(p -> ItemBuilder.fromModernMaterial(
+    public static final Button.Builder IN_OUTLINE = new Button.Builder().icon(p -> ItemBuilder.from(
             "GRAY_STAINED_GLASS_PANE").name(" ").build());
 
     public static final String BASE64_DEC = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWM1YThhYThhNGMwMzYwMGEyYjVhNGViNmJlYjUxZDU5MDI2MGIwOTVlZTFjZGFhOTc2YjA5YmRmZTU2NjFjNiJ9fX0=";
@@ -44,6 +45,10 @@ public class Editor {
     public static final Pattern PRIMARY_KEY_PATTERN = Pattern.compile("(?=.*[a-z])[a-z_]+");
 
     public static final Pattern NON_ASCII_PATTERN = Pattern.compile("[^a-zA-Z0-9_.]+");
+
+    private CrateSettings clipboardCrate;
+    private LootSetSettings clipboardLootSet;
+    private ILoot clipboardILoot;
 
     public void open(Player p000) {
         new SimpleMenu.SBuilder(3)
@@ -54,13 +59,13 @@ public class Editor {
                 * Global Crate List *
                 *                   *
                 \* *************** */
-                .childButton(2, 1, p -> ItemBuilder.copyOf(Material.CHEST).name(Lang.BUTTON_CRATES).build(), new ParallaxMenu.PBuilder()
+                .childButton(2, 1, p -> ItemBuilder.copy(Material.CHEST).name(Lang.BUTTON_CRATES).build(), new ParallaxMenu.PBuilder()
                                 .title(p -> Lang.TITLE_CRATES)
                                 .parentButton(4, 5)
                                 // *       *      *
                                 // Add Crate button
                                 // *       *      *
-                                .childButton(5, 5, p -> ItemBuilder.copyOf(Material.NETHER_STAR).name(Lang.BUTTON_NEW_CRATE).build(), new TextMenu.TBuilder()
+                                .childButton(5, 5, p -> ItemBuilder.copy(Material.NETHER_STAR).name(Lang.BUTTON_NEW_CRATE).build(), new TextMenu.TBuilder()
                                         .title(p -> Lang.TITLE_NEW_CRATE)
                                         .leftRaw(p -> LOREM_IPSUM)
                                         .right(p -> Lang.CRATE_FORMAT, p -> Lang.CRATE_FORMAT_LORE)
@@ -91,7 +96,8 @@ public class Editor {
                                         CrateSettings crate = entry.getValue();
                                         result.add(new Button.Builder()
                                                 // https://regexr.com/6fdsi
-                                                .icon(p -> ItemBuilder.copyOf(crate.item).renderAll().lore(String.format(Lang.FORMAT_ID, crate.id) + "\n" + Lang.LMB_EDIT + "\n" + Lang.RMB_DELETE).build())
+                                                .icon(p -> ItemBuilder.copy(crate.item).renderAll().lore(String.format(Lang.FORMAT_ID, crate.id) + "\n" + Lang.LMB_EDIT + "\n" + Lang.RMB_DELETE).build())
+                                                        .mmb(event -> { clipboardCrate = crate; return Result.REFRESH_GRAB(); })
                                                 .child(self, crate.getBuilder(),
                                                         /// RMB - delete crate
                                                         interact -> {
@@ -106,7 +112,7 @@ public class Editor {
                         /*
                          * View LootSets
                          */
-                ).childButton(4, 1, p -> ItemBuilder.fromModernMaterial("EXPERIENCE_BOTTLE").name(Lang.BUTTON_LOOT_SETS).build(), new ParallaxMenu.PBuilder()
+                ).childButton(4, 1, p -> ItemBuilder.from("EXPERIENCE_BOTTLE").name(Lang.BUTTON_LOOT_SETS).build(), new ParallaxMenu.PBuilder()
                         .title(p -> Lang.TITLE_LOOT_SETS)
                         .parentButton(4, 5)
                         .addAll((self, p1) -> {
@@ -116,7 +122,7 @@ public class Editor {
                                  * List all LootSets
                                  */
                                 result.add(new Button.Builder()
-                                        .icon(p -> ItemBuilder.copyOf(lootSet.item).lore(String.format(Lang.FORMAT_ID, lootSet.id) + "\n" + String.format(Lang.LOOT_SET_COUNT, lootSet.loot.size()) + "\n" + Lang.LMB_EDIT + "\n" + Lang.RMB_DELETE).build())
+                                        .icon(p -> ItemBuilder.copy(lootSet.item).lore(String.format(Lang.FORMAT_ID, lootSet.id) + "\n" + String.format(Lang.LOOT_SET_COUNT, lootSet.loot.size()) + "\n" + Lang.LMB_EDIT + "\n" + Lang.RMB_DELETE).build())
                                         .child(self, lootSet.getBuilder(),
                                                 // RMB - delete lootSet
                                                 interact -> {
@@ -134,7 +140,7 @@ public class Editor {
                             }
                             return result;
                         })
-                        .childButton(5, 5, p -> ItemBuilder.copyOf(Material.NETHER_STAR).name(Lang.BUTTON_NEW_LOOT_SET).build(), new TextMenu.TBuilder()
+                        .childButton(5, 5, p -> ItemBuilder.copy(Material.NETHER_STAR).name(Lang.BUTTON_NEW_LOOT_SET).build(), new TextMenu.TBuilder()
                                 .title(p -> Lang.TITLE_NEW_LOOT_SET)
                                 .leftRaw(p -> LOREM_IPSUM) // id
                                 .onClose((player) -> Result.PARENT())
@@ -161,7 +167,7 @@ public class Editor {
                 /*
                  * Global Fireworks Edit
                  */
-                .childButton(6, 1, p -> ItemBuilder.fromModernMaterial("FIREWORK_ROCKET").name(Lang.BUTTON_EDIT_FIREWORK).build(), new SimpleMenu.SBuilder(5)
+                .childButton(6, 1, p -> ItemBuilder.from("FIREWORK_ROCKET").name(Lang.BUTTON_EDIT_FIREWORK).build(), new SimpleMenu.SBuilder(5)
                         .title(p -> Lang.TITLE_FIREWORK)
                         .background()
                         .button(4, 0, IN_OUTLINE)
@@ -169,9 +175,9 @@ public class Editor {
                         .button(5, 1, IN_OUTLINE)
                         .button(4, 2, IN_OUTLINE)
                         .button(1, 1, new Button.Builder()
-                                .icon(p -> ItemBuilder.fromModernMaterial("FIREWORK_STAR").fireworkEffect(Main.get().rewardSettings.fireworkEffect).build()))
+                                .icon(p -> ItemBuilder.from("FIREWORK_STAR").fireworkEffect(Main.get().rewardSettings.fireworkEffect).build()))
                         .button(4, 1, new Button.Builder()
-                                .icon(p -> ItemBuilder.fromModernMaterial("FIREWORK_STAR").fireworkEffect(Main.get().rewardSettings.fireworkEffect).build())
+                                .icon(p -> ItemBuilder.from("FIREWORK_STAR").fireworkEffect(Main.get().rewardSettings.fireworkEffect).build())
                                 .lmb(interact -> {
                                     if (interact.heldItem != null) {
                                         //if (interact.heldItem.getItemMeta() instanceof FireworkEffectMeta meta && meta.hasEffect()) {

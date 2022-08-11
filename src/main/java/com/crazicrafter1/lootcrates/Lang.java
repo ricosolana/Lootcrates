@@ -7,6 +7,10 @@ import java.lang.reflect.Field;
 
 public class Lang {
 
+    public static String OPEN_BUG_1 = "Either a player is cheating or plugin has bugged out";
+    public static String OPEN_BUG_3 = "Player tried opening crate while already viewing crate";
+    public static String OPEN_BUG_4 = "If the player is not cheating, contact dev";
+
     public static String CRUTILS_MISSING = "&8CRUtils not found, install from &n&7" + Main.GITHUB_URL;
 
     public static String CUSTOM_MACROS = "&9Custom macros: ";
@@ -150,9 +154,9 @@ public class Lang {
     public static String CONFIG_SAVE_FAIL = "Failed to save config";
     public static String CONFIG_BACKUP_FAIL = "Failed to make a config backup";
     public static String CONFIG_PURGE_DISABLED = "Config purging is disabled";
-    public static String CONFIG_PURGES = "Deleted %d old configurations";
-    public static String NO_CONFIG_PURGES = "No configurations were deleted";
-    public static String CONFIG_PURGES_FAIL = "Error deleting old backups: %s";
+    public static String CONFIG_DELETES = "Deleted %d old configurations";
+    public static String NO_CONFIG_DELETES = "No configurations were deleted";
+    public static String CONFIG_DELETES_FAIL = "Error deleting old backups: %s";
 
     public static String STATS_SAVE_FAIL = "Error saving player stats: %s";
     public static String STATS_LOAD_FAIL = "Error loading player stats: %s";

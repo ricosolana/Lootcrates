@@ -1,9 +1,10 @@
 package com.crazicrafter1.lootcrates.listeners;
 
 import com.crazicrafter1.crutils.Version;
+import com.crazicrafter1.lootcrates.Lang;
 import com.crazicrafter1.lootcrates.LootCratesAPI;
 import com.crazicrafter1.lootcrates.Main;
-import com.crazicrafter1.lootcrates.crate.Crate;
+import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -51,16 +52,16 @@ public class ListenerOnPlayerInteract extends BaseListener {
         if (crate == null)
             return;
 
-        if (!plugin.openCrates.containsKey(p.getUniqueId())) {
-            if (p.hasPermission("lootcrates.open") && (a == Action.RIGHT_CLICK_AIR || a == Action.RIGHT_CLICK_BLOCK))
+        if (!CrateInstance.CRATES.containsKey(p.getUniqueId())) {
+            if (p.hasPermission(Main.PERM_OPEN) && (a == Action.RIGHT_CLICK_AIR || a == Action.RIGHT_CLICK_BLOCK))
                 LootCratesAPI.openCrate(p, crate.id, p.getInventory().getHeldItemSlot());
-            else if (p.hasPermission("lootcrates.preview") && (a == Action.LEFT_CLICK_AIR || a == Action.LEFT_CLICK_BLOCK))
+            else if (p.hasPermission(Main.PERM_PREVIEW) && (a == Action.LEFT_CLICK_AIR || a == Action.LEFT_CLICK_BLOCK))
                 LootCratesAPI.previewCrate(p, crate.id);
         } else {
-            plugin.errorAdmin("Either a player is exploitative or LootCrates has bugged out: " + p.getName());
-            plugin.errorAdmin("If you think this is expected behaviour, contact dev");
+            plugin.notifier.globalWarn(Lang.OPEN_BUG_1);
+            plugin.notifier.globalWarn("" + p.getName() + ", " + p.getUniqueId());
+            plugin.notifier.globalWarn(Lang.OPEN_BUG_3);
+            plugin.notifier.globalWarn(Lang.OPEN_BUG_4);
         }
     }
-
-
 }

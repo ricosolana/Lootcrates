@@ -19,14 +19,14 @@ import java.util.Map;
 
 public class LootSkriptEvent implements ILoot {
 
-    public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.MAP).name("&aAdd Skript tag...").build();
+    public static final ItemStack EDITOR_ICON = ItemBuilder.copy(Material.MAP).name("&aAdd Skript tag...").build();
 
     String tag;
-    ItemBuilder item;
+    ItemStack item;
 
     public LootSkriptEvent() {
-        tag = "awesome";
-        item = ItemBuilder.copyOf(Material.JUKEBOX).name("my tag");
+        tag = "custom_tag";
+        item = ItemBuilder.copy(Material.JUKEBOX).build();
     }
 
     public LootSkriptEvent(Map<String, Object> result) {
@@ -36,15 +36,17 @@ public class LootSkriptEvent implements ILoot {
         // TODO eventually remove older revisions
         int rev = Main.get().rev;
         if (rev < 2)
-            item = ItemBuilder.mutable((ItemStack) result.get("itemStack"));
+            item = (ItemStack) result.get("itemStack");
+        else if (rev < 6)
+            item = ((ItemBuilder) result.get("item")).build();
         else
-            item = (ItemBuilder) result.get("item");
+            item = (ItemStack) result.get("item");
     }
 
     @Nonnull
     @Override
     public ItemStack getRenderIcon(@Nonnull Player p) {
-        return item.copy().placeholders(p).renderAll().build();
+        return ItemBuilder.copy(item).placeholders(p).renderAll().build();
     }
 
     @Override
@@ -56,7 +58,7 @@ public class LootSkriptEvent implements ILoot {
     @NotNull
     @Override
     public ItemStack getMenuIcon() {
-        return item.buildCopy();
+        return item.clone();
     }
 
     @NotNull
@@ -69,8 +71,8 @@ public class LootSkriptEvent implements ILoot {
     @Override
     public AbstractMenu.Builder getMenuBuilder() {
         return new ItemModifyMenu()
-                .build(item.build(), input -> (this.item = ItemBuilder.mutable(input)).build())
-                .childButton(1, 0, p -> ItemBuilder.copyOf(Material.PAPER).name(Lang.SKRIPT_EVENT_TAG).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
+                .build(item, input -> this.item = input)
+                .childButton(1, 0, p -> ItemBuilder.copy(Material.PAPER).name(Lang.SKRIPT_EVENT_TAG).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.SKRIPT_EVENT_TAG)
                         .onClose((player) -> Result.PARENT())
                         .leftRaw(p -> tag)

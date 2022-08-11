@@ -23,7 +23,7 @@ public class LootCratesAPI {
     static void registerLoot(@Nonnull Class<? extends ILoot> lootClass) {
         lootClasses.put(lootClass, (ItemStack) ReflectionUtil.getFieldInstance(ReflectionUtil.getField(lootClass, "EDITOR_ICON"), null));
         ConfigurationSerialization.registerClass(lootClass, lootClass.getSimpleName());
-        Main.get().info("Registering " + lootClass.getSimpleName());
+        Main.get().notifier.info("Registering " + lootClass.getSimpleName());
     }
 
     @Nullable
@@ -73,7 +73,7 @@ public class LootCratesAPI {
 
     public static boolean openCrate(@Nonnull Player p, @Nonnull String id, int lock_slot) {
         CrateSettings crate = getCrateByID(id);
-        if (crate != null && !Main.get().openCrates.containsKey(p.getUniqueId())) {
+        if (crate != null && !CrateInstance.CRATES.containsKey(p.getUniqueId())) {
             new CrateInstance(p, crate, lock_slot).open();
             return true;
         }
@@ -93,7 +93,7 @@ public class LootCratesAPI {
      * @return whether the close was successful
      */
     public static boolean closeCrate(@Nonnull Player p) {
-        CrateInstance activeCrate = Main.get().openCrates.remove(p.getUniqueId());
+        CrateInstance activeCrate = CrateInstance.CRATES.remove(p.getUniqueId());
         if (activeCrate != null) {
             activeCrate.close();
             return true;

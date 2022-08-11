@@ -22,11 +22,11 @@ public class LootCommand implements ILoot {
     public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.PAPER).name("&7Add command...").build();
 
     public String command;
-    public ItemBuilder item;
+    public ItemStack item;
 
     public LootCommand() {
-        command = "say %player_name% hi there";
-        item = ItemBuilder.copyOf(Material.CACTUS).name("Hello, world!");
+        command = "say %player_name% Hello, world!";
+        item = ItemBuilder.copy(Material.COMPASS).build();
     }
 
     public LootCommand(Map<String, Object> result) {
@@ -35,15 +35,17 @@ public class LootCommand implements ILoot {
         // TODO eventually remove older revisions
         int rev = Main.get().rev;
         if (rev < 2)
-            item = ItemBuilder.mutable((ItemStack) result.get("itemStack"));
+            item = (ItemStack) result.get("itemStack");
+        else if (rev < 6)
+            item = ((ItemBuilder) result.get("item")).build();
         else
-            item = (ItemBuilder) result.get("item");
+            item = (ItemStack) result.get("item");
     }
 
     @Nonnull
     @Override
     public ItemStack getRenderIcon(@Nonnull Player p) {
-        return item.copy()
+        return ItemBuilder.copy(item)
                 .placeholders(p)
                 .renderAll().build();
     }
@@ -51,7 +53,7 @@ public class LootCommand implements ILoot {
     @NotNull
     @Override
     public ItemStack getMenuIcon() {
-        return item.buildCopy();
+        return item.clone();
     }
 
     @NotNull
@@ -73,7 +75,7 @@ public class LootCommand implements ILoot {
     @Override
     public AbstractMenu.Builder getMenuBuilder() {
         return new ItemModifyMenu()
-                .build(item.build(), input -> (this.item = ItemBuilder.mutable(input)).build())
+                .build(item, input -> this.item = input)
                 .childButton(1, 0, p -> ItemBuilder.copyOf(Material.PAPER).name("&6" + Lang.EDIT_COMMAND).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.EDIT_COMMAND)
                         .onClose((player) -> Result.PARENT())

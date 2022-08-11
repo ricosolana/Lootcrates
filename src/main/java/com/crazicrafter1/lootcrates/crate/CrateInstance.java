@@ -19,13 +19,17 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public final class CrateInstance {
 
-    private static final class QSlot {
+    /*
+     * Runtime modifiable stuff
+     */
+    public static HashMap<UUID, CrateInstance> CRATES = new HashMap<>();
+    public static HashSet<UUID> crateFireworks = new HashSet<>();
+
+    private static final class QSlot { //TODO rename
         boolean isHidden = true;
         ILoot randomLoot;
 
@@ -69,7 +73,7 @@ public final class CrateInstance {
     }
 
     public void open() {
-        Main.get().openCrates.put(player.getUniqueId(), this);
+        CRATES.put(player.getUniqueId(), this);
         player.openInventory(inventory);
     }
 
@@ -141,6 +145,7 @@ public final class CrateInstance {
         if (data.fireworkEffect != null) explosion();
 
         // fixme this might be causing the spam click bug
+        //  I think I fixed it already
         // putting into a runnable might fix
         //new BukkitRunnable() {
         //    @Override
@@ -156,7 +161,7 @@ public final class CrateInstance {
         //noinspection ConstantConditions
         Firework firework = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
 
-        Main.get().crateFireworks.add(firework.getUniqueId());
+        crateFireworks.add(firework.getUniqueId());
 
         FireworkMeta fwm = firework.getFireworkMeta();
         fwm.addEffects(data.fireworkEffect);
@@ -167,7 +172,7 @@ public final class CrateInstance {
         new BukkitRunnable() {
             @Override
             public void run() {
-                Main.get().crateFireworks.remove(firework.getUniqueId());
+                crateFireworks.remove(firework.getUniqueId());
             }
         }.runTaskLater(Main.get(), 1);
     }
@@ -201,7 +206,7 @@ public final class CrateInstance {
             }
         }
 
-        Main.get().getStat(player.getUniqueId()).crateInc(this.crate.id);
+        Main.get().getPlayerStat(player.getUniqueId()).crateInc(this.crate.id);
 
         if (state == State.REVEALING)
             Main.get().getServer().getScheduler().cancelTask(taskID);

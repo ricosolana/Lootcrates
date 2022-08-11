@@ -2,7 +2,7 @@ package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.MathUtil;
-import com.crazicrafter1.crutils.ProbabilityUtil;
+import com.crazicrafter1.crutils.RandomUtil;
 import com.crazicrafter1.crutils.ui.*;
 import com.crazicrafter1.lootcrates.Editor;
 import com.crazicrafter1.lootcrates.Lang;
@@ -49,8 +49,8 @@ public abstract class AbstractLootItem implements ILoot {
 
     @Nonnull
     protected ItemStack ofRange(@Nonnull Player p, @Nonnull ItemStack itemStack) {
-        return ItemBuilder.copyOf(itemStack)
-                .amount(ProbabilityUtil.randomRange(min, max))
+        return ItemBuilder.copy(itemStack)
+                .amount(RandomUtil.randomRange(min, max))
                 .placeholders(p)
                 .renderAll()
                 .build();
@@ -80,7 +80,7 @@ public abstract class AbstractLootItem implements ILoot {
                     min = MathUtil.clamp(min + change, 1, max);
                     return Result.REFRESH();
                 })
-                .icon(p -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name(Lang.MINIMUM).skull(Editor.BASE64_DEC).lore(Lang.LMB_DEC + "\n" + Lang.RMB_INC + "\n" + Lang.SHIFT_MUL).amount(min).build()))
+                .icon(p -> ItemBuilder.from("PLAYER_HEAD").name(Lang.MINIMUM).skull(Editor.BASE64_DEC).lore(Lang.LMB_DEC + "\n" + Lang.RMB_INC + "\n" + Lang.SHIFT_MUL).amount(min).build()))
                 // Max
                 .button(x2, y2, new Button.Builder()
                         .lmb(interact -> {
@@ -93,7 +93,7 @@ public abstract class AbstractLootItem implements ILoot {
                             max = MathUtil.clamp(max + change, min, itemStack.getMaxStackSize());
                             return Result.REFRESH();
                         })
-                        .icon(p -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name(Lang.MAXIMUM).skull(Editor.BASE64_INC).lore(Lang.LMB_DEC + "\n" + Lang.RMB_INC + "\n" + Lang.SHIFT_MUL).amount(max).build()));
+                        .icon(p -> ItemBuilder.from("PLAYER_HEAD").name(Lang.MAXIMUM).skull(Editor.BASE64_INC).lore(Lang.LMB_DEC + "\n" + Lang.RMB_INC + "\n" + Lang.SHIFT_MUL).amount(max).build()));
 
     }
 

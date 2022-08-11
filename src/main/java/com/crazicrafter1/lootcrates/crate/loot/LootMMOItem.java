@@ -23,7 +23,7 @@ import static com.crazicrafter1.lootcrates.Editor.*;
 
 public class LootMMOItem extends AbstractLootItem {
 
-    public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.CLOCK).name("&2Add MMOItem...").build();
+    public static final ItemStack EDITOR_ICON = ItemBuilder.copy(Material.CLOCK).name("&2Add MMOItem...").build();
 
     public String type;
     public String name;
@@ -173,7 +173,7 @@ public class LootMMOItem extends AbstractLootItem {
                 // 0: Level, Tier
                 // 1: Random
                 // 2: Scale with player
-                .childButton(7, 1, (p) -> ItemBuilder.copyOf(Material.PAINTING).amount(1).name(Lang.MMO_EDIT_TIERS).lore(getFormatString()).build(), new TextMenu.TBuilder()
+                .childButton(7, 1, (p) -> ItemBuilder.copy(Material.PAINTING).amount(1).name(Lang.MMO_EDIT_TIERS).lore(getFormatString()).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.LOOT_MMO_EDIT_TITLE)
                         .leftRaw((p) -> this.getFormatString())
                         .right(p -> Lang.MMO_FORMAT, p -> Lang.MMO_FORMAT_LORE + "\n&7- exact:2,RARE\n &7- random\n &7- scale")

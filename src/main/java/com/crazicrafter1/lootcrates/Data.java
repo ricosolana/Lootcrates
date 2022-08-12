@@ -5,10 +5,7 @@ import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import com.crazicrafter1.lootcrates.crate.LootSet;
 import com.crazicrafter1.lootcrates.crate.LootSetSettings;
-import com.crazicrafter1.lootcrates.crate.loot.LootItem;
-import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
-import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -38,10 +35,10 @@ public class Data implements ConfigurationSerializable {
             // TODO remove post-migrate
             if (rev == 0) {
                 // 2/20/2022 and before
-                Main.get().cleanAfterDays = (int) args.getOrDefault("cleanHour", 7) / 24;
+                Main.get().cleanPeriod = (int) args.getOrDefault("cleanHour", 7) / 24;
             } else if (rev <= 2) {
                 // after 2/20/22
-                Main.get().cleanAfterDays = (int) args.getOrDefault("cleanAfterDays", 7);
+                Main.get().cleanPeriod = (int) args.getOrDefault("cleanAfterDays", 7);
             }
 
             speed = (int) args.getOrDefault("speed", 4);

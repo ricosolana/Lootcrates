@@ -72,11 +72,11 @@ public class LootSkriptEvent implements ILoot {
     public AbstractMenu.Builder getMenuBuilder() {
         return new ItemModifyMenu()
                 .build(item, input -> this.item = input)
-                .childButton(1, 0, p -> ItemBuilder.copy(Material.PAPER).name(Lang.SKRIPT_EVENT_TAG).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
-                        .title(p -> Lang.SKRIPT_EVENT_TAG)
+                .childButton(1, 0, p -> ItemBuilder.copy(Material.PAPER).name(Lang.ED_LootSets_PROTO_Skript_TI).lore(Lang.ED_LMB_EDIT).build(), new TextMenu.TBuilder()
+                        .title(p -> Lang.ED_LootSets_PROTO_Skript_TI)
                         .onClose((player) -> Result.PARENT())
                         .leftRaw(p -> tag)
-                        .right(p -> Lang.SKRIPT_INPUT_TAG)
+                        .right(p -> Lang.ED_LootSets_PROTO_Skript_R)
                         .onComplete((p, s, b) -> {
                             if (!s.isEmpty()) {
                                 this.tag = s;

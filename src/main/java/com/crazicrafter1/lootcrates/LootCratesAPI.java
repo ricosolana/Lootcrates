@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class LootCratesAPI {
     public static Map<Class<? extends ILoot>, ItemStack> lootClasses = new HashMap<>();
@@ -52,6 +53,11 @@ public class LootCratesAPI {
 
         INBTTagCompound nbt = NMSAPI.getOrCreateNBT(itemStack);
         nbt.setString("Crate", id);
+
+        // this uniqueness will not correctly work if the
+        // crate itemstack is accidentally duplicated under non-exploitative circumstances,
+        // such as in middle-clicking,
+        //nbt.setUUID("CrateUUID", UUID.randomUUID()); // for dupe prevention
         return nbt.setNBT(itemStack);
 
         //ItemStackMirror nmsStack = new ItemStackMirror(itemStack);

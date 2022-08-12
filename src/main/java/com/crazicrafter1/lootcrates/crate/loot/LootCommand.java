@@ -59,7 +59,7 @@ public class LootCommand implements ILoot {
     @NotNull
     @Override
     public String getMenuDesc() {
-        return String.format(Lang.LOOT_COMMAND, command);
+        return String.format(Lang.ED_LootSets_PROTO_BTN_Command, command);
     }
 
     @Override
@@ -76,11 +76,11 @@ public class LootCommand implements ILoot {
     public AbstractMenu.Builder getMenuBuilder() {
         return new ItemModifyMenu()
                 .build(item, input -> this.item = input)
-                .childButton(1, 0, p -> ItemBuilder.copyOf(Material.PAPER).name("&6" + Lang.EDIT_COMMAND).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
-                        .title(p -> Lang.EDIT_COMMAND)
+                .childButton(1, 0, p -> ItemBuilder.copyOf(Material.PAPER).name("&6" + Lang.ED_LootSets_PROTO_Command_TI).lore(Lang.ED_LMB_EDIT).build(), new TextMenu.TBuilder()
+                        .title(p -> Lang.ED_LootSets_PROTO_Command_TI)
                         .onClose((player) -> Result.PARENT())
                         .leftRaw(p ->  command)
-                        .right(p -> Lang.INPUT_COMMAND, p -> String.format(Lang.SUPPORT_PLUGIN_X, "PlaceholderAPI"))
+                        .right(p -> Lang.ED_LootSets_PROTO_Command_R, p -> String.format(Lang.SUPPORT_PLUGIN_X, "PlaceholderAPI"))
                         .onComplete((p, s, b) -> {
                             if (!s.isEmpty()) {
                                 this.command = s;

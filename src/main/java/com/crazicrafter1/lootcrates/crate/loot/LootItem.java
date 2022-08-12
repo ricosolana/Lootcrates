@@ -19,11 +19,16 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
 
-public class LootItem extends AbstractLootItem {
+public class LootItem extends AbstractLootItem implements Cloneable {
 
-    public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.GOLD_NUGGET).name("&6Add item...").build();
+    public static final ItemStack EDITOR_ICON = ItemBuilder.copy(Material.GOLD_NUGGET).name("&6Add item...").build();
 
     public ItemStack item;
+
+    @Override
+    protected Object clone() {
+        return new LootItem(item.clone());
+    }
 
     /**
      * Default ctor

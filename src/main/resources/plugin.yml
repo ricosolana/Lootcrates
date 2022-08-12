@@ -2,7 +2,8 @@ name: Lootcrates
 version: ${version}
 main: com.crazicrafter1.lootcrates.Main
 api-version: 1.13
-softdepend: [ CRUtils, QualityArmory, Skript, MMOItems ]
+depend: [ CRUtils ]
+softdepend: [ QualityArmory, Skript, MMOItems ]
 authors: [ crazicrafter1 ]
 commands:
   lootcrates:
@@ -16,7 +17,7 @@ permissions:
     default: true
   lootcrates.preview:
     description: Allow crates to be previewed
-    default: true
+    default: false
   lootcrates.admin:
     description: Allows access to /crates command
     default: op

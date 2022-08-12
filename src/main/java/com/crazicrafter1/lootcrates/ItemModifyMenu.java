@@ -23,16 +23,16 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
 
     public ItemModifyMenu build(ItemStack it, Function<ItemStack, ItemStack> itemStackFunction) {
         builder = ItemBuilder.copyOf(it);
-        return (ItemModifyMenu) title(p -> Lang.Edit_item)
+        return (ItemModifyMenu) title(p -> Lang.IED_TI)
                 .background()
                 .parentButton(0, 1)
 
                 // descriptor text
                 .button(7, 0, new Button.Builder()
-                        .icon(p -> ItemBuilder.fromModernMaterial("BLACK_STAINED_GLASS_PANE").name("&7Raw colored item").lore("&6--->").build())
+                        .icon(p -> ItemBuilder.from("BLACK_STAINED_GLASS_PANE").name("&7Raw colored item").lore("&6--->").build())
                 )
                 .button(7, 1, new Button.Builder()
-                        .icon(p -> ItemBuilder.fromModernMaterial("BLACK_STAINED_GLASS_PANE").name("&7Fully <#519999>&bco&3lor&9ed</#786DBC> &7item").lore("&6--->").build())
+                        .icon(p -> ItemBuilder.from("BLACK_STAINED_GLASS_PANE").name("&7Fully <#519999>&bco&3lor&9ed</#786DBC> &7item").lore("&6--->").build())
                 )
 
                 // Completely inverted raw text
@@ -51,7 +51,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                         .icon(p -> builder.copy().renderAll().build())
                 )
 
-                .childButton(4, 0, p -> ItemBuilder.copyOf(Material.COMPASS).name("&8Set material").lore("&7Search...").build(), new TextMenu.TBuilder()
+                .childButton(4, 0, p -> ItemBuilder.copy(Material.COMPASS).name("&8Set material").lore("&7Search...").build(), new TextMenu.TBuilder()
                         .title(p -> "Material search")
                         .leftRaw(p -> builder.getModernMaterial().toLowerCase())
                         .onClose((player) -> Result.PARENT())
@@ -60,7 +60,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                                 //builder.material(builder.apply(builder));
                                 // how to set material for legacy items
                                 // set damage value
-                                builder = ItemBuilder.copyOf(itemStackFunction.apply(builder.modernMaterial(s).build()));
+                                builder = ItemBuilder.copy(itemStackFunction.apply(builder.material(s).build()));
                                 return Result.PARENT();
                             } catch (Exception e) {
                                 return Result.TEXT("Does not exist");
@@ -72,18 +72,18 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                         // if no custom name, don't even name
                         // just skip? or make an override to do nothing when null
                         //.icon(p -> builder.copy().name(builder.getName(), ColorUtil.RENDER_ALL, "" + ChatColor.GRAY).build())
-                        .icon(p -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name("&c&l[Item here]").build())
+                        .icon(p -> ItemBuilder.from("PLAYER_HEAD").name("&c&l[Item here]").build())
                         .lmb(interact -> {
                             if (interact.heldItem == null) {
-                                return Result.MESSAGE(Lang.PLACE_ITEM);
+                                return Result.MESSAGE(Lang.IED_Swap_ERROR);
                             }
                             builder = ItemBuilder.copyOf(itemStackFunction.apply(interact.heldItem));
                             return Result.REFRESH_GRAB(); // TODO this is untested
                         }))
 
                 // Edit Name
-                .childButton(3, 1, p -> ItemBuilder.copyOf(Material.NAME_TAG).name(Lang.NAME).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
-                        .title(p -> Lang.NAME)
+                .childButton(3, 1, p -> ItemBuilder.copy(Material.NAME_TAG).name(Lang.IED_BTN_Name).lore(Lang.ED_LMB_EDIT).build(), new TextMenu.TBuilder()
+                        .title(p -> Lang.IED_BTN_Name)
                         .leftRaw(p -> builder.getNameOrLocaleName())
                         .right(p -> Lang.SPECIAL_FORMATTING, p -> Editor.getColorDem(), ColorUtil.AS_IS)
                         .onClose((player) -> Result.PARENT())
@@ -93,12 +93,12 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             } else
                                 builder.name(s, ColorUtil.RENDER_MARKERS);
 
-                            builder = ItemBuilder.copyOf(itemStackFunction.apply(builder.build()));
+                            builder = ItemBuilder.copy(itemStackFunction.apply(builder.build()));
 
                             return Result.PARENT();
                         }))
                 // Edit Lore                                                                                // terrible name
-                .childButton(4, 1, p -> ItemBuilder.copyOf(ItemBuilder.fromModernMaterial("WRITABLE_BOOK")).hideFlags(ItemFlag.HIDE_POTION_EFFECTS).name(Lang.LORE).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
+                .childButton(4, 1, p -> ItemBuilder.from("WRITABLE_BOOK").hideFlags(ItemFlag.HIDE_POTION_EFFECTS).name(Lang.LORE).lore(Lang.ED_LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.LORE)
                         .leftRaw(p -> Util.def(builder.getLoreString(), Editor.LOREM_IPSUM).replace("\n", "\\n"))
                         .right(p -> Lang.SPECIAL_FORMATTING, p -> Editor.getColorDem(), ColorUtil.AS_IS)
@@ -109,12 +109,12 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             } else
                                 builder.lore(s.replace("\\n", "\n"), ColorUtil.RENDER_MARKERS);
 
-                            builder = ItemBuilder.copyOf(itemStackFunction.apply(builder.build()));
+                            builder = ItemBuilder.copy(itemStackFunction.apply(builder.build()));
 
                             return Result.PARENT();
                         }))
                 // Edit CustomModelData
-                .childButton(5, 1, p -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").skull(BASE64_CUSTOM_MODEL_DATA).name(Lang.CUSTOM_MODEL).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
+                .childButton(5, 1, p -> ItemBuilder.from("PLAYER_HEAD").skull(BASE64_CUSTOM_MODEL_DATA).name(Lang.CUSTOM_MODEL).lore(Lang.ED_LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.CUSTOM_MODEL)
                         .leftRaw(p -> {
                             ItemMeta meta = builder.getMeta();
@@ -122,7 +122,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                                 return "" + meta.getCustomModelData();
                             return Editor.LOREM_IPSUM;
                         })
-                        .right(p -> "&7" + Lang.Input_integer)
+                        .right(p -> "&7" + Lang.IED_Model_R)
                         .onClose((player) -> Result.PARENT())
                         .onComplete((p, s, b) -> {
                             if (s.isEmpty())
@@ -136,7 +136,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             }
                             builder.model(i);
 
-                            builder = ItemBuilder.copyOf(itemStackFunction.apply(builder.build()));
+                            builder = ItemBuilder.copy(itemStackFunction.apply(builder.build()));
 
                             return Result.PARENT();
                         }), Version.AT_LEAST_v1_16.a());

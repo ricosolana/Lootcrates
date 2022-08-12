@@ -65,18 +65,18 @@ public class RewardSettings {
     public RewardSettings(ConfigurationSection section) {
         //Map<String, Object> args = section.getValues(false);
         try {
-            this.unSelectedItem = Objects.requireNonNull(section.getItemStack("unSelectedItem"), "null value for 'unSelectedItem'");
-            this.selectedItem = Objects.requireNonNull(section.getItemStack("selectedItem"), "null value for 'selectedItem'");
+            this.unSelectedItem = Objects.requireNonNull(section.getItemStack("unSelectedItem"), String.format(Lang.CONFIG_NULL_VALUE, "unSelectedItem"));
+            this.selectedItem = Objects.requireNonNull(section.getItemStack("selectedItem"), String.format(Lang.CONFIG_NULL_VALUE, "selectedItem"));
 
             this.lootSets = new LinkedHashMap<>();
             for (Map.Entry<String, Object> entry : section.getConfigurationSection("lootSets").getValues(false).entrySet()) {
                 Map<String, Object> itr = ((ConfigurationSection) entry.getValue()).getValues(false);
 
                 String id = entry.getKey();
-                ItemStack itemStack = Objects.requireNonNull((ItemStack) itr.get("item"), "null value for 'lootSets.<" + id + ">.item'");
+                ItemStack itemStack = Objects.requireNonNull((ItemStack) itr.get("item"), String.format(Lang.CONFIG_NULL_VALUE, "'lootSets.<" + id + ">.item'"));
 
                 List<ILoot> loot = (List<ILoot>) itr.get("loot");
-                Validate.isTrue(!loot.contains(null), "null value for 'lootSets.<" + id + ">.loot[]'");
+                Validate.isTrue(!loot.contains(null), String.format(Lang.CONFIG_NULL_VALUE, "'lootSets.<" + id + ">.loot[]'"));
 
                 this.lootSets.put(id, new LootSetSettings(id, itemStack, loot));
             }
@@ -92,12 +92,12 @@ public class RewardSettings {
                                 e -> (Integer) e.getValue()));//
 
                 this.crates.put(id, new CrateSettings(id,
-                        Objects.requireNonNull((String) itr.get("title"), "null value for 'crates.<" + id + ">.title'"),
+                        Objects.requireNonNull((String) itr.get("title"), String.format(Lang.CONFIG_NULL_VALUE, "'crates.<" + id + ">.title'")),
                         (int) itr.get("columns"),
                         (int) itr.get("picks"),
                         Sound.valueOf((String) itr.get("sound")),
                         new WeightedRandomContainer<>(refWeights),
-                        LootCratesAPI.makeCrate(Objects.requireNonNull((ItemStack) itr.get("item"), "null value for 'crates.<" + id + ">.item"), id)));
+                        LootCratesAPI.makeCrate(Objects.requireNonNull((ItemStack) itr.get("item"), String.format(Lang.CONFIG_NULL_VALUE, "'crates.<" + id + ">.item'")), id)));
             }
 
             fireworkEffect = (FireworkEffect) section.get("fireworkEffect");

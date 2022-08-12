@@ -1,72 +1,72 @@
 package com.crazicrafter1.lootcrates;
 
+import com.crazicrafter1.crutils.ColorUtil;
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.lang.reflect.Field;
 
 public class Lang {
+    // ideally a format like 'editor.button.crates' is best, but I want directly referred variables at the same time
 
-    public static String OPEN_BUG_1 = "Either a player is cheating or plugin has bugged out";
-    public static String OPEN_BUG_3 = "Player tried opening crate while already viewing crate";
-    public static String OPEN_BUG_4 = "If the player is not cheating, contact dev";
+    public static String Misc_OpenBug = "Either a player is cheating or plugin has bugged out\n" +
+            "%s tried opening crate while already viewing crate\n" +
+            "If the player is not cheating, contact dev";
 
-    public static String CRUTILS_MISSING = "&8CRUtils not found, install from &n&7" + Main.GITHUB_URL;
+    public static String Custom_Macros = "&9Custom macros: ";
+    public static String Separate_Lore = "&eSeparate lore lines: ";
 
-    public static String CUSTOM_MACROS = "&9Custom macros: ";
-    public static String SEPARATE_LORE = "&eSeparate lore lines: ";
+    public static String Editor_Title = "Editor";
 
-    public static String TITLE_EDITOR = "Editor";
+    public static String ED_BTN_Crates = "&3&lCrates";
+    public static String ED_BTN_LootSets = "&6&lLoot sets";
+    public static String ED_BTN_Firework = "&e&lFirework";
 
-    public static String BUTTON_CRATES = "&3&lCrates";
-    public static String TITLE_CRATES = "Crates";
-    public static String BUTTON_NEW_CRATE = "&6New crate";
-    public static String TITLE_NEW_CRATE = "New crate";
-    public static String CRATE_FORMAT = "Format (strict):";
-    public static String CRATE_FORMAT_LORE = "&7 - Lowercase\n&7 - Optional underscores";
+    public static String ED_Crates_TI = "Crates";
+    public static String ED_Crates_BTN_New = "&6New crate";
+    public static String ED_Crates_New_TI = "New crate";
 
-    public static String BUTTON_LOOT_SETS = "&6&lLoot sets";
-    public static String TITLE_LOOT_SETS = "Loot sets";
-    public static String LOOT_SET_COUNT = "&8%d items";
-    public static String BUTTON_NEW_LOOT_SET = "&6New loot set";
-    public static String TITLE_NEW_LOOT_SET = "New loot set";
+    public static String ED_LootSets_TI = "LootSets";
+    public static String ED_LootSets_BTN_LORE = "&8%d items";
+    public static String ED_LootSets_BTN_New = "&6New loot set";
+    public static String ED_LootSets_New_TI = "New loot set";
 
-    public static String BUTTON_EDIT_FIREWORK = "&e&lFirework";
-    public static String TITLE_FIREWORK = "Firework";
-    public static String REQUIRE_FIREWORK_EFFECT = "&eMust have effect";
+    public static String ED_Firework_TI = "Firework";
+    public static String ED_Firework_ERROR = "&eMust have effect";
 
+    static final String IED_TI = "Edit item";
+    static final String IED_Swap_ERROR = "Must swap with an item";
+    static final String IED_BTN_Name = "&eName";
+    static final String IED_Model_R = "Input an integer";
 
+    public static String ED_LMB_EDIT = "&7LMB: &aEdit";
+    public static String ED_RMB_DELETE = "&7RMB: &cDelete";
+    public static String ED_LMB_DEC = "&7LMB: &c-";
+    public static String ED_RMB_INC = "&7RMB: &a+";
+    public static String ED_MMB_TOGGLE = "&fMMB: &7toggle";
+    public static String ED_SHIFT_MUL = "&7Shift: &r&7x5";
 
-    static final String Edit_item = "Edit item";
-    static final String PLACE_ITEM = "Must swap with an item";
-    static final String NAME = "&eName";
-    static final String Input_integer = "Input an integer";
+    public static String ED_Crates_PROTO_BTN_Columns = "&8&nColumns&r&8: &7%d";
+    public static String ED_Crates_PROTO_BTN_Picks = "&8&nPicks&r&8: &7%d";
+    public static String ED_Crates_PROTO_BTN_Sound = "&a&nSound&r&8: &7%s";
+    public static String ED_Crates_PROTO_Sound_TI = "Sound";
+    public static String ED_Crates_PROTO_Sound_R = "Input a sound";
 
-    public static String LMB_EDIT = "&7LMB: &aEdit";
-    public static String RMB_DELETE = "&7RMB: &cDelete";
-    public static String LMB_DEC = "&7LMB: &c-";
-    public static String RMB_INC = "&7RMB: &a+";
-    public static String MMB_TOGGLE = "&fMMB: &7toggle";
-    public static String SHIFT_MUL = "&7Shift: &r&7x5";
-    public static String BUTTON_COLUMNS = "&8&nColumns&r&8: &7%d";
-    public static String BUTTON_PICKS = "&8&nPicks&r&8: &7%d";
-    public static String BUTTON_SOUND = "&a&nSound&r&8: &7%s";
-    public static String TITLE_SOUND = "Sound";
-    public static String INPUT_SOUND = "Input a sound";
+    public static String ED_INVALID_ID = "Invalid id";
+    public static String ED_DUP_ID = "That id already exists";
 
-    //public static String DUPLICATE = "Invalid or duplicate";
-    public static String INVALID_ID = "Invalid id";
-    public static String DUPLICATE_ID = "That id already exists";
-    //public static String CRATE_ID = "&8id: %s";
-    public static String LOOT_COMMAND = "&7Command: &f%s";
-    public static String EDIT_COMMAND = "Edit command";
-    public static String INPUT_COMMAND = "Input the command";
+    public static String ED_LootSets_PROTO_BTN_Command = "&7Command: &f%s";
+    public static String ED_LootSets_PROTO_Command_TI = "Edit command";
+    public static String ED_LootSets_PROTO_Command_R = "Input the command";
     public static String SUPPORT_PLUGIN_X = "&6Supports %s";
 
-    public static String MINIMUM = "&8&nMinimum";
-    public static String MAXIMUM = "&8&nMaximum";
+    public static String ED_MIN = "&8&nMinimum";
+    public static String ED_MAX = "&8&nMaximum";
 
-    public static String ADD_LOOT = "Add loot";
+    public static String ED_LootSets_PROTO_New_TI = "Add loot";
 
     public static String ERR_NO_CRATES = "No crates are registered";
 
@@ -85,13 +85,22 @@ public class Lang {
 
     public static String LOOT_MMO_EDIT_TITLE = "Edit scales";
 
-    public static String SKRIPT_EVENT_TAG = "&2Event tag";
-    public static String SKRIPT_INPUT_TAG = "Input a tag";
+    public static String ED_LootSets_PROTO_Skript_TI = "Skript event tag";
+    public static String ED_LootSets_PROTO_Skript_R = "Input a tag";
 
-    public static String ITEM_COUNT = "&7Count: &f%d";
-    public static String ITEM_RANGE = "&7Range: &f[%d, %d]";
+    public static String ED_LootSets_PROTO_LootItem_LORE_Count = "&7Count: &f%d";
+    public static String ED_LootSets_PROTO_LootItem_LORE_Range = "&7Range: &f[%d, %d]";
 
     public static String SPECIAL_FORMATTING = "&7&lSpecial formatting";
+
+    public static String UNABLE_TO_CREATE = "Unable to create plugin data folder";
+    public static String UNABLE_TO_METRICS = "Unable to enable bStats Metrics (%s)";
+    public static String SKRIPT_INIT_ERROR = "Unable to init Skript addons";
+    public static String SAVING_DEFAULT = "Saving default %s";
+    public static String CONFIG_SAVING_FAILED = "Failed to save config: %s";
+    public static String FAIL_REV_FILE = "Failed to read or delete rev file: %s";
+    public static String RECOMMEND_CREATIVE = "Some editor features do not work properly outside of creative mode";
+    public static String CONFIG_NULL_VALUE = "null value for '%s'";
 
     public static String LMB_NEW = "&7LMB: &6New";
     public static String NEW_LOOT_SET = "New LootSet";
@@ -149,11 +158,11 @@ public class Lang {
     public static String UPDATE_FAIL = "Error while updating";
     public static String UPDATE_AVAILABLE = "Update %s is available";
 
-    public static String CONFIG_SAVE = "Saving config...";
+    public static String CONFIG_Save = "Saving config...";
     public static String CONFIG_LOAD_FAIL = "Failed to load config: %s";
-    public static String CONFIG_SAVE_FAIL = "Failed to save config";
-    public static String CONFIG_BACKUP_FAIL = "Failed to make a config backup";
-    public static String CONFIG_PURGE_DISABLED = "Config purging is disabled";
+    public static String CONFIG_SaveError = "Failed to save config";
+    public static String CONFIG_BackupError = "Failed to make a config backup";
+    public static String CONFIG_DeleteDisabled = "Config purging is disabled";
     public static String CONFIG_DELETES = "Deleted %d old configurations";
     public static String NO_CONFIG_DELETES = "No configurations were deleted";
     public static String CONFIG_DELETES_FAIL = "Error deleting old backups: %s";
@@ -169,12 +178,12 @@ public class Lang {
     public static String REWARDS_FAIL = "All fallback attempts failed";
     public static String REWARDS_REPORT = "Please report this at %s";
 
-    public static final File langPath = new File(Main.get().getDataFolder(), "lang/");
+    private static final File PATH = new File(Main.get().getDataFolder(), "lang/");
 
-    public static void load(String language) {
+    public static boolean load(@Nonnull CommandSender sender, @Nonnull String language) {
         try {
-            langPath.mkdirs();
-            File file = new File(langPath, language + ".yml");
+            PATH.mkdirs();
+            File file = new File(PATH, language + ".yml");
 
             YamlConfiguration config = new YamlConfiguration();
             config.load(file);
@@ -184,21 +193,28 @@ public class Lang {
                 try {
                     Field field = Lang.class.getDeclaredField(key);
                     if (field.getType() == String.class) {
+                        // in this case if the field from the config is not found, then
                         field.set(null, config.getString(key).replace("\\n", "\n"));
                     }
-                } catch (Exception ignored) {}
+                } catch (NoSuchFieldException e) {
+                    // field from config doesnt exist, meaning that
+                    Main.get().notifier.commandSevere(sender, "Unknown language tag " + key);
+                } catch (Exception ignored) {
+                }
             }
+            return true;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            return false;
         }
     }
 
-    public static boolean save(String language, boolean override) {
-        try {
-            File file = new File(langPath, language + ".yml");
-            if (override || !file.exists()) {
 
-                langPath.mkdirs();
+    public static void save(@Nonnull CommandSender sender, @Nonnull String language, boolean overwrite) {
+        try {
+            File file = new File(PATH, language + ".yml");
+            if (overwrite || !file.exists()) {
+                PATH.mkdirs();
 
                 YamlConfiguration config = new YamlConfiguration();
 
@@ -212,13 +228,13 @@ public class Lang {
                 }
 
                 config.save(file);
+                Main.get().notifier.commandInfo(sender, "Language file %s overwritten");
+            } else {
+                Main.get().notifier.commandSevere(sender, "Failed to overwrite language file");
             }
-            return true;
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return false;
     }
 
 }

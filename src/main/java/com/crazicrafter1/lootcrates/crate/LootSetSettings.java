@@ -12,13 +12,11 @@ import com.crazicrafter1.lootcrates.crate.loot.LootItem;
 import com.crazicrafter1.lootcrates.crate.loot.LootNBTItem;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -79,7 +77,7 @@ public class LootSetSettings {
                         AbstractMenu.Builder menu = a.getMenuBuilder().title(p -> a.getClass().getSimpleName());
 
                         result1.add(new Button.Builder()
-                                .icon(p -> ItemBuilder.copyOf(copy).lore(a.getMenuDesc() + "\n" + Lang.LMB_EDIT + "\n" + Lang.RMB_DELETE).build())
+                                .icon(p -> ItemBuilder.copyOf(copy).lore(a.getMenuDesc() + "\n" + Lang.ED_LMB_EDIT + "\n" + Lang.ED_RMB_DELETE).build())
 
                                 .child(self1, menu, interact -> {
                                     if (loot.size() > 1) {
@@ -93,10 +91,10 @@ public class LootSetSettings {
                     }
                     return result1;
                 })
-                .childButton(3, 5, p -> ItemBuilder.copy(item).name(Lang.EDIT_ICON).lore(Lang.LMB_EDIT).build(), new ItemModifyMenu()
+                .childButton(3, 5, p -> ItemBuilder.copy(item).name(Lang.EDIT_ICON).lore(Lang.ED_LMB_EDIT).build(), new ItemModifyMenu()
                         .build(this.item, itemStack -> this.item = itemStack))
-                .childButton(5, 5, p -> ItemBuilder.copyOf(Material.NETHER_STAR).name(Lang.LMB_NEW).build(), new ParallaxMenu.PBuilder()
-                        .title(p -> Lang.ADD_LOOT)
+                .childButton(5, 5, p -> ItemBuilder.copy(Material.NETHER_STAR).name(Lang.LMB_NEW).build(), new ParallaxMenu.PBuilder()
+                        .title(p -> Lang.ED_LootSets_PROTO_New_TI)
                         .parentButton(4, 5)
                         .addAll((self1, p00) -> {
                             ArrayList<Button> result1 = new ArrayList<>();

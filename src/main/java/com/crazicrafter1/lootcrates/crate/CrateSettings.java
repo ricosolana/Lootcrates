@@ -7,7 +7,6 @@ import com.crazicrafter1.lootcrates.Main;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -25,10 +24,10 @@ public class CrateSettings implements Cloneable {
     public WeightedRandomContainer<LootSetSettings> loot;
     public ItemStack item;
 
-    @Override
-    protected Object clone() {
-        return new CrateSettings(id + CrateInstance.CRATES.size(), title, columns, picks, sound, loot, item.clone());
-    }
+    //@Override
+    //protected Object clone() {
+    //    return new CrateSettings(id + CrateInstance.CRATES.size(), title, columns, picks, sound, loot, item.clone());
+    //}
 
     //todo hmmm kinda ugly
     @Deprecated
@@ -125,7 +124,7 @@ public class CrateSettings implements Cloneable {
                 // *   *   *
                 // Edit Crate ItemStack
                 // *   *   *
-                .childButton(1, 1, p -> ItemBuilder.copy(item).name(Lang.EDIT_ITEM).lore(Lang.LMB_EDIT).build(), new ItemModifyMenu()
+                .childButton(1, 1, p -> ItemBuilder.copy(item).name(Lang.EDIT_ITEM).lore(Lang.ED_LMB_EDIT).build(), new ItemModifyMenu()
                         .build(item, itemStack ->
                                 ItemBuilder.mut(item)
                                         .apply(itemStack,
@@ -133,7 +132,7 @@ public class CrateSettings implements Cloneable {
                                         .build())
                 )
                 // Edit Inventory Title
-                .childButton(3, 1, p -> ItemBuilder.copy(Material.PAPER).name(String.format(Lang.EDIT_TITLE, title)).lore(Lang.LMB_EDIT).build(), new TextMenu.TBuilder()
+                .childButton(3, 1, p -> ItemBuilder.copy(Material.PAPER).name(String.format(Lang.EDIT_TITLE, title)).lore(Lang.ED_LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.TITLE)
                         .leftRaw(p -> title)
                         .onClose((player) -> Result.PARENT())
@@ -150,7 +149,7 @@ public class CrateSettings implements Cloneable {
                 // *   *   *
                 // Edit LootSets
                 // *   *   *
-                .childButton(5, 1, p -> ItemBuilder.fromModernMaterial("EXPERIENCE_BOTTLE").name(Lang.LOOT).lore(Lang.LMB_EDIT).build(), new ParallaxMenu.PBuilder()
+                .childButton(5, 1, p -> ItemBuilder.fromModernMaterial("EXPERIENCE_BOTTLE").name(Lang.LOOT).lore(Lang.ED_LMB_EDIT).build(), new ParallaxMenu.PBuilder()
                         .title(p -> Lang.LOOT)
                         .parentButton(4, 5)
                         .onClose((player) -> Result.PARENT())
@@ -164,10 +163,10 @@ public class CrateSettings implements Cloneable {
                                 if (weight != null) {
                                     b.lore("&7" + getFormattedFraction(lootSet) + "\n" +
                                             "&7" + getFormattedPercent(lootSet) + "\n" +
-                                            Lang.LMB_DEC + "\n" +
-                                            Lang.RMB_INC + "\n" +
-                                            Lang.MMB_TOGGLE + "\n" +
-                                            Lang.SHIFT_MUL).glow(true);
+                                            Lang.ED_LMB_DEC + "\n" +
+                                            Lang.ED_RMB_INC + "\n" +
+                                            Lang.ED_MMB_TOGGLE + "\n" +
+                                            Lang.ED_SHIFT_MUL).glow(true);
                                     btn.mmb(interact -> {
                                         // toggle inclusion
                                         loot.remove(lootSet);
@@ -188,7 +187,7 @@ public class CrateSettings implements Cloneable {
                                         return Result.REFRESH();
                                     });
                                 } else {
-                                    b.lore(Lang.MMB_TOGGLE);
+                                    b.lore(Lang.ED_MMB_TOGGLE);
                                     btn.mmb(interact -> {
                                         loot.add(lootSet, 1);
                                         return Result.REFRESH();
@@ -204,7 +203,7 @@ public class CrateSettings implements Cloneable {
                 // Edit Columns
                 // *   *   *
                 .button(7, 1, new Button.Builder()
-                        .icon(p -> ItemBuilder.copyOf(Material.LADDER).name(String.format(Lang.BUTTON_COLUMNS, columns)).lore(Lang.LMB_DEC + "\n" + Lang.RMB_INC).amount(columns).build())
+                        .icon(p -> ItemBuilder.copyOf(Material.LADDER).name(String.format(Lang.ED_Crates_PROTO_BTN_Columns, columns)).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC).amount(columns).build())
                         .lmb(interact -> {
                             // decrease
                             columns = MathUtil.clamp(columns - 1, 1, 6);
@@ -219,7 +218,7 @@ public class CrateSettings implements Cloneable {
                 // Edit Picks
                 // *   *   *
                 .button(2, 3, new Button.Builder()
-                        .icon(p -> ItemBuilder.copyOf(Material.MELON_SEEDS).name(String.format(Lang.BUTTON_PICKS, picks)).lore(Lang.LMB_DEC + "\n" + Lang.RMB_INC).amount(picks).build())
+                        .icon(p -> ItemBuilder.copyOf(Material.MELON_SEEDS).name(String.format(Lang.ED_Crates_PROTO_BTN_Picks, picks)).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC).amount(picks).build())
                         .lmb(interact -> {
                             // decrease
                             picks = MathUtil.clamp(picks - 1, 1, columns*9);
@@ -233,11 +232,11 @@ public class CrateSettings implements Cloneable {
                 // *   *   *
                 // Edit Pick Sound
                 // *   *   *
-                .childButton(6, 3, p -> ItemBuilder.copyOf(Material.JUKEBOX).name(String.format(Lang.BUTTON_SOUND, sound)).lore(Lang.LMB_EDIT).build(),
+                .childButton(6, 3, p -> ItemBuilder.copyOf(Material.JUKEBOX).name(String.format(Lang.ED_Crates_PROTO_BTN_Sound, sound)).lore(Lang.ED_LMB_EDIT).build(),
                         new TextMenu.TBuilder()
-                                .title(p -> Lang.TITLE_SOUND)
+                                .title(p -> Lang.ED_Crates_PROTO_Sound_TI)
                                 .leftRaw(p -> Editor.LOREM_IPSUM)
-                                .right(p -> Lang.INPUT_SOUND)
+                                .right(p -> Lang.ED_Crates_PROTO_Sound_R)
                                 .onClose((player) -> Result.PARENT())
                                 .onComplete((p, s, b) -> {
                                     try {

@@ -3,6 +3,7 @@ package com.crazicrafter1.lootcrates.crate;
 import com.crazicrafter1.crutils.ColorUtil;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.PlayerLog;
 import com.crazicrafter1.lootcrates.RewardSettings;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import org.bukkit.Bukkit;
@@ -206,7 +207,7 @@ public final class CrateInstance {
             }
         }
 
-        Main.get().getPlayerStat(player.getUniqueId()).crateInc(this.crate.id);
+        PlayerLog.get(player.getUniqueId()).increment(this.crate.id);
 
         if (state == State.REVEALING)
             Main.get().getServer().getScheduler().cancelTask(taskID);

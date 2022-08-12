@@ -1,9 +1,7 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
-import com.crazicrafter1.crutils.ColorUtil;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.MathUtil;
-import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.crutils.ui.*;
 import com.crazicrafter1.lootcrates.Lang;
 import net.Indyuce.mmoitems.MMOItems;
@@ -129,7 +127,7 @@ public class LootMMOItem extends AbstractLootItem {
                             min = MathUtil.clamp(min + change, 1, max);
                             return Result.REFRESH();
                         })
-                        .icon((p) -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name(Lang.MINIMUM).skull(BASE64_DEC).lore(Lang.LMB_DEC + "\n" + Lang.RMB_INC + "\n" + Lang.SHIFT_MUL).amount(min).build()))
+                        .icon((p) -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name(Lang.ED_MIN).skull(BASE64_DEC).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC + "\n" + Lang.ED_SHIFT_MUL).amount(min).build()))
                 // Max
                 .button(5, 1, new Button.Builder()
                         .lmb(interact -> {
@@ -142,7 +140,7 @@ public class LootMMOItem extends AbstractLootItem {
                             max = MathUtil.clamp(max + change, min, getRenderIcon(null).getMaxStackSize());
                             return Result.REFRESH();
                         })
-                        .icon((p) -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name(Lang.MAXIMUM).skull(BASE64_INC).lore(Lang.LMB_DEC + "\n" + Lang.RMB_INC + "\n" + Lang.SHIFT_MUL).amount(max).build()))
+                        .icon((p) -> ItemBuilder.fromModernMaterial("PLAYER_HEAD").name(Lang.ED_MAX).skull(BASE64_INC).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC + "\n" + Lang.ED_SHIFT_MUL).amount(max).build()))
 
                 // Type/Name menu:
                 .childButton(4, 1, (p) -> ItemBuilder.mutable(getRenderIcon(null)).amount(1).name(Lang.ASSIGN_EXACT).lore(type + ":" + name).build(), new TextMenu.TBuilder()

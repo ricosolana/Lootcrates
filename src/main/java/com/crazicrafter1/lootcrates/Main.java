@@ -15,10 +15,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,7 +23,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.List;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,7 +48,6 @@ public class Main extends JavaPlugin
     private final File rewardsConfigFile = new File(getDataFolder(), "rewards.yml");
     private final File configFile = new File(getDataFolder(), "config.yml");
     private final File backupPath = new File(getDataFolder(), "backup");
-    private final File playerStatsPath = new File(getDataFolder(), "players");
 
     private FileConfiguration config = null;
     private FileConfiguration rewardsConfig = null;
@@ -65,11 +59,10 @@ public class Main extends JavaPlugin
     public SkriptAddon addon;
 
     public RewardSettings rewardSettings;
-    public String language;
-    public boolean update;
-    public long cleanAfterDays;
-    private final HashMap<UUID, PlayerStat> playerStats = new HashMap<>();
     public int rev = -1;
+    public String language = "en";
+    public boolean update = false;
+    public int cleanPeriod = 30;
 
     // -1 on indefinite revision
     // TODO eventually remove
@@ -86,9 +79,10 @@ public class Main extends JavaPlugin
                 revConfig.load(revFile);
                 Files.delete(revFile.toPath());
                 return revConfig.getInt("rev", REV_LATEST);
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                notifier.severe(String.format(Lang.FAIL_REV_FILE, e.getMessage()));
+                return -1;
             }
-            //revFile.delete();
         }
 
         config = YamlConfiguration.loadConfiguration(configFile);
@@ -100,19 +94,6 @@ public class Main extends JavaPlugin
         return -1;
     }
 
-    @Nonnull
-    public PlayerStat getPlayerStat(UUID uuid) {
-        // if not present add
-
-        PlayerStat stat = playerStats.get(uuid);
-        if (stat == null) {
-            stat = new PlayerStat();
-            playerStats.put(uuid, stat);
-        }
-
-        return stat;
-    }
-
     private static Main instance;
     public static Main get() {
         return instance;
@@ -122,23 +103,20 @@ public class Main extends JavaPlugin
     public void onEnable() {
         Main.instance = this;
 
-        if (Bukkit.getPluginManager().getPlugin("CRUtils") == null) {
-            String fmt = ChatColor.translateAlternateColorCodes('&', Lang.CRUTILS_MISSING);
-
-            Bukkit.getConsoleSender().sendMessage(fmt);
-            Bukkit.broadcast(fmt, PERM_ADMIN);
-
-            Bukkit.getPluginManager().registerEvents(new Listener() {
-                @EventHandler
-                public void event(PlayerJoinEvent e) {
-                    Player p = e.getPlayer();
-                    if (p.hasPermission(PERM_ADMIN))
-                        p.sendMessage(fmt);
-                }
-            }, this);
-
-            return;
-        }
+        //if (Bukkit.getPluginManager().getPlugin("CRUtils") == null) {
+        //    String fmt = ChatColor.translateAlternateColorCodes('&', String.format(Lang.CORE_DependMissing, "CRUtils", Main.GITHUB_URL));
+        //    Bukkit.getConsoleSender().sendMessage(fmt);
+        //    Bukkit.broadcast(fmt, PERM_ADMIN);
+        //    Bukkit.getPluginManager().registerEvents(new Listener() {
+        //        @EventHandler
+        //        public void event(PlayerJoinEvent e) {
+        //            Player p = e.getPlayer();
+        //            if (p.hasPermission(PERM_ADMIN))
+        //                p.sendMessage(fmt);
+        //        }
+        //    }, this);
+        //    return;
+        //}
 
         notifier = new Notifier(ChatColor.WHITE + "[%sLC" + ChatColor.WHITE + "] %s%s", PERM_ADMIN);
 
@@ -147,7 +125,8 @@ public class Main extends JavaPlugin
         try {
             Files.createDirectories(getDataFolder().toPath());
         } catch (IOException e) {
-            notifier.warn("Unable to create plugin data folder");
+            notifier.warn(Lang.UNABLE_TO_CREATE);
+            e.printStackTrace();
         }
 
         doSplash();
@@ -156,7 +135,7 @@ public class Main extends JavaPlugin
         reloadConfig();
         checkUpdates(); //TODO remove post-migrate
         checkAddons();
-        reloadOtherConfigs(Bukkit.getConsoleSender()); // must be after skript
+        reloadData(Bukkit.getConsoleSender()); // must be after skript
         initMetrics();
 
         new Cmd(this);
@@ -175,6 +154,7 @@ public class Main extends JavaPlugin
     public void onDisable() {
         this.saveConfig();
         this.saveOtherConfigs(Bukkit.getConsoleSender());
+        deleteOldBackups(Bukkit.getConsoleSender());
     }
 
 
@@ -274,7 +254,7 @@ public class Main extends JavaPlugin
             );
 
         } catch (Exception e) {
-            notifier.severe("Unable to enable bStats Metrics (" + e.getMessage() + ")");
+            notifier.severe(String.format(Lang.UNABLE_TO_METRICS, e.getMessage()));
         }
     }
 
@@ -294,13 +274,14 @@ public class Main extends JavaPlugin
         LootCratesAPI.registerLoot(LootCommand.class);
         LootCratesAPI.registerLoot(LootItem.class);
         LootCratesAPI.registerLoot(LootItemCrate.class);
-        LootCratesAPI.registerLoot(LootNBTItem.class);
+        LootCratesAPI.registerLoot(LootNBTItem.class); //TODO remove post-rev
         if (supportQualityArmory) LootCratesAPI.registerLoot(LootItemQA.class);
         if (supportSkript) {
             addon = Skript.registerAddon(this);
             try {
                 addon.loadClasses(getClass().getPackage().getName(), "sk");
             } catch (Exception e) {
+                notifier.severe(Lang.SKRIPT_INIT_ERROR);
                 e.printStackTrace();
             }
             LootCratesAPI.registerLoot(LootSkriptEvent.class);
@@ -312,7 +293,7 @@ public class Main extends JavaPlugin
 
     public void saveDefaultFile(CommandSender sender, File file, boolean replace) {
         if (replace || !Files.exists(file.toPath())) {
-            notifier.info(sender, "Saving default " + file.getName());
+            notifier.info(sender, String.format(Lang.SAVING_DEFAULT, file.getName()));
             this.saveResource(file.getName(), true);
         }
     }
@@ -348,24 +329,32 @@ public class Main extends JavaPlugin
             } else if (rev == 3) {
                 config = YamlConfiguration.loadConfiguration(configFile);
 
-                this.language = config.getString("language", "en");
-                this.update = config.getBoolean("update", false);
-                this.cleanAfterDays = config.getInt("clean-after-days", 7);
-            } else { // 4 and above
+                this.language = config.getString("language", language);
+                this.update = config.getBoolean("update", update);
+                this.cleanPeriod = config.getInt("clean-after-days", cleanPeriod);
+            } else if (rev < 6) { // 4 and above
                 config = YamlConfiguration.loadConfiguration(configFile);
 
                 //this.rev = config.getInt("rev"); //TODO remove findRev() soon to reduce confusion and complexity
-                this.language = config.getString("language", "en");
-                this.update = config.getBoolean("update", false);
-                this.cleanAfterDays = config.getInt("clean-after-days", 7);
+                this.language = config.getString("language", language);
+                this.update = config.getBoolean("update", update);
+                this.cleanPeriod = config.getInt("clean-after-days", cleanPeriod);
+            } else {
+                config = YamlConfiguration.loadConfiguration(configFile);
+
+                //this.rev = config.getInt("rev"); //TODO remove findRev() soon to reduce confusion and complexity
+                this.language = config.getString("language", language);
+                this.update = config.getBoolean("update", update);
+                this.cleanPeriod = config.getInt("clean-period", cleanPeriod);
+                //this.antiExploit = config.getBoolean("anti-exploit", antiExploit);
             }
         } catch (Exception e) {
             notifier.severe(sender, String.format(Lang.CONFIG_LOAD_FAIL, e.getMessage()));
         }
     }
 
-    public void reloadOtherConfigs(@Nonnull CommandSender sender) {
-        loadPlayerStats(sender);
+    public void reloadData(@Nonnull CommandSender sender) {
+        PlayerLog.loadAll(sender);
 
         // TODO remove post-rev removal
         if (rev <= 2) {
@@ -376,6 +365,10 @@ public class Main extends JavaPlugin
 
             rewardsConfig = YamlConfiguration.loadConfiguration(rewardsConfigFile);
         }
+
+        // save default en.yml file
+        Lang.save(sender, "en", false);
+        Lang.load(sender, language);
 
         // TODO remove rev
         if (rev >= 6) {
@@ -422,6 +415,8 @@ public class Main extends JavaPlugin
         Bukkit.getPluginManager().disablePlugin(this);
     }
 
+    // todo config.yml is never modified by plugin, so this is kind of useless
+    // only rev is set
     public void saveConfig(@Nonnull CommandSender sender) {
         // if a backup was successfully made, then save
 
@@ -430,15 +425,17 @@ public class Main extends JavaPlugin
 
         try {
             config = new YamlConfiguration();
-            config.options().header("Using rev: " + rev);
+
             config.set("rev", REV_LATEST);
             config.set("language", language);
             config.set("update", update);
-            config.set("clean-after-days", cleanAfterDays);
+            config.set("clean-period", cleanPeriod);
+            //config.set("anti-exploit", antiExploit);
+
             config.save(configFile);
         } catch (IOException e) {
+            notifier.severe(sender, String.format(Lang.CONFIG_SAVING_FAILED, e.getMessage()));
             e.printStackTrace();
-            notifier.severe(sender, "Failed to save config");
         }
     }
 
@@ -448,31 +445,26 @@ public class Main extends JavaPlugin
         if (rev == -1)
             return;
 
-        savePlayerStats(sender);
+        PlayerLog.saveAll(sender);
 
         if (backupRewards(sender, false)) {
-            notifier.info(sender, Lang.CONFIG_SAVE);
-            //rewardsConfig.set("data", rewardSettings);
+            notifier.info(sender, Lang.CONFIG_Save);
             rewardsConfig = new YamlConfiguration();
             rewardSettings.serialize(rewardsConfig);
 
             try {
                 rewardsConfig.save(rewardsConfigFile);
             } catch (Exception e) {
-                notifier.severe(sender, Lang.CONFIG_SAVE_FAIL);
+                notifier.severe(sender, Lang.CONFIG_SaveError);
                 e.printStackTrace();
             }
-        } else notifier.severe(sender, Lang.CONFIG_BACKUP_FAIL);
-
-        deleteOldBackups(sender);
+        } else notifier.severe(sender, Lang.CONFIG_BackupError);
     }
 
     private static final Pattern BACKUP_PATTERN = Pattern.compile("([0-9])+_\\S+_rewards.zip");
     private void deleteOldBackups(@Nonnull CommandSender sender) {
-        if (cleanAfterDays <= 0) {
-            notifier.info(Lang.CONFIG_PURGE_DISABLED);
+        if (cleanPeriod <= 0)
             return;
-        }
 
         try {
             int deletedCount = 0;
@@ -484,7 +476,7 @@ public class Main extends JavaPlugin
                 Matcher matcher = BACKUP_PATTERN.matcher(name);
                 if (matcher.matches()) {
                     long create = Long.parseLong(name.substring(0, name.indexOf("_")));
-                    if (create < System.currentTimeMillis() - (cleanAfterDays * 24 * 60 * 60 * 1000)) {
+                    if (create < System.currentTimeMillis() - ((long)cleanPeriod * 24 * 60 * 60 * 1000)) {
                         // delete it
                         Files.delete(file.toPath());
                         deletedCount++;
@@ -500,52 +492,7 @@ public class Main extends JavaPlugin
         }
     }
 
-    private void savePlayerStats(@Nonnull CommandSender sender) {
-        try {
-            for (Map.Entry<UUID, PlayerStat> entry : playerStats.entrySet()) {
-                String rawUUID = entry.getKey().toString();
-                YamlConfiguration playerConfig = new YamlConfiguration();
-                for (Map.Entry<String, List<String>> entry1 : entry.getValue().openedCrates.entrySet()) {
-                    playerConfig.set(entry1.getKey(), entry1.getValue());
-                }
-                playerConfig.save(new File(playerStatsPath, rawUUID + ".yml"));
-            }
-        } catch (Exception e) {
-            notifier.severe(sender, String.format(Lang.STATS_SAVE_FAIL, e.getMessage()));
-        }
-    }
 
-    private void loadPlayerStats(@Nonnull CommandSender sender) {
-        try {
-            if (rev < 5)
-                return;
-
-            if (!playerStatsPath.exists() || !playerStatsPath.isDirectory())
-                return;
-
-            // playerStatsPath.mkdirs();
-
-            File[] files = playerStatsPath.listFiles(); // TODO use Paths.walk
-
-            for (File file : files) {
-                try {
-                    String rawUUID = file.getName().replace(".yml", "");
-                    UUID uuid = UUID.fromString(rawUUID);
-
-                    YamlConfiguration playerConfig = new YamlConfiguration();
-                    playerConfig.load(file);
-
-                    PlayerStat stat = new PlayerStat();
-                    playerStats.put(uuid, stat);
-                    for (String id : playerConfig.getKeys(false))
-                        stat.openedCrates.put(id, playerConfig.getStringList(id));
-
-                } catch (Exception ignored) {}
-            }
-        } catch (Exception e) {
-            notifier.severe(sender, String.format(Lang.STATS_LOAD_FAIL, e.getMessage()));
-        }
-    }
 
 
 

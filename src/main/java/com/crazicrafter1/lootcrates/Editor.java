@@ -8,6 +8,7 @@ import com.crazicrafter1.lootcrates.crate.LootSetSettings;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -30,8 +31,8 @@ public class Editor {
     public static String getColorDem() {
         return COLORS
                 +   ColorUtil.renderAll(String.format(Lang.SUPPORT_PLUGIN_X, "PlaceholderAPI") +            "\n"
-                +   Lang.CUSTOM_MACROS + "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "%crate_picks%" + "\n"
-                +   Lang.SEPARATE_LORE + "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "\\n")
+                +   Lang.Custom_Macros + "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "%crate_picks%" + "\n"
+                +   Lang.Separate_Lore + "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "\\n")
                 ;
     }
 
@@ -51,33 +52,36 @@ public class Editor {
     private ILoot clipboardILoot;
 
     public void open(Player p000) {
+        if (p000.getGameMode() != GameMode.CREATIVE) {
+            Main.get().notifier.warn(p000, Lang.RECOMMEND_CREATIVE);
+        }
+
         new SimpleMenu.SBuilder(3)
-                .title(p -> Lang.TITLE_EDITOR)
+                .title(p -> Lang.Editor_Title)
                 .background()
                 /* *************** *\
                 *                   *
                 * Global Crate List *
                 *                   *
                 \* *************** */
-                .childButton(2, 1, p -> ItemBuilder.copy(Material.CHEST).name(Lang.BUTTON_CRATES).build(), new ParallaxMenu.PBuilder()
-                                .title(p -> Lang.TITLE_CRATES)
+                .childButton(2, 1, p -> ItemBuilder.copy(Material.CHEST).name(Lang.ED_BTN_Crates).build(), new ParallaxMenu.PBuilder()
+                                .title(p -> Lang.ED_Crates_TI)
                                 .parentButton(4, 5)
                                 // *       *      *
                                 // Add Crate button
                                 // *       *      *
-                                .childButton(5, 5, p -> ItemBuilder.copy(Material.NETHER_STAR).name(Lang.BUTTON_NEW_CRATE).build(), new TextMenu.TBuilder()
-                                        .title(p -> Lang.TITLE_NEW_CRATE)
+                                .childButton(5, 5, p -> ItemBuilder.copy(Material.NETHER_STAR).name(Lang.ED_Crates_BTN_New).build(), new TextMenu.TBuilder()
+                                        .title(p -> Lang.ED_Crates_New_TI)
                                         .leftRaw(p -> LOREM_IPSUM)
-                                        .right(p -> Lang.CRATE_FORMAT, p -> Lang.CRATE_FORMAT_LORE)
                                         .onClose((player) -> Result.PARENT())
                                         .onComplete((player, s, b) -> {
                                             s = NON_ASCII_PATTERN.matcher(s.replace(" ", "_")).replaceAll("").toLowerCase();
 
                                             if (s.isEmpty())
-                                                return Result.TEXT(Lang.INVALID_ID);
+                                                return Result.TEXT(Lang.ED_INVALID_ID);
 
                                             if (Main.get().rewardSettings.crates.containsKey(s))
-                                                return Result.TEXT(Lang.DUPLICATE_ID);
+                                                return Result.TEXT(Lang.ED_DUP_ID);
 
                                             //if (!PRIMARY_KEY_PATTERN.matcher(s).matches() || Main.get().data.crates.containsKey(s))
                                             //    return Result.TEXT(Lang.DUPLICATE);
@@ -96,8 +100,8 @@ public class Editor {
                                         CrateSettings crate = entry.getValue();
                                         result.add(new Button.Builder()
                                                 // https://regexr.com/6fdsi
-                                                .icon(p -> ItemBuilder.copy(crate.item).renderAll().lore(String.format(Lang.FORMAT_ID, crate.id) + "\n" + Lang.LMB_EDIT + "\n" + Lang.RMB_DELETE).build())
-                                                        .mmb(event -> { clipboardCrate = crate; return Result.REFRESH_GRAB(); })
+                                                .icon(p -> ItemBuilder.copy(crate.item).renderAll().lore(String.format(Lang.FORMAT_ID, crate.id) + "\n" + Lang.ED_LMB_EDIT + "\n" + Lang.ED_RMB_DELETE).build())
+                                                        //.mmb(event -> { clipboardCrate = crate; return Result.REFRESH_GRAB(); })
                                                 .child(self, crate.getBuilder(),
                                                         /// RMB - delete crate
                                                         interact -> {
@@ -112,8 +116,8 @@ public class Editor {
                         /*
                          * View LootSets
                          */
-                ).childButton(4, 1, p -> ItemBuilder.from("EXPERIENCE_BOTTLE").name(Lang.BUTTON_LOOT_SETS).build(), new ParallaxMenu.PBuilder()
-                        .title(p -> Lang.TITLE_LOOT_SETS)
+                ).childButton(4, 1, p -> ItemBuilder.from("EXPERIENCE_BOTTLE").name(Lang.ED_BTN_LootSets).build(), new ParallaxMenu.PBuilder()
+                        .title(p -> Lang.ED_LootSets_TI)
                         .parentButton(4, 5)
                         .addAll((self, p1) -> {
                             ArrayList<Button> result = new ArrayList<>();
@@ -122,7 +126,7 @@ public class Editor {
                                  * List all LootSets
                                  */
                                 result.add(new Button.Builder()
-                                        .icon(p -> ItemBuilder.copy(lootSet.item).lore(String.format(Lang.FORMAT_ID, lootSet.id) + "\n" + String.format(Lang.LOOT_SET_COUNT, lootSet.loot.size()) + "\n" + Lang.LMB_EDIT + "\n" + Lang.RMB_DELETE).build())
+                                        .icon(p -> ItemBuilder.copy(lootSet.item).lore(String.format(Lang.FORMAT_ID, lootSet.id) + "\n" + String.format(Lang.ED_LootSets_BTN_LORE, lootSet.loot.size()) + "\n" + Lang.ED_LMB_EDIT + "\n" + Lang.ED_RMB_DELETE).build())
                                         .child(self, lootSet.getBuilder(),
                                                 // RMB - delete lootSet
                                                 interact -> {
@@ -140,18 +144,18 @@ public class Editor {
                             }
                             return result;
                         })
-                        .childButton(5, 5, p -> ItemBuilder.copy(Material.NETHER_STAR).name(Lang.BUTTON_NEW_LOOT_SET).build(), new TextMenu.TBuilder()
-                                .title(p -> Lang.TITLE_NEW_LOOT_SET)
+                        .childButton(5, 5, p -> ItemBuilder.copy(Material.NETHER_STAR).name(Lang.ED_LootSets_BTN_New).build(), new TextMenu.TBuilder()
+                                .title(p -> Lang.ED_LootSets_New_TI)
                                 .leftRaw(p -> LOREM_IPSUM) // id
                                 .onClose((player) -> Result.PARENT())
                                 .onComplete((player, s, b) -> {
                                     s = NON_ASCII_PATTERN.matcher(s.replace(" ", "_")).replaceAll("").toLowerCase();
 
                                     if (s.isEmpty())
-                                        return Result.TEXT(Lang.INVALID_ID);
+                                        return Result.TEXT(Lang.ED_INVALID_ID);
 
                                     if (Main.get().rewardSettings.crates.containsKey(s))
-                                        return Result.TEXT(Lang.DUPLICATE_ID);
+                                        return Result.TEXT(Lang.ED_DUP_ID);
 
                                     //if (!PRIMARY_KEY_PATTERN.matcher(s).matches() || Main.get().data.lootSets.containsKey(s))
                                     //    return Result.TEXT(Lang.DUPLICATE);
@@ -167,8 +171,8 @@ public class Editor {
                 /*
                  * Global Fireworks Edit
                  */
-                .childButton(6, 1, p -> ItemBuilder.from("FIREWORK_ROCKET").name(Lang.BUTTON_EDIT_FIREWORK).build(), new SimpleMenu.SBuilder(5)
-                        .title(p -> Lang.TITLE_FIREWORK)
+                .childButton(6, 1, p -> ItemBuilder.from("FIREWORK_ROCKET").name(Lang.ED_BTN_Firework).build(), new SimpleMenu.SBuilder(5)
+                        .title(p -> Lang.ED_Firework_TI)
                         .background()
                         .button(4, 0, IN_OUTLINE)
                         .button(3, 1, IN_OUTLINE)
@@ -188,7 +192,7 @@ public class Editor {
                                                 return Result.REFRESH();
                                             }
                                         }
-                                        interact.player.sendMessage(Lang.REQUIRE_FIREWORK_EFFECT);
+                                        interact.player.sendMessage(Lang.ED_Firework_ERROR);
                                     }
 
                                     return Result.GRAB();

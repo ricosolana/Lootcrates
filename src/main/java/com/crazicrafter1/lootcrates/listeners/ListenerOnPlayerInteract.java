@@ -58,10 +58,7 @@ public class ListenerOnPlayerInteract extends BaseListener {
             else if (p.hasPermission(Main.PERM_PREVIEW) && (a == Action.LEFT_CLICK_AIR || a == Action.LEFT_CLICK_BLOCK))
                 LootCratesAPI.previewCrate(p, crate.id);
         } else {
-            plugin.notifier.globalWarn(Lang.OPEN_BUG_1);
-            plugin.notifier.globalWarn("" + p.getName() + ", " + p.getUniqueId());
-            plugin.notifier.globalWarn(Lang.OPEN_BUG_3);
-            plugin.notifier.globalWarn(Lang.OPEN_BUG_4);
+            plugin.notifier.globalWarn(Lang.Misc_OpenBug);
         }
     }
 }

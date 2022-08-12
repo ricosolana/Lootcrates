@@ -1,10 +1,8 @@
 package com.crazicrafter1.lootcrates.cmd;
 
-import com.crazicrafter1.crutils.ColorUtil;
-import com.crazicrafter1.crutils.MutableString;
-import com.crazicrafter1.crutils.TriFunction;
-import com.crazicrafter1.crutils.Util;
+import com.crazicrafter1.crutils.*;
 import com.crazicrafter1.lootcrates.*;
+import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import org.bukkit.Bukkit;
@@ -13,6 +11,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.BiFunction;
@@ -23,26 +23,28 @@ class CmdArg {
 
     private static final Main plugin = Main.get();
 
-    final TriFunction<CommandSender, String[], Set<String>, Boolean> exe;
-    final BiFunction<CommandSender, String[], List<String>> tab;
+    private static void arg(@Nonnull String arg, @Nonnull TriFunction<CommandSender, String[], Set<String>, Boolean> executor) {
+        arg(arg, executor, null);
+    }
 
-    CmdArg(TriFunction<CommandSender, String[], Set<String>, Boolean> exe,
-           BiFunction<CommandSender, String[], List<String>> tab) {
-        this.exe = exe;
-        this.tab = tab;
+    private static void arg(@Nonnull String arg, @Nonnull TriFunction<CommandSender, String[], Set<String>, Boolean> executor,
+                            @Nullable BiFunction<CommandSender, String[], List<String>> tabCompleter) {
+        args.put(arg, new Pair<>(executor, tabCompleter));
     }
 
     /**
      * Command executor and tab-completer map
      */
-    static Map<String, CmdArg> args = new HashMap<>();
+    static Map<String,
+            Pair<TriFunction<CommandSender, String[], Set<String>, Boolean>,
+                    BiFunction<CommandSender, String[], List<String>>>> args = new HashMap<>();
 
     static {
-        args.put("throw", new CmdArg((sender, args, flags) -> {
+        arg("throw", (sender, args, flags) -> {
             throw new RuntimeException("Test exception");
-        }, null));
+        });
 
-        args.put("class", new CmdArg((sender, args, flags) -> {
+        arg("class", (sender, args, flags) -> {
             try {
                 Class<?> clazz = Class.forName(args[0]);
                 try {
@@ -53,11 +55,11 @@ class CmdArg {
                 return info(sender, "Found: " + clazz.getName());
             } catch (Exception e) {
                 e.printStackTrace();
-                return error(sender, e.getMessage());
+                return severe(sender, e.getMessage());
             }
-        }, null));
+        });
 
-        args.put("method", new CmdArg((sender, args, flags) -> {
+        arg("method", (sender, args, flags) -> {
             try {
                 Class<?> clazz = Class.forName(args[0]);
                 try {
@@ -75,42 +77,30 @@ class CmdArg {
                 return info(sender, "Found: " + clazz.getName());
             } catch (Exception e) {
                 e.printStackTrace();
-                return error(sender, e.getMessage());
+                return severe(sender, e.getMessage());
             }
-        }, null));
+        });
 
-        args.put("lang", new CmdArg((sender, args, flags) -> {
-            //String lang = args[0];
-
-            boolean ack = args.length >= 3 && args[2].equals("confirm");
-
-            switch (args[0].toLowerCase()) {
-                case "save":
-                    if (!Lang.save(args[1], ack)) {
-                        error(sender, "Failed to save language, this might be because the file already exists");
-                        error(sender, "you might have to confirm with '/crates lang save en confirm'");
-                    }
-                    break;
-                case "load":
-                    Lang.load(args[1]);
-                    break;
-            }
-
-            //try {
-            //    Lang.load(lang);
-            //    return info(sender, "Successfully loaded language");
-            //} catch (Exception e) {
-            //    return error(sender, "Failed to load language: " + e.getMessage());
-            //}
+        arg("lang", (sender, args, flags) -> {
+            if (Lang.load(sender, args[0]))
+                Main.get().language = args[0];
             return true;
-        }, (sender, args) -> {
+        }
+                // todo autocompleting looks at disk each time, which is slow?
+                /* (sender, args) -> {
+            File[] files = Lang.langPath.listFiles();
+
+            //return Arrays.stream(Lang.langPath.listFiles()).filter(file -> file.getName().endsWith(".yml"));
+
             ArrayList<String> ret = new ArrayList<>();
             if (args.length == 1) {
                 ret.add("save");
                 ret.add("load");
+            } else if (args.length == 2) {
+                ret.add("confirm");
             }
             return ret;
-        }));
+        }*/);
 
         //args.put("populate", new CmdArg((sender, args, flags) -> {
         //    plugin.saveConfig(sender);
@@ -118,9 +108,9 @@ class CmdArg {
         //    return info(sender, Lang.POPULATING);
         //}, null));
 
-        args.put("colors", new CmdArg((sender, args, flags) -> {
+        arg("colors", (sender, args, flags) -> {
             if (args.length == 0)
-                return error(sender, "Usage: crates colors <#883388>Inertia is a property of matter</#1144FF>");
+                return severe(sender, "Usage: crates colors <#883388>Inertia is a property of matter</#1144FF>");
 
             return info(sender, ColorUtil.renderAll(String.join(" ", args)));
         }, (sender, args) -> {
@@ -154,33 +144,33 @@ class CmdArg {
             }
 
             return new ArrayList<>();
-        }));
+        });
 
-        args.put("rev", new CmdArg((sender, args, flags) -> {
+        arg("rev", (sender, args, flags) -> {
             if (args[0].equalsIgnoreCase("latest")) {
                 plugin.rev = Main.REV_LATEST;
                 plugin.reloadConfig(sender);
-                plugin.reloadOtherConfigs(sender);
+                plugin.reloadData(sender);
                 return info(sender, String.format(Lang.READ_W_LATEST_REV, Main.REV_LATEST));
             } else {
                 try {
                     int rev = Integer.parseInt(args[0]);
                     if (rev > Main.REV_LATEST) {
                         // err
-                        return error(sender, String.format(Lang.REV_UNSUPPORTED, rev));
+                        return severe(sender, String.format(Lang.REV_UNSUPPORTED, rev));
                     } if (rev < 0)
                         throw new RuntimeException();
 
                     plugin.rev = rev;
                     plugin.reloadConfig(sender);
-                    plugin.reloadOtherConfigs(sender);
+                    plugin.reloadData(sender);
                     plugin.rev = Main.REV_LATEST;
 
                     CmdArg.args.remove("rev");
 
                     return info(sender, String.format(Lang.READ_W_REV, rev));
                 } catch (Exception e) {
-                    return error(sender, Lang.REV_REQUIRE_INT);
+                    return severe(sender, Lang.REV_REQUIRE_INT);
                 }
             }
         }, (sender, args) -> {
@@ -190,15 +180,15 @@ class CmdArg {
             }
             ret.add("latest");
             return ret;
-        }));
+        });
 
-        args.put("save", new CmdArg((sender, args, flags) -> {
+        arg("save", (sender, args, flags) -> {
             plugin.saveConfig(sender);
             plugin.saveOtherConfigs(sender);
             return info(sender, Lang.CONFIG_SAVED);
-        }, null));
+        });
 
-        args.put("crate", new CmdArg((sender, args, flags) -> {
+        arg("crate", (sender, args, flags) -> {
             CrateSettings crate = LootCratesAPI.getCrateByID(args[0]);
 
             // the best way to represent this command structure would be with a treemap
@@ -219,12 +209,12 @@ class CmdArg {
             //  - ANY_PLAYER (online/offline)
 
             if (crate == null)
-                return error(sender, Lang.ERR_CRATE_UNKNOWN);
+                return severe(sender, Lang.ERR_CRATE_UNKNOWN);
 
             // /crates crate common
             if (args.length == 1) {
                 if (!(sender instanceof Player))
-                    return error(sender, Lang.ERR_PLAYER_CRATE);
+                    return severe(sender, Lang.ERR_PLAYER_CRATE);
                 Util.give((Player) sender, crate.itemStack((Player) sender));
                 return info(sender, String.format(Lang.SELF_GIVE_CRATE, crate.id));
             }
@@ -241,7 +231,7 @@ class CmdArg {
                 }
 
                 if (given == 0)
-                    return error(sender, Lang.ERR_NONE_ONLINE);
+                    return severe(sender, Lang.ERR_NONE_ONLINE);
 
                 return info(sender, String.format(Lang.GIVE_CRATE_ALL, crate.id, given));
             }
@@ -249,7 +239,7 @@ class CmdArg {
             // crates crate common crazicrafter1
             Player p = Bukkit.getServer().getPlayer(args[1]);
             if (p == null)
-                return error(sender, Lang.ERR_PLAYER_UNKNOWN);
+                return severe(sender, Lang.ERR_PLAYER_UNKNOWN);
 
             Util.give(p, crate.itemStack(p));
 
@@ -283,28 +273,28 @@ class CmdArg {
                                 .collect(Collectors.toList()));
             }
             return new ArrayList<>();
-        }));
+        });
 
-        args.put("reset", new CmdArg((sender, args, flags) -> {
+        arg("reset", (sender, args, flags) -> {
             plugin.saveDefaultConfig(sender, true);
             plugin.reloadConfig(sender);
             return info(sender, Lang.CONFIG_LOADED_DEFAULT);
-        }, null));
+        });
 
-        args.put("reload", new CmdArg((sender, args, flags) -> {
+        arg("reload", (sender, args, flags) -> {
             plugin.reloadConfig(sender);
-            plugin.reloadOtherConfigs(sender);
+            plugin.reloadData(sender);
             return info(sender, Lang.CONFIG_LOADED_DISK);
-        }, null));
+        });
 
-        args.put("dbg-opened", new CmdArg((sender, args, flags) -> {
+        arg("dbg-opened", (sender, args, flags) -> {
             return info(sender, "Open crates: " + String.join(", ",
                     CrateInstance.CRATES.values().stream().map(e -> e.getPlayer().getName()).collect(Collectors.toList()).toArray(new String[0])
             ));
             //return info(sender, "Updated");
-        }, null));
+        });
 
-        args.put("editor", new CmdArg((sender, args, flags) -> {
+        arg("editor", (sender, args, flags) -> {
             if (sender instanceof Player) {
                 // title, subtitle, fadein, stay, fadeout
                 Player p = (Player) sender;
@@ -318,12 +308,12 @@ class CmdArg {
                 return true;
             }
 
-            return error(sender, Lang.ERR_NEED_PLAYER);
-        }, null));
+            return severe(sender, Lang.ERR_NEED_PLAYER);
+        });
 
-        args.put("detect", new CmdArg((sender, args, flags) -> {
+        arg("detect", (sender, args, flags) -> {
             if (!(sender instanceof Player))
-                return error(sender, Lang.ERR_NEED_PLAYER);
+                return severe(sender, Lang.ERR_NEED_PLAYER);
 
             Player p = (Player) sender;
 
@@ -336,8 +326,8 @@ class CmdArg {
                     return info(sender, Lang.NOT_CRATE);
                 }
             }
-            return error(sender, Lang.REQUIRE_HELD);
-        }, null));
+            return severe(sender, Lang.REQUIRE_HELD);
+        });
     }
 
     static boolean info(CommandSender sender, String message) {
@@ -348,7 +338,7 @@ class CmdArg {
         return plugin.notifier.commandWarn(sender, message);
     }
 
-    static boolean error(CommandSender sender, String message) {
+    static boolean severe(CommandSender sender, String message) {
         return plugin.notifier.commandSevere(sender, message);
     }
 
@@ -359,7 +349,7 @@ class CmdArg {
     }
 
     static List<String> getMatches(String arg, Collection<String> samples, String format) {
-
+        // todo this doesnt work as expected on vanilla client because the autocomplete is alphabetical
         //Stream<SimilarString> similar = samples.stream().map(s -> new SimilarString(s, arg));
 
         return samples.parallelStream().filter(s -> s.toLowerCase().startsWith(arg.toLowerCase()))

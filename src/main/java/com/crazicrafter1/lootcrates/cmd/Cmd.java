@@ -1,7 +1,10 @@
 package com.crazicrafter1.lootcrates.cmd;
 
+import com.crazicrafter1.crutils.Pair;
+import com.crazicrafter1.crutils.TriFunction;
 import com.crazicrafter1.lootcrates.Lang;
 import com.crazicrafter1.lootcrates.Main;
+import com.google.common.collect.Lists;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,15 +12,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import static com.crazicrafter1.lootcrates.cmd.CmdArg.info;
-import static com.crazicrafter1.lootcrates.cmd.CmdArg.warn;
-import static com.crazicrafter1.lootcrates.cmd.CmdArg.error;
+import static com.crazicrafter1.lootcrates.cmd.CmdArg.severe;
 
 public class Cmd implements CommandExecutor, TabCompleter {
 
@@ -44,30 +44,31 @@ public class Cmd implements CommandExecutor, TabCompleter {
 
         if (Main.get().rev == -1
                 && !args[0].equalsIgnoreCase("rev")) {
-            return error(sender, String.format(Lang.ASSIGN_REV, ChatColor.UNDERLINE + "/crates rev"));
+            return severe(sender, String.format(Lang.ASSIGN_REV, ChatColor.UNDERLINE + "/crates rev"));
         }
 
-        CmdArg cmdArg = CmdArg.args.get(args[0].toLowerCase());
+        final Pair<TriFunction<CommandSender, String[], Set<String>, Boolean>, BiFunction<CommandSender, String[], List<String>>> pair
+                = CmdArg.args.get(args[0].toLowerCase());
 
-        if (cmdArg == null)
-            return error(sender, Lang.ERR_ARG_UNKNOWN);
+        if (pair == null)
+            return severe(sender, Lang.ERR_ARG_UNKNOWN);
 
         try {
             //String[] smartArgs = smartParse(Arrays.copyOfRange(args, 1, args.length)).toArray(new String[0]);
             String[] smartArgs = Arrays.copyOfRange(args, 1, args.length);
-            cmdArg.exe.apply(sender,
+            pair.first.apply(sender,
                     smartArgs,
                     Arrays.stream(smartArgs).filter(arg -> arg.length() >= 2 && arg.startsWith("-")).map(arg -> arg.substring(1)).collect(Collectors.toSet()));
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
             // Just ensure index with an error print
-            return error(sender, String.format(Lang.ERR_ARG_MORE, e.getMessage()));
+            return severe(sender, String.format(Lang.ERR_ARG_MORE, e.getMessage()));
         }
     }
 
     /**
      * Intelligently parse the args to include spaces only when quotes follow
-     *
+     *  todo could be extended, but sort of feature creep
      */
     @Deprecated
     static ArrayList<String> smartParse(String[] args) {
@@ -118,13 +119,14 @@ public class Cmd implements CommandExecutor, TabCompleter {
                 return CmdArg.getMatches(args[0], CmdArg.args.keySet());
         }
 
-        CmdArg arg = CmdArg.args.get(args[0]);
+        final Pair<TriFunction<CommandSender, String[], Set<String>, Boolean>, BiFunction<CommandSender, String[], List<String>>> pair
+                = CmdArg.args.get(args[0]);
 
-        if (arg == null || arg.tab == null)
+        if (pair == null || pair.second == null)
             return new ArrayList<>();
 
         //String[] smartArgs = smartParse(Arrays.copyOfRange(args, 1, args.length)).toArray(new String[0]);
         String[] smartArgs = Arrays.copyOfRange(args, 1, args.length);
-        return arg.tab.apply(sender, smartArgs);
+        return pair.second.apply(sender, smartArgs);
     }
 }

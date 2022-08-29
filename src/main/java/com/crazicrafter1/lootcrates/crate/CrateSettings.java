@@ -4,7 +4,6 @@ import com.crazicrafter1.crutils.*;
 import com.crazicrafter1.crutils.ui.*;
 import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.lootcrates.Main;
-import com.google.common.collect.Maps;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
@@ -26,8 +25,9 @@ public class CrateSettings {
     public ItemStack item;
 
     public CrateSettings copy() {
+        final String strippedId = Main.NUMBER_AT_END.matcher(id).replaceAll("");
         String newId;
-        for (int i=0; Main.get().rewardSettings.crates.containsKey(newId = id + i); i++) {}
+        for (int i=0; Main.get().rewardSettings.crates.containsKey(newId = strippedId + i); i++) {}
 
         return new CrateSettings(newId, title, columns, picks, sound, new WeightedRandomContainer<>(new HashMap<>(loot.getMap())), item.clone());
     }

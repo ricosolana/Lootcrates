@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 public class Main extends JavaPlugin
 {
+    public static final Pattern NUMBER_AT_END = Pattern.compile("\\d+$");
     private static final String SPLASH =
             " __         ______     ______     ______   ______     ______     ______     ______   ______     ______    \n" +
             "/\\ \\       /\\  __ \\   /\\  __ \\   /\\__  _\\ /\\  ___\\   /\\  == \\   /\\  __ \\   /\\__  _\\ /\\  ___\\   /\\  ___\\   \n" +

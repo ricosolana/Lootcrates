@@ -23,7 +23,7 @@ public class LootItem extends AbstractLootItem {
      */
     public LootItem() {
         //noinspection ConstantConditions
-        itemStack = ItemBuilder.copy(RandomUtil.getRandom(Arrays.asList(Material.DIAMOND_PICKAXE, Material.GOLDEN_SWORD, Material.IRON_AXE))).build();
+        itemStack = ItemBuilder.copy(RandomUtil.getRandomOf(Material.DIAMOND_PICKAXE, Material.GOLDEN_SWORD, Material.IRON_AXE)).build();
     }
 
     public LootItem(Map<String, Object> args) {

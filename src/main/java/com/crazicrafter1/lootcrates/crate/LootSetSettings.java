@@ -10,7 +10,6 @@ import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
 import com.crazicrafter1.lootcrates.crate.loot.LootNBTItem;
-import com.google.common.collect.Lists;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -18,7 +17,6 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,10 +27,10 @@ public class LootSetSettings {
     public List<ILoot> loot;
 
     public LootSetSettings copy() {
+        final String strippedId = Main.NUMBER_AT_END.matcher(id).replaceAll("");
         String newId;
-        for (int i=0; Main.get().rewardSettings.lootSets.containsKey(newId = id + i); i++) {}
+        for (int i=0; Main.get().rewardSettings.lootSets.containsKey(newId = strippedId + i); i++) {}
 
-        // todo List<ILoot> must be deep copied, as in every ILoot instance and members must be completely unique
         return new LootSetSettings(newId, item.clone(),
                 loot.stream().map(ILoot::copy).collect(Collectors.toList()));
     }
@@ -89,10 +87,10 @@ public class LootSetSettings {
                         AbstractMenu.Builder menu = a.getMenuBuilder().title(p -> a.getClass().getSimpleName());
 
                         result1.add(new Button.Builder()
-                                .icon(p -> ItemBuilder.copy(copy).lore(a.getMenuDesc() + "\n" + Lang.ED_LMB_EDIT + "\n" + Lang.ED_RMB_DELETE).build())
+                                .icon(p -> ItemBuilder.copy(copy).lore(a.getMenuDesc() + "\n" + Lang.ED_LMB_EDIT + "\n" + Lang.ED_RMB_SHIFT_DELETE).build())
 
                                 .child(self1, menu, interact -> {
-                                    if (loot.size() > 1) {
+                                    if (interact.shift && loot.size() > 1) {
                                         // delete
                                         loot.remove(a);
                                         return Result.REFRESH();

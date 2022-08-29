@@ -2,7 +2,6 @@ package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.lootcrates.ItemModifyMenu;
-import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.nmsapi.NMSAPI;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -27,19 +26,19 @@ public class LootNBTItem extends LootItem {
     public LootNBTItem(Map<String, Object> args) {
         super(args);
 
-        this.item = NMSAPI.getNBT((String) args.get("nbt")).setNBT(this.item);
+        this.itemStack = NMSAPI.getNBT((String) args.get("nbt")).setNBT(this.itemStack);
     }
 
     @Nonnull
     @Override
     public ItemStack getRenderIcon(@Nonnull Player p) {
-        return super.ofRange(p, item);
+        return super.ofRange(p, itemStack);
     }
 
     @Nonnull
     @Override
     public ItemStack getMenuIcon() {
-        return ItemBuilder.copy(item).amount(min == max ? min : 1).build();
+        return ItemBuilder.copy(itemStack).amount(min == max ? min : 1).build();
     }
 
     @Nonnull
@@ -52,7 +51,7 @@ public class LootNBTItem extends LootItem {
     @Override
     public ItemModifyMenu getMenuBuilder() {
         return (ItemModifyMenu) rangeButtons(new ItemModifyMenu()
-                        .build(item, input -> this.item = input),
-                item, 3, 0, 5, 0);
+                        .build(itemStack, input -> this.itemStack = input),
+                itemStack, 3, 0, 5, 0);
     }
 }

@@ -63,9 +63,10 @@ public class Main extends JavaPlugin
     public String language = "en";
     public boolean update = false;
     public int cleanPeriod = 30;
+    public boolean debug = false;
 
     // -1 on indefinite revision
-    // TODO eventually remove
+    // TODO remove rev
     @Deprecated
     private int findRev() {
         //noinspection ConstantConditions
@@ -103,21 +104,6 @@ public class Main extends JavaPlugin
     public void onEnable() {
         Main.instance = this;
 
-        //if (Bukkit.getPluginManager().getPlugin("CRUtils") == null) {
-        //    String fmt = ChatColor.translateAlternateColorCodes('&', String.format(Lang.CORE_DependMissing, "CRUtils", Main.GITHUB_URL));
-        //    Bukkit.getConsoleSender().sendMessage(fmt);
-        //    Bukkit.broadcast(fmt, PERM_ADMIN);
-        //    Bukkit.getPluginManager().registerEvents(new Listener() {
-        //        @EventHandler
-        //        public void event(PlayerJoinEvent e) {
-        //            Player p = e.getPlayer();
-        //            if (p.hasPermission(PERM_ADMIN))
-        //                p.sendMessage(fmt);
-        //        }
-        //    }, this);
-        //    return;
-        //}
-
         notifier = new Notifier(ChatColor.WHITE + "[%sLC" + ChatColor.WHITE + "] %s%s", PERM_ADMIN);
 
         notifier.info(ColorUtil.renderAll(String.format(Lang.JOIN_DISCORD, DISCORD_URL)));
@@ -131,9 +117,8 @@ public class Main extends JavaPlugin
 
         doSplash();
 
-        this.rev = findRev(); //TODO remove post-migrate
         reloadConfig();
-        checkUpdates(); //TODO remove post-migrate
+        checkUpdates();
         checkAddons();
         reloadData(Bukkit.getConsoleSender()); // must be after skript
         initMetrics();
@@ -266,16 +251,16 @@ public class Main extends JavaPlugin
         supportMMOItems = Bukkit.getPluginManager().isPluginEnabled("MMOItems");
 
         // Register serializable
-        ConfigurationSerialization.registerClass(Data.class, "Data"); // TODO try to stray away from this serialize method somehow
+        ConfigurationSerialization.registerClass(Data.class, "Data"); // TODO remove Data de/serializer
         ConfigurationSerialization.registerClass(LootSet.class, "LootSet");
         ConfigurationSerialization.registerClass(Crate.class, "Crate");
 
         // Register loot classes
-        LootCratesAPI.registerLoot(LootCommand.class);
-        LootCratesAPI.registerLoot(LootItem.class);
-        LootCratesAPI.registerLoot(LootItemCrate.class);
-        LootCratesAPI.registerLoot(LootNBTItem.class); //TODO remove post-rev
-        if (supportQualityArmory) LootCratesAPI.registerLoot(LootItemQA.class);
+        LootcratesAPI.registerLoot(LootCommand.class);
+        LootcratesAPI.registerLoot(LootItem.class);
+        LootcratesAPI.registerLoot(LootItemCrate.class);
+        LootcratesAPI.registerLoot(LootNBTItem.class); // TODO remove rev
+        if (supportQualityArmory) LootcratesAPI.registerLoot(LootItemQA.class);
         if (supportSkript) {
             addon = Skript.registerAddon(this);
             try {
@@ -284,9 +269,9 @@ public class Main extends JavaPlugin
                 notifier.severe(Lang.SKRIPT_INIT_ERROR);
                 e.printStackTrace();
             }
-            LootCratesAPI.registerLoot(LootSkriptEvent.class);
+            LootcratesAPI.registerLoot(LootSkriptEvent.class);
         }
-        if (supportMMOItems) LootCratesAPI.registerLoot(LootMMOItem.class);
+        if (supportMMOItems) LootcratesAPI.registerLoot(LootMMOItem.class);
     }
 
 
@@ -314,7 +299,9 @@ public class Main extends JavaPlugin
 
     public void reloadConfig(@Nonnull CommandSender sender) {
         try {
-            //TODO remove older revisions
+            this.rev = findRev(); // TODO remove rev
+
+            // TODO remove rev
             if (rev <= 2) {
                 // load several
                 final File langFile = new File(getDataFolder(), "lang.yml");
@@ -332,21 +319,19 @@ public class Main extends JavaPlugin
                 this.language = config.getString("language", language);
                 this.update = config.getBoolean("update", update);
                 this.cleanPeriod = config.getInt("clean-after-days", cleanPeriod);
-            } else if (rev < 6) { // 4 and above
+            } else if (rev <= 5) { // 4 and above
                 config = YamlConfiguration.loadConfiguration(configFile);
 
-                //this.rev = config.getInt("rev"); //TODO remove findRev() soon to reduce confusion and complexity
                 this.language = config.getString("language", language);
                 this.update = config.getBoolean("update", update);
                 this.cleanPeriod = config.getInt("clean-after-days", cleanPeriod);
             } else {
                 config = YamlConfiguration.loadConfiguration(configFile);
 
-                //this.rev = config.getInt("rev"); //TODO remove findRev() soon to reduce confusion and complexity
                 this.language = config.getString("language", language);
                 this.update = config.getBoolean("update", update);
                 this.cleanPeriod = config.getInt("clean-period", cleanPeriod);
-                //this.antiExploit = config.getBoolean("anti-exploit", antiExploit);
+                this.debug = config.getBoolean("debug", debug);
             }
         } catch (Exception e) {
             notifier.severe(sender, String.format(Lang.CONFIG_LOAD_FAIL, e.getMessage()));
@@ -356,7 +341,7 @@ public class Main extends JavaPlugin
     public void reloadData(@Nonnull CommandSender sender) {
         PlayerLog.loadAll(sender);
 
-        // TODO remove post-rev removal
+        // TODO remove rev
         if (rev <= 2) {
             // swap config.yml contents with rewards config in memory
             rewardsConfig = YamlConfiguration.loadConfiguration(configFile);
@@ -415,8 +400,6 @@ public class Main extends JavaPlugin
         Bukkit.getPluginManager().disablePlugin(this);
     }
 
-    // todo config.yml is never modified by plugin, so this is kind of useless
-    // only rev is set
     public void saveConfig(@Nonnull CommandSender sender) {
         // if a backup was successfully made, then save
 
@@ -430,7 +413,7 @@ public class Main extends JavaPlugin
             config.set("language", language);
             config.set("update", update);
             config.set("clean-period", cleanPeriod);
-            //config.set("anti-exploit", antiExploit);
+            config.set("debug", debug);
 
             config.save(configFile);
         } catch (IOException e) {

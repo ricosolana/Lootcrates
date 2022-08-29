@@ -36,7 +36,7 @@ public class Editor {
                 ;
     }
 
-    // TODO improve firework menu (tacky and plain ATM)
+    // TODO redo fireworks menu
     public static final Button.Builder IN_OUTLINE = new Button.Builder().icon(p -> ItemBuilder.from(
             "GRAY_STAINED_GLASS_PANE").name(" ").build());
 
@@ -47,8 +47,8 @@ public class Editor {
 
     public static final Pattern NON_ASCII_PATTERN = Pattern.compile("[^a-zA-Z0-9_.]+");
 
-    private CrateSettings clipboardCrate;
-    private LootSetSettings clipboardLootSet;
+    //private CrateSettings clipboardCrate;
+    //private LootSetSettings clipboardLootSet;
     private ILoot clipboardILoot;
 
     public void open(Player p000) {
@@ -93,19 +93,27 @@ public class Editor {
 
                                             return Result.PARENT();
                                         })
-                                )
+
+                                )//.childButton()
                                 .addAll((self, p00) -> {
                                     ArrayList<Button> result = new ArrayList<>();
                                     for (Map.Entry<String, CrateSettings> entry : Main.get().rewardSettings.crates.entrySet()) {
                                         CrateSettings crate = entry.getValue();
                                         result.add(new Button.Builder()
                                                 // https://regexr.com/6fdsi
-                                                .icon(p -> ItemBuilder.copy(crate.item).renderAll().lore(String.format(Lang.FORMAT_ID, crate.id) + "\n" + Lang.ED_LMB_EDIT + "\n" + Lang.ED_RMB_DELETE).build())
+                                                .icon(p -> ItemBuilder.copy(crate.item).renderAll().lore(String.format(Lang.FORMAT_ID, crate.id) + "\n" + Lang.ED_LMB_EDIT + "\n" + Lang.ED_RMB_COPY).build())
                                                         //.mmb(event -> { clipboardCrate = crate; return Result.REFRESH_GRAB(); })
                                                 .child(self, crate.getBuilder(),
                                                         /// RMB - delete crate
                                                         interact -> {
-                                                            Main.get().rewardSettings.crates.remove(crate.id);
+                                                            // TODO right-click used to delete the crate
+                                                            //Main.get().rewardSettings.crates.remove(crate.id);
+                                                            //return Result.REFRESH();
+
+                                                            CrateSettings copy = crate.copy();
+                                                            Main.get().rewardSettings.crates.put(copy.id, copy);
+
+                                                            //Main.get().notifier.info(interact.player, "Copied crate to clipboard");
                                                             return Result.REFRESH();
                                                         }
                                                 ).get()
@@ -126,18 +134,24 @@ public class Editor {
                                  * List all LootSets
                                  */
                                 result.add(new Button.Builder()
-                                        .icon(p -> ItemBuilder.copy(lootSet.item).lore(String.format(Lang.FORMAT_ID, lootSet.id) + "\n" + String.format(Lang.ED_LootSets_BTN_LORE, lootSet.loot.size()) + "\n" + Lang.ED_LMB_EDIT + "\n" + Lang.ED_RMB_DELETE).build())
+                                        .icon(p -> ItemBuilder.copy(lootSet.item).lore(String.format(Lang.FORMAT_ID, lootSet.id) + "\n" + String.format(Lang.ED_LootSets_BTN_LORE, lootSet.loot.size()) + "\n" + Lang.ED_LMB_EDIT + "\n" + Lang.ED_RMB_COPY).build())
                                         .child(self, lootSet.getBuilder(),
                                                 // RMB - delete lootSet
                                                 interact -> {
-                                                    if (Main.get().rewardSettings.lootSets.size() > 1) {
-                                                        Main.get().rewardSettings.lootSets.remove(lootSet.id);
-                                                        for (CrateSettings crate : Main.get().rewardSettings.crates.values()) {
-                                                            crate.loot.remove(lootSet);
-                                                        }
-                                                        return Result.REFRESH();
-                                                    }
-                                                    return null;
+                                                    LootSetSettings copy = lootSet.copy();
+                                                    Main.get().rewardSettings.lootSets.put(copy.id, copy);
+
+                                                    //Main.get().notifier.info(interact.player, "Copied crate to clipboard");
+                                                    return Result.REFRESH();
+
+                                                    //if (Main.get().rewardSettings.lootSets.size() > 1) {
+                                                    //    Main.get().rewardSettings.lootSets.remove(lootSet.id);
+                                                    //    for (CrateSettings crate : Main.get().rewardSettings.crates.values()) {
+                                                    //        crate.loot.remove(lootSet);
+                                                    //    }
+                                                    //    return Result.REFRESH();
+                                                    //}
+                                                    //return null;
                                                 }
                                         ).get()
                                 );

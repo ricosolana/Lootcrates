@@ -21,22 +21,22 @@ public class LootItemCrate implements ILoot {
     public String id;
 
     /**
-     * Default ctor
+     * Editor template LootItemCrate ctor
      */
     public LootItemCrate() {
         try {
-            id = Main.get().rewardSettings.crates.keySet().iterator().next();
+            this.id = Main.get().rewardSettings.crates.keySet().iterator().next();
         } catch (NoSuchElementException e) {
             Main.get().notifier.severe(Lang.ERR_NO_CRATES);
         }
     }
 
-    public LootItemCrate(Map<String, Object> args) {
-        id = (String) args.get("crate");
+    protected LootItemCrate(LootItemCrate other) {
+        this.id = other.id;
     }
 
-    public LootItemCrate(CrateSettings crate) {
-        this.id = crate.id;
+    public LootItemCrate(Map<String, Object> args) {
+        id = (String) args.get("crate");
     }
 
     @Override
@@ -97,5 +97,11 @@ public class LootItemCrate implements ILoot {
                     }
                     return result;
                 });
+    }
+
+    @NotNull
+    @Override
+    public LootItemCrate copy() {
+        return new LootItemCrate(this);
     }
 }

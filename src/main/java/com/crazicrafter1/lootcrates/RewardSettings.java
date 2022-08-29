@@ -97,7 +97,7 @@ public class RewardSettings {
                         (int) itr.get("picks"),
                         Sound.valueOf((String) itr.get("sound")),
                         new WeightedRandomContainer<>(refWeights),
-                        LootCratesAPI.makeCrate(Objects.requireNonNull((ItemStack) itr.get("item"), String.format(Lang.CONFIG_NULL_VALUE, "'crates.<" + id + ">.item'")), id)));
+                        LootcratesAPI.getCrateAsItem(Objects.requireNonNull((ItemStack) itr.get("item"), String.format(Lang.CONFIG_NULL_VALUE, "'crates.<" + id + ">.item'")), id)));
             }
 
             fireworkEffect = (FireworkEffect) section.get("fireworkEffect");

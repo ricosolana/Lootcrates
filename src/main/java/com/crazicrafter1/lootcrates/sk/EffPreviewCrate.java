@@ -5,7 +5,7 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
-import com.crazicrafter1.lootcrates.LootCratesAPI;
+import com.crazicrafter1.lootcrates.LootcratesAPI;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
@@ -32,7 +32,7 @@ public class EffPreviewCrate extends Effect {
     protected void execute(Event e) {
         String id = crate.getSingle(e);
         Player p = player.getSingle(e);
-        LootCratesAPI.previewCrate(p, id);
+        LootcratesAPI.displayCratePreview(p, id);
     }
 
     @Override

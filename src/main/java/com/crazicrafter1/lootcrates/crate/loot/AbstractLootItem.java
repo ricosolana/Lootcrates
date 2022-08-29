@@ -15,22 +15,38 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public abstract class AbstractLootItem implements ILoot {
-
     public int min;
     public int max;
 
     public AbstractLootItem() {
-        min = 1;
-        max = 1;
+        this(1, 1);
     }
 
     public AbstractLootItem(Map<String, Object> args) {
-        this.min = (int) args.get("min");
-        this.max = (int) args.get("max");
+        this((int) args.get("min"), (int) args.get("max"));
 
         if (min > max)
             throw new IllegalArgumentException("failed to assert: min <= max");
     }
+
+    protected AbstractLootItem(AbstractLootItem other) {
+        this(other.min, other.max);
+    }
+
+    protected AbstractLootItem(int min, int max) {
+        this.min = min;
+        this.max = max;
+    }
+
+    //public static AbstractLootItem deserialize(Map<String, Object> args) {
+    //    int min = (int) args.get("min");
+    //    int max = (int) args.get("max");
+
+    //    if (min > max)
+    //        throw new IllegalArgumentException("failed to assert: min <= max");
+    //
+    //    return new
+    //}
 
     @Override
     public final boolean execute(@Nonnull CrateInstance activeCrate) {

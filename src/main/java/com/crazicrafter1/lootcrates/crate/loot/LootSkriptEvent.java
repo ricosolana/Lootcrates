@@ -25,8 +25,13 @@ public class LootSkriptEvent implements ILoot {
     ItemStack item;
 
     public LootSkriptEvent() {
-        tag = "custom_tag";
-        item = ItemBuilder.copy(Material.JUKEBOX).build();
+        tag = "my_skript_tag";
+        item = new ItemStack(Material.JUKEBOX);
+    }
+
+    protected LootSkriptEvent(LootSkriptEvent other) {
+        this.tag = other.tag;
+        this.item = other.item;
     }
 
     public LootSkriptEvent(Map<String, Object> result) {
@@ -86,6 +91,7 @@ public class LootSkriptEvent implements ILoot {
                         }));
     }
 
+    @NotNull
     @Override
     public Map<String, Object> serialize() {
         Map<String, Object> result = new LinkedHashMap<>();
@@ -94,5 +100,11 @@ public class LootSkriptEvent implements ILoot {
         result.put("item", item);
 
         return result;
+    }
+
+    @NotNull
+    @Override
+    public LootSkriptEvent copy() {
+        return new LootSkriptEvent(this);
     }
 }

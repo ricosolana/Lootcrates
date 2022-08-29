@@ -22,7 +22,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
     private ItemBuilder builder;
 
     public ItemModifyMenu build(ItemStack it, Function<ItemStack, ItemStack> itemStackFunction) {
-        builder = ItemBuilder.copyOf(it);
+        builder = ItemBuilder.copy(it);
         return (ItemModifyMenu) title(p -> Lang.IED_TI)
                 .background()
                 .parentButton(0, 1)
@@ -77,8 +77,8 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             if (interact.heldItem == null) {
                                 return Result.MESSAGE(Lang.IED_Swap_ERROR);
                             }
-                            builder = ItemBuilder.copyOf(itemStackFunction.apply(interact.heldItem));
-                            return Result.REFRESH_GRAB(); // TODO this is untested
+                            builder = ItemBuilder.copy(itemStackFunction.apply(interact.heldItem));
+                            return Result.REFRESH_GRAB(); // TODO untested
                         }))
 
                 // Edit Name

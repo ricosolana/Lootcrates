@@ -49,4 +49,7 @@ public interface ILoot extends ConfigurationSerializable {
 
     @Nonnull
     String getMenuDesc();
+
+    @Nonnull
+    ILoot copy();
 }

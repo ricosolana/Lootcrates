@@ -189,7 +189,7 @@ class CmdArg {
         });
 
         arg("crate", (sender, args, flags) -> {
-            CrateSettings crate = LootCratesAPI.getCrateByID(args[0]);
+            CrateSettings crate = LootcratesAPI.getCrateByID(args[0]);
 
             // the best way to represent this command structure would be with a treemap
             // crates -> display plugin info
@@ -311,7 +311,7 @@ class CmdArg {
             return severe(sender, Lang.ERR_NEED_PLAYER);
         });
 
-        arg("detect", (sender, args, flags) -> {
+        arg("which", (sender, args, flags) -> {
             if (!(sender instanceof Player))
                 return severe(sender, Lang.ERR_NEED_PLAYER);
 
@@ -319,7 +319,7 @@ class CmdArg {
 
             ItemStack itemStack = p.getInventory().getItemInMainHand();
             if (itemStack.getType() != Material.AIR) {
-                CrateSettings crate = LootCratesAPI.extractCrateFromItem(itemStack);
+                CrateSettings crate = LootcratesAPI.getCrateFromItem(itemStack);
                 if (crate != null) {
                     return info(sender, String.format(Lang.IS_CRATE, crate.id));
                 } else {

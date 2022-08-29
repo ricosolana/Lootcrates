@@ -2,7 +2,7 @@ package com.crazicrafter1.lootcrates.listeners;
 
 import com.crazicrafter1.crutils.Version;
 import com.crazicrafter1.lootcrates.Lang;
-import com.crazicrafter1.lootcrates.LootCratesAPI;
+import com.crazicrafter1.lootcrates.LootcratesAPI;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import com.crazicrafter1.lootcrates.crate.CrateSettings;
@@ -45,7 +45,7 @@ public class ListenerOnPlayerInteract extends BaseListener {
         if (item.getType() == Material.AIR && Version.AT_LEAST_v1_9.a())
             item = p.getInventory().getItemInOffHand();
 
-        CrateSettings crate = LootCratesAPI.extractCrateFromItem(item);
+        CrateSettings crate = LootcratesAPI.getCrateFromItem(item);
         if (crate != null)
             e.setCancelled(true);
 
@@ -54,9 +54,9 @@ public class ListenerOnPlayerInteract extends BaseListener {
 
         if (!CrateInstance.CRATES.containsKey(p.getUniqueId())) {
             if (p.hasPermission(Main.PERM_OPEN) && (a == Action.RIGHT_CLICK_AIR || a == Action.RIGHT_CLICK_BLOCK))
-                LootCratesAPI.openCrate(p, crate.id, p.getInventory().getHeldItemSlot());
+                LootcratesAPI.displayCrateMenu(p, crate.id, p.getInventory().getHeldItemSlot());
             else if (p.hasPermission(Main.PERM_PREVIEW) && (a == Action.LEFT_CLICK_AIR || a == Action.LEFT_CLICK_BLOCK))
-                LootCratesAPI.previewCrate(p, crate.id);
+                LootcratesAPI.displayCratePreview(p, crate.id);
         } else {
             plugin.notifier.globalWarn(Lang.Misc_OpenBug);
         }

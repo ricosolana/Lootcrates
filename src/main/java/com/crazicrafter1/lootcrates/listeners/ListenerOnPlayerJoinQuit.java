@@ -1,6 +1,6 @@
 package com.crazicrafter1.lootcrates.listeners;
 
-import com.crazicrafter1.lootcrates.LootCratesAPI;
+import com.crazicrafter1.lootcrates.LootcratesAPI;
 import com.crazicrafter1.lootcrates.Main;
 import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -42,7 +42,7 @@ public class ListenerOnPlayerJoinQuit extends BaseListener {
         Player p = e.getPlayer();
 
         if (CrateInstance.CRATES.containsKey(p.getUniqueId())) {
-            LootCratesAPI.closeCrate(p);
+            LootcratesAPI.endDisplayCrateMenu(p);
         }
     }
 }

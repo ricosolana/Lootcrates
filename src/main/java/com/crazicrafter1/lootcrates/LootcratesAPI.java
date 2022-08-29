@@ -16,9 +16,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
-public class LootCratesAPI {
+public class LootcratesAPI {
     public static Map<Class<? extends ILoot>, ItemStack> lootClasses = new HashMap<>();
 
     static void registerLoot(@Nonnull Class<? extends ILoot> lootClass) {
@@ -33,37 +32,23 @@ public class LootCratesAPI {
     }
 
     @Nullable
-    public static CrateSettings extractCrateFromItem(@Nullable final ItemStack itemStack) {
+    public static CrateSettings getCrateFromItem(@Nullable final ItemStack itemStack) {
         if (itemStack == null || itemStack.getType() == Material.AIR)
             return null;
 
         INBTTagCompound nbt = NMSAPI.getNBT(itemStack);
         if (nbt == null) return null;
         return getCrateByID(nbt.getString("Crate"));
-
-        //ItemStackMirror nmsStack = new ItemStackMirror(itemStack);
-        //NBTTagCompoundMirror nbt = nmsStack.getTag();
-        //if (nbt == null) return null;
-        //return getCrateByID(nbt.getString("Crate"));
     }
 
     @Nonnull
-    public static ItemStack makeCrate(@Nonnull final ItemStack itemStack, @Nonnull final String id) {
+    public static ItemStack getCrateAsItem(@Nonnull final ItemStack itemStack, @Nonnull final String id) {
         Validate.notNull(id);
 
         INBTTagCompound nbt = NMSAPI.getOrCreateNBT(itemStack);
         nbt.setString("Crate", id);
 
-        // this uniqueness will not correctly work if the
-        // crate itemstack is accidentally duplicated under non-exploitative circumstances,
-        // such as in middle-clicking,
-        //nbt.setUUID("CrateUUID", UUID.randomUUID()); // for dupe prevention
         return nbt.setNBT(itemStack);
-
-        //ItemStackMirror nmsStack = new ItemStackMirror(itemStack);
-        //NBTTagCompoundMirror nbt = nmsStack.getOrCreateTag();
-        //nbt.setString("Crate", id);
-        //return nmsStack.getItemStack();
     }
 
     /**
@@ -73,11 +58,11 @@ public class LootCratesAPI {
      * @return whether the open was successful
      */
     @Deprecated
-    public static boolean openCrate(@Nonnull Player p, @Nonnull String id) {
-        return openCrate(p, id, -1);
+    public static boolean displayCrateMenu(@Nonnull Player p, @Nonnull String id) {
+        return displayCrateMenu(p, id, -1);
     }
 
-    public static boolean openCrate(@Nonnull Player p, @Nonnull String id, int lock_slot) {
+    public static boolean displayCrateMenu(@Nonnull Player p, @Nonnull String id, int lock_slot) {
         CrateSettings crate = getCrateByID(id);
         if (crate != null && !CrateInstance.CRATES.containsKey(p.getUniqueId())) {
             new CrateInstance(p, crate, lock_slot).open();
@@ -87,7 +72,7 @@ public class LootCratesAPI {
         return false;
     }
 
-    public static void previewCrate(@Nonnull Player p, @Nonnull String id) {
+    public static void displayCratePreview(@Nonnull Player p, @Nonnull String id) {
         CrateSettings crate = getCrateByID(id);
         if (crate != null)
             crate.getPreview().open(p);
@@ -98,7 +83,7 @@ public class LootCratesAPI {
      * @param p {@link Player} instance
      * @return whether the close was successful
      */
-    public static boolean closeCrate(@Nonnull Player p) {
+    public static boolean endDisplayCrateMenu(@Nonnull Player p) {
         CrateInstance activeCrate = CrateInstance.CRATES.remove(p.getUniqueId());
         if (activeCrate != null) {
             activeCrate.close();

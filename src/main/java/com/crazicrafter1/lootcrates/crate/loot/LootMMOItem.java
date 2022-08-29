@@ -35,8 +35,12 @@ public class LootMMOItem extends AbstractLootItem {
     // 1: Random
     // 2: Scale with player
 
+    /**
+     * Editor template LootMMOItem ctor
+     */
     // https://git.lumine.io/mythiccraft/mmoitems/-/wikis/Main%20API%20Features
     public LootMMOItem() {
+        //this("SWORD", "CUTLASS", 0, 1, "UNCOMMON");
         type = "SWORD";
         name = "CUTLASS";
 
@@ -44,6 +48,25 @@ public class LootMMOItem extends AbstractLootItem {
         level = 1;
         tier = "UNCOMMON";
     }
+
+    protected LootMMOItem(LootMMOItem other) {
+        //this(other.type, other.name, other.mode, other.level, other.tier);
+        super(other);
+
+        this.type = other.type;
+        this.name = other.name;
+        this.mode = other.mode;
+        this.level = other.level;
+        this.tier = other.tier;
+    }
+
+    //private LootMMOItem(String type, String name, int mode, int level, String tier) {
+    //    this.type = type;
+    //    this.name = name;
+    //    this.mode = mode;
+    //    this.level = level;
+    //    this.tier = tier;
+    //}
 
     public LootMMOItem(Map<String, Object> args) {
         super(args);
@@ -220,4 +243,9 @@ public class LootMMOItem extends AbstractLootItem {
         return (mode == 0) ? "exact:" + level + "," + tier : (mode == 1) ? "random" : "scale";
     }
 
+    @NotNull
+    @Override
+    public LootMMOItem copy() {
+        return new LootMMOItem(this);
+    }
 }

@@ -1,13 +1,8 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.crutils.MathUtil;
 import com.crazicrafter1.crutils.RandomUtil;
-import com.crazicrafter1.crutils.Util;
-import com.crazicrafter1.crutils.ui.AbstractMenu;
 import com.crazicrafter1.lootcrates.*;
-import com.google.common.collect.Lists;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -15,32 +10,20 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Random;
 
-public class LootItem extends AbstractLootItem implements Cloneable {
+public class LootItem extends AbstractLootItem {
 
     public static final ItemStack EDITOR_ICON = ItemBuilder.copy(Material.GOLD_NUGGET).name("&6Add item...").build();
 
-    public ItemStack item;
-
-    @Override
-    protected Object clone() {
-        return new LootItem(item.clone());
-    }
+    public ItemStack itemStack;
 
     /**
-     * Default ctor
+     * Editor template LootItem ctor
      */
     public LootItem() {
         //noinspection ConstantConditions
-        this.item = ItemBuilder.copy(RandomUtil.getRandom(Arrays.asList(Material.DIAMOND_PICKAXE, Material.GOLDEN_SWORD, Material.IRON_AXE))).build();
-    }
-
-    // todo remove post
-    public LootItem(ItemStack itemStack) {
-        this.item = itemStack;
+        itemStack = ItemBuilder.copy(RandomUtil.getRandom(Arrays.asList(Material.DIAMOND_PICKAXE, Material.GOLDEN_SWORD, Material.IRON_AXE))).build();
     }
 
     public LootItem(Map<String, Object> args) {
@@ -49,35 +32,41 @@ public class LootItem extends AbstractLootItem implements Cloneable {
         // TODO eventually remove older revisions
         int rev = Main.get().rev;
         if (rev < 2)
-            this.item = (ItemStack) args.get("itemStack");
+            this.itemStack = (ItemStack) args.get("itemStack");
         else if (rev < 6)
-            this.item = ((ItemBuilder) args.get("item")).build();
+            this.itemStack = ((ItemBuilder) args.get("item")).build();
         else
-            this.item = (ItemStack) args.get("item");
+            this.itemStack = (ItemStack) args.get("item");
 
-        if (item == null) {
+        if (itemStack == null) {
             Main.get().notifier.severe("A LootItem is null in config");
         }
+    }
+
+    // todo make protected after NBTItem removed
+    public LootItem(LootItem other) {
+        super(other);
+        this.itemStack = other.itemStack.clone();
     }
 
     @Nonnull
     @Override
     public ItemStack getRenderIcon(@Nonnull Player p) {
-        return super.ofRange(p, item);
+        return super.ofRange(p, itemStack);
     }
 
     @Nonnull
     @Override
     public ItemStack getMenuIcon() {
         // set count if min==max
-        return ItemBuilder.copy(item).amount(min == max ? min : 1).build();
+        return ItemBuilder.copy(itemStack).amount(min == max ? min : 1).build();
     }
 
     @Nonnull
     @Override
     public Map<String, Object> serialize() {
         Map<String, Object> result = super.serialize();
-        result.put("item", item);
+        result.put("item", itemStack);
         return result;
     }
 
@@ -85,7 +74,13 @@ public class LootItem extends AbstractLootItem implements Cloneable {
     @Override
     public ItemModifyMenu getMenuBuilder() {
         return (ItemModifyMenu) rangeButtons(new ItemModifyMenu()
-                .build(item, input -> this.item = input),
-                item, 3, 0, 5, 0);
+                .build(itemStack, input -> this.itemStack = input),
+                itemStack, 3, 0, 5, 0);
+    }
+
+    @NotNull
+    @Override
+    public LootItem copy() {
+        return new LootItem(this);
     }
 }

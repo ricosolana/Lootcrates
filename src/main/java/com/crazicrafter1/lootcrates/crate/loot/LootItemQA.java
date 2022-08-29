@@ -17,16 +17,21 @@ import java.util.Map;
 
 public class LootItemQA extends AbstractLootItem {
 
-    public static final ItemStack EDITOR_ICON = ItemBuilder.copyOf(Material.CROSSBOW).name("&8Add QualityArmory item...").build();
+    public static final ItemStack EDITOR_ICON = ItemBuilder.copy(Material.CROSSBOW).name("&8Add QualityArmory item...").build();
 
     public String name;
 
     /**
-     * Default ctor
+     * Editor template LootItemQA ctor
      */
     public LootItemQA() {
         // just the first loaded item
         name = QualityArmory.getCustomItems().next().getName();
+    }
+
+    protected LootItemQA(LootItemQA other) {
+        super(other);
+        this.name = other.name;
     }
 
     public LootItemQA(Map<String, Object> args) {
@@ -106,5 +111,11 @@ public class LootItemQA extends AbstractLootItem {
 
                     return result;
                 }), getMenuIcon(), 1, 5, 2, 5);
+    }
+
+    @NotNull
+    @Override
+    public LootItemQA copy() {
+        return new LootItemQA();
     }
 }

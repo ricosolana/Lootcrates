@@ -10,6 +10,7 @@ import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
 import com.crazicrafter1.lootcrates.crate.loot.LootNBTItem;
+import com.google.common.collect.Lists;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -17,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,11 +28,21 @@ public class LootSetSettings {
     public ItemStack item;
     public List<ILoot> loot;
 
+    public LootSetSettings copy() {
+        String newId;
+        for (int i=0; Main.get().rewardSettings.lootSets.containsKey(newId = id + i); i++) {}
+
+        // todo List<ILoot> must be deep copied, as in every ILoot instance and members must be completely unique
+        return new LootSetSettings(newId, item.clone(),
+                loot.stream().map(ILoot::copy).collect(Collectors.toList()));
+    }
+
     // fallback
     public LootSetSettings(String id, ItemStack item, List<ILoot> loot) {
         this.id = id;
         this.item = item;
-        this.loot = loot.stream().map(v -> v instanceof LootNBTItem ? new LootItem(((LootNBTItem) v).item) : v).collect(Collectors.toList());
+        //this.loot = loot.stream().map(v -> v instanceof LootNBTItem ? new LootItem(((LootNBTItem) v).itemStack) : v).collect(Collectors.toList());
+        this.loot = loot.stream().map(v -> v instanceof LootNBTItem ? new LootItem(((LootNBTItem) v)) : v).collect(Collectors.toList());
     }
 
     //public LootSetSettings(String id, Map<String, Object> args) {
@@ -77,7 +89,7 @@ public class LootSetSettings {
                         AbstractMenu.Builder menu = a.getMenuBuilder().title(p -> a.getClass().getSimpleName());
 
                         result1.add(new Button.Builder()
-                                .icon(p -> ItemBuilder.copyOf(copy).lore(a.getMenuDesc() + "\n" + Lang.ED_LMB_EDIT + "\n" + Lang.ED_RMB_DELETE).build())
+                                .icon(p -> ItemBuilder.copy(copy).lore(a.getMenuDesc() + "\n" + Lang.ED_LMB_EDIT + "\n" + Lang.ED_RMB_DELETE).build())
 
                                 .child(self1, menu, interact -> {
                                     if (loot.size() > 1) {
@@ -99,7 +111,7 @@ public class LootSetSettings {
                         .addAll((self1, p00) -> {
                             ArrayList<Button> result1 = new ArrayList<>();
                             for (Map.Entry<Class<? extends ILoot>, ItemStack> entry
-                                    : LootCratesAPI.lootClasses.entrySet()) {
+                                    : LootcratesAPI.lootClasses.entrySet()) {
                                 // todo remove post
                                 if (entry.getKey().equals(LootNBTItem.class))
                                     continue;

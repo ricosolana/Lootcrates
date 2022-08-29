@@ -32,7 +32,7 @@ public class Data implements ConfigurationSerializable {
         try {
             int rev = Main.get().rev;
 
-            // TODO remove post-migrate
+            // TODO remove rev
             if (rev == 0) {
                 // 2/20/2022 and before
                 Main.get().cleanPeriod = (int) args.getOrDefault("cleanHour", 7) / 24;
@@ -64,7 +64,7 @@ public class Data implements ConfigurationSerializable {
                 Crate crate = entry.getValue();
 
                 crate.id = id;
-                crate.item = ItemBuilder.mutable(LootCratesAPI.makeCrate(crate.item.build(), id));
+                crate.item = ItemBuilder.mutable(LootcratesAPI.getCrateAsItem(crate.item.build(), id));
             }
 
             fireworkEffect = (FireworkEffect) args.get("fireworkEffect");
@@ -87,7 +87,7 @@ public class Data implements ConfigurationSerializable {
         throw new UnsupportedOperationException("Do not use!");
     }
 
-    //todo remove post-migrate
+    // TODO remove rev
     public RewardSettings getSettings() {
         Map<String, CrateSettings> crates = this.crates.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getSettings()));

@@ -1,4 +1,15 @@
-rev: 4
+# config save version
+# do not modify unless you know what you are doing
+rev: 6
+
+# what language locale to use (default: en)
 language: en
+
+# whether to auto-update plugin
 update: false
-clean-after-days: 0
+
+# period in days to remove backup files
+clean-period: 30
+
+# debug log mode
+debug: false

@@ -44,6 +44,7 @@ public class Lang {
 
     public static String ED_LMB_EDIT = "&7LMB: &aEdit";
     public static String ED_RMB_DELETE = "&7RMB: &cDelete";
+    public static String ED_RMB_COPY = "&7RMB: &6Copy";
     public static String ED_LMB_DEC = "&7LMB: &c-";
     public static String ED_RMB_INC = "&7RMB: &a+";
     public static String ED_MMB_TOGGLE = "&fMMB: &7toggle";

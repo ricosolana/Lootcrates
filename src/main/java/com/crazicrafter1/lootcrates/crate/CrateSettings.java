@@ -4,6 +4,7 @@ import com.crazicrafter1.crutils.*;
 import com.crazicrafter1.crutils.ui.*;
 import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.lootcrates.Main;
+import com.google.common.collect.Maps;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
@@ -15,7 +16,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class CrateSettings implements Cloneable {
+public class CrateSettings {
     public final String id;
     public String title;
     public int columns;
@@ -24,10 +25,12 @@ public class CrateSettings implements Cloneable {
     public WeightedRandomContainer<LootSetSettings> loot;
     public ItemStack item;
 
-    //@Override
-    //protected Object clone() {
-    //    return new CrateSettings(id + CrateInstance.CRATES.size(), title, columns, picks, sound, loot, item.clone());
-    //}
+    public CrateSettings copy() {
+        String newId;
+        for (int i=0; Main.get().rewardSettings.crates.containsKey(newId = id + i); i++) {}
+
+        return new CrateSettings(newId, title, columns, picks, sound, new WeightedRandomContainer<>(new HashMap<>(loot.getMap())), item.clone());
+    }
 
     //todo hmmm kinda ugly
     @Deprecated
@@ -38,7 +41,7 @@ public class CrateSettings implements Cloneable {
         this.picks = 4;
         this.sound = Sound.ENTITY_EXPERIENCE_ORB_PICKUP;
         this.loot = new WeightedRandomContainer<>();
-        this.item = ItemBuilder.mut(LootCratesAPI.makeCrate(new ItemStack(Material.ENDER_CHEST), id)).name("my new crate").build();
+        this.item = ItemBuilder.mut(LootcratesAPI.getCrateAsItem(new ItemStack(Material.ENDER_CHEST), id)).name("my new crate").build();
     }
 
     //todo remove post-migrate

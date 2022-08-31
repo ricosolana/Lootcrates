@@ -49,6 +49,8 @@ public class Lang {
     public static String ED_RMB_INC = "&7RMB: &a+";
     public static String ED_MMB_TOGGLE = "&fMMB: &7toggle";
     public static String ED_SHIFT_MUL = "&7Shift: &r&7x5";
+    public static String ED_NUM_SUM =       "&7Num: 1   2   3   4";
+    public static String ED_NUM_SUM_DESC =  "     &4-5 &c-1  &a+1 &2+5";
 
     public static String ED_Crates_PROTO_BTN_Columns = "&8&nColumns&r&8: &7%d";
     public static String ED_Crates_PROTO_BTN_Picks = "&8&nPicks&r&8: &7%d";
@@ -102,6 +104,7 @@ public class Lang {
     public static String FAIL_REV_FILE = "Failed to read or delete rev file: %s";
     public static String RECOMMEND_CREATIVE = "Some editor features do not work properly outside of creative mode";
     public static String CONFIG_NULL_VALUE = "null value for '%s'";
+    public static String CONFIG_ZERO_WEIGHT = "zero weight for '%s'";
 
     public static String LMB_NEW = "&7LMB: &6New";
     public static String NEW_LOOT_SET = "New LootSet";
@@ -229,9 +232,9 @@ public class Lang {
                 }
 
                 config.save(file);
-                Main.get().notifier.commandInfo(sender, "Language file %s overwritten");
+                Main.get().notifier.commandInfo(sender, String.format("Language file %s overwritten", language));
             } else {
-                Main.get().notifier.commandSevere(sender, "Failed to overwrite language file");
+                Main.get().notifier.commandInfo(sender, String.format("Language file %s was not overwritten", language));
             }
         } catch (Exception e) {
             e.printStackTrace();

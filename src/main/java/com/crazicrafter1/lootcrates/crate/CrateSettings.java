@@ -75,11 +75,11 @@ public class CrateSettings {
         section.set("weights", loot.getMap().entrySet().stream().collect(Collectors.toMap(e -> e.getKey().id, Map.Entry::getValue)));
     }
 
-    public String getFormattedPercent(LootSetSettings lootGroup) {
+    private String getFormattedPercent(LootSetSettings lootGroup) {
         return String.format("%.02f%%", 100.f * ((float) loot.get(lootGroup)/(float)loot.getWeight()));
     }
 
-    public String getFormattedFraction(LootSetSettings lootGroup) {
+    private String getFormattedFraction(LootSetSettings lootGroup) {
         return String.format("%d/%d", loot.get(lootGroup), loot.getWeight());
     }
 
@@ -162,7 +162,7 @@ public class CrateSettings {
                             for (LootSetSettings lootSet : Main.get().rewardSettings.lootSets.values()) {
                                 Integer weight = loot.get(lootSet);
                                 Button.Builder btn = new Button.Builder();
-                                ItemBuilder b = ItemBuilder.copy(lootSet.item.getType()).name("&8" + lootSet.id);
+                                ItemBuilder b = ItemBuilder.copy(lootSet.itemStack.getType()).name("&8" + lootSet.id);
                                 if (weight != null) {
                                     b.lore("&7" + getFormattedFraction(lootSet) + "\n" +
                                             "&7" + getFormattedPercent(lootSet) + "\n" +
@@ -265,7 +265,7 @@ public class CrateSettings {
                         int weight = entry.getValue();
                         double chance = ((double)weight / (double)loot.getWeight()) * 100.;
                         buttons.add(new Button.Builder()
-                                .icon(p00 -> ItemBuilder.copy(lootSet.item).lore(String.format("&8%.02f%%", chance)).build()).get());
+                                .icon(p00 -> ItemBuilder.copy(lootSet.itemStack).lore(String.format("&8%.02f%%", chance)).build()).get());
                     }
 
                     return buttons;

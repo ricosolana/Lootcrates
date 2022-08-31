@@ -65,6 +65,8 @@ public class RewardSettings {
     public RewardSettings(ConfigurationSection section) {
         //Map<String, Object> args = section.getValues(false);
         try {
+            final int rev = Main.get().rev;
+
             this.unSelectedItem = Objects.requireNonNull(section.getItemStack("unSelectedItem"), String.format(Lang.CONFIG_NULL_VALUE, "unSelectedItem"));
             this.selectedItem = Objects.requireNonNull(section.getItemStack("selectedItem"), String.format(Lang.CONFIG_NULL_VALUE, "selectedItem"));
 
@@ -75,10 +77,26 @@ public class RewardSettings {
                 String id = entry.getKey();
                 ItemStack itemStack = Objects.requireNonNull((ItemStack) itr.get("item"), String.format(Lang.CONFIG_NULL_VALUE, "'lootSets.<" + id + ">.item'"));
 
-                List<ILoot> loot = (List<ILoot>) itr.get("loot");
-                Validate.isTrue(!loot.contains(null), String.format(Lang.CONFIG_NULL_VALUE, "'lootSets.<" + id + ">.loot[]'"));
+                if (rev <= 6) {
+                    List<ILoot> loot = (List<ILoot>) itr.get("loot");
+                    Validate.isTrue(!loot.contains(null), String.format(Lang.CONFIG_NULL_VALUE, "'lootSets.<" + id + ">.loot[]'"));
 
-                this.lootSets.put(id, new LootSetSettings(id, itemStack, loot));
+                    this.lootSets.put(id, new LootSetSettings(id, itemStack, loot));
+                } else {
+                    //List<ConfigurationSection> loot = (List<ConfigurationSection>) itr.get("loot");
+                    final List<Map<String, Object>> list = (List<Map<String, Object>>) itr.get("loot");
+                    Map<ILoot, Integer> result = new HashMap<>();
+                    for (Map<String, Object> sub : list) {
+                        result.put((ILoot) sub.get("loot"), (int) sub.get("weight"));
+                    }
+                    // write the loot as a list containing sub-maps of item, weight
+                    //Map<ILoot, Integer> loot = (Map<ILoot, Integer>) itr.get("loot");
+                    Validate.isTrue(!result.containsKey(null), String.format(Lang.CONFIG_NULL_VALUE, "'lootSets.<" + id + ">.loot.data'"));
+                    Validate.isTrue(!result.containsValue(0), String.format(Lang.CONFIG_ZERO_WEIGHT, "'lootSets.<" + id + ">.loot.weight'"));
+                    Validate.isTrue(!result.containsValue(null), String.format(Lang.CONFIG_NULL_VALUE, "'lootSets.<" + id + ">.loot.weight'"));
+
+                    this.lootSets.put(id, new LootSetSettings(id, itemStack, new WeightedRandomContainer<>(result)));
+                }
             }
 
             this.crates = new LinkedHashMap<>();

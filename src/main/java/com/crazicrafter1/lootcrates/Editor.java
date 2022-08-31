@@ -5,7 +5,6 @@ import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.ui.*;
 import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import com.crazicrafter1.lootcrates.crate.LootSetSettings;
-import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -139,7 +138,7 @@ public class Editor {
                                  * List all LootSets
                                  */
                                 result.add(new Button.Builder()
-                                        .icon(p -> ItemBuilder.copy(lootSet.item).lore(String.format(Lang.FORMAT_ID, lootSet.id) + "\n" + String.format(Lang.ED_LootSets_BTN_LORE, lootSet.loot.size()) + "\n" + Lang.ED_LMB_EDIT + "\n" + Lang.ED_RMB_COPY + "\n" + Lang.ED_RMB_SHIFT_DELETE).build())
+                                        .icon(p -> ItemBuilder.copy(lootSet.itemStack).lore(String.format(Lang.FORMAT_ID, lootSet.id) + "\n" + String.format(Lang.ED_LootSets_BTN_LORE, lootSet.loot.getMap().size()) + "\n" + Lang.ED_LMB_EDIT + "\n" + Lang.ED_RMB_COPY + "\n" + Lang.ED_RMB_SHIFT_DELETE).build())
                                         .child(self, lootSet.getBuilder(),
                                                 // RMB - delete lootSet
                                                 interact -> {

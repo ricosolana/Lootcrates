@@ -40,7 +40,7 @@ public class Main extends JavaPlugin
 
     public Notifier notifier;
 
-    public static final int REV_LATEST = 6;
+    public static final int REV_LATEST = 7;
     public static final String DISCORD_URL = "https://discord.gg/2JkFBnyvNQ";
     public static final String GITHUB_URL = "https://github.com/PeriodicSeizures/CRUtils/releases";
     public static final String PERM_ADMIN = "lootcrates.admin";
@@ -300,6 +300,8 @@ public class Main extends JavaPlugin
 
     public void reloadConfig(@Nonnull CommandSender sender) {
         try {
+            saveDefaultConfig();
+
             this.rev = findRev(); // TODO remove rev
 
             // TODO remove rev

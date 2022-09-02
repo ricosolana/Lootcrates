@@ -1,13 +1,13 @@
 package com.crazicrafter1.lootcrates.listeners;
 
-import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.LCMain;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 
 public class BaseListener implements Listener {
-    protected static Main plugin = Main.get();
+    protected static LCMain plugin = LCMain.get();
 
-    public BaseListener(Main plugin) {
+    public BaseListener(LCMain plugin) {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 }

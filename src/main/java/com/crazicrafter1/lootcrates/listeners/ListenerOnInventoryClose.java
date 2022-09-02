@@ -1,7 +1,7 @@
 package com.crazicrafter1.lootcrates.listeners;
 
-import com.crazicrafter1.lootcrates.LootcratesAPI;
-import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.Lootcrates;
+import com.crazicrafter1.lootcrates.LCMain;
 import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,7 +9,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 
 public class ListenerOnInventoryClose extends BaseListener {
 
-    public ListenerOnInventoryClose(Main plugin) {
+    public ListenerOnInventoryClose(LCMain plugin) {
         super(plugin);
     }
 
@@ -22,7 +22,7 @@ public class ListenerOnInventoryClose extends BaseListener {
         Player p = (Player)e.getPlayer();
 
         if (CrateInstance.CRATES.containsKey(p.getUniqueId())) {
-            LootcratesAPI.endDisplayCrateMenu(p);
+            Lootcrates.endDisplayCrateMenu(p);
         }
     }
 

@@ -16,7 +16,6 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.units.qual.A;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -25,34 +24,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class LootSetSettings {
+public class LootCollection {
     public final String id;
     public ItemStack itemStack;
     //public List<ILoot> loot;
     public WeightedRandomContainer<ILoot> loot;
 
-    public LootSetSettings copy() {
-        final String strippedId = Main.NUMBER_AT_END.matcher(id).replaceAll("");
+    public LootCollection copy() {
+        final String strippedId = LCMain.NUMBER_AT_END.matcher(id).replaceAll("");
         String newId;
-        for (int i=0; Main.get().rewardSettings.lootSets.containsKey(newId = strippedId + i); i++) {}
+        for (int i = 0; LCMain.get().rewardSettings.lootSets.containsKey(newId = strippedId + i); i++) {}
 
         //loot.getMap().entrySet().stream().collect(Collectors.toMap(e -> e.getKey().copy(), Map.Entry::getValue));
 
-        return new LootSetSettings(newId, itemStack.clone(),
+        return new LootCollection(newId, itemStack.clone(),
                 new WeightedRandomContainer<>(loot.getMap().entrySet().stream().collect(Collectors.toMap(e -> e.getKey().copy(), Map.Entry::getValue))));
     }
 
-    // pre rev 7
-    // where items had no weights
-    public LootSetSettings(String id, ItemStack item, List<ILoot> loot) {
+    // <= rev 6
+    public LootCollection(String id, ItemStack item, List<ILoot> loot) {
         // pass this through to the weighted map constructor
         // a default equal weight of 1 is given to each item
         this(id, item, new WeightedRandomContainer<>(loot.stream().collect(Collectors.toMap(k -> k, v -> 1))));
     }
 
-    // rev7+
-    // where items have weights
-    public LootSetSettings(String id, ItemStack itemStack, WeightedRandomContainer<ILoot> loot) {
+    // > rev 7 (item weights)
+    public LootCollection(String id, ItemStack itemStack, WeightedRandomContainer<ILoot> loot) {
         this.id = id;
         this.itemStack = itemStack;
         //this.loot = loot.stream().map(v -> v instanceof LootNBTItem ? new LootItem(((LootNBTItem) v).itemStack) : v).collect(Collectors.toList());
@@ -116,6 +113,27 @@ public class LootSetSettings {
         return String.format("%d/%d", loot.get(item), loot.getWeight());
     }
 
+    public ItemStack getMenuIcon() {
+        //return ItemBuilder.copy(itemStack)
+        //        .replace("lootset_id", id, '%')
+        //        .replace("lootset_size", "" + loot.getMap().size(), '%')
+        //        .lore(
+        //                  String.format(Lang.FORMAT_ID, id) + "\n"
+        //                + String.format(Lang.ED_LootSets_BTN_LORE, loot.getMap().size()) + "\n"
+        //                + Lang.ED_LMB_EDIT + "\n"
+        //                + Lang.ED_RMB_COPY + "\n"
+        //                + Lang.ED_RMB_SHIFT_DELETE
+        //).build();
+
+        return ItemBuilder.copy(itemStack).lore(
+                  String.format(Lang.FORMAT_ID, id) + "\n"
+                + String.format(Lang.ED_LootSets_BTN_LORE, loot.getMap().size()) + "\n"
+                + Lang.ED_LMB_EDIT + "\n"
+                + Lang.ED_RMB_COPY + "\n"
+                + Lang.ED_RMB_SHIFT_DELETE
+        ).build();
+    }
+
     public AbstractMenu.Builder getBuilder() {
         return new ParallaxMenu.PBuilder()
                 .title(p -> id)
@@ -130,7 +148,9 @@ public class LootSetSettings {
                         AbstractMenu.Builder menu = a.getMenuBuilder().title(p -> a.getClass().getSimpleName());
 
                         result1.add(new Button.Builder()
-                                .icon(p -> ItemBuilder.copy(copy).lore(a.getMenuDesc() + "\n" + "&7" + getFormattedFraction(a) + "\n" + "&7" + getFormattedPercent(a) + "\n" + Lang.ED_LMB_EDIT + "\n" + Lang.ED_RMB_SHIFT_DELETE + "\n" + Lang.ED_NUM_SUM + "\n" + Lang.ED_NUM_SUM_DESC).build())
+                                .icon(p -> ItemBuilder.copy(copy)
+                                        .lore(a.getMenuDesc() + "\n"
+                                                + "&7Weight: " + getFormattedFraction(a) + " (" + getFormattedPercent(a) + ") - NUM\n" + Lang.ED_LMB_EDIT + "\n" + Lang.ED_RMB_SHIFT_DELETE + "\n" + Lang.ED_NUM_SUM + "\n" + Lang.ED_NUM_SUM_DESC).build())
 
                                 .child(self1, menu)
                                 .rmb(interact -> {
@@ -164,7 +184,7 @@ public class LootSetSettings {
                         .addAll((self1, p00) -> {
                             ArrayList<Button> result1 = new ArrayList<>();
                             for (Map.Entry<Class<? extends ILoot>, ItemStack> entry
-                                    : LootcratesAPI.lootClasses.entrySet()) {
+                                    : LCMain.get().lootClasses.entrySet()) {
                                 // todo remove post
                                 if (entry.getKey().equals(LootNBTItem.class))
                                     continue;

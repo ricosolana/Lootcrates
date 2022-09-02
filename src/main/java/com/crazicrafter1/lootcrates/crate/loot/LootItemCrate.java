@@ -3,9 +3,8 @@ package com.crazicrafter1.lootcrates.crate.loot;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.ui.*;
 import com.crazicrafter1.lootcrates.Lang;
-import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.LCMain;
 import com.crazicrafter1.lootcrates.crate.CrateInstance;
-import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -25,9 +24,9 @@ public class LootItemCrate implements ILoot {
      */
     public LootItemCrate() {
         try {
-            this.id = Main.get().rewardSettings.crates.keySet().iterator().next();
+            this.id = LCMain.get().rewardSettings.crates.keySet().iterator().next();
         } catch (NoSuchElementException e) {
-            Main.get().notifier.severe(Lang.ERR_NO_CRATES);
+            LCMain.get().notifier.severe(Lang.ERR_NO_CRATES);
         }
     }
 
@@ -47,7 +46,7 @@ public class LootItemCrate implements ILoot {
     @Nonnull
     @Override
     public ItemStack getRenderIcon(@Nonnull Player p) {
-        CrateSettings crate = Main.get().rewardSettings.crates.get(id);
+        CrateSettings crate = LCMain.get().rewardSettings.crates.get(id);
         return Objects.requireNonNull(crate,
                 "Referred a crate by name (" + id + ") " +
                         "which doesn't have a definition in config").itemStack(p);
@@ -56,13 +55,13 @@ public class LootItemCrate implements ILoot {
     @NotNull
     @Override
     public ItemStack getMenuIcon() {
-        return Main.get().rewardSettings.crates.get(id).item.clone();
+        return LCMain.get().rewardSettings.crates.get(id).item.clone();
     }
 
     @NotNull
     @Override
     public String getMenuDesc() {
-        return "&7crate: &f" + id;
+        return "&7Crate: &f" + id;
     }
 
     @Override
@@ -80,7 +79,7 @@ public class LootItemCrate implements ILoot {
                 .parentButton(4, 5)
                 .addAll((self, p00) -> {
                     ArrayList<Button> result = new ArrayList<>();
-                    for (Map.Entry<String, CrateSettings> entry : Main.get().rewardSettings.crates.entrySet()) {
+                    for (Map.Entry<String, CrateSettings> entry : LCMain.get().rewardSettings.crates.entrySet()) {
                         CrateSettings crate = entry.getValue();
 
                         //ItemStack icon = ItemBuilder.copyOf(Material.LOOM).apply(crate.item).glow(crate.id.equals(id)).build();

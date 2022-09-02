@@ -15,6 +15,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class Main extends JavaPlugin
+public class LCMain extends JavaPlugin
 {
     public static final Pattern NUMBER_AT_END = Pattern.compile("\\d+$");
     private static final String SPLASH =
@@ -46,9 +47,12 @@ public class Main extends JavaPlugin
     public static final String PERM_ADMIN = "lootcrates.admin";
     public static final String PERM_OPEN = "lootcrates.open";
     public static final String PERM_PREVIEW = "lootcrates.preview";
+    //private final File cratesConfigFile_REV8_ONWARD = new File(getDataFolder(), "rewards.yml");
     private final File rewardsConfigFile = new File(getDataFolder(), "rewards.yml");
     private final File configFile = new File(getDataFolder(), "config.yml");
     private final File backupPath = new File(getDataFolder(), "backup");
+
+    public Map<Class<? extends ILoot>, ItemStack> lootClasses = new HashMap<>();
 
     private FileConfiguration config = null;
     private FileConfiguration rewardsConfig = null;
@@ -96,14 +100,14 @@ public class Main extends JavaPlugin
         return -1;
     }
 
-    private static Main instance;
-    public static Main get() {
+    private static LCMain instance;
+    public static LCMain get() {
         return instance;
     }
 
     @Override
     public void onEnable() {
-        Main.instance = this;
+        LCMain.instance = this;
 
         notifier = new Notifier(ChatColor.WHITE + "[%sLC" + ChatColor.WHITE + "] %s%s", PERM_ADMIN);
 
@@ -158,6 +162,14 @@ public class Main extends JavaPlugin
     @Override
     public void saveConfig() {
         saveConfig(Bukkit.getConsoleSender());
+    }
+
+
+
+    private void registerLoot(@Nonnull Class<? extends ILoot> lootClass) {
+        lootClasses.put(lootClass, (ItemStack) ReflectionUtil.getFieldInstance(ReflectionUtil.getField(lootClass, "EDITOR_ICON"), null));
+        ConfigurationSerialization.registerClass(lootClass, lootClass.getSimpleName());
+        LCMain.get().notifier.info("Registering " + lootClass.getSimpleName());
     }
 
 
@@ -257,11 +269,11 @@ public class Main extends JavaPlugin
         ConfigurationSerialization.registerClass(Crate.class, "Crate");
 
         // Register loot classes
-        LootcratesAPI.registerLoot(LootCommand.class);
-        LootcratesAPI.registerLoot(LootItem.class);
-        LootcratesAPI.registerLoot(LootItemCrate.class);
-        LootcratesAPI.registerLoot(LootNBTItem.class); // TODO remove rev
-        if (supportQualityArmory) LootcratesAPI.registerLoot(LootItemQA.class);
+        registerLoot(LootCommand.class);
+        registerLoot(LootItem.class);
+        registerLoot(LootItemCrate.class);
+        registerLoot(LootNBTItem.class); // TODO remove rev
+        if (supportQualityArmory) registerLoot(LootItemQA.class);
         if (supportSkript) {
             addon = Skript.registerAddon(this);
             try {
@@ -270,9 +282,9 @@ public class Main extends JavaPlugin
                 notifier.severe(Lang.SKRIPT_INIT_ERROR);
                 e.printStackTrace();
             }
-            LootcratesAPI.registerLoot(LootSkriptEvent.class);
+            registerLoot(LootSkriptEvent.class);
         }
-        if (supportMMOItems) LootcratesAPI.registerLoot(LootMMOItem.class);
+        if (supportMMOItems) registerLoot(LootMMOItem.class);
     }
 
 
@@ -289,7 +301,7 @@ public class Main extends JavaPlugin
     }
 
     public boolean backupRewards(CommandSender sender, boolean isBroken) {
-        File backupFile = new File(backupPath, System.currentTimeMillis() + "_" + (isBroken ? "broken" : "old") + "_rewards.zip");
+        File backupFile = new File(backupPath, System.currentTimeMillis() + "_" + (isBroken ? "broken" : "old") + "_rewards_rev" + rev + ".zip");
 
         notifier.info(sender, Lang.REWARDS_BACKUP);
 
@@ -403,6 +415,79 @@ public class Main extends JavaPlugin
         Bukkit.getPluginManager().disablePlugin(this);
     }
 
+
+
+    // TODO rev 8
+    //   rev 8 will split the configs up more
+    //      into crates.yml and rewards.yml
+    //          crates.yml will contain the crates with their lootCollection id references
+    //              rewards.yml will contain the lootItems in their respective lootCollections
+    public void reloadCrateConfig(@Nonnull CommandSender sender) {
+        PlayerLog.loadAll(sender);
+
+
+
+        // TODO remove rev
+        if (rev <= 2) {
+            // swap config.yml contents with rewards config in memory
+            rewardsConfig = YamlConfiguration.loadConfiguration(configFile);
+        } else {
+            saveDefaultFile(sender, rewardsConfigFile, false);
+
+            rewardsConfig = YamlConfiguration.loadConfiguration(rewardsConfigFile);
+        }
+
+        // save default en.yml file
+        Lang.save(sender, "en", false);
+        Lang.load(sender, language);
+
+        // TODO remove rev
+        if (rev >= 6) {
+            try {
+                this.rewardSettings = new RewardSettings(rewardsConfig);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        } else {
+            try {
+                notifier.info(sender, Lang.REWARDS_1);
+                rewardSettings = Objects.requireNonNull((Data) rewardsConfig.get("data")).getSettings();
+            } catch (Exception e) {
+                //error(sender, e.getMessage());
+                e.printStackTrace();
+                try {
+                    notifier.warn(sender, Lang.REWARDS_2);
+
+                    saveDefaultFile(sender, rewardsConfigFile, true);
+                    rewardsConfig.load(rewardsConfigFile);
+                    rewardSettings = new RewardSettings(rewardsConfig);
+                } catch (Exception e1) {
+                    //error(sender, e1.getMessage());
+                    e.printStackTrace();
+                    try {
+                        notifier.warn(sender, Lang.REWARDS_3);
+
+                        rewardSettings = new RewardSettings();
+                    } catch (Exception e2) {
+                        // Very severe, should theoretically never reach this point
+                        e2.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        if (rewardSettings != null) {
+            notifier.info(sender, Lang.REWARDS_SUCCESS);
+            return;
+        }
+
+        notifier.severe(sender, Lang.REWARDS_FAIL);
+        notifier.severe(sender, String.format(Lang.REWARDS_REPORT, DISCORD_URL));
+        Bukkit.getPluginManager().disablePlugin(this);
+    }
+
+
+
     public void saveConfig(@Nonnull CommandSender sender) {
         // if a backup was successfully made, then save
 
@@ -447,7 +532,8 @@ public class Main extends JavaPlugin
         } else notifier.severe(sender, Lang.CONFIG_BackupError);
     }
 
-    private static final Pattern BACKUP_PATTERN = Pattern.compile("([0-9])+_\\S+_rewards.zip");
+    //private static final Pattern BACKUP_PATTERN = Pattern.compile("([0-9])+_\\S+_rewards_\\S+.zip");
+    private static final Pattern BACKUP_PATTERN = Pattern.compile("^([0-9])+(_\\S+)?.zip");
     private void deleteOldBackups(@Nonnull CommandSender sender) {
         if (cleanPeriod <= 0)
             return;

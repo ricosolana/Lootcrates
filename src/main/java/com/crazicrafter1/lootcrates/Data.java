@@ -4,7 +4,7 @@ import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.lootcrates.crate.Crate;
 import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import com.crazicrafter1.lootcrates.crate.LootSet;
-import com.crazicrafter1.lootcrates.crate.LootSetSettings;
+import com.crazicrafter1.lootcrates.crate.LootCollection;
 import org.bukkit.FireworkEffect;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
@@ -30,15 +30,15 @@ public class Data implements ConfigurationSerializable {
 
     public Data(Map<String, Object> args) {
         try {
-            int rev = Main.get().rev;
+            int rev = LCMain.get().rev;
 
             // TODO remove rev
             if (rev == 0) {
                 // 2/20/2022 and before
-                Main.get().cleanPeriod = (int) args.getOrDefault("cleanHour", 7) / 24;
+                LCMain.get().cleanPeriod = (int) args.getOrDefault("cleanHour", 7) / 24;
             } else if (rev <= 2) {
                 // after 2/20/22
-                Main.get().cleanPeriod = (int) args.getOrDefault("cleanAfterDays", 7);
+                LCMain.get().cleanPeriod = (int) args.getOrDefault("cleanAfterDays", 7);
             }
 
             speed = (int) args.getOrDefault("speed", 4);
@@ -64,20 +64,20 @@ public class Data implements ConfigurationSerializable {
                 Crate crate = entry.getValue();
 
                 crate.id = id;
-                crate.item = ItemBuilder.mutable(LootcratesAPI.getCrateAsItem(crate.item.build(), id));
+                crate.item = ItemBuilder.mutable(Lootcrates.tagItemAsCrate(crate.item.build(), id));
             }
 
             fireworkEffect = (FireworkEffect) args.get("fireworkEffect");
         } catch (Exception e) {
-            Main.get().notifier.severe("Failed to load config: " + e.getMessage());
-            Main.get().notifier.severe("Possible issues/solutions: ");
-            Main.get().notifier.severe(" - There are null values in config: ");
-            Main.get().notifier.severe("     - This is likely caused by a prior plugin failure, try using an earlier backup");
-            Main.get().notifier.severe(" - Chained errors when config being loaded: ");
-            Main.get().notifier.severe("     - There might be null values in config, try the above");
-            Main.get().notifier.severe(" - Material does not exist when config is being loaded: ");
-            Main.get().notifier.severe("     - You are on a version that might not be supported by lootcrates, or the material is named badly");
-            Main.get().notifier.severe("You can try to fix the config manually/restoring a backup, resetting the config with </crates reset>, or by doing </crates populate>");
+            LCMain.get().notifier.severe("Failed to load config: " + e.getMessage());
+            LCMain.get().notifier.severe("Possible issues/solutions: ");
+            LCMain.get().notifier.severe(" - There are null values in config: ");
+            LCMain.get().notifier.severe("     - This is likely caused by a prior plugin failure, try using an earlier backup");
+            LCMain.get().notifier.severe(" - Chained errors when config being loaded: ");
+            LCMain.get().notifier.severe("     - There might be null values in config, try the above");
+            LCMain.get().notifier.severe(" - Material does not exist when config is being loaded: ");
+            LCMain.get().notifier.severe("     - You are on a version that might not be supported by lootcrates, or the material is named badly");
+            LCMain.get().notifier.severe("You can try to fix the config manually/restoring a backup, resetting the config with </crates reset>, or by doing </crates populate>");
             e.printStackTrace();
         }
     }
@@ -91,7 +91,7 @@ public class Data implements ConfigurationSerializable {
     public RewardSettings getSettings() {
         Map<String, CrateSettings> crates = this.crates.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getSettings()));
-        Map<String, LootSetSettings> loot = this.lootSets.entrySet().stream()
+        Map<String, LootCollection> loot = this.lootSets.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getSettings()));
 
         return new RewardSettings(speed, unSelectedItem.build(), selectedItem.build(), fireworkEffect, crates, loot);

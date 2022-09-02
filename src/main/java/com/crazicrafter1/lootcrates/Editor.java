@@ -4,7 +4,7 @@ import com.crazicrafter1.crutils.ColorUtil;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.ui.*;
 import com.crazicrafter1.lootcrates.crate.CrateSettings;
-import com.crazicrafter1.lootcrates.crate.LootSetSettings;
+import com.crazicrafter1.lootcrates.crate.LootCollection;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -52,7 +52,7 @@ public class Editor {
 
     public void open(Player p000) {
         if (p000.getGameMode() != GameMode.CREATIVE) {
-            Main.get().notifier.warn(p000, Lang.RECOMMEND_CREATIVE);
+            LCMain.get().notifier.warn(p000, Lang.RECOMMEND_CREATIVE);
         }
 
         new SimpleMenu.SBuilder(3)
@@ -79,16 +79,12 @@ public class Editor {
                                             if (s.isEmpty())
                                                 return Result.TEXT(Lang.ED_INVALID_ID);
 
-                                            if (Main.get().rewardSettings.crates.containsKey(s))
+                                            // if crate already exists
+                                            CrateSettings crate = Lootcrates.getCrate(s);
+                                            if (crate != null)
                                                 return Result.TEXT(Lang.ED_DUP_ID);
 
-                                            //if (!PRIMARY_KEY_PATTERN.matcher(s).matches() || Main.get().data.crates.containsKey(s))
-                                            //    return Result.TEXT(Lang.DUPLICATE);
-
-                                            CrateSettings crate = new CrateSettings(s);
-                                            crate.loot.add(Main.get().rewardSettings.lootSets.values().iterator().next(), 1);
-
-                                            Main.get().rewardSettings.crates.put(s, crate);
+                                            Lootcrates.registerCrate(Lootcrates.createCrate(s));
 
                                             return Result.PARENT();
                                         })
@@ -96,11 +92,11 @@ public class Editor {
                                 )//.childButton()
                                 .addAll((self, p00) -> {
                                     ArrayList<Button> result = new ArrayList<>();
-                                    for (Map.Entry<String, CrateSettings> entry : Main.get().rewardSettings.crates.entrySet()) {
+                                    for (Map.Entry<String, CrateSettings> entry : LCMain.get().rewardSettings.crates.entrySet()) {
                                         CrateSettings crate = entry.getValue();
                                         result.add(new Button.Builder()
                                                 // https://regexr.com/6fdsi
-                                                .icon(p -> ItemBuilder.copy(crate.item).renderAll().lore(String.format(Lang.FORMAT_ID, crate.id) + "\n" + Lang.ED_LMB_EDIT + "\n" + Lang.ED_RMB_COPY + "\n" + Lang.ED_RMB_SHIFT_DELETE).build())
+                                                .icon(p -> crate.getMenuIcon())
                                                         //.mmb(event -> { clipboardCrate = crate; return Result.REFRESH_GRAB(); })
                                                 .child(self, crate.getBuilder(),
                                                         /// RMB - delete crate
@@ -111,12 +107,10 @@ public class Editor {
 
                                                             if (interact.shift) {
                                                                 // delete crate then
-                                                                Main.get().rewardSettings.crates.remove(crate.id);
+                                                                LCMain.get().rewardSettings.crates.remove(crate.id);
                                                             } else {
                                                                 CrateSettings copy = crate.copy();
-                                                                Main.get().rewardSettings.crates.put(copy.id, copy);
-
-                                                                //Main.get().notifier.info(interact.player, "Copied crate to clipboard");
+                                                                Lootcrates.registerCrate(copy);
                                                             }
                                                             return Result.REFRESH();
                                                         }
@@ -133,26 +127,28 @@ public class Editor {
                         .parentButton(4, 5)
                         .addAll((self, p1) -> {
                             ArrayList<Button> result = new ArrayList<>();
-                            for (LootSetSettings lootSet : Main.get().rewardSettings.lootSets.values()) {
+                            for (LootCollection lootSet : LCMain.get().rewardSettings.lootSets.values()) {
                                 /*
                                  * List all LootSets
                                  */
                                 result.add(new Button.Builder()
-                                        .icon(p -> ItemBuilder.copy(lootSet.itemStack).lore(String.format(Lang.FORMAT_ID, lootSet.id) + "\n" + String.format(Lang.ED_LootSets_BTN_LORE, lootSet.loot.getMap().size()) + "\n" + Lang.ED_LMB_EDIT + "\n" + Lang.ED_RMB_COPY + "\n" + Lang.ED_RMB_SHIFT_DELETE).build())
+                                        .icon(p -> lootSet.getMenuIcon())
                                         .child(self, lootSet.getBuilder(),
                                                 // RMB - delete lootSet
                                                 interact -> {
                                                     if (interact.shift) {
-                                                        if (Main.get().rewardSettings.lootSets.size() > 1) {
-                                                            Main.get().rewardSettings.lootSets.remove(lootSet.id);
-                                                            for (CrateSettings crate : Main.get().rewardSettings.crates.values()) {
-                                                                crate.loot.remove(lootSet);
-                                                            }
-                                                        } else
-                                                            return null;
+                                                        //if (Main.get().rewardSettings.lootSets.size() > 1) {
+                                                        //    Main.get().rewardSettings.lootSets.remove(lootSet.id);
+                                                        //    for (CrateSettings crate : Main.get().rewardSettings.crates.values()) {
+                                                        //        crate.removeLootSet(lootSet.id);
+                                                        //    }
+                                                        //} else
+                                                        if (Lootcrates.removeLootSet(lootSet.id))
+                                                            return Result.MESSAGE("Failed to remove LootSet");
+                                                        return null;
                                                     } else {
-                                                        LootSetSettings copy = lootSet.copy();
-                                                        Main.get().rewardSettings.lootSets.put(copy.id, copy);
+                                                        LootCollection copy = lootSet.copy();
+                                                        LCMain.get().rewardSettings.lootSets.put(copy.id, copy);
                                                     }
 
                                                     //Main.get().notifier.info(interact.player, "Copied crate to clipboard");
@@ -182,14 +178,11 @@ public class Editor {
                                     if (s.isEmpty())
                                         return Result.TEXT(Lang.ED_INVALID_ID);
 
-                                    if (Main.get().rewardSettings.crates.containsKey(s))
+                                    if (LCMain.get().rewardSettings.crates.containsKey(s))
                                         return Result.TEXT(Lang.ED_DUP_ID);
 
-                                    //if (!PRIMARY_KEY_PATTERN.matcher(s).matches() || Main.get().data.lootSets.containsKey(s))
-                                    //    return Result.TEXT(Lang.DUPLICATE);
-
-                                    Main.get().rewardSettings.lootSets.put(s,
-                                            new LootSetSettings(s, new ItemStack(Material.GLOWSTONE_DUST),
+                                    LCMain.get().rewardSettings.lootSets.put(s,
+                                            new LootCollection(s, new ItemStack(Material.GLOWSTONE_DUST),
                                                     new ArrayList<>(Collections.singletonList(new LootItem()))));
 
                                     return Result.PARENT();
@@ -207,16 +200,16 @@ public class Editor {
                         .button(5, 1, IN_OUTLINE)
                         .button(4, 2, IN_OUTLINE)
                         .button(1, 1, new Button.Builder()
-                                .icon(p -> ItemBuilder.from("FIREWORK_STAR").fireworkEffect(Main.get().rewardSettings.fireworkEffect).build()))
+                                .icon(p -> ItemBuilder.from("FIREWORK_STAR").fireworkEffect(LCMain.get().rewardSettings.fireworkEffect).build()))
                         .button(4, 1, new Button.Builder()
-                                .icon(p -> ItemBuilder.from("FIREWORK_STAR").fireworkEffect(Main.get().rewardSettings.fireworkEffect).build())
+                                .icon(p -> ItemBuilder.from("FIREWORK_STAR").fireworkEffect(LCMain.get().rewardSettings.fireworkEffect).build())
                                 .lmb(interact -> {
                                     if (interact.heldItem != null) {
                                         //if (interact.heldItem.getItemMeta() instanceof FireworkEffectMeta meta && meta.hasEffect()) {
                                         if (interact.heldItem.getItemMeta() instanceof FireworkEffectMeta) {
                                             FireworkEffectMeta meta = (FireworkEffectMeta) interact.heldItem.getItemMeta();
                                             if (meta.hasEffect()) {
-                                                Main.get().rewardSettings.fireworkEffect = meta.getEffect();
+                                                LCMain.get().rewardSettings.fireworkEffect = meta.getEffect();
                                                 return Result.REFRESH();
                                             }
                                         }

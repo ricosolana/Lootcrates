@@ -2,7 +2,7 @@ package com.crazicrafter1.lootcrates.crate;
 
 import com.crazicrafter1.crutils.ColorUtil;
 import com.crazicrafter1.crutils.Util;
-import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.LCMain;
 import com.crazicrafter1.lootcrates.PlayerLog;
 import com.crazicrafter1.lootcrates.RewardSettings;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
@@ -45,7 +45,7 @@ public final class CrateInstance {
     private final int size;
     private final int picks;
     private final Sound sound;
-    private final LootSetSettings[] lootChances;
+    private final LootCollection[] lootChances;
     private final Inventory inventory;
 
     // Live variables
@@ -54,7 +54,7 @@ public final class CrateInstance {
     private int taskID = -1;
     private int lockSlot;
 
-    private final RewardSettings data = Main.get().rewardSettings;
+    private final RewardSettings data = LCMain.get().rewardSettings;
 
     public CrateInstance(Player p, CrateSettings crate, int lockSlot) {
         this.player = p;
@@ -62,7 +62,7 @@ public final class CrateInstance {
         this.size = crate.columns * 9;
         this.picks = crate.picks;
         this.sound = crate.sound;
-        this.lootChances = new LootSetSettings[size];
+        this.lootChances = new LootCollection[size];
 
         this.inventory = Bukkit.createInventory(p, size, ColorUtil.renderAll(crate.getTitle(p)));
         this.lockSlot = lockSlot;
@@ -80,7 +80,7 @@ public final class CrateInstance {
 
     private void populate(CrateSettings crate) {
         for (int i = 0; i < size; i++) {
-            this.lootChances[i] = crate.loot.getRandom();
+            this.lootChances[i] = crate.getRandomLootSet();
         }
     }
 
@@ -128,7 +128,7 @@ public final class CrateInstance {
 
                         iterations++;
                     }
-                }.runTaskTimer(Main.get(), 20, data.speed).getTaskId();
+                }.runTaskTimer(LCMain.get(), 20, data.speed).getTaskId();
 
             } else {
                 pop();
@@ -175,7 +175,7 @@ public final class CrateInstance {
             public void run() {
                 crateFireworks.remove(firework.getUniqueId());
             }
-        }.runTaskLater(Main.get(), 1);
+        }.runTaskLater(LCMain.get(), 1);
     }
 
     /**
@@ -210,7 +210,7 @@ public final class CrateInstance {
         PlayerLog.get(player.getUniqueId()).increment(this.crate.id);
 
         if (state == State.REVEALING)
-            Main.get().getServer().getScheduler().cancelTask(taskID);
+            LCMain.get().getServer().getScheduler().cancelTask(taskID);
     }
 
     private void fill() {

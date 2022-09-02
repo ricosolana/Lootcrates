@@ -1,6 +1,6 @@
 package com.crazicrafter1.lootcrates.listeners;
 
-import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.LCMain;
 import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -8,7 +8,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 public class ListenerOnEntityDamageByEntity extends BaseListener {
 
-    public ListenerOnEntityDamageByEntity(Main plugin) {
+    public ListenerOnEntityDamageByEntity(LCMain plugin) {
         super(plugin);
     }
 

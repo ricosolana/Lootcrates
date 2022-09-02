@@ -1,6 +1,6 @@
 name: Lootcrates
 version: ${version}
-main: com.crazicrafter1.lootcrates.Main
+main: com.crazicrafter1.lootcrates.LCMain
 api-version: 1.17
 depend: [ CRUtils ]
 softdepend: [ QualityArmory, Skript, MMOItems ]

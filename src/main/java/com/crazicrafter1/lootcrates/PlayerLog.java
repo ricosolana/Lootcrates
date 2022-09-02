@@ -10,7 +10,7 @@ import java.util.*;
 
 public class PlayerLog {
 
-    private static final File PATH = new File(Main.get().getDataFolder(), "players");
+    private static final File PATH = new File(LCMain.get().getDataFolder(), "players");
 
     //public boolean antiExploit = false;
     private static final HashMap<UUID, PlayerLog> LOGS = new HashMap<>();
@@ -50,13 +50,13 @@ public class PlayerLog {
                 playerConfig.save(new File(PATH, rawUUID + ".yml"));
             }
         } catch (Exception e) {
-            Main.get().notifier.severe(sender, String.format(Lang.STATS_SAVE_FAIL, e.getMessage()));
+            LCMain.get().notifier.severe(sender, String.format(Lang.STATS_SAVE_FAIL, e.getMessage()));
         }
     }
 
     public static void loadAll(@Nonnull CommandSender sender) {
         try {
-            if (Main.get().rev < 5)
+            if (LCMain.get().rev < 5)
                 return;
 
             if (!PATH.exists() || !PATH.isDirectory())
@@ -82,7 +82,7 @@ public class PlayerLog {
                 } catch (Exception ignored) {}
             }
         } catch (Exception e) {
-            Main.get().notifier.severe(sender, String.format(Lang.STATS_LOAD_FAIL, e.getMessage()));
+            LCMain.get().notifier.severe(sender, String.format(Lang.STATS_LOAD_FAIL, e.getMessage()));
         }
     }
 

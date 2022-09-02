@@ -1,6 +1,5 @@
 package com.crazicrafter1.lootcrates.cmd;
 
-import com.crazicrafter1.lootcrates.Main;
 import com.google.common.collect.LinkedHashMultimap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

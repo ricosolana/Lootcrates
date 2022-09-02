@@ -32,26 +32,24 @@ public class LootNBTItem extends LootItem {
     @Nonnull
     @Override
     public ItemStack getRenderIcon(@Nonnull Player p) {
-        return super.ofRange(p, itemStack);
+        throw new RuntimeException("Stub");
     }
 
     @Nonnull
     @Override
     public ItemStack getMenuIcon() {
-        return ItemBuilder.copy(itemStack).amount(min == max ? min : 1).build();
+        throw new RuntimeException("Stub");
     }
 
     @Nonnull
     @Override
     public Map<String, Object> serialize() {
-        throw new UnsupportedOperationException("Do not use!");
+        throw new RuntimeException("Stub");
     }
 
     @Nonnull
     @Override
     public ItemModifyMenu getMenuBuilder() {
-        return (ItemModifyMenu) rangeButtons(new ItemModifyMenu()
-                        .build(itemStack, input -> this.itemStack = input),
-                itemStack, 3, 0, 5, 0);
+        throw new RuntimeException("Stub");
     }
 }

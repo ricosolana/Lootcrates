@@ -1,7 +1,7 @@
 package com.crazicrafter1.lootcrates.listeners;
 
-import com.crazicrafter1.lootcrates.LootcratesAPI;
-import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.Lootcrates;
+import com.crazicrafter1.lootcrates.LCMain;
 import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -13,7 +13,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class ListenerOnPlayerJoinQuit extends BaseListener {
 
-    public ListenerOnPlayerJoinQuit(Main plugin) {
+    public ListenerOnPlayerJoinQuit(LCMain plugin) {
         super(plugin);
     }
 
@@ -21,7 +21,7 @@ public class ListenerOnPlayerJoinQuit extends BaseListener {
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
 
-        if (!p.hasPermission(Main.get().PERM_ADMIN))
+        if (!p.hasPermission(LCMain.get().PERM_ADMIN))
             return;
 
         if (plugin.rev == -1) {
@@ -42,7 +42,7 @@ public class ListenerOnPlayerJoinQuit extends BaseListener {
         Player p = e.getPlayer();
 
         if (CrateInstance.CRATES.containsKey(p.getUniqueId())) {
-            LootcratesAPI.endDisplayCrateMenu(p);
+            Lootcrates.endDisplayCrateMenu(p);
         }
     }
 }

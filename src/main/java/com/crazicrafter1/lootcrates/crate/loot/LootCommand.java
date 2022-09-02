@@ -5,7 +5,7 @@ import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.crutils.ui.*;
 import com.crazicrafter1.lootcrates.ItemModifyMenu;
 import com.crazicrafter1.lootcrates.Lang;
-import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.LCMain;
 import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -36,7 +36,7 @@ public class LootCommand implements ILoot {
         command = (String) result.get("command");
 
         // TODO eventually remove older revisions
-        int rev = Main.get().rev;
+        int rev = LCMain.get().rev;
         if (rev < 2)
             itemStack = (ItemStack) result.get("itemStack");
         else if (rev < 6)

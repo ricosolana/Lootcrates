@@ -1,19 +1,11 @@
 package com.crazicrafter1.lootcrates.crate;
 
 import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.crutils.ReflectionUtil;
-import com.crazicrafter1.crutils.ui.AbstractMenu;
-import com.crazicrafter1.crutils.ui.Button;
-import com.crazicrafter1.crutils.ui.ParallaxMenu;
-import com.crazicrafter1.crutils.ui.Result;
 import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
-import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -32,7 +24,7 @@ public class LootSet implements ConfigurationSerializable {
 
     public LootSet(Map<String, Object> args) {
         // TODO eventually remove older revisions
-        int rev = Main.get().rev;
+        int rev = LCMain.get().rev;
         if (rev < 2)
             item = ItemBuilder.mutable((ItemStack) args.get("itemStack"));
         else
@@ -40,7 +32,7 @@ public class LootSet implements ConfigurationSerializable {
         loot = (ArrayList<ILoot>) args.get("loot");
         for (int i=0; i < loot.size(); i++) {
             if (loot.get(i) == null) {
-                Main.get().notifier.severe("Item in rewards.yml is null (" + i + ")");
+                LCMain.get().notifier.severe("Item in rewards.yml is null (" + i + ")");
             }
         }
     }
@@ -51,7 +43,7 @@ public class LootSet implements ConfigurationSerializable {
     }
 
     //todo remove post-migrate
-    public LootSetSettings getSettings() {
-        return new LootSetSettings(id, item.build(), loot);
+    public LootCollection getSettings() {
+        return new LootCollection(id, item.build(), loot);
     }
 }

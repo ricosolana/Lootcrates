@@ -2,6 +2,7 @@ package com.crazicrafter1.lootcrates.crate.loot;
 
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.RandomUtil;
+import com.crazicrafter1.crutils.ui.Button;
 import com.crazicrafter1.lootcrates.*;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -9,7 +10,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
 import java.util.Map;
 
 public class LootItem extends AbstractLootItem {
@@ -30,7 +30,7 @@ public class LootItem extends AbstractLootItem {
         super(args);
 
         // TODO eventually remove older revisions
-        int rev = Main.get().rev;
+        int rev = LCMain.get().rev;
         if (rev < 2)
             this.itemStack = (ItemStack) args.get("itemStack");
         else if (rev < 6)
@@ -39,7 +39,7 @@ public class LootItem extends AbstractLootItem {
             this.itemStack = (ItemStack) args.get("item");
 
         if (itemStack == null) {
-            Main.get().notifier.severe("A LootItem is null in config");
+            LCMain.get().notifier.severe("A LootItem is null in config");
         }
     }
 
@@ -73,9 +73,13 @@ public class LootItem extends AbstractLootItem {
     @Nonnull
     @Override
     public ItemModifyMenu getMenuBuilder() {
-        return (ItemModifyMenu) rangeButtons(new ItemModifyMenu()
+        return (ItemModifyMenu) rangeButtons(((ItemModifyMenu) new ItemModifyMenu()
+                        .button(0, 1, new Button.Builder()
+                                .icon(p -> ItemBuilder.copy(Material.PAPER).name("&c\u2191 &7Item min/max").build())
+                        ))
+
                 .build(itemStack, input -> this.itemStack = input),
-                itemStack, 3, 0, 5, 0);
+                itemStack, 0, 0, 1, 0);
     }
 
     @NotNull

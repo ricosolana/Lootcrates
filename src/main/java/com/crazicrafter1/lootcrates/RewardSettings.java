@@ -3,7 +3,7 @@ package com.crazicrafter1.lootcrates;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.WeightedRandomContainer;
 import com.crazicrafter1.lootcrates.crate.CrateSettings;
-import com.crazicrafter1.lootcrates.crate.LootSetSettings;
+import com.crazicrafter1.lootcrates.crate.LootCollection;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
 import org.apache.commons.lang.Validate;
@@ -27,9 +27,9 @@ public class RewardSettings {
     public FireworkEffect fireworkEffect;
 
     public Map<String, CrateSettings> crates;
-    public Map<String, LootSetSettings> lootSets;
+    public Map<String, LootCollection> lootSets;
 
-    public RewardSettings(int speed, ItemStack unSelectedItem, ItemStack selectedItem, FireworkEffect fireworkEffect, Map<String, CrateSettings> crates, Map<String, LootSetSettings> lootSets) {
+    public RewardSettings(int speed, ItemStack unSelectedItem, ItemStack selectedItem, FireworkEffect fireworkEffect, Map<String, CrateSettings> crates, Map<String, LootCollection> lootSets) {
         this.speed = speed;
         this.unSelectedItem = unSelectedItem;
         this.selectedItem = selectedItem;
@@ -47,17 +47,14 @@ public class RewardSettings {
         selectedItem = ItemBuilder.from("WHITE_STAINED_GLASS_PANE").name("&7&l???").lore("&7You have selected this mystery chest").build();
 
         lootSets = new LinkedHashMap<>();
-        LootSetSettings lootSet = new LootSetSettings(
+        LootCollection lootSet = new LootCollection(
                 "common",
                 ItemBuilder.from("WHITE_STAINED_GLASS_PANE").name("&f&lCommon Reward").build(),
                 new ArrayList<>(Collections.singletonList(new LootItem())));
         lootSets.put(lootSet.id, lootSet);
 
-        crates = new LinkedHashMap<>();
-        CrateSettings crate = new CrateSettings("peasant");
-        crates.put(crate.id, crate);
 
-        crate.loot.add(lootSet, 10);
+        crates.put("peasant", Lootcrates.createCrate("peasant"));
 
         fireworkEffect = FireworkEffect.builder().withColor(Color.RED, Color.BLUE, Color.WHITE).with(FireworkEffect.Type.BURST).build();
     }
@@ -65,7 +62,7 @@ public class RewardSettings {
     public RewardSettings(ConfigurationSection section) {
         //Map<String, Object> args = section.getValues(false);
         try {
-            final int rev = Main.get().rev;
+            final int rev = LCMain.get().rev;
 
             this.unSelectedItem = Objects.requireNonNull(section.getItemStack("unSelectedItem"), String.format(Lang.CONFIG_NULL_VALUE, "unSelectedItem"));
             this.selectedItem = Objects.requireNonNull(section.getItemStack("selectedItem"), String.format(Lang.CONFIG_NULL_VALUE, "selectedItem"));
@@ -81,7 +78,7 @@ public class RewardSettings {
                     List<ILoot> loot = (List<ILoot>) itr.get("loot");
                     Validate.isTrue(!loot.contains(null), String.format(Lang.CONFIG_NULL_VALUE, "'lootSets.<" + id + ">.loot[]'"));
 
-                    this.lootSets.put(id, new LootSetSettings(id, itemStack, loot));
+                    this.lootSets.put(id, new LootCollection(id, itemStack, loot));
                 } else {
                     //List<ConfigurationSection> loot = (List<ConfigurationSection>) itr.get("loot");
                     final List<Map<String, Object>> list = (List<Map<String, Object>>) itr.get("loot");
@@ -95,7 +92,7 @@ public class RewardSettings {
                     Validate.isTrue(!result.containsValue(0), String.format(Lang.CONFIG_ZERO_WEIGHT, "'lootSets.<" + id + ">.loot.weight'"));
                     Validate.isTrue(!result.containsValue(null), String.format(Lang.CONFIG_NULL_VALUE, "'lootSets.<" + id + ">.loot.weight'"));
 
-                    this.lootSets.put(id, new LootSetSettings(id, itemStack, new WeightedRandomContainer<>(result)));
+                    this.lootSets.put(id, new LootCollection(id, itemStack, new WeightedRandomContainer<>(result)));
                 }
             }
 
@@ -104,18 +101,18 @@ public class RewardSettings {
                 Map<String, Object> itr = ((ConfigurationSection) entry.getValue()).getValues(false);
                 String id = entry.getKey();
 
-                Map<String, Object> weights = ((ConfigurationSection) itr.get("weights")).getValues(false);
-                Map<LootSetSettings, Integer> refWeights = weights.entrySet().stream()
-                        .collect(Collectors.toMap(e -> Objects.requireNonNull(this.lootSets.get(e.getKey()), e.getKey() + "missing reference to LootSet '" + e.getKey() + "' in 'crates.<" + id + ">.weights.<" + e.getKey() + ">'"),
+                Map<String, Object> map = ((ConfigurationSection) itr.get("weights")).getValues(false);
+                Map<String, Integer> weights = map.entrySet().stream()
+                        .collect(Collectors.toMap(e -> Objects.requireNonNull(this.lootSets.get(e.getKey()), e.getKey() + "missing reference to LootSet '" + e.getKey() + "' in 'crates.<" + id + ">.weights.<" + e.getKey() + ">'").id,
                                 e -> (Integer) e.getValue()));//
 
-                this.crates.put(id, new CrateSettings(id,
+                crates.put(id, new CrateSettings(id,
                         Objects.requireNonNull((String) itr.get("title"), String.format(Lang.CONFIG_NULL_VALUE, "'crates.<" + id + ">.title'")),
                         (int) itr.get("columns"),
                         (int) itr.get("picks"),
                         Sound.valueOf((String) itr.get("sound")),
-                        new WeightedRandomContainer<>(refWeights),
-                        LootcratesAPI.getCrateAsItem(Objects.requireNonNull((ItemStack) itr.get("item"), String.format(Lang.CONFIG_NULL_VALUE, "'crates.<" + id + ">.item'")), id)));
+                        weights,
+                        Lootcrates.tagItemAsCrate(Objects.requireNonNull((ItemStack) itr.get("item"), String.format(Lang.CONFIG_NULL_VALUE, "'crates.<" + id + ">.item'")), id)));
             }
 
             fireworkEffect = (FireworkEffect) section.get("fireworkEffect");

@@ -1,6 +1,6 @@
 package com.crazicrafter1.lootcrates.listeners;
 
-import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.LCMain;
 import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -8,7 +8,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 
 public class ListenerOnInventoryDrag extends BaseListener {
 
-    public ListenerOnInventoryDrag(Main plugin) {
+    public ListenerOnInventoryDrag(LCMain plugin) {
         super(plugin);
     }
 

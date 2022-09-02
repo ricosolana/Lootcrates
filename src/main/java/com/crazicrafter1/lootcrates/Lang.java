@@ -1,7 +1,5 @@
 package com.crazicrafter1.lootcrates;
 
-import com.crazicrafter1.crutils.ColorUtil;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -43,13 +41,15 @@ public class Lang {
     static final String IED_Model_R = "Input an integer";
 
     public static String ED_LMB_EDIT = "&7LMB: &aEdit";
+    public static String ED_LMB_TOGGLE = "&7LMB: &6Toggle";
     public static String ED_RMB_SHIFT_DELETE = "&7Shift-RMB: &cDelete";
     public static String ED_RMB_COPY = "&7RMB: &6Copy";
     public static String ED_LMB_DEC = "&7LMB: &c-";
     public static String ED_RMB_INC = "&7RMB: &a+";
-    public static String ED_MMB_TOGGLE = "&fMMB: &7toggle";
+    //public static String ED_MMB_TOGGLE = "&fMMB: &7toggle";
     public static String ED_SHIFT_MUL = "&7Shift: &r&7x5";
-    public static String ED_NUM_SUM =       "&7Num: 1   2   3   4";
+    public static String ED_NUM_SUM =       "&7NUM: 1   2   3   4";
+    //public static String ED_NUM_SUM =       "     1   2   3   4";
     public static String ED_NUM_SUM_DESC =  "     &4-5 &c-1  &a+1 &2+5";
 
     public static String ED_Crates_PROTO_BTN_Columns = "&8&nColumns&r&8: &7%d";
@@ -72,6 +72,8 @@ public class Lang {
     public static String ED_LootSets_PROTO_New_TI = "Add loot";
 
     public static String ERR_NO_CRATES = "No crates are registered";
+    public static String ERR_NO_PERM_OPEN = "&cNo permission to open crate";
+    public static String ERR_NO_PERM_PREVIEW = "&cNo permission to preview crate";
 
     public static String ASSIGN_EXACT = "Search or assign";
 
@@ -182,7 +184,7 @@ public class Lang {
     public static String REWARDS_FAIL = "All fallback attempts failed";
     public static String REWARDS_REPORT = "Please report this at %s";
 
-    private static final File PATH = new File(Main.get().getDataFolder(), "lang/");
+    private static final File PATH = new File(LCMain.get().getDataFolder(), "lang/");
 
     public static boolean load(@Nonnull CommandSender sender, @Nonnull String language) {
         try {
@@ -202,7 +204,7 @@ public class Lang {
                     }
                 } catch (NoSuchFieldException e) {
                     // field from config doesnt exist, meaning that
-                    Main.get().notifier.commandSevere(sender, "Unknown language tag " + key);
+                    LCMain.get().notifier.commandSevere(sender, "Unknown language tag " + key);
                 } catch (Exception ignored) {
                 }
             }
@@ -232,9 +234,9 @@ public class Lang {
                 }
 
                 config.save(file);
-                Main.get().notifier.commandInfo(sender, String.format("Language file %s overwritten", language));
+                LCMain.get().notifier.commandInfo(sender, String.format("Language file %s overwritten", language));
             } else {
-                Main.get().notifier.commandInfo(sender, String.format("Language file %s was not overwritten", language));
+                LCMain.get().notifier.commandInfo(sender, String.format("Language file %s was not overwritten", language));
             }
         } catch (Exception e) {
             e.printStackTrace();

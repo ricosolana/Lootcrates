@@ -5,7 +5,7 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
-import com.crazicrafter1.lootcrates.LootcratesAPI;
+import com.crazicrafter1.lootcrates.Lootcrates;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
@@ -32,7 +32,9 @@ public class EffOpenCrate extends Effect {
     protected void execute(Event e) {
         String id = crate.getSingle(e);
         Player p = player.getSingle(e);
-        LootcratesAPI.displayCrateMenu(p, id, p.getInventory().getHeldItemSlot());
+        //LootcratesAPI.displayCrateMenu(p, id, p.getInventory().getHeldItemSlot());
+        //new CrateInstance(p, LootcratesAPI.getCrate(id), -1).open();
+        Lootcrates.displayCrateMenu(p, Lootcrates.getCrate(id), -1);
     }
 
     @Override

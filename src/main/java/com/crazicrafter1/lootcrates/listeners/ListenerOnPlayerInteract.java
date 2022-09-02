@@ -1,9 +1,11 @@
 package com.crazicrafter1.lootcrates.listeners;
 
+import com.crazicrafter1.crutils.ColorUtil;
+import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.crutils.Version;
 import com.crazicrafter1.lootcrates.Lang;
-import com.crazicrafter1.lootcrates.LootcratesAPI;
-import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.Lootcrates;
+import com.crazicrafter1.lootcrates.LCMain;
 import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import org.bukkit.Material;
@@ -17,7 +19,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class ListenerOnPlayerInteract extends BaseListener {
 
-    public ListenerOnPlayerInteract(Main plugin) {
+    public ListenerOnPlayerInteract(LCMain plugin) {
         super(plugin);
     }
 
@@ -28,8 +30,6 @@ public class ListenerOnPlayerInteract extends BaseListener {
             return;
 
         Action a = e.getAction();
-        //if (!(a == Action.RIGHT_CLICK_AIR || a == Action.RIGHT_CLICK_BLOCK))
-//            return;
 
         // PHYSICAL describes stepping onto pressure plate or tripwire...
         if (a == Action.PHYSICAL)
@@ -45,7 +45,7 @@ public class ListenerOnPlayerInteract extends BaseListener {
         if (item.getType() == Material.AIR && Version.AT_LEAST_v1_9.a())
             item = p.getInventory().getItemInOffHand();
 
-        CrateSettings crate = LootcratesAPI.getCrateFromItem(item);
+        CrateSettings crate = Lootcrates.getCrate(item);
         if (crate != null)
             e.setCancelled(true);
 
@@ -53,12 +53,18 @@ public class ListenerOnPlayerInteract extends BaseListener {
             return;
 
         if (!CrateInstance.CRATES.containsKey(p.getUniqueId())) {
-            if (p.hasPermission(Main.PERM_OPEN) && (a == Action.RIGHT_CLICK_AIR || a == Action.RIGHT_CLICK_BLOCK))
-                LootcratesAPI.displayCrateMenu(p, crate.id, p.getInventory().getHeldItemSlot());
-            else if (p.hasPermission(Main.PERM_PREVIEW) && (a == Action.LEFT_CLICK_AIR || a == Action.LEFT_CLICK_BLOCK))
-                LootcratesAPI.displayCratePreview(p, crate.id);
-        } else {
+            if (a == Action.RIGHT_CLICK_BLOCK || a == Action.RIGHT_CLICK_AIR) {
+                if (p.hasPermission(LCMain.PERM_OPEN)) {
+                    new CrateInstance(p, crate, p.getInventory().getHeldItemSlot()).open();
+                } else
+                    p.sendMessage(ColorUtil.renderAll(Lang.ERR_NO_PERM_OPEN));
+            } else {
+                if (p.hasPermission(LCMain.PERM_PREVIEW))
+                    Lootcrates.displayCratePreview(p, crate);
+                else
+                    p.sendMessage(ColorUtil.renderAll(Lang.ERR_NO_PERM_PREVIEW));
+            }
+        } else
             plugin.notifier.globalWarn(Lang.Misc_OpenBug);
-        }
     }
 }

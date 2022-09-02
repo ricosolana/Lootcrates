@@ -4,7 +4,7 @@ import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.ui.*;
 import com.crazicrafter1.lootcrates.ItemModifyMenu;
 import com.crazicrafter1.lootcrates.Lang;
-import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.LCMain;
 import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import com.crazicrafter1.lootcrates.sk.SkriptLootEvent;
 import org.bukkit.Bukkit;
@@ -39,7 +39,7 @@ public class LootSkriptEvent implements ILoot {
         tag = (String) result.get("tag");
 
         // TODO eventually remove older revisions
-        int rev = Main.get().rev;
+        int rev = LCMain.get().rev;
         if (rev < 2)
             item = (ItemStack) result.get("itemStack");
         else if (rev < 6)

@@ -277,23 +277,6 @@ crates:
       common: 42
       regular: 6
       ultra: 8
-  testcrate:
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 2730
-      type: ENDER_CHEST
-      meta:
-        ==: ItemMeta
-        meta-type: TILE_ENTITY
-        display-name: '{"extra":[{"text":"my new crate"}],"text":""}'
-        internal: H4sIAAAAAAAA/+NiYOBgYHUuSixJZeAsSS0uSQYzAVjcF8YXAAAA
-        blockMaterial: ENDER_CHEST
-    title: select loot
-    columns: 3
-    picks: 4
-    sound: ENTITY_EXPERIENCE_ORB_PICKUP
-    weights:
-      common: 1
   king:
     item:
       ==: org.bukkit.inventory.ItemStack

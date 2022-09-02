@@ -3,7 +3,7 @@ package com.crazicrafter1.lootcrates.crate;
 import com.crazicrafter1.crutils.*;
 import com.crazicrafter1.crutils.ui.*;
 import com.crazicrafter1.lootcrates.*;
-import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.LCMain;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
@@ -21,37 +21,42 @@ public class CrateSettings {
     public int columns;
     public int picks;
     public Sound sound;
-    public WeightedRandomContainer<LootSetSettings> loot;
+
+    // TODO deleting the lootset in editor will cause an error when crate is opened
+    // because the string referencing to key in map will be removed
+    // should use WeakReference
+    //private WeightedRandomContainer<String> loot;
+    public WeightedRandomContainer<String> loot;
     public ItemStack item;
 
     public CrateSettings copy() {
-        final String strippedId = Main.NUMBER_AT_END.matcher(id).replaceAll("");
+        final String strippedId = LCMain.NUMBER_AT_END.matcher(id).replaceAll("");
         String newId;
-        for (int i=0; Main.get().rewardSettings.crates.containsKey(newId = strippedId + i); i++) {}
+        for (int i = 0; LCMain.get().rewardSettings.crates.containsKey(newId = strippedId + i); i++) {}
 
-        return new CrateSettings(newId, title, columns, picks, sound, new WeightedRandomContainer<>(new HashMap<>(loot.getMap())), item.clone());
+        return new CrateSettings(newId, title, columns, picks, sound, new HashMap<>(loot.getMap()), Lootcrates.tagItemAsCrate(item.clone(), newId));
     }
 
     //todo hmmm kinda ugly
-    @Deprecated
-    public CrateSettings(String id) {
-        this.id = id;
-        this.title = "select loot";
-        this.columns = 3;
-        this.picks = 4;
-        this.sound = Sound.ENTITY_EXPERIENCE_ORB_PICKUP;
-        this.loot = new WeightedRandomContainer<>();
-        this.item = ItemBuilder.mut(LootcratesAPI.getCrateAsItem(new ItemStack(Material.ENDER_CHEST), id)).name("my new crate").build();
-    }
+    //@Deprecated
+    //public CrateSettings(String id) {
+    //    this.id = id;
+    //    this.title = "select loot";
+    //    this.columns = 3;
+    //    this.picks = 4;
+    //    this.sound = Sound.ENTITY_EXPERIENCE_ORB_PICKUP;
+    //    this.loot = new WeightedRandomContainer<>();
+    //    this.item = ItemBuilder.mut(LootcratesAPI.getCrateAsItem(new ItemStack(Material.ENDER_CHEST), id)).name("my new crate").build();
+    //}
 
     //todo remove post-migrate
-    public CrateSettings(String id, String title, int columns, int picks, Sound sound, WeightedRandomContainer<LootSetSettings> loot, ItemStack item) {
+    public CrateSettings(String id, String title, int columns, int picks, Sound sound, Map<String, Integer> loot, ItemStack item) {
         this.id = id;
         this.title = title;
         this.columns = columns;
         this.picks = picks;
         this.sound = sound;
-        this.loot = loot;
+        this.loot = new WeightedRandomContainer<>(loot);
         this.item = item;
     }
 
@@ -72,15 +77,40 @@ public class CrateSettings {
         section.set("columns", columns);
         section.set("picks", picks);
         section.set("sound", sound.name());
-        section.set("weights", loot.getMap().entrySet().stream().collect(Collectors.toMap(e -> e.getKey().id, Map.Entry::getValue)));
+        section.set("weights", loot.getMap().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
     }
 
-    private String getFormattedPercent(LootSetSettings lootGroup) {
-        return String.format("%.02f%%", 100.f * ((float) loot.get(lootGroup)/(float)loot.getWeight()));
+    private String getFormattedPercent(LootCollection lootGroup) {
+        return String.format("%.02f%%", 100.f * ((float) loot.get(lootGroup.id)/(float)loot.getWeight()));
     }
 
-    private String getFormattedFraction(LootSetSettings lootGroup) {
-        return String.format("%d/%d", loot.get(lootGroup), loot.getWeight());
+    private String getFormattedFraction(LootCollection lootGroup) {
+        return String.format("%d/%d", loot.get(lootGroup.id), loot.getWeight());
+    }
+
+    public LootCollection getRandomLootSet() {
+        return LCMain.get().rewardSettings.lootSets.get(loot.getRandom());
+    }
+
+    /**
+     * Remove the lootset by id if present
+     * If the last lootset was removed from this crate then a blank
+     * @param
+     */
+    //public void removeLootSet(String id) {
+    //    loot.remove(id);
+    //    if (loot.getMap().isEmpty()) {
+    //        LootSetSettings lootSetSettings = Main.get().rewardSettings.lootSets.values().iterator().next();
+    //        loot.add(lootSetSettings.id, 1);
+    //    }
+    //}
+
+    public ItemStack getMenuIcon() {
+        return ItemBuilder.copy(item).renderAll().lore(
+                  String.format(Lang.FORMAT_ID, id) + "\n"
+                + Lang.ED_LMB_EDIT + "\n"
+                + Lang.ED_RMB_COPY + "\n"
+                + Lang.ED_RMB_SHIFT_DELETE).build();
     }
 
     /**
@@ -152,47 +182,46 @@ public class CrateSettings {
                 // *   *   *
                 // Edit LootSets
                 // *   *   *
-                .childButton(5, 1, p -> ItemBuilder.fromModernMaterial("EXPERIENCE_BOTTLE").name(Lang.LOOT).lore(Lang.ED_LMB_EDIT).build(), new ParallaxMenu.PBuilder()
+                .childButton(5, 1, p -> ItemBuilder.from("EXPERIENCE_BOTTLE").name(Lang.LOOT).lore(Lang.ED_LMB_EDIT).build(), new ParallaxMenu.PBuilder()
                         .title(p -> Lang.LOOT)
                         .parentButton(4, 5)
                         .onClose((player) -> Result.PARENT())
                         .addAll((builder, p) -> {
                             ArrayList<Button> result1 = new ArrayList<>();
 
-                            for (LootSetSettings lootSet : Main.get().rewardSettings.lootSets.values()) {
-                                Integer weight = loot.get(lootSet);
+                            for (LootCollection lootSet : LCMain.get().rewardSettings.lootSets.values()) {
+                                Integer weight = loot.get(lootSet.id);
                                 Button.Builder btn = new Button.Builder();
                                 ItemBuilder b = ItemBuilder.copy(lootSet.itemStack.getType()).name("&8" + lootSet.id);
+
                                 if (weight != null) {
-                                    b.lore("&7" + getFormattedFraction(lootSet) + "\n" +
-                                            "&7" + getFormattedPercent(lootSet) + "\n" +
-                                            Lang.ED_LMB_DEC + "\n" +
-                                            Lang.ED_RMB_INC + "\n" +
-                                            Lang.ED_MMB_TOGGLE + "\n" +
-                                            Lang.ED_SHIFT_MUL).glow(true);
-                                    btn.mmb(interact -> {
-                                        // toggle inclusion
-                                        loot.remove(lootSet);
-                                        return Result.REFRESH();
-                                    }).lmb(interact -> {
-                                        // capped decrement
-                                        int change = interact.shift ? 5 : 1;
+                                    b.lore( "&7Weight: " + getFormattedFraction(lootSet) + " (" + getFormattedPercent(lootSet) + ") - NUM\n" +
+                                            Lang.ED_LMB_TOGGLE + "\n" +
+                                            Lang.ED_NUM_SUM + "\n" +
+                                            Lang.ED_NUM_SUM_DESC).glow(true);
 
-                                        loot.add(lootSet, MathUtil.clamp(weight - change, 1, Integer.MAX_VALUE));
+                                    btn.lmb(interact -> {
+                                        if (loot.getMap().size() > 1) {
+                                            // toggle inclusion
+                                            loot.remove(lootSet.id);
+                                            return Result.REFRESH();
+                                        }
+                                        return null;
+                                    }).num(interact -> {
+                                        // weight modifiers
+                                        final int n = interact.numberKeySlot;
+                                        int change = n == 0 ? -5 : n == 1 ? -1 : n == 2 ? 1 : n == 3 ? 5 : 0;
 
-                                        return Result.REFRESH();
-                                    }).rmb(interact -> {
-                                        // capped increment
-                                        int change = interact.shift ? 5 : 1;
-
-                                        loot.add(lootSet, MathUtil.clamp(weight + change, 1, Integer.MAX_VALUE));
-
+                                        if (change != 0) {
+                                            // then change weight
+                                            loot.add(lootSet.id, MathUtil.clamp(weight + change, 1, Integer.MAX_VALUE));
+                                        }
                                         return Result.REFRESH();
                                     });
                                 } else {
-                                    b.lore(Lang.ED_MMB_TOGGLE);
-                                    btn.mmb(interact -> {
-                                        loot.add(lootSet, 1);
+                                    b.lore(Lang.ED_LMB_TOGGLE);
+                                    btn.lmb(interact -> {
+                                        loot.add(lootSet.id, 1);
                                         return Result.REFRESH();
                                     });
                                 }
@@ -206,7 +235,7 @@ public class CrateSettings {
                 // Edit Columns
                 // *   *   *
                 .button(7, 1, new Button.Builder()
-                        .icon(p -> ItemBuilder.copyOf(Material.LADDER).name(String.format(Lang.ED_Crates_PROTO_BTN_Columns, columns)).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC).amount(columns).build())
+                        .icon(p -> ItemBuilder.copy(Material.LADDER).name(String.format(Lang.ED_Crates_PROTO_BTN_Columns, columns)).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC).amount(columns).build())
                         .lmb(interact -> {
                             // decrease
                             columns = MathUtil.clamp(columns - 1, 1, 6);
@@ -221,7 +250,7 @@ public class CrateSettings {
                 // Edit Picks
                 // *   *   *
                 .button(2, 3, new Button.Builder()
-                        .icon(p -> ItemBuilder.copyOf(Material.MELON_SEEDS).name(String.format(Lang.ED_Crates_PROTO_BTN_Picks, picks)).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC).amount(picks).build())
+                        .icon(p -> ItemBuilder.copy(Material.MELON_SEEDS).name(String.format(Lang.ED_Crates_PROTO_BTN_Picks, picks)).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC).amount(picks).build())
                         .lmb(interact -> {
                             // decrease
                             picks = MathUtil.clamp(picks - 1, 1, columns*9);
@@ -235,7 +264,7 @@ public class CrateSettings {
                 // *   *   *
                 // Edit Pick Sound
                 // *   *   *
-                .childButton(6, 3, p -> ItemBuilder.copyOf(Material.JUKEBOX).name(String.format(Lang.ED_Crates_PROTO_BTN_Sound, sound)).lore(Lang.ED_LMB_EDIT).build(),
+                .childButton(6, 3, p -> ItemBuilder.copy(Material.JUKEBOX).name(String.format(Lang.ED_Crates_PROTO_BTN_Sound, sound)).lore(Lang.ED_LMB_EDIT).build(),
                         new TextMenu.TBuilder()
                                 .title(p -> Lang.ED_Crates_PROTO_Sound_TI)
                                 .leftRaw(p -> Editor.LOREM_IPSUM)
@@ -243,8 +272,7 @@ public class CrateSettings {
                                 .onClose((player) -> Result.PARENT())
                                 .onComplete((p, s, b) -> {
                                     try {
-                                        Sound sound = Sound.valueOf(s.toUpperCase());
-                                        this.sound = sound;
+                                        sound = Sound.valueOf(s.toUpperCase());
                                         p.playSound(p.getLocation(), sound, 1, 1);
                                         return Result.PARENT();
                                     } catch (Exception e) {
@@ -260,8 +288,8 @@ public class CrateSettings {
                 .addAll((self, p) -> {
                     List<Button> buttons = new ArrayList<>();
 
-                    for (Map.Entry<LootSetSettings, Integer> entry : loot.getMap().entrySet()) {
-                        LootSetSettings lootSet = entry.getKey();
+                    for (Map.Entry<String, Integer> entry : loot.getMap().entrySet()) {
+                        LootCollection lootSet = LCMain.get().rewardSettings.lootSets.get(entry.getKey());
                         int weight = entry.getValue();
                         double chance = ((double)weight / (double)loot.getWeight()) * 100.;
                         buttons.add(new Button.Builder()

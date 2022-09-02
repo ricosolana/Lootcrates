@@ -1,16 +1,12 @@
 package com.crazicrafter1.lootcrates.crate;
 
 import com.crazicrafter1.crutils.*;
-import com.crazicrafter1.lootcrates.*;
-import com.crazicrafter1.lootcrates.Main;
-import org.bukkit.Material;
+import com.crazicrafter1.lootcrates.LCMain;
 import org.bukkit.Sound;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,7 +29,7 @@ public class Crate implements ConfigurationSerializable {
         sound = Sound.valueOf((String) args.get("sound"));
 
         // TODO eventually remove older revisions
-        int rev = Main.get().rev;
+        int rev = LCMain.get().rev;
         if (rev < 2)
             item = ItemBuilder.mut((ItemStack) args.get("itemStack"));
         else
@@ -55,9 +51,9 @@ public class Crate implements ConfigurationSerializable {
     public CrateSettings getSettings() {
         // transforms the LootSet map to LootSetSettings map
         // this is the 'magic'
-        WeightedRandomContainer<LootSetSettings> loot = new WeightedRandomContainer<>(this.loot.getMap().entrySet().stream()
-                .collect(Collectors.toMap(e -> e.getKey().getSettings(), Map.Entry::getValue)));
+        Map<String, Integer> map = this.loot.getMap().entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getKey().id, Map.Entry::getValue));
 
-        return new CrateSettings(id, title, columns, picks, sound, loot, item.build());
+        return new CrateSettings(id, title, columns, picks, sound, map, item.build());
     }
 }

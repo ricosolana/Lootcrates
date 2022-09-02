@@ -2,7 +2,7 @@ package com.crazicrafter1.lootcrates.cmd;
 
 import com.crazicrafter1.crutils.*;
 import com.crazicrafter1.lootcrates.*;
-import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.LCMain;
 import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import org.bukkit.Bukkit;
@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 
 class CmdArg {
 
-    private static final Main plugin = Main.get();
+    private static final LCMain plugin = LCMain.get();
 
     private static void arg(@Nonnull String arg, @Nonnull TriFunction<CommandSender, String[], Set<String>, Boolean> executor) {
         arg(arg, executor, null);
@@ -83,7 +83,7 @@ class CmdArg {
 
         arg("lang", (sender, args, flags) -> {
             if (Lang.load(sender, args[0]))
-                Main.get().language = args[0];
+                LCMain.get().language = args[0];
             return true;
         }
                 // todo autocompleting looks at disk each time, which is slow?
@@ -148,14 +148,14 @@ class CmdArg {
 
         arg("rev", (sender, args, flags) -> {
             if (args[0].equalsIgnoreCase("latest")) {
-                plugin.rev = Main.REV_LATEST;
+                plugin.rev = LCMain.REV_LATEST;
                 plugin.reloadConfig(sender);
                 plugin.reloadData(sender);
-                return info(sender, String.format(Lang.READ_W_LATEST_REV, Main.REV_LATEST));
+                return info(sender, String.format(Lang.READ_W_LATEST_REV, LCMain.REV_LATEST));
             } else {
                 try {
                     int rev = Integer.parseInt(args[0]);
-                    if (rev > Main.REV_LATEST) {
+                    if (rev > LCMain.REV_LATEST) {
                         // err
                         return severe(sender, String.format(Lang.REV_UNSUPPORTED, rev));
                     } if (rev < 0)
@@ -164,7 +164,7 @@ class CmdArg {
                     plugin.rev = rev;
                     plugin.reloadConfig(sender);
                     plugin.reloadData(sender);
-                    plugin.rev = Main.REV_LATEST;
+                    plugin.rev = LCMain.REV_LATEST;
 
                     CmdArg.args.remove("rev");
 
@@ -175,7 +175,7 @@ class CmdArg {
             }
         }, (sender, args) -> {
             ArrayList<String> ret = new ArrayList<>();
-            for (int i=0; i < Main.REV_LATEST; i++) {
+            for (int i = 0; i < LCMain.REV_LATEST; i++) {
                 ret.add("" + i);
             }
             ret.add("latest");
@@ -189,7 +189,7 @@ class CmdArg {
         });
 
         arg("crate", (sender, args, flags) -> {
-            CrateSettings crate = LootcratesAPI.getCrateByID(args[0]);
+            CrateSettings crate = Lootcrates.getCrate(args[0]);
 
             // the best way to represent this command structure would be with a treemap
             // crates -> display plugin info
@@ -255,7 +255,7 @@ class CmdArg {
             return info(sender, String.format(Lang.SELF_GIVE_CRATE, crate.id));
         }, (sender, args) -> {
             if (args.length == 1) {
-                return getMatches(args[0], Main.get().rewardSettings.crates.keySet());
+                return getMatches(args[0], LCMain.get().rewardSettings.crates.keySet());
             }
             if (args.length == 2) {
                 return getMatches(args[1],
@@ -319,7 +319,7 @@ class CmdArg {
 
             ItemStack itemStack = p.getInventory().getItemInMainHand();
             if (itemStack.getType() != Material.AIR) {
-                CrateSettings crate = LootcratesAPI.getCrateFromItem(itemStack);
+                CrateSettings crate = Lootcrates.getCrate(itemStack);
                 if (crate != null) {
                     return info(sender, String.format(Lang.IS_CRATE, crate.id));
                 } else {

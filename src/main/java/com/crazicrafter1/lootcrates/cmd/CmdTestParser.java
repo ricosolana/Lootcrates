@@ -1,6 +1,6 @@
 package com.crazicrafter1.lootcrates.cmd;
 
-import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.LCMain;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,9 +9,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class CmdTestParser implements CommandExecutor {
 
-    private final Main plugin;
+    private final LCMain plugin;
 
-    public CmdTestParser(Main plugin) {
+    public CmdTestParser(LCMain plugin) {
         this.plugin = plugin;
         Bukkit.getPluginCommand("testparser").setExecutor(this);
     }

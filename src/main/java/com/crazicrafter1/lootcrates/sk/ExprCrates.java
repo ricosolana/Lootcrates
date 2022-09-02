@@ -6,7 +6,7 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
-import com.crazicrafter1.lootcrates.Main;
+import com.crazicrafter1.lootcrates.LCMain;
 import org.bukkit.event.Event;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class ExprCrates extends SimpleExpression<String> {
 
     @Override
     protected String[] get(Event event) {
-        List<String> list = new ArrayList<>(Main.get().rewardSettings.crates.keySet());
+        List<String> list = new ArrayList<>(LCMain.get().rewardSettings.crates.keySet());
 
         return list.toArray(new String[0]);
     }

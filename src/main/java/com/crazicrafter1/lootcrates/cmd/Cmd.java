@@ -3,8 +3,7 @@ package com.crazicrafter1.lootcrates.cmd;
 import com.crazicrafter1.crutils.Pair;
 import com.crazicrafter1.crutils.TriFunction;
 import com.crazicrafter1.lootcrates.Lang;
-import com.crazicrafter1.lootcrates.Main;
-import com.google.common.collect.Lists;
+import com.crazicrafter1.lootcrates.LCMain;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -21,9 +20,9 @@ import static com.crazicrafter1.lootcrates.cmd.CmdArg.severe;
 
 public class Cmd implements CommandExecutor, TabCompleter {
 
-    private Main plugin;
+    private LCMain plugin;
 
-    public Cmd(Main plugin) {
+    public Cmd(LCMain plugin) {
         this.plugin = plugin;
         plugin.getCommand("crates").setExecutor(this);
         plugin.getCommand("crates").setTabCompleter(this);
@@ -32,17 +31,17 @@ public class Cmd implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command c, String s, String[] args) {
         if (args.length == 0) {
-            if (Main.get().rev == -1) {
+            if (LCMain.get().rev == -1) {
                 return plugin.notifier.commandSevere(sender, String.format(Lang.ASSIGN_REV, ChatColor.UNDERLINE + "/crates rev"));
             }
-            info(sender, String.format(Lang.VERSION, Main.get().getDescription().getVersion()));
-            info(sender, String.format(Lang.REV, Main.get().rev));
+            info(sender, String.format(Lang.VERSION, LCMain.get().getDescription().getVersion()));
+            info(sender, String.format(Lang.REV, LCMain.get().rev));
             return info(sender, Lang.USAGE + "/crates ["
                     + String.join(", ", CmdArg.args.keySet())
                     + "]");
         }
 
-        if (Main.get().rev == -1
+        if (LCMain.get().rev == -1
                 && !args[0].equalsIgnoreCase("rev")) {
             return severe(sender, String.format(Lang.ASSIGN_REV, ChatColor.UNDERLINE + "/crates rev"));
         }
@@ -113,7 +112,7 @@ public class Cmd implements CommandExecutor, TabCompleter {
             return new ArrayList<>();
 
         if (args.length == 1) {
-            if (Main.get().rev == -1) {
+            if (LCMain.get().rev == -1) {
                 return Collections.singletonList("rev"); // todo remove post-migrate
             } else
                 return CmdArg.getMatches(args[0], CmdArg.args.keySet());

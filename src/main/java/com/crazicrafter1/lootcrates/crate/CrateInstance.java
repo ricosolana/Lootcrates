@@ -28,7 +28,8 @@ public final class CrateInstance {
      * Runtime modifiable stuff
      */
     public static HashMap<UUID, CrateInstance> CRATES = new HashMap<>();
-    public static HashSet<UUID> crateFireworks = new HashSet<>();
+    public static Set<Firework> crateFireworks = Collections.newSetFromMap(new WeakHashMap<>());
+    //public static HashSet<UUID> crateFireworks = new HashSet<>();
 
     private static final class QSlot { //TODO rename
         boolean isHidden = true;
@@ -145,15 +146,7 @@ public final class CrateInstance {
 
         if (data.fireworkEffect != null) explosion();
 
-        // fixme this might be causing the spam click bug
-        //  I think I fixed it already
-        // putting into a runnable might fix
-        //new BukkitRunnable() {
-        //    @Override
-        //    public void run() {
-                state = State.REVEALED;
-        //    }
-        //}.runTask(Main.get());
+        state = State.REVEALED;
     }
 
     private void explosion() {
@@ -162,7 +155,8 @@ public final class CrateInstance {
         //noinspection ConstantConditions
         Firework firework = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
 
-        crateFireworks.add(firework.getUniqueId());
+        // adding
+        crateFireworks.add(firework);
 
         FireworkMeta fwm = firework.getFireworkMeta();
         fwm.addEffects(data.fireworkEffect);
@@ -170,12 +164,15 @@ public final class CrateInstance {
 
         firework.detonate();
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                crateFireworks.remove(firework.getUniqueId());
-            }
-        }.runTaskLater(LCMain.get(), 1);
+        // this might be causing issues
+        //new BukkitRunnable() {
+        //    @Override
+        //    public void run() {
+        //        // check if the firework is alive still
+        //        if (!firework.isValid())
+        //            crateFireworks.remove(firework.getUniqueId());
+        //    }
+        //}.runTaskLater(LCMain.get(), 100);
     }
 
     /**

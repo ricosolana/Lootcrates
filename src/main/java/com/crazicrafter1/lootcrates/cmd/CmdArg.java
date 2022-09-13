@@ -146,6 +146,7 @@ class CmdArg {
             return new ArrayList<>();
         });
 
+        // TODO this adds a lot of tackiness into plugin
         arg("rev", (sender, args, flags) -> {
             if (args[0].equalsIgnoreCase("latest")) {
                 plugin.rev = LCMain.REV_LATEST;

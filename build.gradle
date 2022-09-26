@@ -50,7 +50,7 @@ configurations {
 dependencies {
     compileOnly "org.spigotmc:spigot-api:${project.spigot_version}"
     //shadow files('com.github.PeriodicSeizures'
-    shadow files('C:\\Users\\Rico\\Documents\\MinecraftDev\\dev\\NMSAPI\\api\\target\\nmsapi-1.0.0-SNAPSHOT.jar')
+    shadow files('C:\\Users\\Rico\\Documents\\MinecraftDev\\plugins\\NMSAPI\\api\\target\\nmsapi-1.0.0-SNAPSHOT.jar')
     //implementation 'com.github.PeriodicSeizures:CRUtils:main-SNAPSHOT'
     // Load from files during dev for no hour long delay for jit
     implementation files('C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.18.2 paper\\plugins\\CRUtils.jar')

@@ -53,7 +53,7 @@ dependencies {
     shadow files('C:\\Users\\Rico\\Documents\\MinecraftDev\\plugins\\NMSAPI\\api\\target\\nmsapi-1.0.0-SNAPSHOT.jar')
     //implementation 'com.github.PeriodicSeizures:CRUtils:main-SNAPSHOT'
     // Load from files during dev for no hour long delay for jit
-    implementation files('C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.18.2 paper\\plugins\\CRUtils.jar')
+    implementation files('C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.19.3 paper\\plugins\\CRUtils.jar')
     //implementation files("C:\\Users\\Rico\\Documents\\MinecraftDev\\api\\CRUtils.jar");
     //implementation 'com.github.PeriodicSeizures:Gapi:main-SNAPSHOT'
     //implementation files('C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.19 paper\\plugins\\Gapi.jar')
@@ -64,7 +64,7 @@ dependencies {
     compileOnly 'net.ess3:EssentialsX:2.17.2'
 }
 
-def targetJavaVersion = 8
+def targetJavaVersion = 11
 java {
     def javaVersion = JavaVersion.toVersion(targetJavaVersion)
     sourceCompatibility = javaVersion

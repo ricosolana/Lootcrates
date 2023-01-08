@@ -21,3 +21,5 @@ permissions:
   lootcrates.admin:
     description: Allows access to /crates command
     default: op
+libraries:
+  - org.apache.commons:commons-lang3:3.12.0

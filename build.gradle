@@ -27,6 +27,11 @@ repositories {
         name = 'codemc'
         url = 'https://repo.codemc.io/repository/maven-snapshots/'
     }
+    // for NBT API (but I don't use it)
+    maven {
+        name = "CodeMC"
+        url = uri("https://repo.codemc.org/repository/maven-public/")
+    }
     maven {
         name = 'lumine'
         url = 'https://mvn.lumine.io/repository/maven-public/'
@@ -51,6 +56,7 @@ dependencies {
     compileOnly "org.spigotmc:spigot-api:${project.spigot_version}"
     //shadow files('com.github.PeriodicSeizures'
     shadow files('C:\\Users\\Rico\\Documents\\MinecraftDev\\plugins\\NMSAPI\\api\\target\\nmsapi-1.0.0-SNAPSHOT.jar')
+    //compileOnly "de.tr7zw:item-nbt-api-plugin:2.11.1"
     //implementation 'com.github.PeriodicSeizures:CRUtils:main-SNAPSHOT'
     // Load from files during dev for no hour long delay for jit
     implementation files('C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.19.3 paper\\plugins\\CRUtils.jar')
@@ -62,6 +68,7 @@ dependencies {
     implementation 'net.Indyuce:MMOItems:6.7.1-SNAPSHOT'
     implementation 'io.lumine:MythicLib-dist:1.3-SNAPSHOT'
     compileOnly 'net.ess3:EssentialsX:2.17.2'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
 }
 
 def targetJavaVersion = 11
@@ -82,7 +89,7 @@ tasks.withType(JavaCompile).configureEach {
 
 tasks.withType(Jar) {
     //destinationDirectory = file("C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.18.2 paper\\plugins\\")
-    destinationDirectory = file("C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.18.2 paper\\plugins")
+    destinationDirectory = file("C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.19.3 paper\\plugins")
     //destinationDirectory = file('C:\\Users\\Rico\\Downloads\\mohist_server_test\\plugins')
 }
 

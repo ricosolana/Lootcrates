@@ -27,6 +27,9 @@ public class LootNBTItem extends LootItem {
         super(args);
 
         this.itemStack = NMSAPI.getNBT((String) args.get("nbt")).setNBT(this.itemStack);
+
+        // read the json nbt from string
+        //NBT.itemStackFromNBT(NBT.parseNBT((String) args.get("nbt")));
     }
 
     @Nonnull

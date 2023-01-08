@@ -6,7 +6,7 @@ import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import com.crazicrafter1.lootcrates.crate.LootCollection;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Material;

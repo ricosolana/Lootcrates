@@ -7,7 +7,7 @@ import com.crazicrafter1.lootcrates.crate.LootCollection;
 import com.crazicrafter1.nmsapi.NMSAPI;
 import com.crazicrafter1.nmsapi.nbt.INBTTagCompound;
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -114,6 +114,9 @@ public class Lootcrates {
         if (itemStack == null || itemStack.getType() == Material.AIR)
             return null;
 
+        // return value of key 'Crate', otherwise null if absent
+        //return getCrate(NBT.itemStackToNBT(itemStack).getString("Crate"));
+
         INBTTagCompound nbt = NMSAPI.getNBT(itemStack);
         if (nbt == null) return null;
         return getCrate(nbt.getString("Crate"));
@@ -122,6 +125,9 @@ public class Lootcrates {
     @Nonnull
     public static ItemStack tagItemAsCrate(@Nonnull final ItemStack itemStack, @Nonnull final String id) {
         Validate.notNull(id);
+
+        //ReadWriteNBT nbt = NBT.itemStackToNBT(itemStack);
+        //nbt.
 
         INBTTagCompound nbt = NMSAPI.getOrCreateNBT(itemStack);
         nbt.setString("Crate", id);

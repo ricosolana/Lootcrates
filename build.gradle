@@ -55,11 +55,11 @@ configurations {
 dependencies {
     compileOnly "org.spigotmc:spigot-api:${project.spigot_version}"
     //shadow files('com.github.PeriodicSeizures'
-    shadow files('C:\\Users\\Rico\\Documents\\MinecraftDev\\plugins\\NMSAPI\\api\\target\\nmsapi-1.0.0-SNAPSHOT.jar')
+    shadow files('C:\\Users\\rico\\Documents\\MinecraftDev\\Plugins\\NMSAPI\\api\\target\\nmsapi-1.0.0-SNAPSHOT.jar')
     //compileOnly "de.tr7zw:item-nbt-api-plugin:2.11.1"
     //implementation 'com.github.PeriodicSeizures:CRUtils:main-SNAPSHOT'
     // Load from files during dev for no hour long delay for jit
-    implementation files('C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.18.2 paper lc\\plugins\\CRUtils.jar')
+    implementation files('C:\\Users\\rico\\Documents\\MinecraftDev\\servers\\1.19.4 paper\\plugins\\CRUtils.jar')
     //implementation files("C:\\Users\\Rico\\Documents\\MinecraftDev\\api\\CRUtils.jar");
     //implementation 'com.github.PeriodicSeizures:Gapi:main-SNAPSHOT'
     //implementation files('C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.19 paper\\plugins\\Gapi.jar')
@@ -89,7 +89,7 @@ tasks.withType(JavaCompile).configureEach {
 
 tasks.withType(Jar) {
     //destinationDirectory = file("C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.18.2 paper\\plugins\\")
-    destinationDirectory = file("C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.18.2 paper lc\\plugins")
+    destinationDirectory = file("C:\\Users\\rico\\Documents\\MinecraftDev\\servers\\1.19.4 paper\\plugins")
     //destinationDirectory = file('C:\\Users\\Rico\\Downloads\\mohist_server_test\\plugins')
 }
 

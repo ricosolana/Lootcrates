@@ -17,7 +17,7 @@ permissions:
     default: true
   lootcrates.preview:
     description: Allow crates to be previewed
-    default: false
+    default: op
   lootcrates.admin:
     description: Allows access to /crates command
     default: op

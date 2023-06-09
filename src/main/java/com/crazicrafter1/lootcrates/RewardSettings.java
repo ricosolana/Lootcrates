@@ -64,6 +64,8 @@ public class RewardSettings {
         try {
             final int rev = LCMain.get().rev;
 
+            this.speed = section.getInt("speed");
+
             this.unSelectedItem = Objects.requireNonNull(section.getItemStack("unSelectedItem"), String.format(Lang.CONFIG_NULL_VALUE, "unSelectedItem"));
             this.selectedItem = Objects.requireNonNull(section.getItemStack("selectedItem"), String.format(Lang.CONFIG_NULL_VALUE, "selectedItem"));
 

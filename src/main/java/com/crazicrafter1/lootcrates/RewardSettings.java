@@ -114,7 +114,10 @@ public class RewardSettings {
                         (int) itr.get("picks"),
                         Sound.valueOf((String) itr.get("sound")),
                         weights,
-                        Lootcrates.tagItemAsCrate(Objects.requireNonNull((ItemStack) itr.get("item"), String.format(Lang.CONFIG_NULL_VALUE, "'crates.<" + id + ">.item'")), id)));
+                        Lootcrates.tagItemAsCrate(Objects.requireNonNull((ItemStack) itr.get("item"), String.format(Lang.CONFIG_NULL_VALUE, "'crates.<" + id + ">.item'")), id),
+                        rev >= 8 ? CrateSettings.RevealType.valueOf((String) itr.get("revealType")) : CrateSettings.RevealType.GOOD_OL_DESTY
+                    )
+                );
             }
 
             fireworkEffect = (FireworkEffect) section.get("fireworkEffect");

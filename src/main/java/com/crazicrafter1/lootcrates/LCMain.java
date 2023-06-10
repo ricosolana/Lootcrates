@@ -41,7 +41,7 @@ public class LCMain extends JavaPlugin
 
     public Notifier notifier;
 
-    public static final int REV_LATEST = 7;
+    public static final int REV_LATEST = 8;
     public static final String DISCORD_URL = "https://discord.gg/2JkFBnyvNQ";
     public static final String GITHUB_URL = "https://github.com/PeriodicSeizures/CRUtils/releases";
     public static final String PERM_ADMIN = "lootcrates.admin";

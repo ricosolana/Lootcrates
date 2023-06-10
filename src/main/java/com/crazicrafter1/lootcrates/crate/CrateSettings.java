@@ -16,11 +16,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class CrateSettings {
+    public enum RevealType {
+        GOOD_OL_DESTY,
+        WASD,
+        CSGO,
+    }
+
     public final String id;
     public String title;
     public int columns;
     public int picks;
     public Sound sound;
+    public RevealType revealType;
 
     // TODO deleting the lootset in editor will cause an error when crate is opened
     // because the string referencing to key in map will be removed
@@ -32,9 +39,10 @@ public class CrateSettings {
     public CrateSettings copy() {
         final String strippedId = LCMain.NUMBER_AT_END.matcher(id).replaceAll("");
         String newId;
-        for (int i = 0; LCMain.get().rewardSettings.crates.containsKey(newId = strippedId + i); i++) {}
+        //noinspection StatementWithEmptyBody
+        for (int i = 0; LCMain.get().rewardSettings.crates.containsKey(newId = strippedId + i); i++);
 
-        return new CrateSettings(newId, title, columns, picks, sound, new HashMap<>(loot.getMap()), Lootcrates.tagItemAsCrate(item.clone(), newId));
+        return new CrateSettings(newId, title, columns, picks, sound, new HashMap<>(loot.getMap()), Lootcrates.tagItemAsCrate(item.clone(), newId), revealType);
     }
 
     //todo hmmm kinda ugly
@@ -50,7 +58,7 @@ public class CrateSettings {
     //}
 
     //todo remove post-migrate
-    public CrateSettings(String id, String title, int columns, int picks, Sound sound, Map<String, Integer> loot, ItemStack item) {
+    public CrateSettings(String id, String title, int columns, int picks, Sound sound, Map<String, Integer> loot, ItemStack item, RevealType revealType) {
         this.id = id;
         this.title = title;
         this.columns = columns;
@@ -58,6 +66,7 @@ public class CrateSettings {
         this.sound = sound;
         this.loot = new WeightedRandomContainer<>(loot);
         this.item = item;
+        this.revealType = revealType;
     }
 
     //public CrateSettings(String id, Map<String, Object> args) {
@@ -78,6 +87,7 @@ public class CrateSettings {
         section.set("picks", picks);
         section.set("sound", sound.name());
         section.set("weights", loot.getMap().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+        section.set("revealType", revealType.name());
     }
 
     private String getFormattedPercent(LootCollection lootGroup) {
@@ -141,7 +151,8 @@ public class CrateSettings {
                 "size: " + title + "\n" +
                 "picks: " + picks + "\n" +
                 "sound: " + sound + "\n" +
-                "weights: " + loot + "\n";
+                "weights: " + loot + "\n" +
+                "revealType" + revealType.name() + "\n";
     }
 
     public AbstractMenu.Builder getBuilder() {

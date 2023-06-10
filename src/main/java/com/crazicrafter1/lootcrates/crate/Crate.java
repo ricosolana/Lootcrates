@@ -54,6 +54,6 @@ public class Crate implements ConfigurationSerializable {
         Map<String, Integer> map = this.loot.getMap().entrySet().stream()
                 .collect(Collectors.toMap(e -> e.getKey().id, Map.Entry::getValue));
 
-        return new CrateSettings(id, title, columns, picks, sound, map, item.build());
+        return new CrateSettings(id, title, columns, picks, sound, map, item.build(), CrateSettings.RevealType.GOOD_OL_DESTY);
     }
 }

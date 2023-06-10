@@ -97,7 +97,10 @@ public class Lootcrates {
 
     public static CrateSettings createCrate(String id) {
         return new CrateSettings(id, "select loot", 3, 4, Sound.ENTITY_EXPERIENCE_ORB_PICKUP,
-                ImmutableMap.of(getLoot().next().id, 1), ItemBuilder.mut(tagItemAsCrate(new ItemStack(Material.ENDER_CHEST), id)).name("my new crate").build());
+                ImmutableMap.of(getLoot().next().id, 1),
+                ItemBuilder.mut(tagItemAsCrate(new ItemStack(Material.ENDER_CHEST), id)).name("my new crate").build(),
+                CrateSettings.RevealType.GOOD_OL_DESTY
+        );
     }
 
     public static void registerCrate(CrateSettings crateSettings) {

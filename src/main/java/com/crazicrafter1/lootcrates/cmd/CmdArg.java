@@ -177,7 +177,7 @@ class CmdArg {
         }, (sender, args) -> {
             ArrayList<String> ret = new ArrayList<>();
             for (int i = 0; i < LCMain.REV_LATEST; i++) {
-                ret.add("" + i);
+                ret.add(String.valueOf(i));
             }
             ret.add("latest");
             return ret;

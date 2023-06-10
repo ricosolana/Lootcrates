@@ -1,6 +1,7 @@
 package com.crazicrafter1.lootcrates.crate;
 
 import com.crazicrafter1.crutils.ColorUtil;
+import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.LCMain;
 import com.crazicrafter1.lootcrates.PlayerLog;
@@ -29,7 +30,6 @@ public final class CrateInstance {
      */
     public static HashMap<UUID, CrateInstance> CRATES = new HashMap<>();
     public static Set<Firework> crateFireworks = Collections.newSetFromMap(new WeakHashMap<>());
-    //public static HashSet<UUID> crateFireworks = new HashSet<>();
 
     private static final class QSlot { //TODO rename
         boolean isHidden = true;
@@ -99,7 +99,6 @@ public final class CrateInstance {
 
         // Play animatic on final pick
         if (slots.size() == picks) {
-
             // "Cost" of opening crate
             {
                 ItemStack itemStack = getPlayer().getInventory().getItem(lockSlot);
@@ -112,29 +111,108 @@ public final class CrateInstance {
 
             state = State.REVEALING;
 
+
             if (data.speed != 0) {
-                 taskID = new BukkitRunnable() {
-                     int iterations = 0;
-
-                    @Override
-                    public void run() {
-                        // Panel reveal
-                        if (iterations < size) {
-                            inventory.setItem(iterations, getPanel(iterations));
-                        }
-                        else if (iterations > size + 10/data.speed) {
-                            this.cancel();
-                            pop();
-                        }
-
-                        iterations++;
-                    }
-                }.runTaskTimer(LCMain.get(), 20, data.speed).getTaskId();
-
+                switch (crate.revealType) {
+                    case GOOD_OL_DESTY:
+                        startDestyAnimation();
+                        break;
+                    case WASD:
+                        startWASDAnimation();
+                        break;
+                    default:
+                        pop();
+                        break;
+                }
             } else {
                 pop();
             }
         }
+    }
+
+    private void startDestyAnimation() {
+        taskID = new BukkitRunnable() {
+            int iterations = 0;
+
+            @Override
+            public void run() {
+                // Panel reveal
+                if (iterations < size) {
+                    inventory.setItem(iterations, getPanel(iterations));
+                }
+                else if (iterations > size + 10/data.speed) {
+                    this.cancel();
+                    pop();
+                }
+
+                iterations++;
+            }
+        }.runTaskTimer(LCMain.get(), 20, data.speed).getTaskId();
+    }
+
+    // This is not the actual csgo animation because more than 1 pick can be picked
+    // instead an animation of vertically/horizontally translating tiles in each row/col
+    // will be played
+    private void startWASDAnimation() {
+        taskID = new BukkitRunnable() {
+            final int maxIterations = size + 10 / data.speed;
+            int iterations = 0;
+
+            int x0, y0;
+
+            @Override
+            public void run() {
+
+                // TODO
+                //  maybe have rows with more selected icons to scroll faster than those with less
+
+                // sequenced horizontal and vertical scrolling
+                if (iterations < maxIterations / 4) {
+                    x0++;
+                } else if (iterations < maxIterations / 2) {
+                    y0++;
+                } else if (iterations >= maxIterations - maxIterations / 4) {
+                    y0--;
+                } else {
+                    x0--;
+                }
+
+                //x0 %= 9;
+                //y0 %= size / 9;
+
+                // Set the panels from the left to right and shift each time
+                for (int x = 0; x < 9; x++) {
+                    for (int y = 0; y < size / 9; y++) {
+                        // horizontal scrolling
+                        //inventory.setItem(x + y * 9,
+                        //        getPanel(((x + iterations) % 9) + y + 9)
+                        //);
+
+                        int ix = (x0 + x) % 9;
+                        int iy = (y0 + y) % (size / 9);
+
+                        if (ix < 0)
+                            ix += 9;
+                        if (iy < 0)
+                            iy += size / 9;
+
+                        //ItemBuilder.mut().gl
+
+                        inventory.setItem(x + y * 9,
+                                getPanel(ix + iy * 9)
+                        );
+                    }
+                }
+
+                // timer expiry check
+                if (iterations > maxIterations) {
+                    this.cancel();
+                    pop();
+                }
+
+                iterations++;
+            }
+        }.runTaskTimer(LCMain.get(), 20, data.speed).getTaskId();
     }
 
     private void pop() {
@@ -163,16 +241,6 @@ public final class CrateInstance {
         firework.setFireworkMeta(fwm);
 
         firework.detonate();
-
-        // this might be causing issues
-        //new BukkitRunnable() {
-        //    @Override
-        //    public void run() {
-        //        // check if the firework is alive still
-        //        if (!firework.isValid())
-        //            crateFireworks.remove(firework.getUniqueId());
-        //    }
-        //}.runTaskLater(LCMain.get(), 100);
     }
 
     /**
@@ -219,6 +287,7 @@ public final class CrateInstance {
         return player;
     }
 
+    // Get the LootCollection visual signifier panel (not the reward item)
     private ItemStack getPanel(int slot) {
         return this.lootChances[slot].itemStack(player);
     }
@@ -233,10 +302,10 @@ public final class CrateInstance {
             int slot = e.getSlot();
 
             // If crate GUI clicked on
-            // On Mohist and certain versions, '==' does not work, meaning that the same representing
+
+            // On MohistMC and certain versions, '==' does not work, meaning that the same representing
             // object does not share the same address space (so not same object but still could be same inventory)
             if (Objects.equals(e.getClickedInventory(), inventory)) {
-
                 switch (state) {
                     case SELECTING:
                         selectSlot(slot);

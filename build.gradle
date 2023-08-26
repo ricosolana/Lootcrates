@@ -56,7 +56,7 @@ dependencies {
     compileOnly "org.spigotmc:spigot-api:${project.spigot_version}"
     //shadow files('com.github.PeriodicSeizures'
     shadow files('C:\\Users\\rico\\Documents\\MinecraftDev\\Plugins\\NMSAPI\\api\\target\\nmsapi-1.0.0-SNAPSHOT.jar')
-    //compileOnly "de.tr7zw:item-nbt-api-plugin:2.11.1"
+    compileOnly "de.tr7zw:item-nbt-api-plugin:2.11.3"
     //implementation 'com.github.PeriodicSeizures:CRUtils:main-SNAPSHOT'
     // Load from files during dev for no hour long delay for jit
     implementation files('C:\\Users\\rico\\Documents\\MinecraftDev\\Servers\\1.20 spigot\\plugins\\CRUtils.jar')

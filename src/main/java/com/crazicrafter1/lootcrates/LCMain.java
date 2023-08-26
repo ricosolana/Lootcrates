@@ -5,8 +5,6 @@ import ch.njol.skript.SkriptAddon;
 import com.crazicrafter1.crutils.*;
 import com.crazicrafter1.lootcrates.cmd.Cmd;
 import com.crazicrafter1.lootcrates.cmd.CmdTestParser;
-import com.crazicrafter1.lootcrates.crate.Crate;
-import com.crazicrafter1.lootcrates.crate.LootSet;
 import com.crazicrafter1.lootcrates.crate.loot.*;
 import com.crazicrafter1.lootcrates.listeners.*;
 import org.bukkit.Bukkit;
@@ -263,16 +261,10 @@ public class LCMain extends JavaPlugin
         supportSkript = Bukkit.getPluginManager().isPluginEnabled("Skript");
         supportMMOItems = Bukkit.getPluginManager().isPluginEnabled("MMOItems");
 
-        // Register serializable
-        ConfigurationSerialization.registerClass(Data.class, "Data"); // TODO remove Data de/serializer
-        ConfigurationSerialization.registerClass(LootSet.class, "LootSet");
-        ConfigurationSerialization.registerClass(Crate.class, "Crate");
-
         // Register loot classes
         registerLoot(LootCommand.class);
         registerLoot(LootItem.class);
         registerLoot(LootItemCrate.class);
-        registerLoot(LootNBTItem.class); // TODO remove rev
         if (supportQualityArmory) registerLoot(LootItemQA.class);
         if (supportSkript) {
             addon = Skript.registerAddon(this);
@@ -378,29 +370,23 @@ public class LCMain extends JavaPlugin
                 e1.printStackTrace();
             }
         } else {
+            //error(sender, e.getMessage());
             try {
-                notifier.info(sender, Lang.REWARDS_1);
-                rewardSettings = Objects.requireNonNull((Data) rewardsConfig.get("data")).getSettings();
-            } catch (Exception e) {
-                //error(sender, e.getMessage());
-                e.printStackTrace();
+                notifier.warn(sender, Lang.REWARDS_2);
+
+                saveDefaultFile(sender, rewardsConfigFile, true);
+                rewardsConfig.load(rewardsConfigFile);
+                rewardSettings = new RewardSettings(rewardsConfig);
+            } catch (Exception e1) {
+                //error(sender, e1.getMessage());
+                e1.printStackTrace();
                 try {
-                    notifier.warn(sender, Lang.REWARDS_2);
+                    notifier.warn(sender, Lang.REWARDS_3);
 
-                    saveDefaultFile(sender, rewardsConfigFile, true);
-                    rewardsConfig.load(rewardsConfigFile);
-                    rewardSettings = new RewardSettings(rewardsConfig);
-                } catch (Exception e1) {
-                    //error(sender, e1.getMessage());
-                    e.printStackTrace();
-                    try {
-                        notifier.warn(sender, Lang.REWARDS_3);
-
-                        rewardSettings = new RewardSettings();
-                    } catch (Exception e2) {
-                        // Very severe, should theoretically never reach this point
-                        e2.printStackTrace();
-                    }
+                    rewardSettings = new RewardSettings();
+                } catch (Exception e2) {
+                    // Very severe, should theoretically never reach this point
+                    e2.printStackTrace();
                 }
             }
         }
@@ -450,28 +436,21 @@ public class LCMain extends JavaPlugin
             }
         } else {
             try {
-                notifier.info(sender, Lang.REWARDS_1);
-                rewardSettings = Objects.requireNonNull((Data) rewardsConfig.get("data")).getSettings();
-            } catch (Exception e) {
-                //error(sender, e.getMessage());
-                e.printStackTrace();
+                notifier.warn(sender, Lang.REWARDS_2);
+
+                saveDefaultFile(sender, rewardsConfigFile, true);
+                rewardsConfig.load(rewardsConfigFile);
+                rewardSettings = new RewardSettings(rewardsConfig);
+            } catch (Exception e1) {
+                //error(sender, e1.getMessage());
+                e1.printStackTrace();
                 try {
-                    notifier.warn(sender, Lang.REWARDS_2);
+                    notifier.warn(sender, Lang.REWARDS_3);
 
-                    saveDefaultFile(sender, rewardsConfigFile, true);
-                    rewardsConfig.load(rewardsConfigFile);
-                    rewardSettings = new RewardSettings(rewardsConfig);
-                } catch (Exception e1) {
-                    //error(sender, e1.getMessage());
-                    e.printStackTrace();
-                    try {
-                        notifier.warn(sender, Lang.REWARDS_3);
-
-                        rewardSettings = new RewardSettings();
-                    } catch (Exception e2) {
-                        // Very severe, should theoretically never reach this point
-                        e2.printStackTrace();
-                    }
+                    rewardSettings = new RewardSettings();
+                } catch (Exception e2) {
+                    // Very severe, should theoretically never reach this point
+                    e2.printStackTrace();
                 }
             }
         }

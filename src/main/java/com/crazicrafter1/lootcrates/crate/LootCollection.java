@@ -11,7 +11,6 @@ import com.crazicrafter1.crutils.ui.Result;
 import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
-import com.crazicrafter1.lootcrates.crate.loot.LootNBTItem;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -61,7 +60,7 @@ public class LootCollection {
 
         // condense any old LootNBTItems to LootItem, forward it otherwise
         this.loot = new WeightedRandomContainer<>(loot.getMap().entrySet().stream().collect(
-                Collectors.toMap(e1 -> e1.getKey() instanceof LootNBTItem ? new LootItem(((LootNBTItem) e1.getKey())) : e1.getKey(), Map.Entry::getValue)));
+                Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
     }
 
     //public LootSetSettings(String id, Map<String, Object> args) {
@@ -185,9 +184,6 @@ public class LootCollection {
                             ArrayList<Button> result1 = new ArrayList<>();
                             for (Map.Entry<Class<? extends ILoot>, ItemStack> entry
                                     : LCMain.get().lootClasses.entrySet()) {
-                                // todo remove post
-                                if (entry.getKey().equals(LootNBTItem.class))
-                                    continue;
 
                                 //AbstractLoot aLootInstance = new a
                                 result1.add(new Button.Builder()

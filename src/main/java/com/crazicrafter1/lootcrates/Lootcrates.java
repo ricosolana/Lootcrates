@@ -120,10 +120,11 @@ public class Lootcrates {
         if (itemStack == null || itemStack.getType() == Material.AIR)
             return null;
 
-        // return value of key 'Crate', otherwise null if absent
-        //return getCrate(NBT.itemStackToNBT(itemStack).getString("Crate"));
+        // item.nbt["tag"]["Crate"] (pseudocode)
 
-        return getCrate(NBT.itemStackToNBT(itemStack).getString("Crate"));
+        ReadWriteNBT tag = NBT.itemStackToNBT(itemStack).getCompound("tag");
+        if (tag == null) return null;
+        return getCrate(tag.getString("Crate"));
 
         //INBTTagCompound nbt = NMSAPI.getNBT(itemStack);
         //if (nbt == null) return null;
@@ -134,14 +135,13 @@ public class Lootcrates {
     public static ItemStack tagItemAsCrate(@Nonnull final ItemStack itemStack, @Nonnull final String id) {
         Validate.notNull(id);
 
-        //ReadWriteNBT nbt = NBT.itemStackToNBT(itemStack);
+        ReadWriteNBT tag = NBT.itemStackToNBT(itemStack).getCompound("tag");
+        tag.setString("Crate", id);
+        return NBT.itemStackFromNBT(tag);
+
+        //INBTTagCompound nbt = NMSAPI.getOrCreateNBT(itemStack);
         //nbt.setString("Crate", id);
-        //return NBT
-
-        INBTTagCompound nbt = NMSAPI.getOrCreateNBT(itemStack);
-        nbt.setString("Crate", id);
-
-        return nbt.setNBT(itemStack);
+        //return nbt.setNBT(itemStack);
     }
 
     public static Iterator<CrateSettings> getCrates() {

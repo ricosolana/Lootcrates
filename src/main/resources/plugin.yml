@@ -2,7 +2,7 @@ name: Lootcrates
 version: ${version}
 main: com.crazicrafter1.lootcrates.LCMain
 api-version: 1.13
-depend: [ CRUtils ]
+depend: [ NBTAPI, CRUtils ]
 softdepend: [ QualityArmory, Skript, MMOItems ]
 authors: [ crazicrafter1 ]
 commands:

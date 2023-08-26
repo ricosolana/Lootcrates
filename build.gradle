@@ -55,7 +55,7 @@ configurations {
 dependencies {
     compileOnly "org.spigotmc:spigot-api:${project.spigot_version}"
     //shadow files('com.github.PeriodicSeizures'
-    shadow files('C:\\Users\\rico\\Documents\\MinecraftDev\\Plugins\\NMSAPI\\api\\target\\nmsapi-1.0.0-SNAPSHOT.jar')
+    //shadow files('C:\\Users\\rico\\Documents\\MinecraftDev\\Plugins\\NMSAPI\\api\\target\\nmsapi-1.0.0-SNAPSHOT.jar')
     compileOnly "de.tr7zw:item-nbt-api-plugin:2.11.3"
     //implementation "de.tr7zw:item-nbt-api:2.11.3" // if shadowing
     //shadow "de.tr7zw:item-nbt-api:2.11.3" // doesnt work

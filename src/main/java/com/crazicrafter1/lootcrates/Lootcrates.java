@@ -132,9 +132,10 @@ public class Lootcrates {
     public static ItemStack tagItemAsCrate(@Nonnull final ItemStack itemStack, @Nonnull final String id) {
         Validate.notNull(id);
 
-        ReadWriteNBT tag = NBT.itemStackToNBT(itemStack).getCompound("tag");
+        ReadWriteNBT nbt = NBT.itemStackToNBT(itemStack);
+        ReadWriteNBT tag = nbt.getCompound("tag");
         tag.setString("Crate", id);
-        return NBT.itemStackFromNBT(tag);
+        return NBT.itemStackFromNBT(nbt);
 
         //INBTTagCompound nbt = NMSAPI.getOrCreateNBT(itemStack);
         //nbt.setString("Crate", id);

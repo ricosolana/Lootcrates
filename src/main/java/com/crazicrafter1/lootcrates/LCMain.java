@@ -68,36 +68,6 @@ public class LCMain extends JavaPlugin
     public int cleanPeriod = 30;
     public boolean debug = false;
 
-    // -1 on indefinite revision
-    // TODO remove rev
-    @Deprecated
-    private int findRev() {
-        //noinspection ConstantConditions
-        if (getDataFolder().listFiles().length == 0)
-            return REV_LATEST;
-
-        final File revFile = new File(getDataFolder(), "rev.yml");
-        if (revFile.exists()) {
-            FileConfiguration revConfig = new YamlConfiguration();
-            try {
-                revConfig.load(revFile);
-                Files.delete(revFile.toPath());
-                return revConfig.getInt("rev", REV_LATEST);
-            } catch (Exception e) {
-                notifier.severe(String.format(Lang.FAIL_REV_FILE, e.getMessage()));
-                return -1;
-            }
-        }
-
-        config = YamlConfiguration.loadConfiguration(configFile);
-        int r = config.getInt("rev", -1);
-        if (r != -1)
-            return r;
-
-        notifier.severe(Lang.UNKNOWN_REV);
-        return -1;
-    }
-
     private static LCMain instance;
     public static LCMain get() {
         return instance;
@@ -306,40 +276,13 @@ public class LCMain extends JavaPlugin
         try {
             saveDefaultConfig();
 
-            this.rev = findRev(); // TODO remove rev
+            config = YamlConfiguration.loadConfiguration(configFile);
 
-            // TODO remove rev
-            if (rev <= 2) {
-                // load several
-                final File langFile = new File(getDataFolder(), "lang.yml");
-                YamlConfiguration langConfig = YamlConfiguration.loadConfiguration(langFile);
-                File noUpdateFile = new File(getDataFolder(), "NO_UPDATE.txt");
-
-                this.language = langConfig.getString("language", "en");
-                this.update = !(Files.exists(noUpdateFile.toPath()) && Files.isRegularFile(noUpdateFile.toPath()));
-
-                Files.delete(langFile.toPath()); // throws if missing
-                Files.deleteIfExists(noUpdateFile.toPath());
-            } else if (rev == 3) {
-                config = YamlConfiguration.loadConfiguration(configFile);
-
-                this.language = config.getString("language", language);
-                this.update = config.getBoolean("update", update);
-                this.cleanPeriod = config.getInt("clean-after-days", cleanPeriod);
-            } else if (rev <= 5) { // 4 and above
-                config = YamlConfiguration.loadConfiguration(configFile);
-
-                this.language = config.getString("language", language);
-                this.update = config.getBoolean("update", update);
-                this.cleanPeriod = config.getInt("clean-after-days", cleanPeriod);
-            } else {
-                config = YamlConfiguration.loadConfiguration(configFile);
-
-                this.language = config.getString("language", language);
-                this.update = config.getBoolean("update", update);
-                this.cleanPeriod = config.getInt("clean-period", cleanPeriod);
-                this.debug = config.getBoolean("debug", debug);
-            }
+            this.rev = config.getInt("rev", -1);
+            this.language = config.getString("language", language);
+            this.update = config.getBoolean("update", update);
+            this.cleanPeriod = config.getInt("clean-period", cleanPeriod);
+            this.debug = config.getBoolean("debug", debug);
         } catch (Exception e) {
             notifier.severe(sender, String.format(Lang.CONFIG_LOAD_FAIL, e.getMessage()));
         }
@@ -348,47 +291,17 @@ public class LCMain extends JavaPlugin
     public void reloadData(@Nonnull CommandSender sender) {
         PlayerLog.loadAll(sender);
 
-        // TODO remove rev
-        if (rev <= 2) {
-            // swap config.yml contents with rewards config in memory
-            rewardsConfig = YamlConfiguration.loadConfiguration(configFile);
-        } else {
-            saveDefaultFile(sender, rewardsConfigFile, false);
-
-            rewardsConfig = YamlConfiguration.loadConfiguration(rewardsConfigFile);
-        }
+        saveDefaultFile(sender, rewardsConfigFile, false);
+        rewardsConfig = YamlConfiguration.loadConfiguration(rewardsConfigFile);
 
         // save default en.yml file
         Lang.save(sender, "en", false);
         Lang.load(sender, language);
 
-        // TODO remove rev
-        if (rev >= 6) {
-            try {
-                this.rewardSettings = new RewardSettings(rewardsConfig);
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
-        } else {
-            //error(sender, e.getMessage());
-            try {
-                notifier.warn(sender, Lang.REWARDS_2);
-
-                saveDefaultFile(sender, rewardsConfigFile, true);
-                rewardsConfig.load(rewardsConfigFile);
-                rewardSettings = new RewardSettings(rewardsConfig);
-            } catch (Exception e1) {
-                //error(sender, e1.getMessage());
-                e1.printStackTrace();
-                try {
-                    notifier.warn(sender, Lang.REWARDS_3);
-
-                    rewardSettings = new RewardSettings();
-                } catch (Exception e2) {
-                    // Very severe, should theoretically never reach this point
-                    e2.printStackTrace();
-                }
-            }
+        try {
+            this.rewardSettings = new RewardSettings(rewardsConfig);
+        } catch (Exception e1) {
+            e1.printStackTrace();
         }
 
         if (rewardSettings != null) {
@@ -404,55 +317,24 @@ public class LCMain extends JavaPlugin
 
 
     // TODO rev 8
-    //   rev 8 will split the configs up more
-    //      into crates.yml and rewards.yml
-    //          crates.yml will contain the crates with their lootCollection id references
-    //              rewards.yml will contain the lootItems in their respective lootCollections
+    //  rev 8 will have a crates.yml and rewards.yml
+    //  crates.yml: contains crates with their lootCollection id references
+    //  rewards.yml: contains lootItems in their respective lootCollections
     public void reloadCrateConfig(@Nonnull CommandSender sender) {
         PlayerLog.loadAll(sender);
 
+        saveDefaultFile(sender, rewardsConfigFile, false);
 
-
-        // TODO remove rev
-        if (rev <= 2) {
-            // swap config.yml contents with rewards config in memory
-            rewardsConfig = YamlConfiguration.loadConfiguration(configFile);
-        } else {
-            saveDefaultFile(sender, rewardsConfigFile, false);
-
-            rewardsConfig = YamlConfiguration.loadConfiguration(rewardsConfigFile);
-        }
+        rewardsConfig = YamlConfiguration.loadConfiguration(rewardsConfigFile);
 
         // save default en.yml file
         Lang.save(sender, "en", false);
         Lang.load(sender, language);
 
-        // TODO remove rev
-        if (rev >= 6) {
-            try {
-                this.rewardSettings = new RewardSettings(rewardsConfig);
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
-        } else {
-            try {
-                notifier.warn(sender, Lang.REWARDS_2);
-
-                saveDefaultFile(sender, rewardsConfigFile, true);
-                rewardsConfig.load(rewardsConfigFile);
-                rewardSettings = new RewardSettings(rewardsConfig);
-            } catch (Exception e1) {
-                //error(sender, e1.getMessage());
-                e1.printStackTrace();
-                try {
-                    notifier.warn(sender, Lang.REWARDS_3);
-
-                    rewardSettings = new RewardSettings();
-                } catch (Exception e2) {
-                    // Very severe, should theoretically never reach this point
-                    e2.printStackTrace();
-                }
-            }
+        try {
+            this.rewardSettings = new RewardSettings(rewardsConfig);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         if (rewardSettings != null) {
@@ -470,6 +352,7 @@ public class LCMain extends JavaPlugin
     public void saveConfig(@Nonnull CommandSender sender) {
         // if a backup was successfully made, then save
 
+        // TODO no longer using -1 rev
         if (rev == -1)
             return;
 
@@ -542,8 +425,6 @@ public class LCMain extends JavaPlugin
             notifier.severe(sender, String.format(Lang.CONFIG_DELETES_FAIL, e.getMessage()));
         }
     }
-
-
 
 
 

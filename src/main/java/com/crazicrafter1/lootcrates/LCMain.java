@@ -40,14 +40,25 @@ public class LCMain extends JavaPlugin
 
     public Notifier notifier;
 
-    public static final int REV_LATEST = 8;
+    public static final int REV_LATEST = 9;
+
     public static final String DISCORD_URL = "https://discord.gg/2JkFBnyvNQ";
-    public static final String GITHUB_URL = "https://github.com/PeriodicSeizures/CRUtils/releases";
+
     public static final String PERM_ADMIN = "lootcrates.admin";
     public static final String PERM_OPEN = "lootcrates.open";
     public static final String PERM_PREVIEW = "lootcrates.preview";
-    //private final File cratesConfigFile_REV8_ONWARD = new File(getDataFolder(), "rewards.yml");
+
+    public static final String KEY_rev = "rev";
+    public static final String Key_language = "language";
+    public static final String KEY_update = "update";
+    public static final String KEY_cleanPeriod = "clean-period";
+    public static final String KEY_debug = "debug";
+    public static final String KEY_checkCerts = "check-certs";
+    public static final String KEY_certs = "certs";
+
+    //private final File cratesConfigFile_REV9_ONWARD = new File(getDataFolder(), "crates.yml");
     private final File rewardsConfigFile = new File(getDataFolder(), "rewards.yml");
+    //private final File lootConfigFile_REV9_ONWARD = new File(getDataFolder(), "loot.yml");
     private final File configFile = new File(getDataFolder(), "config.yml");
     private final File backupPath = new File(getDataFolder(), "backup");
     private final File certsFile = new File(getDataFolder(), "certs.yml");
@@ -200,11 +211,11 @@ public class LCMain extends JavaPlugin
         try {
             Metrics metrics = new Metrics(this, 10395);
 
-            metrics.addCustomChart(new Metrics.SimplePie("update",
-                    () -> "" + update)
+            metrics.addCustomChart(new Metrics.SimplePie(KEY_update,
+                    () -> String.valueOf(update))
             );
 
-            metrics.addCustomChart(new Metrics.SimplePie("language",
+            metrics.addCustomChart(new Metrics.SimplePie(Key_language,
                     () -> language)
             );
 
@@ -220,7 +231,7 @@ public class LCMain extends JavaPlugin
             );
 
             metrics.addCustomChart(
-                new Metrics.SimplePie("check-certs", () -> "" + checkCerts)
+                new Metrics.SimplePie(KEY_checkCerts, () -> String.valueOf(checkCerts))
             );
 
         } catch (Exception e) {
@@ -282,12 +293,12 @@ public class LCMain extends JavaPlugin
 
             config = YamlConfiguration.loadConfiguration(configFile);
 
-            this.rev = config.getInt("rev", -1);
-            this.language = config.getString("language", language);
-            this.update = config.getBoolean("update", update);
-            this.cleanPeriod = config.getInt("clean-period", cleanPeriod);
-            this.debug = config.getBoolean("debug", debug);
-            this.checkCerts = config.getBoolean("check-certs", checkCerts);
+            this.rev = config.getInt(KEY_rev, REV_LATEST);
+            this.language = config.getString(Key_language, language);
+            this.update = config.getBoolean(KEY_update, update);
+            this.cleanPeriod = config.getInt(KEY_cleanPeriod, cleanPeriod);
+            this.debug = config.getBoolean(KEY_debug, debug);
+            this.checkCerts = config.getBoolean(KEY_checkCerts, checkCerts);
         } catch (Exception e) {
             notifier.severe(sender, String.format(Lang.CONFIG_LOAD_FAIL, e.getMessage()));
         }
@@ -300,7 +311,7 @@ public class LCMain extends JavaPlugin
         FileConfiguration rewardsConfig = YamlConfiguration.loadConfiguration(rewardsConfigFile);
 
         FileConfiguration certsConfig = YamlConfiguration.loadConfiguration(certsFile);
-        crateCerts = certsConfig.getStringList("certs").stream().map(UUID::fromString).collect(Collectors.toSet());
+        crateCerts = certsConfig.getStringList(KEY_certs).stream().map(UUID::fromString).collect(Collectors.toSet());
 
         // save default en.yml file
         Lang.save(sender, "en", false);
@@ -323,7 +334,7 @@ public class LCMain extends JavaPlugin
     }
 
 
-
+    /*
     // TODO rev 8
     //  rev 8 will have a crates.yml and rewards.yml
     //  crates.yml: contains crates with their lootCollection id references
@@ -354,25 +365,21 @@ public class LCMain extends JavaPlugin
         notifier.severe(sender, String.format(Lang.REWARDS_REPORT, DISCORD_URL));
         Bukkit.getPluginManager().disablePlugin(this);
     }
-
+    */
 
 
     public void saveConfig(@Nonnull CommandSender sender) {
         // if a backup was successfully made, then save
 
-        // TODO no longer using -1 rev
-        if (rev == -1)
-            return;
-
         try {
             config = new YamlConfiguration();
 
-            config.set("rev", REV_LATEST);
-            config.set("language", language);
-            config.set("update", update);
-            config.set("clean-period", cleanPeriod);
-            config.set("debug", debug);
-            config.set("check-certs", checkCerts);
+            config.set(KEY_rev, REV_LATEST);
+            config.set(Key_language, language);
+            config.set(KEY_update, update);
+            config.set(KEY_cleanPeriod, cleanPeriod);
+            config.set(KEY_debug, debug);
+            config.set(KEY_checkCerts, checkCerts);
 
             config.save(configFile);
         } catch (IOException e) {
@@ -393,7 +400,7 @@ public class LCMain extends JavaPlugin
             rewardSettings.serialize(rewardsConfig);
 
             FileConfiguration certsConfig = new YamlConfiguration();
-            certsConfig.set("certs", crateCerts.stream().map(UUID::toString).collect(Collectors.toList()));
+            certsConfig.set(KEY_certs, crateCerts.stream().map(UUID::toString).collect(Collectors.toList()));
 
             try {
                 rewardsConfig.save(rewardsConfigFile);
@@ -405,7 +412,6 @@ public class LCMain extends JavaPlugin
         } else notifier.severe(sender, Lang.CONFIG_BackupError);
     }
 
-    //private static final Pattern BACKUP_PATTERN = Pattern.compile("([0-9])+_\\S+_rewards_\\S+.zip");
     private static final Pattern BACKUP_PATTERN = Pattern.compile("^([0-9])+(_\\S+)?.zip");
     private void deleteOldBackups(@Nonnull CommandSender sender) {
         if (cleanPeriod <= 0)

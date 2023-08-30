@@ -69,7 +69,7 @@ public class Editor {
                                 // *       *      *
                                 // Add Crate button
                                 // *       *      *
-                                .childButton(5, 5, p -> ItemBuilder.copy(Material.NETHER_STAR).name(Lang.ED_Crates_BTN_New).build(), new TextMenu.TBuilder()
+                                .childButton(5, 5, p -> ItemBuilder.copy(Material.END_CRYSTAL).name(Lang.ED_Crates_BTN_New).build(), new TextMenu.TBuilder()
                                         .title(p -> Lang.ED_Crates_New_TI)
                                         .leftRaw(p -> LOREM_IPSUM)
                                         .onClose((player) -> Result.PARENT())

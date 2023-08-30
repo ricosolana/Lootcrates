@@ -41,17 +41,6 @@ class CmdArg {
 
     static {
         if (plugin.debug) {
-            arg("dbg-opened", (sender, args, flags) -> {
-                return info(sender, "Open crates: " + String.join(", ",
-                        CrateInstance.CRATES.values().stream().map(e -> e.getPlayer().getName()).toArray(String[]::new)
-                ));
-                //return info(sender, "Updated");
-            });
-
-            arg("throw", (sender, args, flags) -> {
-                throw new RuntimeException("Test exception");
-            });
-
             arg("class", (sender, args, flags) -> {
                 try {
                     Class<?> clazz = Class.forName(args[0]);
@@ -65,6 +54,13 @@ class CmdArg {
                     e.printStackTrace();
                     return severe(sender, e.getMessage());
                 }
+            });
+
+            arg("opened", (sender, args, flags) -> {
+                return info(sender, "Open crates: " + String.join(", ",
+                        CrateInstance.CRATES.values().stream().map(e -> e.getPlayer().getName()).toArray(String[]::new)
+                ));
+                //return info(sender, "Updated");
             });
 
             arg("method", (sender, args, flags) -> {
@@ -88,34 +84,11 @@ class CmdArg {
                     return severe(sender, e.getMessage());
                 }
             });
+
+            arg("throw", (sender, args, flags) -> {
+                throw new RuntimeException("Test exception");
+            });
         }
-
-        arg("lang", (sender, args, flags) -> {
-            if (Lang.load(sender, args[0]))
-                LCMain.get().language = args[0];
-            return true;
-        }
-                // todo autocompleting looks at disk each time, which is slow?
-                /* (sender, args) -> {
-            File[] files = Lang.langPath.listFiles();
-
-            //return Arrays.stream(Lang.langPath.listFiles()).filter(file -> file.getName().endsWith(".yml"));
-
-            ArrayList<String> ret = new ArrayList<>();
-            if (args.length == 1) {
-                ret.add("save");
-                ret.add("load");
-            } else if (args.length == 2) {
-                ret.add("confirm");
-            }
-            return ret;
-        }*/);
-
-        //args.put("populate", new CmdArg((sender, args, flags) -> {
-        //    plugin.saveConfig(sender);
-        //    plugin.data = new Data();
-        //    return info(sender, Lang.POPULATING);
-        //}, null));
 
         arg("colors", (sender, args, flags) -> {
             if (args.length == 0)
@@ -153,12 +126,6 @@ class CmdArg {
             }
 
             return new ArrayList<>();
-        });
-
-        arg("save", (sender, args, flags) -> {
-            plugin.saveConfig(sender);
-            plugin.saveOtherConfigs(sender);
-            return info(sender, Lang.CONFIG_SAVED);
         });
 
         arg("crate", (sender, args, flags) -> {
@@ -210,7 +177,7 @@ class CmdArg {
             }
 
             // crates crate common crazicrafter1
-            Player p = Bukkit.getServer().getPlayer(args[1]);
+            Player p = Bukkit.getServer().getOnlinePlayers().stream().filter(player -> player.getName().equals(args[1])).findFirst().orElse(null);
             if (p == null)
                 return severe(sender, Lang.ERR_PLAYER_UNKNOWN);
 
@@ -233,43 +200,26 @@ class CmdArg {
             if (args.length == 2) {
                 return getMatches(args[1],
                         Stream.concat(
-                            Stream.concat(
-                                            Bukkit.getServer().getOnlinePlayers().stream().filter(p -> p != sender).map(Player::getName),
-                                            (Bukkit.getServer().getOnlinePlayers().size() > 1) ? // Removing redundant identifiers for discrete
-                                                    Stream.of("*") : Stream.empty()),
-                                sender instanceof Player ? Stream.of("-s", "-silent") : Stream.empty()
+                                        Stream.concat(
+                                                Bukkit.getServer().getOnlinePlayers().stream().filter(p -> p != sender).map(Player::getName),
+                                                (Bukkit.getServer().getOnlinePlayers().size() > 1) ? // Removing redundant identifiers for discrete
+                                                        Stream.of("*") : Stream.empty()),
+                                        sender instanceof Player ? Stream.of("-s", "-silent") : Stream.empty()
                                 )
                                 .collect(Collectors.toList()));
             }
-            if (args.length == 3) {
+            if (args.length == 3 && !args[args.length - 1].startsWith("-s")) {
                 return getMatches(args[2], Stream.of("-s", "-silent")
-                                .collect(Collectors.toList()));
+                        .collect(Collectors.toList()));
             }
             return new ArrayList<>();
         });
 
-        arg("reset", (sender, args, flags) -> {
-            plugin.saveDefaultConfig(sender, true);
-            plugin.reloadConfig(sender);
-            return info(sender, Lang.CONFIG_LOADED_DEFAULT);
-        });
-
-        arg("reload", (sender, args, flags) -> {
-            plugin.reloadConfig(sender);
-            plugin.reloadData(sender);
-            return info(sender, Lang.CONFIG_LOADED_DISK);
-        });
-
         arg("editor", (sender, args, flags) -> {
             if (sender instanceof Player) {
-                // title, subtitle, fadein, stay, fadeout
                 Player p = (Player) sender;
-                // todo an opened crate holds a reference to the same object pointed to by CrateInstance.openCrates
-                //  when this object is modified (not reassigned), issues might occur?
-                //if (CrateInstance.openCrates.isEmpty())
-                    new Editor().open(p);
-                //else
-                //    error(sender, "Can only be used when no crates are open");
+
+                new Editor().open(p);
 
                 return true;
             }
@@ -295,7 +245,44 @@ class CmdArg {
             return severe(sender, Lang.REQUIRE_HELD);
         });
 
-        //arg("auth");
+        arg("lang", (sender, args, flags) -> {
+                    if (Lang.load(sender, args[0]))
+                        LCMain.get().language = args[0];
+                    return true;
+                }
+                // todo autocompleting looks at disk each time, which is slow?
+                /* (sender, args) -> {
+            File[] files = Lang.langPath.listFiles();
+
+            //return Arrays.stream(Lang.langPath.listFiles()).filter(file -> file.getName().endsWith(".yml"));
+
+            ArrayList<String> ret = new ArrayList<>();
+            if (args.length == 1) {
+                ret.add("save");
+                ret.add("load");
+            } else if (args.length == 2) {
+                ret.add("confirm");
+            }
+            return ret;
+        }*/);
+
+        arg("reload", (sender, args, flags) -> {
+            plugin.reloadConfig(sender);
+            plugin.reloadData(sender);
+            return info(sender, Lang.CONFIG_LOADED_DISK);
+        });
+
+        arg("reset", (sender, args, flags) -> {
+            plugin.saveDefaultConfig(sender, true);
+            plugin.reloadConfig(sender);
+            return info(sender, Lang.CONFIG_LOADED_DEFAULT);
+        });
+
+        arg("save", (sender, args, flags) -> {
+            plugin.saveConfig(sender);
+            plugin.saveOtherConfigs(sender);
+            return info(sender, Lang.CONFIG_SAVED);
+        });
     }
 
     static boolean info(CommandSender sender, String message) {

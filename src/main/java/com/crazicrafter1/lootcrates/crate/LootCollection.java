@@ -177,7 +177,7 @@ public class LootCollection {
                 })
                 .childButton(3, 5, p -> ItemBuilder.copy(itemStack).name(Lang.EDIT_ICON).lore(Lang.ED_LMB_EDIT).build(), new ItemModifyMenu()
                         .build(this.itemStack, itemStack -> this.itemStack = itemStack))
-                .childButton(5, 5, p -> ItemBuilder.copy(Material.NETHER_STAR).name(Lang.LMB_NEW).build(), new ParallaxMenu.PBuilder()
+                .childButton(5, 5, p -> ItemBuilder.copy(Material.GOLDEN_CARROT).name(Lang.LMB_NEW).build(), new ParallaxMenu.PBuilder()
                         .title(p -> Lang.ED_LootSets_PROTO_New_TI)
                         .parentButton(4, 5)
                         .addAll((self1, p00) -> {

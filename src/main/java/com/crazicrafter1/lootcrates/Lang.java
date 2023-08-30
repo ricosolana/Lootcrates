@@ -11,8 +11,7 @@ public class Lang {
     // ideally a format like 'editor.button.crates' is best, but I want directly referred variables at the same time
 
     public static String Misc_OpenBug = "Either a player is cheating or plugin has bugged out\n" +
-            "%s tried opening crate while already viewing crate\n" +
-            "If the player is not cheating, contact dev";
+            "%s attempted to open crate while already open";
 
     public static String Custom_Macros = "&9Custom macros: ";
     public static String Separate_Lore = "&eSeparate lore lines: ";
@@ -20,17 +19,17 @@ public class Lang {
     public static String Editor_Title = "Editor";
 
     public static String ED_BTN_Crates = "&3&lCrates";
-    public static String ED_BTN_LootSets = "&6&lLoot sets";
+    public static String ED_BTN_LootSets = "&6&lLoot";
     public static String ED_BTN_Firework = "&e&lFirework";
 
     public static String ED_Crates_TI = "Crates";
-    public static String ED_Crates_BTN_New = "&6New crate";
-    public static String ED_Crates_New_TI = "New crate";
+    public static String ED_Crates_BTN_New = "&6Add new crate";
+    public static String ED_Crates_New_TI = "Name of crate:";
 
-    public static String ED_LootSets_TI = "LootSets";
+    public static String ED_LootSets_TI = "Loot";
     public static String ED_LootSets_BTN_LORE = "&8%d items";
-    public static String ED_LootSets_BTN_New = "&6New loot set";
-    public static String ED_LootSets_New_TI = "New loot set";
+    public static String ED_LootSets_BTN_New = "&6Add new collection...";
+    public static String ED_LootSets_New_TI = "Name of collection:";
 
     public static String ED_Firework_TI = "Firework";
     public static String ED_Firework_ERROR = "&eMust have effect";

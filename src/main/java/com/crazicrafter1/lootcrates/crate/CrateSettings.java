@@ -4,6 +4,8 @@ import com.crazicrafter1.crutils.*;
 import com.crazicrafter1.crutils.ui.*;
 import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.lootcrates.LCMain;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
@@ -92,7 +94,7 @@ public class CrateSettings {
     }
 
     private String getFormattedPercent(LootCollection lootGroup) {
-        return String.format("%.02f%%", 100.f * ((float) loot.get(lootGroup.id)/(float)loot.getWeight()));
+        return String.format("%.02f%%", 100.f * ((float) loot.get(lootGroup.id)/(float) loot.getWeight()));
     }
 
     private String getFormattedFraction(LootCollection lootGroup) {
@@ -130,11 +132,24 @@ public class CrateSettings {
      * @return the formatted item
      */
     public ItemStack itemStack(@Nullable Player p) {
-        return ItemBuilder.copy(item)
+        ItemStack itemStack = ItemBuilder.copy(item)
                 .replace("crate_picks", "" + picks, '%')
                 .placeholders(p)
                 .renderAll()
                 .build();
+
+        if (LCMain.get().checkCerts) {
+            ReadWriteNBT nbt = NBT.itemStackToNBT(itemStack);
+            ReadWriteNBT tag = nbt.getCompound("tag");
+            UUID ticket = UUID.randomUUID();
+            tag.setUUID("CrateCert", ticket);
+
+            LCMain.crateCerts.add(ticket);
+
+            return NBT.itemStackFromNBT(nbt);
+        }
+
+        return itemStack;
     }
 
     public String getTitle(@Nullable Player p) {

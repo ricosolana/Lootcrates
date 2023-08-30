@@ -7,9 +7,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
-public class ListenerOnInventoryClick extends BaseListener {
+public class ListenerCrateInteract extends BaseListener {
 
-    public ListenerOnInventoryClick(LCMain plugin) {
+    public ListenerCrateInteract(LCMain plugin) {
         super(plugin);
     }
 
@@ -22,9 +22,18 @@ public class ListenerOnInventoryClick extends BaseListener {
         Player p = (Player) e.getWhoClicked();
 
         // If player is opening crate
-        if (CrateInstance.CRATES.containsKey(p.getUniqueId())) {
-            CrateInstance.CRATES.get(p.getUniqueId()).onInventoryClick(e);
-        }/* else if (e.getClickedInventory() != null) {
+        CrateInstance instance = CrateInstance.CRATES.get(p.getUniqueId());
+        if (instance != null) {
+            instance.onInventoryClick(e);
+        }
+        //else if (e.getClick().isCreativeAction()
+        //    && Lootcrates.getCrate(e.getCurrentItem()) != null) {
+        //    // cancel
+        //    e.setCancelled(true);
+        //}
+
+
+        /* else if (e.getClickedInventory() != null) {
             if (LootCratesAPI.extractCrateFromItem(e.getCursor()) != null) {
 
                 Main.get().info(e.getClickedInventory().getType().name());

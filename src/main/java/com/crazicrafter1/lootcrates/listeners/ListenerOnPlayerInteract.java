@@ -1,14 +1,12 @@
 package com.crazicrafter1.lootcrates.listeners;
 
 import com.crazicrafter1.crutils.ColorUtil;
-import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.crutils.Version;
 import com.crazicrafter1.lootcrates.Lang;
 import com.crazicrafter1.lootcrates.Lootcrates;
 import com.crazicrafter1.lootcrates.LCMain;
 import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import com.crazicrafter1.lootcrates.crate.CrateSettings;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -16,6 +14,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 public class ListenerOnPlayerInteract extends BaseListener {
 
@@ -24,26 +23,23 @@ public class ListenerOnPlayerInteract extends BaseListener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerInteract(PlayerInteractEvent e)
-    {
-        if (plugin.rev == -1)
-            return;
-
-        Action a = e.getAction();
+    public void onPlayerInteract(PlayerInteractEvent e) {
+        Action action = e.getAction();
 
         // PHYSICAL describes stepping onto pressure plate or tripwire...
-        if (a == Action.PHYSICAL)
+        if (action == Action.PHYSICAL)
             return;
 
         if (e.useItemInHand() == Event.Result.DENY)
             return;
 
         Player p = e.getPlayer();
+        PlayerInventory inventory = p.getInventory();
 
         //noinspection deprecation
-        ItemStack item = p.getInventory().getItemInHand();
-        if (item.getType() == Material.AIR && Version.AT_LEAST_v1_9.a())
-            item = p.getInventory().getItemInOffHand();
+        ItemStack item = inventory.getItemInHand();
+        if (item.getType().isAir() && Version.AT_LEAST_v1_9.a())
+            item = inventory.getItemInOffHand();
 
         CrateSettings crate = Lootcrates.getCrate(item);
         if (crate != null)
@@ -53,14 +49,19 @@ public class ListenerOnPlayerInteract extends BaseListener {
             return;
 
         if (!CrateInstance.CRATES.containsKey(p.getUniqueId())) {
-            if (a == Action.RIGHT_CLICK_BLOCK || a == Action.RIGHT_CLICK_AIR) {
-                if (p.hasPermission(LCMain.PERM_OPEN)) {
-                    new CrateInstance(p, crate, p.getInventory().getHeldItemSlot()).open();
-                } else
-                    p.sendMessage(ColorUtil.renderAll(Lang.ERR_NO_PERM_OPEN));
+            if (action == Action.RIGHT_CLICK_BLOCK || action == Action.RIGHT_CLICK_AIR) {
+                if (!plugin.checkCerts || Lootcrates.canClaimTicket(item) != null) {
+                    if (p.hasPermission(LCMain.PERM_OPEN)) {
+                        new CrateInstance(p, crate, item).open();
+                    } else
+                        p.sendMessage(ColorUtil.renderAll(Lang.ERR_NO_PERM_OPEN));
+                } else {
+                    // TODO improve logging
+                    plugin.notifier.warn("A crate appears to be duplicated! " + p.getName());
+                }
             } else {
                 if (p.hasPermission(LCMain.PERM_PREVIEW))
-                    Lootcrates.displayCratePreview(p, crate);
+                    Lootcrates.showPreview(p, crate);
                 else
                     p.sendMessage(ColorUtil.renderAll(Lang.ERR_NO_PERM_PREVIEW));
             }

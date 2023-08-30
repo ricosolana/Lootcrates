@@ -32,9 +32,8 @@ public class EffOpenCrate extends Effect {
     protected void execute(Event e) {
         String id = crate.getSingle(e);
         Player p = player.getSingle(e);
-        //LootcratesAPI.displayCrateMenu(p, id, p.getInventory().getHeldItemSlot());
-        //new CrateInstance(p, LootcratesAPI.getCrate(id), -1).open();
-        Lootcrates.displayCrateMenu(p, Lootcrates.getCrate(id), -1);
+
+        Lootcrates.showCrate(p, Lootcrates.getCrate(id));
     }
 
     @Override

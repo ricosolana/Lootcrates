@@ -35,7 +35,7 @@ public class EffPreviewCrate extends Effect {
         //LootcratesAPI.displayCratePreview(p, id);
 
         //LootcratesAPI.getCrate(id).getPreview().open(p);
-        Lootcrates.displayCratePreview(p, Lootcrates.getCrate(id));
+        Lootcrates.showPreview(p, Lootcrates.getCrate(id));
     }
 
     @Override

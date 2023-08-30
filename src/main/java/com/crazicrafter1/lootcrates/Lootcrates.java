@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Iterator;
+import java.util.UUID;
 
 public class Lootcrates {
     //public static Map<Class<? extends ILoot>, ItemStack> lootClasses = new HashMap<>();
@@ -142,6 +143,31 @@ public class Lootcrates {
         //return nbt.setNBT(itemStack);
     }
 
+    /**
+     * Try to claim the UUID ticket attached to a crate (to prevent duplication)
+     *  This can modify the legal ticket pool
+     * @param itemStack crate item
+     * @return The attached UUID or null if illegal
+     */
+    public static UUID claimTicket(ItemStack itemStack) {
+        ReadWriteNBT tag = NBT.itemStackToNBT(itemStack).getCompound("tag");
+        if (tag == null) return null; // hmm
+        UUID ticket = tag.getUUID("CrateCert");
+        return LCMain.crateCerts.remove(ticket) ? ticket : null;
+    }
+
+    /**
+     * If the attacked ticket to the crate ItemStack can be claimed
+     * @param itemStack crate item
+     * @return The attached UUID or null if illegal
+     */
+    public static UUID canClaimTicket(ItemStack itemStack) {
+        ReadWriteNBT tag = NBT.itemStackToNBT(itemStack).getCompound("tag");
+        if (tag == null) return null; // hmm
+        UUID ticket = tag.getUUID("CrateCert");
+        return LCMain.crateCerts.contains(ticket) ? ticket : null;
+    }
+
     public static Iterator<CrateSettings> getCrates() {
         return LCMain.get().rewardSettings.crates.values().iterator();
     }
@@ -150,37 +176,16 @@ public class Lootcrates {
         return LCMain.get().rewardSettings.lootSets.values().iterator();
     }
 
-    /**
-     * Show a crate to a player
-     * @param p {@link Player} instance
-     * @param id crate id
-     * @return whether the open was successful
-     */
-    @Deprecated
-    public static boolean displayCrateMenu(@Nonnull Player p, @Nonnull String id) {
-        return displayCrateMenu(p, id, -1);
-    }
-
-    @Deprecated
-    public static boolean displayCrateMenu(@Nonnull Player p, @Nonnull String id, int lock_slot) {
-        CrateSettings crate = getCrate(id);
-        if (crate != null && !CrateInstance.CRATES.containsKey(p.getUniqueId())) {
-            new CrateInstance(p, crate, lock_slot).open();
-            return true;
-        }
-
-        return false;
-    }
-
-    public static boolean displayCrateMenu(@Nonnull Player p, @Nonnull CrateSettings crate, int lock_slot) {
+    // TODO add force-or prevention check
+    public static boolean showCrate(@Nonnull Player p, @Nonnull CrateSettings crate) {
         if (CrateInstance.CRATES.containsKey(p.getUniqueId()))
             return false;
 
-        new CrateInstance(p, crate, lock_slot).open();
+        new CrateInstance(p, crate, null).open();
         return true;
     }
 
-    public static boolean displayCratePreview(@Nonnull Player p, @Nonnull CrateSettings crate) {
+    public static boolean showPreview(@Nonnull Player p, @Nonnull CrateSettings crate) {
         if (CrateInstance.CRATES.containsKey(p.getUniqueId()))
             return false;
 
@@ -189,11 +194,11 @@ public class Lootcrates {
     }
 
     /**
-     * Close a player currently opened crate
+     * Closes a player-opened crate
      * @param p {@link Player} instance
      * @return whether the close was successful
      */
-    public static boolean endDisplayCrateMenu(@Nonnull Player p) {
+    public static boolean stopCrate(@Nonnull Player p) {
         CrateInstance activeCrate = CrateInstance.CRATES.remove(p.getUniqueId());
         if (activeCrate != null) {
             activeCrate.close();

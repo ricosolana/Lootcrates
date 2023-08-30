@@ -4,9 +4,11 @@ import com.crazicrafter1.crutils.ColorUtil;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.Util;
 import com.crazicrafter1.lootcrates.LCMain;
+import com.crazicrafter1.lootcrates.Lootcrates;
 import com.crazicrafter1.lootcrates.PlayerLog;
 import com.crazicrafter1.lootcrates.RewardSettings;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
@@ -17,6 +19,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,7 +30,7 @@ public final class CrateInstance {
     /*
      * Runtime modifiable stuff
      */
-    public static HashMap<UUID, CrateInstance> CRATES = new HashMap<>();
+    public static Map<UUID, CrateInstance> CRATES = new HashMap<>();
     public static Set<Firework> crateFireworks = Collections.newSetFromMap(new WeakHashMap<>());
 
     private static final class QSlot { //TODO rename
@@ -52,11 +55,12 @@ public final class CrateInstance {
     private final HashMap<Integer, QSlot> slots = new HashMap<>();
     private State state = State.SELECTING;
     private int taskID = -1;
-    private int lockSlot;
+    //private int lockSlot;
+    private final ItemStack hostItem;
 
     private final RewardSettings data = LCMain.get().rewardSettings;
 
-    public CrateInstance(Player p, CrateSettings crate, int lockSlot) {
+    public CrateInstance(Player p, CrateSettings crate, @Nullable ItemStack hostItem) {
         this.player = p;
         this.crate = crate;
         this.size = crate.columns * 9;
@@ -65,12 +69,11 @@ public final class CrateInstance {
         this.lootChances = new LootCollection[size];
 
         this.inventory = Bukkit.createInventory(p, size, ColorUtil.renderAll(crate.getTitle(p)));
-        this.lockSlot = lockSlot;
+        this.hostItem = hostItem;
 
         this.populate(crate);
 
         this.fill();
-        //p.openInventory(inventory);
     }
 
     public void open() {
@@ -99,17 +102,12 @@ public final class CrateInstance {
         // Play animatic on final pick
         if (slots.size() == picks) {
             // "Cost" of opening crate
-            {
-                ItemStack itemStack = getPlayer().getInventory().getItem(lockSlot);
-                //noinspection ConstantConditions
-                itemStack.setAmount(itemStack.getAmount() - 1);
+            if (hostItem != null) {
+                Validate.isTrue(!LCMain.get().checkCerts || Lootcrates.claimTicket(hostItem) != null);
+                hostItem.setAmount(hostItem.getAmount() - 1);
             }
 
-            // Free the locked crate slot
-            lockSlot = -1;
-
             state = State.REVEALING;
-
 
             if (data.speed != 0) {
                 switch (crate.revealType) {
@@ -387,7 +385,7 @@ public final class CrateInstance {
                     }
                 }
             } else if (e.getClickedInventory() == e.getWhoClicked().getInventory()) {
-                if (slot != lockSlot) {
+                if (hostItem == null || !(slot >= 0 && slot <= 8)) {
                     e.setCancelled(false);
                 }
             }

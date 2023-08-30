@@ -40,46 +40,55 @@ class CmdArg {
                     BiFunction<CommandSender, String[], List<String>>>> args = new HashMap<>();
 
     static {
-        arg("throw", (sender, args, flags) -> {
-            throw new RuntimeException("Test exception");
-        });
+        if (plugin.debug) {
+            arg("dbg-opened", (sender, args, flags) -> {
+                return info(sender, "Open crates: " + String.join(", ",
+                        CrateInstance.CRATES.values().stream().map(e -> e.getPlayer().getName()).toArray(String[]::new)
+                ));
+                //return info(sender, "Updated");
+            });
 
-        arg("class", (sender, args, flags) -> {
-            try {
-                Class<?> clazz = Class.forName(args[0]);
+            arg("throw", (sender, args, flags) -> {
+                throw new RuntimeException("Test exception");
+            });
+
+            arg("class", (sender, args, flags) -> {
                 try {
-                    plugin.notifier.info("Package: " + clazz.getPackage().getName());
+                    Class<?> clazz = Class.forName(args[0]);
+                    try {
+                        plugin.notifier.info("Package: " + clazz.getPackage().getName());
+                    } catch (Exception e) {
+                        plugin.notifier.info("In default package?");
+                    }
+                    return info(sender, "Found: " + clazz.getName());
                 } catch (Exception e) {
-                    plugin.notifier.info("In default package?");
+                    e.printStackTrace();
+                    return severe(sender, e.getMessage());
                 }
-                return info(sender, "Found: " + clazz.getName());
-            } catch (Exception e) {
-                e.printStackTrace();
-                return severe(sender, e.getMessage());
-            }
-        });
+            });
 
-        arg("method", (sender, args, flags) -> {
-            try {
-                Class<?> clazz = Class.forName(args[0]);
+            arg("method", (sender, args, flags) -> {
                 try {
-                    plugin.notifier.info("Package: " + clazz.getPackage().getName());
+                    Class<?> clazz = Class.forName(args[0]);
+                    try {
+                        plugin.notifier.info("Package: " + clazz.getPackage().getName());
+                    } catch (Exception e) {
+                        plugin.notifier.info("In default package?");
+                    }
+
+                    plugin.notifier.info("Methods:");
+                    for (Method method : clazz.getMethods()) {
+                        if (method.getName().startsWith(args[1]))
+                            plugin.notifier.info(" - " + method.getName());
+                    }
+
+                    return info(sender, "Found: " + clazz.getName());
                 } catch (Exception e) {
-                    plugin.notifier.info("In default package?");
+                    e.printStackTrace();
+                    return severe(sender, e.getMessage());
                 }
-
-                plugin.notifier.info("Methods:");
-                for (Method method : clazz.getMethods()) {
-                    if (method.getName().startsWith(args[1]))
-                        plugin.notifier.info(" - " + method.getName());
-                }
-
-                return info(sender, "Found: " + clazz.getName());
-            } catch (Exception e) {
-                e.printStackTrace();
-                return severe(sender, e.getMessage());
-            }
-        });
+            });
+        }
 
         arg("lang", (sender, args, flags) -> {
             if (Lang.load(sender, args[0]))
@@ -144,43 +153,6 @@ class CmdArg {
             }
 
             return new ArrayList<>();
-        });
-
-        // TODO this adds a lot of tackiness into plugin
-        arg("rev", (sender, args, flags) -> {
-            if (args[0].equalsIgnoreCase("latest")) {
-                plugin.rev = LCMain.REV_LATEST;
-                plugin.reloadConfig(sender);
-                plugin.reloadData(sender);
-                return info(sender, String.format(Lang.READ_W_LATEST_REV, LCMain.REV_LATEST));
-            } else {
-                try {
-                    int rev = Integer.parseInt(args[0]);
-                    if (rev > LCMain.REV_LATEST) {
-                        // err
-                        return severe(sender, String.format(Lang.REV_UNSUPPORTED, rev));
-                    } if (rev < 0)
-                        throw new RuntimeException();
-
-                    plugin.rev = rev;
-                    plugin.reloadConfig(sender);
-                    plugin.reloadData(sender);
-                    plugin.rev = LCMain.REV_LATEST;
-
-                    CmdArg.args.remove("rev");
-
-                    return info(sender, String.format(Lang.READ_W_REV, rev));
-                } catch (Exception e) {
-                    return severe(sender, Lang.REV_REQUIRE_INT);
-                }
-            }
-        }, (sender, args) -> {
-            ArrayList<String> ret = new ArrayList<>();
-            for (int i = 0; i < LCMain.REV_LATEST; i++) {
-                ret.add(String.valueOf(i));
-            }
-            ret.add("latest");
-            return ret;
         });
 
         arg("save", (sender, args, flags) -> {
@@ -288,13 +260,6 @@ class CmdArg {
             return info(sender, Lang.CONFIG_LOADED_DISK);
         });
 
-        arg("dbg-opened", (sender, args, flags) -> {
-            return info(sender, "Open crates: " + String.join(", ",
-                    CrateInstance.CRATES.values().stream().map(e -> e.getPlayer().getName()).collect(Collectors.toList()).toArray(new String[0])
-            ));
-            //return info(sender, "Updated");
-        });
-
         arg("editor", (sender, args, flags) -> {
             if (sender instanceof Player) {
                 // title, subtitle, fadein, stay, fadeout
@@ -312,7 +277,7 @@ class CmdArg {
             return severe(sender, Lang.ERR_NEED_PLAYER);
         });
 
-        arg("which", (sender, args, flags) -> {
+        arg("identify", (sender, args, flags) -> {
             if (!(sender instanceof Player))
                 return severe(sender, Lang.ERR_NEED_PLAYER);
 
@@ -329,6 +294,8 @@ class CmdArg {
             }
             return severe(sender, Lang.REQUIRE_HELD);
         });
+
+        //arg("auth");
     }
 
     static boolean info(CommandSender sender, String message) {

@@ -75,7 +75,7 @@ public class LootItemQA extends AbstractLootItem {
                 .parentButton(4, 5)
                 //.childButton(2, 5, () -> new ItemBuilder(Material.COMPASS).name("&eSearch..."), new )
                 .button(3, 5, new Button.Builder().icon(p -> getMenuIcon()))
-                .childButton(5, 5, p -> ItemBuilder.copyOf(Material.COMPASS).name(Lang.ASSIGN_EXACT).build(), new TextMenu.TBuilder()
+                .childButton(5, 5, p -> ItemBuilder.copy(Material.COMPASS).name(Lang.ASSIGN_EXACT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.ASSIGN_EXACT)
                         .leftRaw(p -> name)
                         .right(p -> Lang.SET_BY_NAME)

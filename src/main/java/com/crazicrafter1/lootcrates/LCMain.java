@@ -36,6 +36,7 @@ public class LCMain extends JavaPlugin
             "\\ \\ \\____  \\ \\ \\/\\ \\  \\ \\ \\/\\ \\  \\/_/\\ \\/ \\ \\ \\____  \\ \\  __<   \\ \\  __ \\  \\/_/\\ \\/ \\ \\  __\\   \\ \\___  \\  \n" +
             " \\ \\_____\\  \\ \\_____\\  \\ \\_____\\    \\ \\_\\  \\ \\_____\\  \\ \\_\\ \\_\\  \\ \\_\\ \\_\\    \\ \\_\\  \\ \\_____\\  \\/\\_____\\ \n" +
             "  \\/_____/   \\/_____/   \\/_____/     \\/_/   \\/_____/   \\/_/ /_/   \\/_/\\/_/     \\/_/   \\/_____/   \\/_____/";
+    public static Set<UUID> crateCerts = new HashSet<>(); // drm
 
     public Notifier notifier;
 
@@ -49,11 +50,11 @@ public class LCMain extends JavaPlugin
     private final File rewardsConfigFile = new File(getDataFolder(), "rewards.yml");
     private final File configFile = new File(getDataFolder(), "config.yml");
     private final File backupPath = new File(getDataFolder(), "backup");
+    private final File certsFile = new File(getDataFolder(), "certs.yml");
 
     public Map<Class<? extends ILoot>, ItemStack> lootClasses = new HashMap<>();
 
     private FileConfiguration config = null;
-    private FileConfiguration rewardsConfig = null;
 
     public boolean supportQualityArmory = false;
     public boolean supportSkript = false;
@@ -62,11 +63,12 @@ public class LCMain extends JavaPlugin
     public SkriptAddon addon;
 
     public RewardSettings rewardSettings;
-    public int rev = -1;
+    public int rev = REV_LATEST;
     public String language = "en";
     public boolean update = false;
     public int cleanPeriod = 30;
     public boolean debug = false;
+    public boolean checkCerts = false;
 
     private static LCMain instance;
     public static LCMain get() {
@@ -100,10 +102,10 @@ public class LCMain extends JavaPlugin
         new CmdTestParser(this);
 
         new ListenerOnEntityDamageByEntity(this);
-        new ListenerOnInventoryClick(this);
+        new ListenerCrateInteract(this);
         new ListenerOnInventoryClose(this);
+        new ListenerDestroyCrate(this);
         new ListenerOnInventoryDrag(this);
-        new ListenerOnPlayerInteract(this);
         new ListenerOnPlayerInteract(this);
         new ListenerOnPlayerJoinQuit(this);
     }
@@ -171,10 +173,8 @@ public class LCMain extends JavaPlugin
 
 
     private void checkUpdates() {
-        boolean checkForUpdate = rev == -1 || !update;
-
-        if (rev != -1) {
-            if (update) try {
+        if (update) {
+            try {
                 StringBuilder outTag = new StringBuilder();
                 if (GitUtils.updatePlugin(this, "PeriodicSeizures", "Lootcrates", "Lootcrates.jar", outTag)) {
                     notifier.warn(String.format(Lang.UPDATED, outTag));
@@ -186,14 +186,13 @@ public class LCMain extends JavaPlugin
                 notifier.warn(Lang.UPDATE_FAIL);
                 e.printStackTrace();
             }
-        }
-
-        if (checkForUpdate)
+        } else {
             GitUtils.checkForUpdateAsync(this, "PeriodicSeizures", "Lootcrates",
                     (result, tag) -> {
                         if (result) notifier.info(String.format(Lang.UPDATE_AVAILABLE, tag));
                         else notifier.info(Lang.LATEST_VERSION);
                     });
+        }
     }
 
 
@@ -202,21 +201,26 @@ public class LCMain extends JavaPlugin
             Metrics metrics = new Metrics(this, 10395);
 
             metrics.addCustomChart(new Metrics.SimplePie("update",
-                    () -> "" + update));
+                    () -> "" + update)
+            );
 
             metrics.addCustomChart(new Metrics.SimplePie("language",
-                    () -> language));
+                    () -> language)
+            );
 
-            metrics.addCustomChart(
-                    new Metrics.AdvancedPie("loot",
-                            () -> rewardSettings.lootSets.keySet().stream().map(
-                                    lootSet -> new AbstractMap.SimpleEntry<>(lootSet, 1)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
+            metrics.addCustomChart(new Metrics.AdvancedPie("loot",
+                    () -> rewardSettings.lootSets.keySet().stream().map(
+                            lootSet -> new AbstractMap.SimpleEntry<>(lootSet, 1)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
             );
 
             metrics.addCustomChart(
                     new Metrics.AdvancedPie("crates",
                             () -> rewardSettings.crates.keySet().stream().map(
                                     crate -> new AbstractMap.SimpleEntry<>(crate, 1)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
+            );
+
+            metrics.addCustomChart(
+                new Metrics.SimplePie("check-certs", () -> "" + checkCerts)
             );
 
         } catch (Exception e) {
@@ -283,6 +287,7 @@ public class LCMain extends JavaPlugin
             this.update = config.getBoolean("update", update);
             this.cleanPeriod = config.getInt("clean-period", cleanPeriod);
             this.debug = config.getBoolean("debug", debug);
+            this.checkCerts = config.getBoolean("check-certs", checkCerts);
         } catch (Exception e) {
             notifier.severe(sender, String.format(Lang.CONFIG_LOAD_FAIL, e.getMessage()));
         }
@@ -292,7 +297,10 @@ public class LCMain extends JavaPlugin
         PlayerLog.loadAll(sender);
 
         saveDefaultFile(sender, rewardsConfigFile, false);
-        rewardsConfig = YamlConfiguration.loadConfiguration(rewardsConfigFile);
+        FileConfiguration rewardsConfig = YamlConfiguration.loadConfiguration(rewardsConfigFile);
+
+        FileConfiguration certsConfig = YamlConfiguration.loadConfiguration(certsFile);
+        crateCerts = certsConfig.getStringList("certs").stream().map(UUID::fromString).collect(Collectors.toSet());
 
         // save default en.yml file
         Lang.save(sender, "en", false);
@@ -325,7 +333,7 @@ public class LCMain extends JavaPlugin
 
         saveDefaultFile(sender, rewardsConfigFile, false);
 
-        rewardsConfig = YamlConfiguration.loadConfiguration(rewardsConfigFile);
+        FileConfiguration rewardsConfig = YamlConfiguration.loadConfiguration(rewardsConfigFile);
 
         // save default en.yml file
         Lang.save(sender, "en", false);
@@ -364,6 +372,7 @@ public class LCMain extends JavaPlugin
             config.set("update", update);
             config.set("clean-period", cleanPeriod);
             config.set("debug", debug);
+            config.set("check-certs", checkCerts);
 
             config.save(configFile);
         } catch (IOException e) {
@@ -375,18 +384,20 @@ public class LCMain extends JavaPlugin
     public void saveOtherConfigs(@Nonnull CommandSender sender) {
         // if a backup was successfully made, then save
 
-        if (rev == -1)
-            return;
-
         PlayerLog.saveAll(sender);
 
         if (backupRewards(sender, false)) {
             notifier.info(sender, Lang.CONFIG_Save);
-            rewardsConfig = new YamlConfiguration();
+
+            FileConfiguration rewardsConfig = new YamlConfiguration();
             rewardSettings.serialize(rewardsConfig);
+
+            FileConfiguration certsConfig = new YamlConfiguration();
+            certsConfig.set("certs", crateCerts.stream().map(UUID::toString).collect(Collectors.toList()));
 
             try {
                 rewardsConfig.save(rewardsConfigFile);
+                certsConfig.save(certsFile);
             } catch (Exception e) {
                 notifier.severe(sender, Lang.CONFIG_SaveError);
                 e.printStackTrace();

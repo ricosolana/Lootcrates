@@ -138,7 +138,7 @@ public class Lang {
 
     public static String ERR_NEED_PLAYER = "Only a player can execute this command";
 
-    public static String IS_CRATE = "Item is a crate (%s)";
+    public static String IS_CRATE = "Item is a '%s' crate";
     public static String NOT_CRATE = "Item is not a crate";
     public static String REQUIRE_HELD = "Must hold an item to detect";
 

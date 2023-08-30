@@ -84,7 +84,7 @@ public class LootCommand implements ILoot {
     public AbstractMenu.Builder getMenuBuilder() {
         return new ItemModifyMenu()
                 .build(itemStack, input -> this.itemStack = input)
-                .childButton(1, 0, p -> ItemBuilder.copyOf(Material.PAPER).name("&6" + Lang.ED_LootSets_PROTO_Command_TI).lore(Lang.ED_LMB_EDIT).build(), new TextMenu.TBuilder()
+                .childButton(1, 0, p -> ItemBuilder.copy(Material.PAPER).name("&6" + Lang.ED_LootSets_PROTO_Command_TI).lore(Lang.ED_LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.ED_LootSets_PROTO_Command_TI)
                         .onClose((player) -> Result.PARENT())
                         .leftRaw(p ->  command)

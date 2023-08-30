@@ -42,7 +42,7 @@ public class ListenerOnPlayerJoinQuit extends BaseListener {
         Player p = e.getPlayer();
 
         if (CrateInstance.CRATES.containsKey(p.getUniqueId())) {
-            Lootcrates.endDisplayCrateMenu(p);
+            Lootcrates.stopCrate(p);
         }
     }
 }

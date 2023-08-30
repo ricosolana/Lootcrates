@@ -20,6 +20,7 @@ public class CrateSettings {
         GOOD_OL_DESTY,
         WASD,
         CSGO,
+        POPCORN,
     }
 
     public final String id;

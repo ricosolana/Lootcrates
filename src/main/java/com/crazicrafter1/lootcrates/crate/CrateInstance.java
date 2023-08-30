@@ -7,10 +7,7 @@ import com.crazicrafter1.lootcrates.LCMain;
 import com.crazicrafter1.lootcrates.PlayerLog;
 import com.crazicrafter1.lootcrates.RewardSettings;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -22,6 +19,8 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public final class CrateInstance {
 
@@ -120,6 +119,9 @@ public final class CrateInstance {
                     case WASD:
                         startWASDAnimation();
                         break;
+                    case POPCORN:
+                        startPopcornAnimation();
+                        break;
                     default:
                         pop();
                         break;
@@ -213,6 +215,52 @@ public final class CrateInstance {
                 iterations++;
             }
         }.runTaskTimer(LCMain.get(), 20, data.speed).getTaskId();
+    }
+
+    private void startPopcornAnimation() {
+        taskID = new BukkitRunnable() {
+            final int maxIterations = size + 10 / data.speed;
+            int iterations = 0;
+
+            //int delay = 10;
+            float delay = 5;
+
+            //int timer = 0;
+
+            private final List<Integer> availableSlots;
+
+            {
+                availableSlots = IntStream.range(0, size).boxed().filter(i -> !slots.containsKey(i)).collect(Collectors.toList());
+                Collections.shuffle(availableSlots);
+            }
+
+            @Override
+            public void run() {
+                double r = Math.random();
+                double t = 1.0 / (1 + delay);
+                if (delay <= 0 || r < t) {
+                    delay -= r;
+
+                    player.spawnParticle(r > t/3.0 ? Particle.SMOKE_LARGE : Particle.SMOKE_NORMAL,
+                            player.getLocation(), (int)(20.0/(5.0 + delay)));
+
+                    if (iterations < availableSlots.size()) {
+                        inventory.setItem(availableSlots.get(iterations),
+                                r < t/3.0 ? new ItemStack(Material.AIR) : ItemBuilder.copy(r > (t*2./3.) ? Material.POLISHED_BLACKSTONE_BUTTON : Material.DARK_OAK_BUTTON).name("&8Burnt").build());
+
+                        if (r > t/3.0)
+                            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASEDRUM, 1, (float)(.9 + r/20.0));
+                        else
+                            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_SNARE, 1, (float)(.8 + r/20.0));
+                    }
+                    else if (iterations > maxIterations) {
+                        this.cancel();
+                        pop();
+                    }
+                    iterations++;
+                }
+            }
+        }.runTaskTimer(LCMain.get(), 20, 1).getTaskId();
     }
 
     private void pop() {

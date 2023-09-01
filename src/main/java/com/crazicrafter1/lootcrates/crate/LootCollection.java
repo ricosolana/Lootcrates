@@ -6,7 +6,7 @@ import com.crazicrafter1.crutils.ReflectionUtil;
 import com.crazicrafter1.crutils.WeightedRandomContainer;
 import com.crazicrafter1.crutils.ui.AbstractMenu;
 import com.crazicrafter1.crutils.ui.Button;
-import com.crazicrafter1.crutils.ui.ParallaxMenu;
+import com.crazicrafter1.crutils.ui.ListMenu;
 import com.crazicrafter1.crutils.ui.Result;
 import com.crazicrafter1.lootcrates.*;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
@@ -134,7 +134,7 @@ public class LootCollection {
     }
 
     public AbstractMenu.Builder getBuilder() {
-        return new ParallaxMenu.PBuilder()
+        return new ListMenu.LBuilder()
                 .title(p -> id)
                 .parentButton(4, 5)
                 .addAll((self1, p00) -> {
@@ -177,7 +177,7 @@ public class LootCollection {
                 })
                 .childButton(3, 5, p -> ItemBuilder.copy(itemStack).name(Lang.EDIT_ICON).lore(Lang.ED_LMB_EDIT).build(), new ItemModifyMenu()
                         .build(this.itemStack, itemStack -> this.itemStack = itemStack))
-                .childButton(5, 5, p -> ItemBuilder.copy(Material.GOLDEN_CARROT).name(Lang.LMB_NEW).build(), new ParallaxMenu.PBuilder()
+                .childButton(5, 5, p -> ItemBuilder.copy(Material.GOLDEN_CARROT).name(Lang.LMB_NEW).build(), new ListMenu.LBuilder()
                         .title(p -> Lang.ED_LootSets_PROTO_New_TI)
                         .parentButton(4, 5)
                         .addAll((self1, p00) -> {

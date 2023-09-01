@@ -75,7 +75,7 @@ public class LootItemCrate implements ILoot {
 
     @Override
     public AbstractMenu.Builder getMenuBuilder() {
-        return new ParallaxMenu.PBuilder()
+        return new ListMenu.LBuilder()
                 .parentButton(4, 5)
                 .addAll((self, p00) -> {
                     ArrayList<Button> result = new ArrayList<>();

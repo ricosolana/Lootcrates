@@ -71,7 +71,7 @@ public class LootItemQA extends AbstractLootItem {
     @Nonnull
     @Override
     public AbstractMenu.Builder getMenuBuilder() {
-        return rangeButtons(new ParallaxMenu.PBuilder()
+        return rangeButtons(new ListMenu.LBuilder()
                 .parentButton(4, 5)
                 //.childButton(2, 5, () -> new ItemBuilder(Material.COMPASS).name("&eSearch..."), new )
                 .button(3, 5, new Button.Builder().icon(p -> getMenuIcon()))

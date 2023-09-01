@@ -209,7 +209,7 @@ public class CrateSettings {
                 // *   *   *
                 // Edit LootSets
                 // *   *   *
-                .childButton(5, 1, p -> ItemBuilder.from("EXPERIENCE_BOTTLE").name(Lang.LOOT).lore(Lang.ED_LMB_EDIT).build(), new ParallaxMenu.PBuilder()
+                .childButton(5, 1, p -> ItemBuilder.from("EXPERIENCE_BOTTLE").name(Lang.LOOT).lore(Lang.ED_LMB_EDIT).build(), new ListMenu.LBuilder()
                         .title(p -> Lang.LOOT)
                         .parentButton(4, 5)
                         .onClose((player) -> Result.PARENT())
@@ -310,7 +310,7 @@ public class CrateSettings {
     }
 
     public AbstractMenu.Builder getPreview() {
-        return new ParallaxMenu.PBuilder()
+        return new ListMenu.LBuilder()
                 .title(p -> "Preview")
                 .addAll((self, p) -> {
                     List<Button> buttons = new ArrayList<>();

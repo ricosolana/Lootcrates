@@ -63,7 +63,7 @@ public class Editor {
                 * Global Crate List *
                 *                   *
                 \* *************** */
-                .childButton(2, 1, p -> ItemBuilder.copy(Material.CHEST).name(Lang.ED_BTN_Crates).build(), new ParallaxMenu.PBuilder()
+                .childButton(2, 1, p -> ItemBuilder.copy(Material.CHEST).name(Lang.ED_BTN_Crates).build(), new ListMenu.LBuilder()
                                 .title(p -> Lang.ED_Crates_TI)
                                 .parentButton(4, 5)
                                 // *       *      *
@@ -122,7 +122,7 @@ public class Editor {
                         /*
                          * View LootSets
                          */
-                ).childButton(4, 1, p -> ItemBuilder.from("EXPERIENCE_BOTTLE").name(Lang.ED_BTN_LootSets).build(), new ParallaxMenu.PBuilder()
+                ).childButton(4, 1, p -> ItemBuilder.from("EXPERIENCE_BOTTLE").name(Lang.ED_BTN_LootSets).build(), new ListMenu.LBuilder()
                         .title(p -> Lang.ED_LootSets_TI)
                         .parentButton(4, 5)
                         .addAll((self, p1) -> {

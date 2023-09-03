@@ -108,10 +108,10 @@ public class Lang {
     public static String CONFIG_ZERO_WEIGHT = "zero weight for '%s'";
 
     public static String LMB_NEW = "&7LMB: &6New";
-    public static String NEW_LOOT = "Add item...";
+    public static String NEW_LOOT = "&6Add item...";
     public static String FORMAT_ID = "&8id: %s";
 
-    public static String LOOT_HELP_TITLE = "&6Drop items here!";
+    public static String LOOT_HELP_TITLE = "&6Drop items anywhere here!";
     public static String LOOT_HELP_SUB = "&2" +
             "&7No more back-and-forth with menus!\n" +
             "&7This &conly &7works with basic items.\n" +

@@ -72,21 +72,21 @@ public class Editor {
                                 .childButton(5, 5, p -> ItemBuilder.copy(Material.END_CRYSTAL).name(Lang.ED_Crates_BTN_New).build(), new TextMenu.TBuilder()
                                         .title(p -> Lang.ED_Crates_New_TI)
                                         .leftRaw(p -> LOREM_IPSUM)
-                                        .onClose((player) -> Result.PARENT())
+                                        .onClose((player) -> Result.parent())
                                         .onComplete((player, s, b) -> {
                                             s = NON_ASCII_PATTERN.matcher(s.replace(" ", "_")).replaceAll("").toLowerCase();
 
                                             if (s.isEmpty())
-                                                return Result.TEXT(Lang.ED_INVALID_ID);
+                                                return Result.text(Lang.ED_INVALID_ID);
 
                                             // if crate already exists
                                             CrateSettings crate = Lootcrates.getCrate(s);
                                             if (crate != null)
-                                                return Result.TEXT(Lang.ED_DUP_ID);
+                                                return Result.text(Lang.ED_DUP_ID);
 
                                             Lootcrates.registerCrate(Lootcrates.createCrate(s));
 
-                                            return Result.PARENT();
+                                            return Result.parent();
                                         })
 
                                 )//.childButton()
@@ -112,28 +112,31 @@ public class Editor {
                                                                 CrateSettings copy = crate.copy();
                                                                 Lootcrates.registerCrate(copy);
                                                             }
-                                                            return Result.REFRESH();
+                                                            return Result.refresh();
                                                         }
                                                 ).get()
                                         );
                                     }
                                     return result;
                                 })
-                        /*
-                         * View LootSets
-                         */
+                /*
+                 * View LootSets
+                 */
                 ).childButton(4, 1, p -> ItemBuilder.from("EXPERIENCE_BOTTLE").name(Lang.ED_BTN_LootSets).build(), new ListMenu.LBuilder()
                         .title(p -> Lang.ED_LootSets_TI)
                         .parentButton(4, 5)
+                        /*
+                         * Each Collection
+                         */
                         .addAll((self, p1) -> {
                             ArrayList<Button> result = new ArrayList<>();
                             for (LootCollection lootSet : LCMain.get().rewardSettings.lootSets.values()) {
                                 /*
-                                 * List all LootSets
+                                 * Add Collections
                                  */
                                 result.add(new Button.Builder()
                                         .icon(p -> lootSet.getMenuIcon())
-                                        .child(self, lootSet.getBuilder(),
+                                        .child(self, lootSet.getBuilder(), // LMB - Edit Loot Collection
                                                 // RMB - delete lootSet
                                                 interact -> {
                                                     if (interact.shift) {
@@ -144,7 +147,7 @@ public class Editor {
                                                         //    }
                                                         //} else
                                                         if (Lootcrates.removeLootSet(lootSet.id))
-                                                            return Result.MESSAGE("Failed to remove LootSet");
+                                                            return Result.message("Failed to remove LootSet");
                                                         return null;
                                                     } else {
                                                         LootCollection copy = lootSet.copy();
@@ -152,7 +155,7 @@ public class Editor {
                                                     }
 
                                                     //Main.get().notifier.info(interact.player, "Copied crate to clipboard");
-                                                    return Result.REFRESH();
+                                                    return Result.refresh();
 
                                                     //if (Main.get().rewardSettings.lootSets.size() > 1) {
                                                     //    Main.get().rewardSettings.lootSets.remove(lootSet.id);
@@ -168,30 +171,35 @@ public class Editor {
                             }
                             return result;
                         })
+                        /*
+                         * Add custom Collection
+                         */
                         .childButton(5, 5, p -> ItemBuilder.copy(Material.NETHER_STAR).name(Lang.ED_LootSets_BTN_New).build(), new TextMenu.TBuilder()
                                 .title(p -> Lang.ED_LootSets_New_TI)
                                 .leftRaw(p -> LOREM_IPSUM) // id
-                                .onClose((player) -> Result.PARENT())
+                                .onClose((player) -> Result.parent())
                                 .onComplete((player, s, b) -> {
                                     s = NON_ASCII_PATTERN.matcher(s.replace(" ", "_")).replaceAll("").toLowerCase();
 
                                     if (s.isEmpty())
-                                        return Result.TEXT(Lang.ED_INVALID_ID);
+                                        return Result.text(Lang.ED_INVALID_ID);
 
                                     if (LCMain.get().rewardSettings.crates.containsKey(s))
-                                        return Result.TEXT(Lang.ED_DUP_ID);
+                                        return Result.text(Lang.ED_DUP_ID);
 
                                     LCMain.get().rewardSettings.lootSets.put(s,
                                             new LootCollection(s, new ItemStack(Material.GLOWSTONE_DUST),
                                                     new ArrayList<>(Collections.singletonList(new LootItem()))));
 
-                                    return Result.PARENT();
+                                    return Result.parent();
                                 })
                         )
                 )
                 /*
                  * Global Fireworks Edit
                  */
+                // TODO this menu is absolutely ugly in every conceivable way
+                //  and requires a long overdue rework
                 .childButton(6, 1, p -> ItemBuilder.from("FIREWORK_ROCKET").name(Lang.ED_BTN_Firework).build(), new SimpleMenu.SBuilder(5)
                         .title(p -> Lang.ED_Firework_TI)
                         .background()
@@ -210,13 +218,13 @@ public class Editor {
                                             FireworkEffectMeta meta = (FireworkEffectMeta) interact.heldItem.getItemMeta();
                                             if (meta.hasEffect()) {
                                                 LCMain.get().rewardSettings.fireworkEffect = meta.getEffect();
-                                                return Result.REFRESH();
+                                                return Result.refresh();
                                             }
                                         }
                                         interact.player.sendMessage(Lang.ED_Firework_ERROR);
                                     }
 
-                                    return Result.GRAB();
+                                    return Result.grab();
                                 }))
                         .parentButton(4, 4)
                 )

@@ -86,15 +86,15 @@ public class LootCommand implements ILoot {
                 .build(itemStack, input -> this.itemStack = input)
                 .childButton(1, 0, p -> ItemBuilder.copy(Material.PAPER).name("&6" + Lang.ED_LootSets_PROTO_Command_TI).lore(Lang.ED_LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.ED_LootSets_PROTO_Command_TI)
-                        .onClose((player) -> Result.PARENT())
+                        .onClose((player) -> Result.parent())
                         .leftRaw(p ->  command)
                         .right(p -> Lang.ED_LootSets_PROTO_Command_R, p -> String.format(Lang.SUPPORT_PLUGIN_X, "PlaceholderAPI"))
                         .onComplete((p, s, b) -> {
                             if (!s.isEmpty()) {
                                 this.command = s;
-                                return Result.PARENT();
+                                return Result.parent();
                             }
-                            return Result.TEXT(Lang.ERR_INVALID);
+                            return Result.text(Lang.ERR_INVALID);
                         }));
     }
 

@@ -143,12 +143,12 @@ public class LootMMOItem extends AbstractLootItem {
                         .lmb(interact -> {
                             int change = interact.shift ? 5 : 1;
                             min = MathUtil.clamp(min - change, 1, min);
-                            return Result.REFRESH();
+                            return Result.refresh();
                         })
                         .rmb(interact -> {
                             int change = interact.shift ? 5 : 1;
                             min = MathUtil.clamp(min + change, 1, max);
-                            return Result.REFRESH();
+                            return Result.refresh();
                         })
                         .icon((p) -> ItemBuilder.from("PLAYER_HEAD").name(Lang.ED_MIN).skull(BASE64_DEC).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC + "\n" + Lang.ED_SHIFT_MUL).amount(min).build()))
                 // Max
@@ -156,12 +156,12 @@ public class LootMMOItem extends AbstractLootItem {
                         .lmb(interact -> {
                             int change = interact.shift ? 5 : 1;
                             max = MathUtil.clamp(max - change, min, getRenderIcon(null).getMaxStackSize());
-                            return Result.REFRESH();
+                            return Result.refresh();
                         })
                         .rmb(interact -> {
                             int change = interact.shift ? 5 : 1;
                             max = MathUtil.clamp(max + change, min, getRenderIcon(null).getMaxStackSize());
-                            return Result.REFRESH();
+                            return Result.refresh();
                         })
                         .icon((p) -> ItemBuilder.from("PLAYER_HEAD").name(Lang.ED_MAX).skull(BASE64_INC).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC + "\n" + Lang.ED_SHIFT_MUL).amount(max).build()))
 
@@ -170,7 +170,7 @@ public class LootMMOItem extends AbstractLootItem {
                     .title(p -> Lang.ASSIGN_EXACT)
                     .leftRaw(p -> type + ":" + name)
                     .right(p -> Lang.MMO_ENTER)
-                    .onClose((player) -> Result.PARENT())
+                    .onClose((player) -> Result.parent())
                     .onComplete((p, s, b) -> {
                         try {
                             String[] split = s.toUpperCase().split(":");
@@ -181,13 +181,13 @@ public class LootMMOItem extends AbstractLootItem {
                             if (itemStack != null) {
                                 this.type = split[0];
                                 this.name = split[1];
-                                return Result.PARENT();
+                                return Result.parent();
                             }
                         } catch (Exception e) {
                             //e.printStackTrace();
                         }
 
-                        return Result.TEXT(Lang.ERR_INVALID);
+                        return Result.text(Lang.ERR_INVALID);
                     })
                 )
                 //special delimiter reader/writer for
@@ -198,7 +198,7 @@ public class LootMMOItem extends AbstractLootItem {
                         .title(p -> Lang.LOOT_MMO_EDIT_TITLE)
                         .leftRaw((p) -> this.getFormatString())
                         .right(p -> Lang.MMO_FORMAT, p -> Lang.MMO_FORMAT_LORE + "\n&7- exact:2,RARE\n &7- random\n &7- scale")
-                        .onClose((player) -> Result.PARENT())
+                        .onClose((player) -> Result.parent())
                         .onComplete((p, s, b) -> {
                             s = s.replace(" ", "");
                             try {
@@ -222,19 +222,19 @@ public class LootMMOItem extends AbstractLootItem {
                                         String tier = sub.substring(index+1); // 6
 
                                         if (!MMOItems.plugin.getTiers().has(tier))
-                                            return Result.TEXT(Lang.ERR_INVALID);
+                                            return Result.text(Lang.ERR_INVALID);
 
                                         this.tier = tier;
                                     } else if (sub.charAt(0) == 'r') { // random
                                         mode = 1;
                                     } else mode = 2; // scale
 
-                                    return Result.PARENT();
+                                    return Result.parent();
                                 }
                             }
                             catch (Exception ignored) {}
 
-                            return Result.TEXT(Lang.ERR_INVALID);
+                            return Result.text(Lang.ERR_INVALID);
                         })
                 );
     }

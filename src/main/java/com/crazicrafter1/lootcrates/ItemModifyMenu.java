@@ -58,16 +58,16 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                 .childButton(2, 3, p -> ItemBuilder.copy(Material.COMPASS).name("&8Set material").lore("&7Search...").build(), new TextMenu.TBuilder()
                         .title(p -> "Material search")
                         .leftRaw(p -> builder.getModernMaterial().toLowerCase())
-                        .onClose((player) -> Result.PARENT())
+                        .onClose((player) -> Result.parent())
                         .onComplete(((player, s, tBuilder) -> {
                             try {
                                 //builder.material(builder.apply(builder));
                                 // how to set material for legacy items
                                 // set damage value
                                 builder = ItemBuilder.copy(itemStackFunction.apply(builder.material(s).build()));
-                                return Result.PARENT();
+                                return Result.parent();
                             } catch (Exception e) {
-                                return Result.TEXT("Does not exist");
+                                return Result.text("Does not exist");
                             }
                         }))
                 )
@@ -77,7 +77,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                         .title(p -> Lang.IED_BTN_Name)
                         .leftRaw(p -> builder.getNameOrLocaleName())
                         .right(p -> Lang.SPECIAL_FORMATTING, p -> Editor.getColorDem(), ColorUtil.AS_IS)
-                        .onClose((player) -> Result.PARENT())
+                        .onClose((player) -> Result.parent())
                         .onComplete((player, s, b) -> {
                             if (s.isEmpty()) {
                                 builder.removeName();
@@ -86,7 +86,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
 
                             builder = ItemBuilder.copy(itemStackFunction.apply(builder.build()));
 
-                            return Result.PARENT();
+                            return Result.parent();
                         }))
 
                 // edit Lore                                                                                // terrible name
@@ -94,7 +94,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                         .title(p -> Lang.LORE)
                         .leftRaw(p -> Util.def(builder.getLoreString(), Editor.LOREM_IPSUM).replace("\n", "\\n"))
                         .right(p -> Lang.SPECIAL_FORMATTING, p -> Editor.getColorDem(), ColorUtil.AS_IS)
-                        .onClose((player) -> Result.PARENT())
+                        .onClose((player) -> Result.parent())
                         .onComplete((player, s, b) -> {
                             if (s.isEmpty()) {
                                 builder.removeLore();
@@ -103,7 +103,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
 
                             builder = ItemBuilder.copy(itemStackFunction.apply(builder.build()));
 
-                            return Result.PARENT();
+                            return Result.parent();
                         }))
                 // Edit CustomModelData
                 .childButton(4, 3, p -> ItemBuilder.from("PLAYER_HEAD").skull(BASE64_CUSTOM_MODEL_DATA).name(Lang.CUSTOM_MODEL).lore(Lang.ED_LMB_EDIT).build(), new TextMenu.TBuilder()
@@ -115,7 +115,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             return Editor.LOREM_IPSUM;
                         })
                         .right(p -> "&7" + Lang.IED_Model_R)
-                        .onClose((player) -> Result.PARENT())
+                        .onClose((player) -> Result.parent())
                         .onComplete((p, s, b) -> {
                             if (s.isEmpty())
                                 return null;
@@ -124,13 +124,13 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             try {
                                 i = Integer.parseInt(s);
                             } catch (Exception e00) {
-                                return Result.TEXT(Lang.ERR_INVALID);
+                                return Result.text(Lang.ERR_INVALID);
                             }
                             builder.model(i);
 
                             builder = ItemBuilder.copy(itemStackFunction.apply(builder.build()));
 
-                            return Result.PARENT();
+                            return Result.parent();
                         }), Version.AT_LEAST_v1_16.a())
 
 
@@ -142,10 +142,14 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                         .icon(p -> ItemBuilder.from("PLAYER_HEAD").name("&c&l[Item here]").build())
                         .lmb(interact -> {
                             if (interact.heldItem == null) {
-                                return Result.MESSAGE(Lang.IED_Swap_ERROR);
+                                return Result.message(Lang.IED_Swap_ERROR);
                             }
                             builder = ItemBuilder.copy(itemStackFunction.apply(interact.heldItem));
-                            return Result.REFRESH_GRAB(); // TODO untested
+
+                            // Findings:
+                            //  Item will be swapped out with the clicked item
+                            //  Will result in menu elements being able to be pulled out
+                            return Result.grab().andThen(Result.refresh());
                         }))
 
                 ;

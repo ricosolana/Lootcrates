@@ -1,9 +1,6 @@
 package com.crazicrafter1.lootcrates.crate;
 
-import com.crazicrafter1.crutils.ItemBuilder;
-import com.crazicrafter1.crutils.MathUtil;
-import com.crazicrafter1.crutils.ReflectionUtil;
-import com.crazicrafter1.crutils.WeightedRandomContainer;
+import com.crazicrafter1.crutils.*;
 import com.crazicrafter1.crutils.ui.AbstractMenu;
 import com.crazicrafter1.crutils.ui.Button;
 import com.crazicrafter1.crutils.ui.ListMenu;
@@ -17,10 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class LootCollection {
@@ -32,42 +26,32 @@ public class LootCollection {
     public LootCollection copy() {
         final String strippedId = LCMain.NUMBER_AT_END.matcher(id).replaceAll("");
         String newId;
+        //noinspection StatementWithEmptyBody
         for (int i = 0; LCMain.get().rewardSettings.lootSets.containsKey(newId = strippedId + i); i++) {}
 
-        //loot.getMap().entrySet().stream().collect(Collectors.toMap(e -> e.getKey().copy(), Map.Entry::getValue));
-
         return new LootCollection(newId, itemStack.clone(),
-                new WeightedRandomContainer<>(loot.getMap().entrySet().stream().collect(Collectors.toMap(e -> e.getKey().copy(), Map.Entry::getValue))));
+                new WeightedRandomContainer<>(loot.getMap().entrySet().stream().collect(CollectorUtils.toLinkedMap(e -> e.getKey().copy(), Map.Entry::getValue))));
     }
 
     // <= rev 6
     public LootCollection(String id, ItemStack item, List<ILoot> loot) {
         // pass this through to the weighted map constructor
         // a default equal weight of 1 is given to each item
-        this(id, item, new WeightedRandomContainer<>(loot.stream().collect(Collectors.toMap(k -> k, v -> 1))));
+        this(id, item, new WeightedRandomContainer<>(loot.stream().collect(CollectorUtils.toLinkedMap(k -> k, v -> 1))));
+
+        //this(id, item, new WeightedRandomContainer<>(
+          //      loot.stream().collect(LinkedHashMap::new, (map, v) -> map.put(v, 1), Map::putAll)));
     }
 
     // > rev 7 (item weights)
     public LootCollection(String id, ItemStack itemStack, WeightedRandomContainer<ILoot> loot) {
         this.id = id;
         this.itemStack = itemStack;
-        //this.loot = loot.stream().map(v -> v instanceof LootNBTItem ? new LootItem(((LootNBTItem) v).itemStack) : v).collect(Collectors.toList());
 
-        //loot.getMap().entrySet().stream().collect(Collectors.toMap(e1 -> e1.getKey() instanceof LootNBTItem ? new LootItem(((LootNBTItem) e1)) : e1, e2 -> e2.getValue()))
-
-        //loot.getMap().entrySet().stream().collect(
-        //        Collectors.toMap(e1 -> e1.getKey().copy(), e2 -> e2.getValue()));
-
-        // condense any old LootNBTItems to LootItem, forward it otherwise
-        this.loot = new WeightedRandomContainer<>(loot.getMap().entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+        this.loot = new WeightedRandomContainer<>(
+                loot.getMap().entrySet().stream().collect(
+                CollectorUtils.toLinkedMap(Map.Entry::getKey, Map.Entry::getValue)));
     }
-
-    //public LootSetSettings(String id, Map<String, Object> args) {
-    //    this.id = id;
-    //    this.item = ((ItemBuilder) args.get("item"));
-    //    this.loot = (ArrayList<ILoot>) args.get("loot");
-    //}
 
     public void serialize(ConfigurationSection section) {
         section.set("item", itemStack);
@@ -105,11 +89,11 @@ public class LootCollection {
     }
 
     private String getFormattedPercent(ILoot item) {
-        return String.format("%.02f%%", 100.f * ((float) loot.get(item)/(float)loot.getWeight()));
+        return String.format("%.02f%%", 100.f * ((float) loot.get(item)/(float)loot.getTotalWeight()));
     }
 
     private String getFormattedFraction(ILoot item) {
-        return String.format("%d/%d", loot.get(item), loot.getWeight());
+        return String.format("%d/%d", loot.get(item), loot.getTotalWeight());
     }
 
     public ItemStack getMenuIcon() {
@@ -137,6 +121,9 @@ public class LootCollection {
         return new ListMenu.LBuilder()
                 .title(p -> id)
                 .parentButton(4, 5)
+                /*
+                 * Add all Loot Items
+                 */
                 .addAll((self1, p00) -> {
                     ArrayList<Button> result1 = new ArrayList<>();
                     for (Map.Entry<ILoot, Integer> entry : loot.getMap().entrySet()) {
@@ -156,7 +143,7 @@ public class LootCollection {
                                     if (interact.shift && loot.getMap().size() > 1) {
                                         // delete
                                         loot.remove(a);
-                                        return Result.REFRESH();
+                                        return Result.refresh();
                                     }
                                     return null;
                                 })
@@ -169,7 +156,7 @@ public class LootCollection {
                                         // then change weight
                                         loot.add(a, MathUtil.clamp(loot.get(a) + change, 1, Integer.MAX_VALUE));
                                     }
-                                    return Result.REFRESH();
+                                    return Result.refresh();
                                 })
                                 .get());
                     }
@@ -177,7 +164,7 @@ public class LootCollection {
                 })
                 .childButton(3, 5, p -> ItemBuilder.copy(itemStack).name(Lang.EDIT_ICON).lore(Lang.ED_LMB_EDIT).build(), new ItemModifyMenu()
                         .build(this.itemStack, itemStack -> this.itemStack = itemStack))
-                .childButton(5, 5, p -> ItemBuilder.copy(Material.GOLDEN_CARROT).name(Lang.LMB_NEW).build(), new ListMenu.LBuilder()
+                .childButton(5, 5, p -> ItemBuilder.copy(Material.GOLDEN_CARROT).name(Lang.NEW_LOOT).lore(Lang.LMB_NEW).build(), new ListMenu.LBuilder()
                         .title(p -> Lang.ED_LootSets_PROTO_New_TI)
                         .parentButton(4, 5)
                         .addAll((self1, p00) -> {
@@ -201,13 +188,21 @@ public class LootCollection {
                                             menu.parent(self1.parentMenuBuilder)
                                                     .title(p -> menu.getClass().getSimpleName());
 
-                                            return Result.OPEN(menu);
+                                            return Result.open(menu);
                                         })
                                         .get());
                             }
                             return result1;
                         })
-                );
+                )
+                .button(7, 5, new Button.Builder().icon(p -> ItemBuilder.copy(Material.PAPER).name(Lang.LOOT_HELP_TITLE).lore(Lang.LOOT_HELP_SUB).build()))
+                .capture(new Button.Builder().lmb(e -> {
+                    if (e.heldItem != null) {
+                        addLoot(new LootItem(e.heldItem), 1);
+                        return Result.refresh();
+                    }
+                    return Result.ok();
+                }));
     }
 
 }

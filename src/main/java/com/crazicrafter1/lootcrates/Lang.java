@@ -108,8 +108,15 @@ public class Lang {
     public static String CONFIG_ZERO_WEIGHT = "zero weight for '%s'";
 
     public static String LMB_NEW = "&7LMB: &6New";
-    public static String NEW_LOOT_SET = "New LootSet";
+    public static String NEW_LOOT = "Add item...";
     public static String FORMAT_ID = "&8id: %s";
+
+    public static String LOOT_HELP_TITLE = "&6Drop items here!";
+    public static String LOOT_HELP_SUB = "&2" +
+            "&7No more back-and-forth with menus!\n" +
+            "&7This &conly &7works with basic items.\n" +
+            "&7I do not recommend using with &2QA &7items\n" +
+            "&7or custom items added from other plugins";
 
     public static String UNKNOWN_REV = "Unable to determine plugin save revision";
     public static String ASSIGN_REV = "Must assign revision: %s";

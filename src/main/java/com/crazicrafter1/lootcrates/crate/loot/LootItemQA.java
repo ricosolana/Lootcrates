@@ -79,14 +79,14 @@ public class LootItemQA extends AbstractLootItem {
                         .title(p -> Lang.ASSIGN_EXACT)
                         .leftRaw(p -> name)
                         .right(p -> Lang.SET_BY_NAME)
-                        .onClose((player) -> Result.PARENT())
+                        .onClose((player) -> Result.parent())
                         .onComplete((p, s, b) -> {
                             CustomBaseObject customBaseObject = QualityArmory.getCustomItemByName(s);
                             if (customBaseObject != null) {
                                 this.name = s;
-                                return Result.PARENT();
+                                return Result.parent();
                             }
-                            return Result.TEXT(Lang.ERR_INVALID);
+                            return Result.text(Lang.ERR_INVALID);
                         })
                 )
                 .addAll((self, p00) -> {
@@ -103,7 +103,7 @@ public class LootItemQA extends AbstractLootItem {
                                     .lmb(interact -> {
                                         // change
                                         name = customBaseObject.getName();
-                                        return Result.PARENT();
+                                        return Result.parent();
                                     }).get()
                             );
                         }

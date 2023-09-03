@@ -79,15 +79,15 @@ public class LootSkriptEvent implements ILoot {
                 .build(item, input -> this.item = input)
                 .childButton(1, 0, p -> ItemBuilder.copy(Material.PAPER).name(Lang.ED_LootSets_PROTO_Skript_TI).lore(Lang.ED_LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.ED_LootSets_PROTO_Skript_TI)
-                        .onClose((player) -> Result.PARENT())
+                        .onClose((player) -> Result.parent())
                         .leftRaw(p -> tag)
                         .right(p -> Lang.ED_LootSets_PROTO_Skript_R)
                         .onComplete((p, s, b) -> {
                             if (!s.isEmpty()) {
                                 this.tag = s;
-                                return Result.PARENT();
+                                return Result.parent();
                             }
-                            return Result.TEXT(Lang.ERR_INVALID);
+                            return Result.text(Lang.ERR_INVALID);
                         }));
     }
 

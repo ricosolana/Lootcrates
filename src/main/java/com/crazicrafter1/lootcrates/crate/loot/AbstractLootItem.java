@@ -89,12 +89,12 @@ public abstract class AbstractLootItem implements ILoot {
                 .lmb(interact -> {
                     int change = interact.shift ? 5 : 1;
                     min = MathUtil.clamp(min - change, 1, min);
-                    return Result.REFRESH();
+                    return Result.refresh();
                 })
                 .rmb(interact -> {
                     int change = interact.shift ? 5 : 1;
                     min = MathUtil.clamp(min + change, 1, max);
-                    return Result.REFRESH();
+                    return Result.refresh();
                 })
                 .icon(p -> ItemBuilder.from("PLAYER_HEAD").name(Lang.ED_MIN).skull(Editor.BASE64_DEC).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC + "\n" + Lang.ED_SHIFT_MUL).amount(min).build()))
                 // Max
@@ -102,12 +102,12 @@ public abstract class AbstractLootItem implements ILoot {
                         .lmb(interact -> {
                             int change = interact.shift ? 5 : 1;
                             max = MathUtil.clamp(max - change, min, itemStack.getMaxStackSize());
-                            return Result.REFRESH();
+                            return Result.refresh();
                         })
                         .rmb(interact -> {
                             int change = interact.shift ? 5 : 1;
                             max = MathUtil.clamp(max + change, min, itemStack.getMaxStackSize());
-                            return Result.REFRESH();
+                            return Result.refresh();
                         })
                         .icon(p -> ItemBuilder.from("PLAYER_HEAD").name(Lang.ED_MAX).skull(Editor.BASE64_INC).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC + "\n" + Lang.ED_SHIFT_MUL).amount(max).build()));
 

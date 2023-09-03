@@ -89,7 +89,7 @@ public class LootItemCrate implements ILoot {
                                 .lmb(interact -> {
                                     // select as active
                                     id = crate.id;
-                                    return Result.REFRESH();
+                                    return Result.refresh();
                                 })
                                 .get()
                         );

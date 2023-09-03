@@ -94,11 +94,11 @@ public class CrateSettings {
     }
 
     private String getFormattedPercent(LootCollection lootGroup) {
-        return String.format("%.02f%%", 100.f * ((float) loot.get(lootGroup.id)/(float) loot.getWeight()));
+        return String.format("%.02f%%", 100.f * ((float) loot.get(lootGroup.id)/(float) loot.getTotalWeight()));
     }
 
     private String getFormattedFraction(LootCollection lootGroup) {
-        return String.format("%d/%d", loot.get(lootGroup.id), loot.getWeight());
+        return String.format("%d/%d", loot.get(lootGroup.id), loot.getTotalWeight());
     }
 
     public LootCollection getRandomLootSet() {
@@ -195,15 +195,15 @@ public class CrateSettings {
                 .childButton(3, 1, p -> ItemBuilder.copy(Material.PAPER).name(String.format(Lang.EDIT_TITLE, title)).lore(Lang.ED_LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.TITLE)
                         .leftRaw(p -> title)
-                        .onClose((player) -> Result.PARENT())
+                        .onClose((player) -> Result.parent())
                         .right(p -> Lang.SPECIAL_FORMATTING, p -> Editor.getColorDem(), ColorUtil.AS_IS)
                         .onComplete((p, s, b) -> {
                             if (!s.isEmpty()) {
                                 title = ColorUtil.RENDER_MARKERS.a(s);
-                                return Result.PARENT();
+                                return Result.parent();
                             }
 
-                            return Result.TEXT(Lang.ERR_INVALID);
+                            return Result.text(Lang.ERR_INVALID);
                         })
                 )
                 // *   *   *
@@ -212,7 +212,7 @@ public class CrateSettings {
                 .childButton(5, 1, p -> ItemBuilder.from("EXPERIENCE_BOTTLE").name(Lang.LOOT).lore(Lang.ED_LMB_EDIT).build(), new ListMenu.LBuilder()
                         .title(p -> Lang.LOOT)
                         .parentButton(4, 5)
-                        .onClose((player) -> Result.PARENT())
+                        .onClose((player) -> Result.parent())
                         .addAll((builder, p) -> {
                             ArrayList<Button> result1 = new ArrayList<>();
 
@@ -231,7 +231,7 @@ public class CrateSettings {
                                         if (loot.getMap().size() > 1) {
                                             // toggle inclusion
                                             loot.remove(lootSet.id);
-                                            return Result.REFRESH();
+                                            return Result.refresh();
                                         }
                                         return null;
                                     }).num(interact -> {
@@ -243,13 +243,13 @@ public class CrateSettings {
                                             // then change weight
                                             loot.add(lootSet.id, MathUtil.clamp(weight + change, 1, Integer.MAX_VALUE));
                                         }
-                                        return Result.REFRESH();
+                                        return Result.refresh();
                                     });
                                 } else {
                                     b.lore(Lang.ED_LMB_TOGGLE);
                                     btn.lmb(interact -> {
                                         loot.add(lootSet.id, 1);
-                                        return Result.REFRESH();
+                                        return Result.refresh();
                                     });
                                 }
                                 result1.add(btn.icon(p1 -> b.build()).get());
@@ -266,12 +266,12 @@ public class CrateSettings {
                         .lmb(interact -> {
                             // decrease
                             columns = MathUtil.clamp(columns - 1, 1, 6);
-                            return Result.REFRESH();
+                            return Result.refresh();
                         })
                         .rmb(interact -> {
                             // decrease
                             columns = MathUtil.clamp(columns + 1, 1, 6);
-                            return Result.REFRESH();
+                            return Result.refresh();
                         }))
                 // *   *   *
                 // Edit Picks
@@ -281,12 +281,12 @@ public class CrateSettings {
                         .lmb(interact -> {
                             // decrease
                             picks = MathUtil.clamp(picks - 1, 1, columns*9);
-                            return Result.REFRESH();
+                            return Result.refresh();
                         })
                         .rmb(interact -> {
                             // decrease
                             picks = MathUtil.clamp(picks + 1, 1, columns*9);
-                            return Result.REFRESH();
+                            return Result.refresh();
                         }))
                 // *   *   *
                 // Edit Pick Sound
@@ -296,14 +296,14 @@ public class CrateSettings {
                                 .title(p -> Lang.ED_Crates_PROTO_Sound_TI)
                                 .leftRaw(p -> Editor.LOREM_IPSUM)
                                 .right(p -> Lang.ED_Crates_PROTO_Sound_R)
-                                .onClose((player) -> Result.PARENT())
+                                .onClose((player) -> Result.parent())
                                 .onComplete((p, s, b) -> {
                                     try {
                                         sound = Sound.valueOf(s.toUpperCase());
                                         p.playSound(p.getLocation(), sound, 1, 1);
-                                        return Result.PARENT();
+                                        return Result.parent();
                                     } catch (Exception e) {
-                                        return Result.TEXT(Lang.ERR_INVALID);
+                                        return Result.text(Lang.ERR_INVALID);
                                     }
                                 })
                 );
@@ -318,7 +318,7 @@ public class CrateSettings {
                     for (Map.Entry<String, Integer> entry : loot.getMap().entrySet()) {
                         LootCollection lootSet = LCMain.get().rewardSettings.lootSets.get(entry.getKey());
                         int weight = entry.getValue();
-                        double chance = ((double)weight / (double)loot.getWeight()) * 100.;
+                        double chance = ((double)weight / (double)loot.getTotalWeight()) * 100.0;
                         buttons.add(new Button.Builder()
                                 .icon(p00 -> ItemBuilder.copy(lootSet.itemStack).lore(String.format("&8%.02f%%", chance)).build()).get());
                     }

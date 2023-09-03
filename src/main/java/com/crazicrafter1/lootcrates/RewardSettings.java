@@ -53,14 +53,12 @@ public class RewardSettings {
                 new ArrayList<>(Collections.singletonList(new LootItem())));
         lootSets.put(lootSet.id, lootSet);
 
-
         crates.put("peasant", Lootcrates.createCrate("peasant"));
 
         fireworkEffect = FireworkEffect.builder().withColor(Color.RED, Color.BLUE, Color.WHITE).with(FireworkEffect.Type.BURST).build();
     }
 
     public RewardSettings(ConfigurationSection section) {
-        //Map<String, Object> args = section.getValues(false);
         try {
             final int rev = LCMain.get().rev;
 
@@ -82,14 +80,13 @@ public class RewardSettings {
 
                     this.lootSets.put(id, new LootCollection(id, itemStack, loot));
                 } else {
-                    //List<ConfigurationSection> loot = (List<ConfigurationSection>) itr.get("loot");
                     final List<Map<String, Object>> list = (List<Map<String, Object>>) itr.get("loot");
-                    Map<ILoot, Integer> result = new HashMap<>();
+                    Map<ILoot, Integer> result = new LinkedHashMap<>();
                     for (Map<String, Object> sub : list) {
                         result.put((ILoot) sub.get("loot"), (int) sub.get("weight"));
                     }
+
                     // write the loot as a list containing sub-maps of item, weight
-                    //Map<ILoot, Integer> loot = (Map<ILoot, Integer>) itr.get("loot");
                     Validate.isTrue(!result.containsKey(null), String.format(Lang.CONFIG_NULL_VALUE, "'lootSets.<" + id + ">.loot.data'"));
                     Validate.isTrue(!result.containsValue(0), String.format(Lang.CONFIG_ZERO_WEIGHT, "'lootSets.<" + id + ">.loot.weight'"));
                     Validate.isTrue(!result.containsValue(null), String.format(Lang.CONFIG_NULL_VALUE, "'lootSets.<" + id + ">.loot.weight'"));
@@ -106,7 +103,7 @@ public class RewardSettings {
                 Map<String, Object> map = ((ConfigurationSection) itr.get("weights")).getValues(false);
                 Map<String, Integer> weights = map.entrySet().stream()
                         .collect(Collectors.toMap(e -> Objects.requireNonNull(this.lootSets.get(e.getKey()), e.getKey() + "missing reference to LootSet '" + e.getKey() + "' in 'crates.<" + id + ">.weights.<" + e.getKey() + ">'").id,
-                                e -> (Integer) e.getValue()));//
+                                e -> (Integer) e.getValue()));
 
                 crates.put(id, new CrateSettings(id,
                         Objects.requireNonNull((String) itr.get("title"), String.format(Lang.CONFIG_NULL_VALUE, "'crates.<" + id + ">.title'")),

@@ -5,6 +5,7 @@ import com.crazicrafter1.crutils.RandomUtil;
 import com.crazicrafter1.crutils.ui.Button;
 import com.crazicrafter1.lootcrates.*;
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +18,11 @@ public class LootItem extends AbstractLootItem {
     public static final ItemStack EDITOR_ICON = ItemBuilder.copy(Material.GOLD_NUGGET).name("&6Add item...").build();
 
     public ItemStack itemStack;
+
+    // TODO clone or not?
+    public LootItem(ItemStack itemStack) {
+        this.itemStack = itemStack.clone();
+    }
 
     /**
      * Editor template LootItem ctor

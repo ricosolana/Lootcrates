@@ -213,7 +213,7 @@ public class Editor {
                             switch (effect.getType()) {
                                 case BALL: base64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDcxMWU1NDcyYzU3YzMyMTgwOGI3YmUzNDRhMTFlZmFhNGRlYjViNDA0NTU2OTdlZDRhM2U2ZTkyODc3MjAwMiJ9fX0="; break;
                                 case STAR: base64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTIzODJlZWVhZWNjMzM5Y2ZhZjgzYjRiMTk2ZTVlMDAwZTdiNmZlNmM4MWZjZTNjYzNjOGFlM2VkMWMwNDNkNCJ9fX0="; break;
-                                case BURST: base64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjRkNzY1MWU5ZGViNWMyODEzODIwZmVkMzExZDU0MTExOWYzMTU1ZWFhYjU0OWQzYWQ1MmQyMDJiYzNmMGU3In19fQ=="; break;
+                                case BURST: base64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGExYWY3YjIxZTljM2EzYzdhNGExNGZkM2RmYzhkZjgxYmU2OWY0ODkwYzVjOWE3YjUxYTYwYWU2NDQ0OGQ1NCJ9fX0="; break;
                                 case CREEPER: base64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODQyYmVhNzQ0NThjNWM1YjQ5Y2RmODMyYmUwNTI3YTA0ZTcyYjRlNzMzZmQ4NWEwOTE5MjBjNWY1NGJlN2FlYiJ9fX0="; break;
                                 default: base64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzJlYmVhMTdjMzIzNTYzN2E3NDQ4ODczODA2MDllMzhmYWU3NDhhMjY5YzY3NThkZDA5Njk4NmYyYWI5ZjgxNCJ9fX0="; break;
                             }
@@ -246,22 +246,39 @@ public class Editor {
                             return Result.refresh();
                         }))
                         // Flicker
-                                .button(2, 0, new Button.Builder().icon(p40 -> ItemBuilder.from("PLAYER_HEAD")
-                                        .skull(LCMain.get().rewardSettings.fireworkEffect.hasFlicker() ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmM4YWZiZmUzZmJkYmRkNTRlZTkxYWZlYTkxYTczY2ZjNjY2MzUyYzI3ZTcwNmYyYzM5MjE0MGY3MjAzMTI4YSJ9fX0=" : "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTBhZjMyMzhmNjNhYjIwYzU5YjE1OGY0MDQ3YmViNTVkYjExNmQxYTk0OThhZWE0YjlhZTU4MTk5MGZmOGQxNyJ9fX0=")
-                                        .name((LCMain.get().rewardSettings.fireworkEffect.hasFlicker() ? "&6" : "&7") + "Flicker (Click to toggle)")
+                        .button(2, 0, new Button.Builder().icon(p40 -> ItemBuilder.from("PLAYER_HEAD")
+                                .skull(LCMain.get().rewardSettings.fireworkEffect.hasFlicker() ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmM4YWZiZmUzZmJkYmRkNTRlZTkxYWZlYTkxYTczY2ZjNjY2MzUyYzI3ZTcwNmYyYzM5MjE0MGY3MjAzMTI4YSJ9fX0=" : "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTBhZjMyMzhmNjNhYjIwYzU5YjE1OGY0MDQ3YmViNTVkYjExNmQxYTk0OThhZWE0YjlhZTU4MTk5MGZmOGQxNyJ9fX0=")
+                                .name((LCMain.get().rewardSettings.fireworkEffect.hasFlicker() ? "&6&l" : "&7") + "Flicker (Click to toggle)")
+                                .build())
+                            .lmb(e -> {
+                                // toggle
+                                FireworkEffect effect = LCMain.get().rewardSettings.fireworkEffect;
+                                LCMain.get().rewardSettings.fireworkEffect = FireworkEffect.builder()
+                                        .with(effect.getType())
+                                        .flicker(!effect.hasFlicker())
+                                        .trail(effect.hasTrail())
+                                        .withColor(effect.getColors())
+                                        .withFade(effect.getFadeColors()).build();
+                                return Result.refresh();
+                            })
+                        )
+                        // Trail
+                        .button(7, 0, new Button.Builder().icon(p40 -> ItemBuilder.from("PLAYER_HEAD")
+                                        .skull(LCMain.get().rewardSettings.fireworkEffect.hasTrail() ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQzMGM1YjkzNTgxNzlkMDk4Nzc0MGQ3NDc4YzBlZWI2YjljN2ZhMDdjZTQ4OGRkNjk4NTE4MWFmNjFmYjhhMiJ9fX0=" : "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzg3ZDgzNWI1NDNlZDFiMDI0MTU3MDFjYTdiM2Y4YzhhMGExMTJhZjEzMThmOWNlYzVhNWU5MWU0ODE0YTI0OSJ9fX0=")
+                                        .name((LCMain.get().rewardSettings.fireworkEffect.hasTrail() ? "&c&l" : "&7") + "Trail (Click to toggle)")
                                         .build())
-                                    .lmb(e -> {
-                                        // toggle
-                                        FireworkEffect effect = LCMain.get().rewardSettings.fireworkEffect;
-                                        LCMain.get().rewardSettings.fireworkEffect = FireworkEffect.builder()
-                                                .with(effect.getType())
-                                                .flicker(!effect.hasFlicker())
-                                                .trail(effect.hasTrail())
-                                                .withColor(effect.getColors())
-                                                .withFade(effect.getFadeColors()).build();
-                                        return Result.refresh();
-                                    })
-                                )
+                                .lmb(e -> {
+                                    // toggle
+                                    FireworkEffect effect = LCMain.get().rewardSettings.fireworkEffect;
+                                    LCMain.get().rewardSettings.fireworkEffect = FireworkEffect.builder()
+                                            .with(effect.getType())
+                                            .flicker(effect.hasFlicker())
+                                            .trail(!effect.hasTrail())
+                                            .withColor(effect.getColors())
+                                            .withFade(effect.getFadeColors()).build();
+                                    return Result.refresh();
+                                })
+                        )
                         // TODO use the same code for colors as fade colors
                         //  just change titles and references between colors <-> fade ...
                         .childButton(0, 2, p0010 -> ItemBuilder.from("FIREWORK_STAR").name("&2Colors").build(), new ListMenu.LBuilder()

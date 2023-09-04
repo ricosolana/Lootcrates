@@ -8,6 +8,7 @@ import com.crazicrafter1.lootcrates.Editor;
 import com.crazicrafter1.lootcrates.Lang;
 import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
@@ -86,27 +87,27 @@ public abstract class AbstractLootItem implements ILoot {
     protected SimpleMenu.SBuilder rangeButtons(SimpleMenu.SBuilder builder, ItemStack itemStack,
                                           int x1, int y1, int x2, int y2) {
         return builder.button(x1, y1, new Button.Builder()
-                .lmb(interact -> {
-                    int change = interact.shift ? 5 : 1;
-                    min = MathUtil.clamp(min - change, 1, min);
-                    return Result.refresh();
-                })
-                .rmb(interact -> {
-                    int change = interact.shift ? 5 : 1;
+                .click(e -> {
+                    ClickType clickType = e.clickType;
+                    if (!(clickType.isLeftClick() || clickType.isRightClick()))
+                        return Result.ok();
+
+                    int change = e.shift ? 5 : 1;
+                    if (clickType.isLeftClick()) change *= -1;
                     min = MathUtil.clamp(min + change, 1, max);
                     return Result.refresh();
                 })
                 .icon(p -> ItemBuilder.from("PLAYER_HEAD").name(Lang.ED_MIN).skull(Editor.BASE64_DEC).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC + "\n" + Lang.ED_SHIFT_MUL).amount(min).build()))
                 // Max
                 .button(x2, y2, new Button.Builder()
-                        .lmb(interact -> {
-                            int change = interact.shift ? 5 : 1;
-                            max = MathUtil.clamp(max - change, min, itemStack.getMaxStackSize());
-                            return Result.refresh();
-                        })
-                        .rmb(interact -> {
-                            int change = interact.shift ? 5 : 1;
-                            max = MathUtil.clamp(max + change, min, itemStack.getMaxStackSize());
+                        .click(e -> {
+                            ClickType clickType = e.clickType;
+                            if (!(clickType.isLeftClick() || clickType.isRightClick()))
+                                return Result.ok();
+
+                            int change = e.shift ? 5 : 1;
+                            if (clickType.isLeftClick()) change *= -1;
+                            min = MathUtil.clamp(max + change, min, itemStack.getMaxStackSize());
                             return Result.refresh();
                         })
                         .icon(p -> ItemBuilder.from("PLAYER_HEAD").name(Lang.ED_MAX).skull(Editor.BASE64_INC).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC + "\n" + Lang.ED_SHIFT_MUL).amount(max).build()));

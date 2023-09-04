@@ -49,7 +49,7 @@ public class LootCollection {
         this.itemStack = itemStack;
 
         this.loot = new WeightedRandomContainer<>(
-                loot.getMap().entrySet().stream().collect(
+                loot.getMap().entrySet().stream().collect(//LinkedHashMap::new, (map, v) -> map.put(v, )
                 CollectorUtils.toLinkedMap(Map.Entry::getKey, Map.Entry::getValue)));
     }
 

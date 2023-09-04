@@ -6,15 +6,19 @@ import com.crazicrafter1.crutils.ui.*;
 import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import com.crazicrafter1.lootcrates.crate.LootCollection;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
+import org.apache.commons.lang3.text.WordUtils;
 import org.bukkit.ChatColor;
+import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
 
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Editor {
 
@@ -96,7 +100,8 @@ public class Editor {
                                                 // https://regexr.com/6fdsi
                                                 .icon(p -> crate.getMenuIcon())
                                                         //.mmb(event -> { clipboardCrate = crate; return Result.REFRESH_GRAB(); })
-                                                .child(self, crate.getBuilder(),
+                                                .child(self, crate.getBuilder())
+                                                .rmb(
                                                         /// RMB - delete crate
                                                         interact -> {
                                                             // TODO right-click used to delete the crate
@@ -134,7 +139,8 @@ public class Editor {
                                  */
                                 result.add(new Button.Builder()
                                         .icon(p -> lootSet.getMenuIcon())
-                                        .child(self, lootSet.getBuilder(), // LMB - Edit Loot Collection
+                                        .child(self, lootSet.getBuilder()) // LMB - Edit Loot Collection
+                                        .rmb(
                                                 // RMB - delete lootSet
                                                 interact -> {
                                                     if (interact.shift) {
@@ -201,6 +207,45 @@ public class Editor {
                 .childButton(6, 1, p -> ItemBuilder.from("FIREWORK_ROCKET").name(Lang.ED_BTN_Firework).build(), new SimpleMenu.SBuilder(5)
                         .title(p -> Lang.ED_Firework_TI)
                         .background()
+                        // Type
+                        .button(0, 0, new Button.Builder().icon(p -> {
+                            FireworkEffect effect = LCMain.get().rewardSettings.fireworkEffect;
+
+                            String base64;
+                            switch (effect.getType()) {
+                                case BALL: base64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDcxMWU1NDcyYzU3YzMyMTgwOGI3YmUzNDRhMTFlZmFhNGRlYjViNDA0NTU2OTdlZDRhM2U2ZTkyODc3MjAwMiJ9fX0="; break;
+                                case STAR: base64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTIzODJlZWVhZWNjMzM5Y2ZhZjgzYjRiMTk2ZTVlMDAwZTdiNmZlNmM4MWZjZTNjYzNjOGFlM2VkMWMwNDNkNCJ9fX0="; break;
+                                case BURST: base64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjRkNzY1MWU5ZGViNWMyODEzODIwZmVkMzExZDU0MTExOWYzMTU1ZWFhYjU0OWQzYWQ1MmQyMDJiYzNmMGU3In19fQ=="; break;
+                                case CREEPER: base64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODQyYmVhNzQ0NThjNWM1YjQ5Y2RmODMyYmUwNTI3YTA0ZTcyYjRlNzMzZmQ4NWEwOTE5MjBjNWY1NGJlN2FlYiJ9fX0="; break;
+                                default: base64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzJlYmVhMTdjMzIzNTYzN2E3NDQ4ODczODA2MDllMzhmYWU3NDhhMjY5YzY3NThkZDA5Njk4NmYyYWI5ZjgxNCJ9fX0="; break;
+                            }
+
+                            return ItemBuilder.from("PLAYER_HEAD").skull(base64)
+                                    .name(WordUtils.capitalize(effect.getType().name().toLowerCase()))
+                                    .lore(Arrays.stream(FireworkEffect.Type.values()).map(type -> WordUtils.capitalize(type.name().toLowerCase())).collect(Collectors.toList())).build();
+                        }).click(e -> {
+                            ClickType clickType = e.clickType;
+                            if (!(clickType.isRightClick() || clickType.isLeftClick()))
+                                return Result.ok();
+
+                            RewardSettings settings = LCMain.get().rewardSettings;
+                            FireworkEffect effect = settings.fireworkEffect;
+
+                            FireworkEffect.Type[] values = FireworkEffect.Type.values();
+                            FireworkEffect.Type nextType = values[(Arrays.asList(values).indexOf(effect.getType()) + (clickType.isLeftClick() ? 1 : -1)) % values.length];
+
+                            //settings.fireworkEffect = new FireworkEffect(effect.hasFlicker(), effect.hasTrail(), effect.getColors(), effect.getFadeColors(), nextType);
+
+                            settings.fireworkEffect = FireworkEffect.builder()
+                                    .with(nextType)
+                                    .flicker(effect.hasFlicker())
+                                    .trail(effect.hasTrail())
+                                    .withColor(effect.getColors())
+                                    .withFade(effect.getFadeColors()).build();
+
+                            return Result.refresh();
+                        }))
+
                         .button(4, 0, IN_OUTLINE)
                         .button(3, 1, IN_OUTLINE)
                         .button(5, 1, IN_OUTLINE)
@@ -215,6 +260,9 @@ public class Editor {
                                         if (interact.heldItem.getItemMeta() instanceof FireworkEffectMeta) {
                                             FireworkEffectMeta meta = (FireworkEffectMeta) interact.heldItem.getItemMeta();
                                             if (meta.hasEffect()) {
+                                                //meta.getEffect().getType() == FireworkEffect.Type.BALL;
+                                                FireworkEffect effect = meta.getEffect();
+                                                //effect.getColors().get(0)
                                                 LCMain.get().rewardSettings.fireworkEffect = meta.getEffect();
                                                 return Result.refresh();
                                             }

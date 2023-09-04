@@ -6,11 +6,9 @@ import com.crazicrafter1.crutils.ui.*;
 import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import com.crazicrafter1.lootcrates.crate.LootCollection;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
+import com.google.common.collect.Streams;
 import org.apache.commons.lang3.text.WordUtils;
-import org.bukkit.ChatColor;
-import org.bukkit.FireworkEffect;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -221,8 +219,8 @@ public class Editor {
                             }
 
                             return ItemBuilder.from("PLAYER_HEAD").skull(base64)
-                                    .name(WordUtils.capitalize(effect.getType().name().toLowerCase()))
-                                    .lore(Arrays.stream(FireworkEffect.Type.values()).map(type -> WordUtils.capitalize(type.name().toLowerCase())).collect(Collectors.toList())).build();
+                                    .name(String.format(Lang.ED_Fireworks_Type, WordUtils.capitalize(effect.getType().name().toLowerCase())))
+                                    .lore(Arrays.stream(FireworkEffect.Type.values()).map(type -> "&7" + (effect.getType() == type ? "&l" : "") + WordUtils.capitalize(type.name().toLowerCase())).collect(Collectors.toList())).build();
                         }).click(e -> {
                             ClickType clickType = e.clickType;
                             if (!(clickType.isRightClick() || clickType.isLeftClick()))
@@ -232,7 +230,9 @@ public class Editor {
                             FireworkEffect effect = settings.fireworkEffect;
 
                             FireworkEffect.Type[] values = FireworkEffect.Type.values();
-                            FireworkEffect.Type nextType = values[(Arrays.asList(values).indexOf(effect.getType()) + (clickType.isLeftClick() ? 1 : -1)) % values.length];
+                            int index = (Arrays.asList(values).indexOf(effect.getType()) + (clickType.isLeftClick() ? -1 : 1)) % values.length;
+                            if (index < 0) index += values.length;
+                            FireworkEffect.Type nextType = values[index];
 
                             //settings.fireworkEffect = new FireworkEffect(effect.hasFlicker(), effect.hasTrail(), effect.getColors(), effect.getFadeColors(), nextType);
 
@@ -245,7 +245,88 @@ public class Editor {
 
                             return Result.refresh();
                         }))
+                        // Flicker
+                                .button(2, 0, new Button.Builder().icon(p40 -> ItemBuilder.from("PLAYER_HEAD")
+                                        .skull(LCMain.get().rewardSettings.fireworkEffect.hasFlicker() ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmM4YWZiZmUzZmJkYmRkNTRlZTkxYWZlYTkxYTczY2ZjNjY2MzUyYzI3ZTcwNmYyYzM5MjE0MGY3MjAzMTI4YSJ9fX0=" : "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTBhZjMyMzhmNjNhYjIwYzU5YjE1OGY0MDQ3YmViNTVkYjExNmQxYTk0OThhZWE0YjlhZTU4MTk5MGZmOGQxNyJ9fX0=")
+                                        .name((LCMain.get().rewardSettings.fireworkEffect.hasFlicker() ? "&6" : "&7") + "Flicker (Click to toggle)")
+                                        .build())
+                                    .lmb(e -> {
+                                        // toggle
+                                        FireworkEffect effect = LCMain.get().rewardSettings.fireworkEffect;
+                                        LCMain.get().rewardSettings.fireworkEffect = FireworkEffect.builder()
+                                                .with(effect.getType())
+                                                .flicker(!effect.hasFlicker())
+                                                .trail(effect.hasTrail())
+                                                .withColor(effect.getColors())
+                                                .withFade(effect.getFadeColors()).build();
+                                        return Result.refresh();
+                                    })
+                                )
+                        // TODO use the same code for colors as fade colors
+                        //  just change titles and references between colors <-> fade ...
+                        .childButton(0, 2, p0010 -> ItemBuilder.from("FIREWORK_STAR").name("&2Colors").build(), new ListMenu.LBuilder()
+                                .title(p0 -> "Colors editor")
+                                .background()
+                                .parentButton(4, 5)
+                                .addAll((self, p) -> {
+                                    RewardSettings settings = LCMain.get().rewardSettings;
 
+                                    return Streams.mapWithIndex(settings.fireworkEffect.getColors().stream(), (color, colorIndex) -> new Button.Builder()
+                                        .child(self, new TextMenu.TBuilder()
+                                                .title(p049 -> "Set color")
+                                                .leftRaw(p00202 -> "#" + Integer.toHexString(color.asRGB()))
+                                                .parentOnClose()
+                                                .onComplete((p0020, text, menu) -> {
+                                                    int value;
+
+                                                    try {
+                                                        int i = text.indexOf("0x");
+                                                        if (i != -1)
+                                                            value = Integer.parseUnsignedInt(text, i + 2, text.length(), 16);
+                                                        else {
+                                                            i = text.indexOf("#");
+                                                            if (i != -1)
+                                                                value = Integer.parseUnsignedInt(text, i + 1, text.length(), 16);
+                                                            else {
+                                                                // decimal
+                                                                value = Integer.parseUnsignedInt(text);
+                                                            }
+                                                        }
+                                                    } catch (Exception ignored) {
+                                                        return Result.text("Must match: 1234567, #abcdef, 0xabcdef, ...");
+                                                    }
+
+                                                    if ((value > 0xFFFFFF) || value < 0)
+                                                        return Result.text("Too large");
+
+                                                    FireworkEffect effect = settings.fireworkEffect;
+
+                                                    List<Color> colors = new ArrayList<>(effect.getColors());
+
+                                                    Color color1 = Color.fromRGB(value);
+                                                    if (colors.contains(color1))
+                                                        return Result.text("Color already applied");
+
+                                                    colors.set((int) colorIndex, color1);
+
+                                                    settings.fireworkEffect = FireworkEffect.builder()
+                                                            .with(effect.getType())
+                                                            .flicker(effect.hasFlicker())
+                                                            .trail(effect.hasTrail())
+                                                            .withColor(colors) // Colors are reassigned with the copied list
+                                                            .withFade(effect.getFadeColors()).build();
+
+                                                    return Result.parent();
+                                                })
+                                        )
+                                        .icon(p102 -> ItemBuilder.copy(Material.LEATHER_CHESTPLATE)
+                                                .name(ColorUtil.toHexMarker(color) + "0x" + Integer.toHexString(color.asRGB()))
+                                                .color(color)
+                                                .build()
+                                        )
+                                        .get()
+                                ).collect(Collectors.toList());})
+                        )
                         .button(4, 0, IN_OUTLINE)
                         .button(3, 1, IN_OUTLINE)
                         .button(5, 1, IN_OUTLINE)

@@ -9,7 +9,10 @@ import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
+import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,17 +21,15 @@ import java.util.stream.Collectors;
 
 public class FireworkModifyMenu extends SimpleMenu.SBuilder {
 
-    // TODO redo fireworks menu
-    public static final Button.Builder IN_OUTLINE = new Button.Builder().icon(p -> ItemBuilder.from(
-            "GRAY_STAINED_GLASS_PANE").name(" ").build());
-
     public FireworkModifyMenu() {
-        super(5);
+        super(3);
+
+        RewardSettings settings = LCMain.get().rewardSettings;
 
         this.title(p -> Lang.ED_Firework_TI)
                 .background()
                 // Type
-                .button(0, 0, new Button.Builder().icon(p -> {
+                .button(1, 1, new Button.Builder().icon(p -> {
                     FireworkEffect effect = LCMain.get().rewardSettings.fireworkEffect;
 
                     String base64;
@@ -48,15 +49,12 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                     if (!(clickType.isRightClick() || clickType.isLeftClick()))
                         return Result.ok();
 
-                    RewardSettings settings = LCMain.get().rewardSettings;
                     FireworkEffect effect = settings.fireworkEffect;
 
                     FireworkEffect.Type[] values = FireworkEffect.Type.values();
                     int index = (Arrays.asList(values).indexOf(effect.getType()) + (clickType.isLeftClick() ? -1 : 1)) % values.length;
                     if (index < 0) index += values.length;
                     FireworkEffect.Type nextType = values[index];
-
-                    //settings.fireworkEffect = new FireworkEffect(effect.hasFlicker(), effect.hasTrail(), effect.getColors(), effect.getFadeColors(), nextType);
 
                     settings.fireworkEffect = FireworkEffect.builder()
                             .with(nextType)
@@ -68,14 +66,15 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                     return Result.refresh();
                 }))
                 // Flicker
-                .button(2, 0, new Button.Builder().icon(p40 -> ItemBuilder.from("PLAYER_HEAD")
-                                .skull(LCMain.get().rewardSettings.fireworkEffect.hasFlicker() ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmM4YWZiZmUzZmJkYmRkNTRlZTkxYWZlYTkxYTczY2ZjNjY2MzUyYzI3ZTcwNmYyYzM5MjE0MGY3MjAzMTI4YSJ9fX0=" : "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTBhZjMyMzhmNjNhYjIwYzU5YjE1OGY0MDQ3YmViNTVkYjExNmQxYTk0OThhZWE0YjlhZTU4MTk5MGZmOGQxNyJ9fX0=")
-                                .name("&7Flicker (" + (LCMain.get().rewardSettings.fireworkEffect.hasFlicker() ? "&con" : "&8off") + "&7)")
+                .button(3, 1, new Button.Builder().icon(p40 -> ItemBuilder.from("PLAYER_HEAD")
+                                .skull(settings.fireworkEffect.hasFlicker() ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmM4YWZiZmUzZmJkYmRkNTRlZTkxYWZlYTkxYTczY2ZjNjY2MzUyYzI3ZTcwNmYyYzM5MjE0MGY3MjAzMTI4YSJ9fX0=" : "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTBhZjMyMzhmNjNhYjIwYzU5YjE1OGY0MDQ3YmViNTVkYjExNmQxYTk0OThhZWE0YjlhZTU4MTk5MGZmOGQxNyJ9fX0=")
+                                .name("&7Flicker (" + (settings.fireworkEffect.hasFlicker() ? "&con" : "&8off") + "&7)")
+                                //.glow(settings.fireworkEffect.hasFlicker()) // TODO heads do not glow :(
                                 .build())
                         .lmb(e -> {
                             // toggle
-                            FireworkEffect effect = LCMain.get().rewardSettings.fireworkEffect;
-                            LCMain.get().rewardSettings.fireworkEffect = FireworkEffect.builder()
+                            FireworkEffect effect = settings.fireworkEffect;
+                            settings.fireworkEffect = FireworkEffect.builder()
                                     .with(effect.getType())
                                     .flicker(!effect.hasFlicker())
                                     .trail(effect.hasTrail())
@@ -85,14 +84,15 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                         })
                 )
                 // Trail
-                .button(7, 0, new Button.Builder().icon(p40 -> ItemBuilder.from("PLAYER_HEAD")
-                                .skull(LCMain.get().rewardSettings.fireworkEffect.hasTrail() ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQzMGM1YjkzNTgxNzlkMDk4Nzc0MGQ3NDc4YzBlZWI2YjljN2ZhMDdjZTQ4OGRkNjk4NTE4MWFmNjFmYjhhMiJ9fX0=" : "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzg3ZDgzNWI1NDNlZDFiMDI0MTU3MDFjYTdiM2Y4YzhhMGExMTJhZjEzMThmOWNlYzVhNWU5MWU0ODE0YTI0OSJ9fX0=")
-                                .name("&7Trail (" + (LCMain.get().rewardSettings.fireworkEffect.hasTrail() ? "&6&lon" : "&8off") + "&r&7)")
+                .button(5, 1, new Button.Builder().icon(p40 -> ItemBuilder.from("PLAYER_HEAD")
+                                .skull(settings.fireworkEffect.hasTrail() ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQzMGM1YjkzNTgxNzlkMDk4Nzc0MGQ3NDc4YzBlZWI2YjljN2ZhMDdjZTQ4OGRkNjk4NTE4MWFmNjFmYjhhMiJ9fX0=" : "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzg3ZDgzNWI1NDNlZDFiMDI0MTU3MDFjYTdiM2Y4YzhhMGExMTJhZjEzMThmOWNlYzVhNWU5MWU0ODE0YTI0OSJ9fX0=")
+                                .name("&7Trail (" + (settings.fireworkEffect.hasTrail() ? "&6&lon" : "&8off") + "&r&7)")
+                                //.glow(settings.fireworkEffect.hasTrail())
                                 .build())
                         .lmb(e -> {
                             // toggle
-                            FireworkEffect effect = LCMain.get().rewardSettings.fireworkEffect;
-                            LCMain.get().rewardSettings.fireworkEffect = FireworkEffect.builder()
+                            FireworkEffect effect = settings.fireworkEffect;
+                            settings.fireworkEffect = FireworkEffect.builder()
                                     .with(effect.getType())
                                     .flicker(effect.hasFlicker())
                                     .trail(!effect.hasTrail())
@@ -103,21 +103,19 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                 )
                 // TODO use the same code for colors as fade colors
                 //  just change titles and references between colors <-> fade ...
-                .childButton(0, 2, p0010 -> ItemBuilder.from("FIREWORK_STAR")
-                        .name("&2Colors &7(" + LCMain.get().rewardSettings.fireworkEffect.getColors().size() + ") applied")
-                        .lore(LCMain.get().rewardSettings.fireworkEffect.getColors().stream().map(color -> ColorUtil.toHexMarker(color) + " - #" + Integer.toHexString(color.asRGB())).collect(Collectors.toList())).build(),
+                .childButton(7, 1, p0010 -> ItemBuilder.from("FIREWORK_STAR")
+                        .name("&2Colors &7(" + settings.fireworkEffect.getColors().size() + ") applied")
+                        .lore(settings.fireworkEffect.getColors().stream().map(color -> String.format("&7 - #%X %s\u2588", color.asRGB(), ColorUtil.toHexMarker(color))).collect(Collectors.toList())).build(),
 
                         new ListMenu.LBuilder()
                         .title(p0 -> "Colors editor")
                         .background()
                         .parentButton(4, 5)
                         .addAll((self, p) -> {
-                            RewardSettings settings = LCMain.get().rewardSettings;
-
                             return Streams.mapWithIndex(settings.fireworkEffect.getColors().stream(), (color, colorIndex) -> new Button.Builder()
                                     .child(self, new TextMenu.TBuilder()
                                             .title(p049 -> "Set color")
-                                            .leftRaw(p00202 -> "#" + Integer.toHexString(color.asRGB()))
+                                            .leftRaw(p00202 -> String.format("#%X", color.asRGB()))
                                             .parentOnClose()
                                             .onComplete((p0020, text, menu) -> {
                                                 int value;
@@ -136,7 +134,7 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                                                         }
                                                     }
                                                 } catch (Exception ignored) {
-                                                    return Result.text("Must match: 1234567, #abcdef, 0xabcdef, ...");
+                                                    return Result.text("Must match: 1234567, #aBcDeF, 0xABCDEF, ...");
                                                 }
 
                                                 if ((value > 0xFFFFFF) || value < 0)
@@ -163,40 +161,37 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                                             })
                                     )
                                     .icon(p102 -> ItemBuilder.copy(Material.LEATHER_CHESTPLATE)
-                                            .name(ColorUtil.toHexMarker(color) + "0x" + Integer.toHexString(color.asRGB()))
+                                            .name(String.format("&7#%X %s\u2588", color.asRGB(), ColorUtil.toHexMarker(color)))
                                             .color(color)
+                                            .hideFlags(ItemFlag.HIDE_DYE, ItemFlag.HIDE_ATTRIBUTES)
                                             .build()
                                     )
                                     .get()
                             ).collect(Collectors.toList());})
                 )
-                .button(4, 0, IN_OUTLINE)
-                .button(3, 1, IN_OUTLINE)
-                .button(5, 1, IN_OUTLINE)
-                .button(4, 2, IN_OUTLINE)
-                .button(1, 1, new Button.Builder()
-                        .icon(p -> ItemBuilder.from("FIREWORK_STAR").fireworkEffect(LCMain.get().rewardSettings.fireworkEffect).build()))
-                .button(4, 1, new Button.Builder()
-                        .icon(p -> ItemBuilder.from("FIREWORK_STAR").fireworkEffect(LCMain.get().rewardSettings.fireworkEffect).build())
-                        .lmb(interact -> {
-                            if (interact.heldItem != null) {
-                                //if (interact.heldItem.getItemMeta() instanceof FireworkEffectMeta meta && meta.hasEffect()) {
-                                if (interact.heldItem.getItemMeta() instanceof FireworkEffectMeta) {
-                                    FireworkEffectMeta meta = (FireworkEffectMeta) interact.heldItem.getItemMeta();
-                                    if (meta.hasEffect()) {
-                                        //meta.getEffect().getType() == FireworkEffect.Type.BALL;
-                                        FireworkEffect effect = meta.getEffect();
-                                        //effect.getColors().get(0)
-                                        LCMain.get().rewardSettings.fireworkEffect = meta.getEffect();
-                                        return Result.refresh();
-                                    }
+                // TODO we'll just ignore this mess unless someone wants it
+                // apply firework from item
+                /*
+                .capture(new Button.Builder().lmb(e -> {
+                    if (e.clickType.isLeftClick() || e.clickType.isRightClick()) {
+                        // set firework to inputted firework
+                        if (e.heldItem != null) {
+                            ItemMeta meta = e.heldItem.getItemMeta();
+                            FireworkEffectMeta fmeta = meta instanceof FireworkMeta ? ((FireworkMeta) meta). : meta instanceof FireworkEffectMeta ? (FireworkEffectMeta) meta : null;
+                            if (e.heldItem.getItemMeta() instanceof FireworkEffectMeta) {
+                                FireworkEffectMeta meta = (FireworkEffectMeta) e.heldItem.getItemMeta();
+                                if (meta.hasEffect()) {
+                                    settings.fireworkEffect = meta.getEffect();
+                                    return Result.message("Applied firework").andThen(Result.refresh());
                                 }
-                                interact.player.sendMessage(Lang.ED_Firework_ERROR);
                             }
+                            return Result.message(Lang.ED_Firework_ERROR);
+                        }
+                    }
 
-                            return Result.grab();
-                        }))
-                .parentButton(4, 4);
+                    return Result.ok();
+                }))*/
+                .parentButton(4, 2);
     }
 
 }

@@ -41,7 +41,7 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                     }
 
                     return ItemBuilder.from("PLAYER_HEAD").skull(base64)
-                            .name(String.format(Lang.ED_Fireworks_Type, WordUtils.capitalize(effect.getType().name().toLowerCase())))
+                            .name(Lang.ED_Fireworks_Type)
                             .lore(Arrays.stream(FireworkEffect.Type.values()).map(type -> "&7" + (effect.getType() == type ? "&l" : "") + WordUtils.capitalize(type.name().toLowerCase())).collect(Collectors.toList())).build();
                 }).click(e -> {
                     ClickType clickType = e.clickType;
@@ -70,7 +70,7 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                 // Flicker
                 .button(2, 0, new Button.Builder().icon(p40 -> ItemBuilder.from("PLAYER_HEAD")
                                 .skull(LCMain.get().rewardSettings.fireworkEffect.hasFlicker() ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmM4YWZiZmUzZmJkYmRkNTRlZTkxYWZlYTkxYTczY2ZjNjY2MzUyYzI3ZTcwNmYyYzM5MjE0MGY3MjAzMTI4YSJ9fX0=" : "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTBhZjMyMzhmNjNhYjIwYzU5YjE1OGY0MDQ3YmViNTVkYjExNmQxYTk0OThhZWE0YjlhZTU4MTk5MGZmOGQxNyJ9fX0=")
-                                .name((LCMain.get().rewardSettings.fireworkEffect.hasFlicker() ? "&6&l" : "&7") + "Flicker (Click to toggle)")
+                                .name("&7Flicker (" + (LCMain.get().rewardSettings.fireworkEffect.hasFlicker() ? "&con" : "&8off") + "&7)")
                                 .build())
                         .lmb(e -> {
                             // toggle
@@ -87,7 +87,7 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                 // Trail
                 .button(7, 0, new Button.Builder().icon(p40 -> ItemBuilder.from("PLAYER_HEAD")
                                 .skull(LCMain.get().rewardSettings.fireworkEffect.hasTrail() ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQzMGM1YjkzNTgxNzlkMDk4Nzc0MGQ3NDc4YzBlZWI2YjljN2ZhMDdjZTQ4OGRkNjk4NTE4MWFmNjFmYjhhMiJ9fX0=" : "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzg3ZDgzNWI1NDNlZDFiMDI0MTU3MDFjYTdiM2Y4YzhhMGExMTJhZjEzMThmOWNlYzVhNWU5MWU0ODE0YTI0OSJ9fX0=")
-                                .name((LCMain.get().rewardSettings.fireworkEffect.hasTrail() ? "&c&l" : "&7") + "Trail (Click to toggle)")
+                                .name("&7Trail (" + (LCMain.get().rewardSettings.fireworkEffect.hasTrail() ? "&6&lon" : "&8off") + "&r&7)")
                                 .build())
                         .lmb(e -> {
                             // toggle
@@ -103,7 +103,11 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                 )
                 // TODO use the same code for colors as fade colors
                 //  just change titles and references between colors <-> fade ...
-                .childButton(0, 2, p0010 -> ItemBuilder.from("FIREWORK_STAR").name("&2Colors").build(), new ListMenu.LBuilder()
+                .childButton(0, 2, p0010 -> ItemBuilder.from("FIREWORK_STAR")
+                        .name("&2Colors &7(" + LCMain.get().rewardSettings.fireworkEffect.getColors().size() + ") applied")
+                        .lore(LCMain.get().rewardSettings.fireworkEffect.getColors().stream().map(color -> ColorUtil.toHexMarker(color) + " - #" + Integer.toHexString(color.asRGB())).collect(Collectors.toList())).build(),
+
+                        new ListMenu.LBuilder()
                         .title(p0 -> "Colors editor")
                         .background()
                         .parentButton(4, 5)

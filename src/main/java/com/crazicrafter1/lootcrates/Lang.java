@@ -95,7 +95,7 @@ public class Lang {
     public static String ED_LootSets_PROTO_LootItem_LORE_Count = "&7Count: &f%d";
     public static String ED_LootSets_PROTO_LootItem_LORE_Range = "&7Range: &f[%d, %d]";
 
-    public static String ED_Fireworks_Type = "&6%s &7(Click to change)";
+    public static String ED_Fireworks_Type = "&8Type &7(Click to change)";
 
     public static String SPECIAL_FORMATTING = "&7&lSpecial formatting";
 

@@ -107,7 +107,7 @@ public abstract class AbstractLootItem implements ILoot {
 
                             int change = e.shift ? 5 : 1;
                             if (clickType.isLeftClick()) change *= -1;
-                            min = MathUtil.clamp(max + change, min, itemStack.getMaxStackSize());
+                            max = MathUtil.clamp(max + change, min, itemStack.getMaxStackSize());
                             return Result.refresh();
                         })
                         .icon(p -> ItemBuilder.from("PLAYER_HEAD").name(Lang.ED_MAX).skull(Editor.BASE64_INC).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC + "\n" + Lang.ED_SHIFT_MUL).amount(max).build()));

@@ -144,9 +144,8 @@ public class Editor {
                                                         //        crate.removeLootSet(lootSet.id);
                                                         //    }
                                                         //} else
-                                                        if (Lootcrates.removeLootSet(lootSet.id))
+                                                        if (!Lootcrates.removeLootSet(lootSet.id))
                                                             return Result.message("Failed to remove LootSet");
-                                                        return null;
                                                     } else {
                                                         LootCollection copy = lootSet.copy();
                                                         LCMain.get().rewardSettings.lootSets.put(copy.id, copy);

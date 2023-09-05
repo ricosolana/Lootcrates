@@ -103,6 +103,9 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                 )
                 // TODO use the same code for colors as fade colors
                 //  just change titles and references between colors <-> fade ...
+
+                // TODO add button to test out firework
+                //  either fire it or give it to the player?
                 .childButton(7, 1, p0010 -> ItemBuilder.from("FIREWORK_STAR")
                         .name("&2Colors &7(" + settings.fireworkEffect.getColors().size() + ") applied")
                         .lore(settings.fireworkEffect.getColors().stream().map(color -> String.format("&7 - #%X %s\u2588", color.asRGB(), ColorUtil.toHexMarker(color))).collect(Collectors.toList())).build(),

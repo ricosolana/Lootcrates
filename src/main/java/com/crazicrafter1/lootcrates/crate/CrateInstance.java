@@ -276,6 +276,11 @@ public final class CrateInstance {
     private void explosion() {
         Location loc = getPlayer().getLocation();
 
+        // TODO because the firework is purely visual
+        //  make client side only
+        // how? maybe protocol lib
+        //  im not sure whether fireworks are server side or what
+
         //noinspection ConstantConditions
         Firework firework = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
 

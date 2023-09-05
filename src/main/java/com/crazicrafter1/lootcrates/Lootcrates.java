@@ -5,6 +5,7 @@ import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import com.crazicrafter1.lootcrates.crate.LootCollection;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import org.apache.commons.lang3.Validate;
@@ -15,8 +16,7 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Iterator;
-import java.util.UUID;
+import java.util.*;
 
 public class Lootcrates {
     //public static Map<Class<? extends ILoot>, ItemStack> lootClasses = new HashMap<>();
@@ -97,8 +97,10 @@ public class Lootcrates {
     }
 
     public static CrateSettings createCrate(String id) {
+        Map<String, Integer> map = new HashMap<>();
+        map.put(getLoot().next().id, 1);
         return new CrateSettings(id, "select loot", 3, 4, Sound.ENTITY_EXPERIENCE_ORB_PICKUP,
-                ImmutableMap.of(getLoot().next().id, 1),
+                map,
                 ItemBuilder.mut(tagItemAsCrate(new ItemStack(Material.ENDER_CHEST), id)).name("my new crate").build(),
                 CrateSettings.RevealType.GOOD_OL_DESTY
         );
@@ -134,7 +136,7 @@ public class Lootcrates {
         Validate.notNull(id);
 
         ReadWriteNBT nbt = NBT.itemStackToNBT(itemStack);
-        ReadWriteNBT tag = nbt.getCompound("tag");
+        ReadWriteNBT tag = nbt.getOrCreateCompound("tag");
         tag.setString("Crate", id);
         return NBT.itemStackFromNBT(nbt);
 

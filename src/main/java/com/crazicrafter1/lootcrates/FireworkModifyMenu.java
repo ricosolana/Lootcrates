@@ -11,41 +11,53 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.FireworkEffectMeta;
-import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class FireworkModifyMenu extends SimpleMenu.SBuilder {
 
     // Helper method to prevent code duplication across colors and fade colors
-    private FireworkModifyMenu addColorButton(int x, int y,
-                                              Function<Player, ItemStack> icon,
-                                              Function<Player, String> title,
-                                              List<Color> finalColors,
-                                              BiFunction<FireworkEffect.Builder, List<Color>, FireworkEffect.Builder> colorApplier) {
+    private void addColorButton(int x, int y,
+                                //Function<Player, ItemStack> icon,
+                                String nameFormat,
+                                Function<Player, String> title,
+                                Function<FireworkEffect, List<Color>> colorFunction,
+                                BiFunction<FireworkEffect.Builder, List<Color>, FireworkEffect.Builder> colorApplier)
+    {
         RewardSettings settings = LCMain.get().rewardSettings;
 
-        return (FireworkModifyMenu) childButton(x, y, icon,
-
+        childButton(x, y,
+                p0010 -> {
+                    FireworkEffect effect = settings.fireworkEffect;
+                    List<Color> constColors = colorFunction.apply(effect);
+                    return ItemBuilder.from("FIREWORK_STAR")
+                            //.fireworkEffect(FireworkEffect.builder()
+                            //        .with(effect.getType())
+                            //        .withColor(effect.getColors())
+                            //        .withFade(effect.getFadeColors())
+                            //        .flicker(effect.hasFlicker())
+                            //        .trail(effect.hasTrail())
+                            //        .build())
+                            .fireworkEffect(effect)
+                            .name(String.format(nameFormat, constColors.size()))
+                            .lore(constColors.stream().map(color -> String.format("&7 - #%06X %s\u2588", color.asRGB(), ColorUtil.toHexMarker(color))).collect(Collectors.toList())).build();
+                },
                 new ListMenu.LBuilder()
                         .title(title)
                         .background()
                         .parentButton(4, 5)
                         .addAll((self, p) -> {
-                            return Streams.mapWithIndex(finalColors.stream(), (color, colorIndex) -> new Button.Builder()
+                            List<Color> constColors = colorFunction.apply(settings.fireworkEffect);
+
+                            return Streams.mapWithIndex(constColors.stream(), (color, colorIndex) -> new Button.Builder()
                                     .child(self, new TextMenu.TBuilder()
                                             .title(p049 -> "Set color")
-                                            .leftRaw(p00202 -> String.format("#%X", color.asRGB()))
+                                            .leftRaw(p00202 -> String.format("#%06X", color.asRGB()))
                                             .parentOnClose()
                                             .onComplete((p0020, text, menu) -> {
                                                 int value;
@@ -57,7 +69,8 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                                                     else {
                                                         i = text.indexOf("#");
                                                         if (i != -1) {
-                                                            if (text.length() != 7) return Result.text("Hex must match #ABCDEF");
+                                                            if (text.length() != 7)
+                                                                return Result.text("Hex must match #ABCDEF");
                                                             value = Integer.parseUnsignedInt(text, i + 1, text.length(), 16);
                                                         } else {
                                                             // decimal
@@ -72,10 +85,10 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                                                     return Result.text("Too large");
 
                                                 Color color1 = Color.fromRGB(value);
-                                                if (finalColors.contains(color1))
+                                                if (constColors.contains(color1))
                                                     return Result.text("Color already applied");
 
-                                                List<Color> colors = new ArrayList<>(finalColors);
+                                                List<Color> colors = new ArrayList<>(constColors);
                                                 colors.set((int) colorIndex, color1);
 
                                                 FireworkEffect effect = settings.fireworkEffect;
@@ -96,13 +109,14 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                                             })
                                     )
                                     .icon(p102 -> ItemBuilder.copy(Material.LEATHER_CHESTPLATE)
-                                            .name(String.format("&7#%X %s\u2588", color.asRGB(), ColorUtil.toHexMarker(color)))
+                                            .name(String.format("&7#%06X %s\u2588", color.asRGB(), ColorUtil.toHexMarker(color)))
                                             .color(color)
                                             .hideFlags(ItemFlag.HIDE_DYE, ItemFlag.HIDE_ATTRIBUTES)
                                             .build()
                                     )
                                     .get()
-                            ).collect(Collectors.toList());})
+                            ).collect(Collectors.toList());
+                        })
         );
     }
 
@@ -214,17 +228,14 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                 .parentButton(4, 2);
 
         // Add basic color button
-        this.addColorButton(6, 1, p0010 -> ItemBuilder.from("FIREWORK_STAR")
-                //.fireworkEffect(FireworkEffect.builder())
-                .name("&2Colors &7(" + settings.fireworkEffect.getColors().size() + ") applied")
-                .lore(settings.fireworkEffect.getColors().stream().map(color -> String.format("&7 - #%X %s\u2588", color.asRGB(), ColorUtil.toHexMarker(color))).collect(Collectors.toList())).build(),
-                p0 -> "Colors editor", settings.fireworkEffect.getColors(), (fb, colors) -> fb.withColor(colors).withFade(settings.fireworkEffect.getFadeColors()));
+        this.addColorButton(6, 1, "&2Colors &7(&c%d&7) &2applied",
+                p0 -> "Colors editor", FireworkEffect::getColors,
+                (fb, colors) -> fb.withColor(colors).withFade(settings.fireworkEffect.getFadeColors()));
 
         // Add fade color button
-        this.addColorButton(7, 1, p0010 -> ItemBuilder.from("FIREWORK_STAR")
-                        .name("&2Fade Colors &7(" + settings.fireworkEffect.getFadeColors().size() + ") applied")
-                        .lore(settings.fireworkEffect.getFadeColors().stream().map(color -> String.format("&7 - #%X %s\u2588", color.asRGB(), ColorUtil.toHexMarker(color))).collect(Collectors.toList())).build(),
-                p0 -> "Colors editor", settings.fireworkEffect.getFadeColors(), (fb, colors) -> fb.withColor(settings.fireworkEffect.getColors()).withFade(colors));
+        this.addColorButton(7, 1, "&2Fade Colors &7(&c%d&7) &2applied",
+                p0 -> "Colors editor", FireworkEffect::getFadeColors,
+                (fb, colors) -> fb.withColor(settings.fireworkEffect.getColors()).withFade(colors));
     }
 
 }

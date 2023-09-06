@@ -8,8 +8,10 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -17,9 +19,92 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class FireworkModifyMenu extends SimpleMenu.SBuilder {
+
+    // Helper method to prevent code duplication across colors and fade colors
+    private FireworkModifyMenu addColorButton(int x, int y,
+                                              Function<Player, ItemStack> icon,
+                                              Function<Player, String> title,
+                                              List<Color> finalColors,
+                                              BiFunction<FireworkEffect.Builder, List<Color>, FireworkEffect.Builder> colorApplier) {
+        RewardSettings settings = LCMain.get().rewardSettings;
+
+        return (FireworkModifyMenu) childButton(x, y, icon,
+
+                new ListMenu.LBuilder()
+                        .title(title)
+                        .background()
+                        .parentButton(4, 5)
+                        .addAll((self, p) -> {
+                            return Streams.mapWithIndex(finalColors.stream(), (color, colorIndex) -> new Button.Builder()
+                                    .child(self, new TextMenu.TBuilder()
+                                            .title(p049 -> "Set color")
+                                            .leftRaw(p00202 -> String.format("#%X", color.asRGB()))
+                                            .parentOnClose()
+                                            .onComplete((p0020, text, menu) -> {
+                                                int value;
+
+                                                try {
+                                                    int i = text.indexOf("0x");
+                                                    if (i != -1)
+                                                        value = Integer.parseUnsignedInt(text, i + 2, text.length(), 16);
+                                                    else {
+                                                        i = text.indexOf("#");
+                                                        if (i != -1) {
+                                                            if (text.length() != 7) return Result.text("Hex must match #ABCDEF");
+                                                            value = Integer.parseUnsignedInt(text, i + 1, text.length(), 16);
+                                                        } else {
+                                                            // decimal
+                                                            value = Integer.parseUnsignedInt(text);
+                                                        }
+                                                    }
+                                                } catch (Exception ignored) {
+                                                    return Result.text("Must start with #, 0x, ...");
+                                                }
+
+                                                if (value > 0xFFFFFF)
+                                                    return Result.text("Too large");
+
+                                                Color color1 = Color.fromRGB(value);
+                                                if (finalColors.contains(color1))
+                                                    return Result.text("Color already applied");
+
+                                                List<Color> colors = new ArrayList<>(finalColors);
+                                                colors.set((int) colorIndex, color1);
+
+                                                FireworkEffect effect = settings.fireworkEffect;
+
+                                                settings.fireworkEffect = colorApplier.apply(FireworkEffect.builder()
+                                                        .with(effect.getType())
+                                                        .flicker(effect.hasFlicker())
+                                                        .trail(effect.hasTrail()), colors).build();
+
+                                                //settings.fireworkEffect = FireworkEffect.builder()
+                                                //        .with(effect.getType())
+                                                //        .flicker(effect.hasFlicker())
+                                                //        .trail(effect.hasTrail())
+                                                //        .withColor(colors) // Colors are reassigned with the copied list
+                                                //        .withFade(effect.getFadeColors()).build();
+
+                                                return Result.parent();
+                                            })
+                                    )
+                                    .icon(p102 -> ItemBuilder.copy(Material.LEATHER_CHESTPLATE)
+                                            .name(String.format("&7#%X %s\u2588", color.asRGB(), ColorUtil.toHexMarker(color)))
+                                            .color(color)
+                                            .hideFlags(ItemFlag.HIDE_DYE, ItemFlag.HIDE_ATTRIBUTES)
+                                            .build()
+                                    )
+                                    .get()
+                            ).collect(Collectors.toList());})
+        );
+    }
 
     public FireworkModifyMenu() {
         super(3);
@@ -30,7 +115,7 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                 .background()
                 // Type
                 .button(1, 1, new Button.Builder().icon(p -> {
-                    FireworkEffect effect = LCMain.get().rewardSettings.fireworkEffect;
+                    FireworkEffect effect = settings.fireworkEffect;
 
                     String base64;
                     switch (effect.getType()) {
@@ -84,7 +169,7 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                         })
                 )
                 // Trail
-                .button(5, 1, new Button.Builder().icon(p40 -> ItemBuilder.from("PLAYER_HEAD")
+                .button(4, 1, new Button.Builder().icon(p40 -> ItemBuilder.from("PLAYER_HEAD")
                                 .skull(settings.fireworkEffect.hasTrail() ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQzMGM1YjkzNTgxNzlkMDk4Nzc0MGQ3NDc4YzBlZWI2YjljN2ZhMDdjZTQ4OGRkNjk4NTE4MWFmNjFmYjhhMiJ9fX0=" : "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzg3ZDgzNWI1NDNlZDFiMDI0MTU3MDFjYTdiM2Y4YzhhMGExMTJhZjEzMThmOWNlYzVhNWU5MWU0ODE0YTI0OSJ9fX0=")
                                 .name("&7Trail (" + (settings.fireworkEffect.hasTrail() ? "&6&lon" : "&8off") + "&r&7)")
                                 //.glow(settings.fireworkEffect.hasTrail())
@@ -101,77 +186,9 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                             return Result.refresh();
                         })
                 )
-                // TODO use the same code for colors as fade colors
-                //  just change titles and references between colors <-> fade ...
-
                 // TODO add button to test out firework
                 //  either fire it or give it to the player?
-                .childButton(7, 1, p0010 -> ItemBuilder.from("FIREWORK_STAR")
-                        .name("&2Colors &7(" + settings.fireworkEffect.getColors().size() + ") applied")
-                        .lore(settings.fireworkEffect.getColors().stream().map(color -> String.format("&7 - #%X %s\u2588", color.asRGB(), ColorUtil.toHexMarker(color))).collect(Collectors.toList())).build(),
 
-                        new ListMenu.LBuilder()
-                        .title(p0 -> "Colors editor")
-                        .background()
-                        .parentButton(4, 5)
-                        .addAll((self, p) -> {
-                            return Streams.mapWithIndex(settings.fireworkEffect.getColors().stream(), (color, colorIndex) -> new Button.Builder()
-                                    .child(self, new TextMenu.TBuilder()
-                                            .title(p049 -> "Set color")
-                                            .leftRaw(p00202 -> String.format("#%X", color.asRGB()))
-                                            .parentOnClose()
-                                            .onComplete((p0020, text, menu) -> {
-                                                int value;
-
-                                                try {
-                                                    int i = text.indexOf("0x");
-                                                    if (i != -1)
-                                                        value = Integer.parseUnsignedInt(text, i + 2, text.length(), 16);
-                                                    else {
-                                                        i = text.indexOf("#");
-                                                        if (i != -1)
-                                                            value = Integer.parseUnsignedInt(text, i + 1, text.length(), 16);
-                                                        else {
-                                                            // decimal
-                                                            value = Integer.parseUnsignedInt(text);
-                                                        }
-                                                    }
-                                                } catch (Exception ignored) {
-                                                    return Result.text("Must match: 1234567, #aBcDeF, 0xABCDEF, ...");
-                                                }
-
-                                                if ((value > 0xFFFFFF) || value < 0)
-                                                    return Result.text("Too large");
-
-                                                FireworkEffect effect = settings.fireworkEffect;
-
-                                                List<Color> colors = new ArrayList<>(effect.getColors());
-
-                                                Color color1 = Color.fromRGB(value);
-                                                if (colors.contains(color1))
-                                                    return Result.text("Color already applied");
-
-                                                colors.set((int) colorIndex, color1);
-
-                                                settings.fireworkEffect = FireworkEffect.builder()
-                                                        .with(effect.getType())
-                                                        .flicker(effect.hasFlicker())
-                                                        .trail(effect.hasTrail())
-                                                        .withColor(colors) // Colors are reassigned with the copied list
-                                                        .withFade(effect.getFadeColors()).build();
-
-                                                return Result.parent();
-                                            })
-                                    )
-                                    .icon(p102 -> ItemBuilder.copy(Material.LEATHER_CHESTPLATE)
-                                            .name(String.format("&7#%X %s\u2588", color.asRGB(), ColorUtil.toHexMarker(color)))
-                                            .color(color)
-                                            .hideFlags(ItemFlag.HIDE_DYE, ItemFlag.HIDE_ATTRIBUTES)
-                                            .build()
-                                    )
-                                    .get()
-                            ).collect(Collectors.toList());})
-                )
                 // TODO we'll just ignore this mess unless someone wants it
                 // apply firework from item
                 /*
@@ -195,6 +212,19 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                     return Result.ok();
                 }))*/
                 .parentButton(4, 2);
+
+        // Add basic color button
+        this.addColorButton(6, 1, p0010 -> ItemBuilder.from("FIREWORK_STAR")
+                //.fireworkEffect(FireworkEffect.builder())
+                .name("&2Colors &7(" + settings.fireworkEffect.getColors().size() + ") applied")
+                .lore(settings.fireworkEffect.getColors().stream().map(color -> String.format("&7 - #%X %s\u2588", color.asRGB(), ColorUtil.toHexMarker(color))).collect(Collectors.toList())).build(),
+                p0 -> "Colors editor", settings.fireworkEffect.getColors(), (fb, colors) -> fb.withColor(colors).withFade(settings.fireworkEffect.getFadeColors()));
+
+        // Add fade color button
+        this.addColorButton(7, 1, p0010 -> ItemBuilder.from("FIREWORK_STAR")
+                        .name("&2Fade Colors &7(" + settings.fireworkEffect.getFadeColors().size() + ") applied")
+                        .lore(settings.fireworkEffect.getFadeColors().stream().map(color -> String.format("&7 - #%X %s\u2588", color.asRGB(), ColorUtil.toHexMarker(color))).collect(Collectors.toList())).build(),
+                p0 -> "Colors editor", settings.fireworkEffect.getFadeColors(), (fb, colors) -> fb.withColor(settings.fireworkEffect.getColors()).withFade(colors));
     }
 
 }

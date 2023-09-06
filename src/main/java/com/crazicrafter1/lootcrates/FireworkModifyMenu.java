@@ -23,7 +23,6 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
 
     // Helper method to prevent code duplication across colors and fade colors
     private void addColorButton(int x, int y,
-                                //Function<Player, ItemStack> icon,
                                 String nameFormat,
                                 Function<Player, String> title,
                                 Function<FireworkEffect, List<Color>> colorFunction,
@@ -36,14 +35,6 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                     FireworkEffect effect = settings.fireworkEffect;
                     List<Color> constColors = colorFunction.apply(effect);
                     return ItemBuilder.from("FIREWORK_STAR")
-                            //.fireworkEffect(FireworkEffect.builder()
-                            //        .with(effect.getType())
-                            //        .withColor(effect.getColors())
-                            //        .withFade(effect.getFadeColors())
-                            //        .flicker(effect.hasFlicker())
-                            //        .trail(effect.hasTrail())
-                            //        .build())
-                            .fireworkEffect(effect)
                             .name(String.format(nameFormat, constColors.size()))
                             .lore(constColors.stream().map(color -> String.format("&7 - #%06X %s\u2588", color.asRGB(), ColorUtil.toHexMarker(color))).collect(Collectors.toList())).build();
                 },
@@ -51,6 +42,11 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                         .title(title)
                         .background()
                         .parentButton(4, 5)
+                        // TODO add and remove button
+                        //.button(5, 5, new Button.Builder()
+                        //        .icon(p -> ItemBuilder.copy(Material.NAME_TAG).name("add").build())
+                        //        .c
+                        //)
                         .addAll((self, p) -> {
                             List<Color> constColors = colorFunction.apply(settings.fireworkEffect);
 
@@ -98,13 +94,6 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                                                         .flicker(effect.hasFlicker())
                                                         .trail(effect.hasTrail()), colors).build();
 
-                                                //settings.fireworkEffect = FireworkEffect.builder()
-                                                //        .with(effect.getType())
-                                                //        .flicker(effect.hasFlicker())
-                                                //        .trail(effect.hasTrail())
-                                                //        .withColor(colors) // Colors are reassigned with the copied list
-                                                //        .withFade(effect.getFadeColors()).build();
-
                                                 return Result.parent();
                                             })
                                     )
@@ -127,6 +116,7 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
 
         this.title(p -> Lang.ED_Firework_TI)
                 .background()
+                .button(8, 2, new Button.Builder().icon(p -> ItemBuilder.copy(Material.PAPER).name("&aToggle/change settings with LMB").build()))
                 // Type
                 .button(1, 1, new Button.Builder().icon(p -> {
                     FireworkEffect effect = settings.fireworkEffect;
@@ -142,7 +132,7 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
 
                     return ItemBuilder.from("PLAYER_HEAD").skull(base64)
                             .name(Lang.ED_Fireworks_Type)
-                            .lore(Arrays.stream(FireworkEffect.Type.values()).map(type -> "&7" + (effect.getType() == type ? "&l" : "") + WordUtils.capitalize(type.name().toLowerCase())).collect(Collectors.toList())).build();
+                            .lore(Arrays.stream(FireworkEffect.Type.values()).map(type -> (effect.getType() == type ? "&6" : "&7") + WordUtils.capitalize(type.name().toLowerCase().replace('_', ' '))).collect(Collectors.toList())).build();
                 }).click(e -> {
                     ClickType clickType = e.clickType;
                     if (!(clickType.isRightClick() || clickType.isLeftClick()))
@@ -167,8 +157,7 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                 // Flicker
                 .button(3, 1, new Button.Builder().icon(p40 -> ItemBuilder.from("PLAYER_HEAD")
                                 .skull(settings.fireworkEffect.hasFlicker() ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmM4YWZiZmUzZmJkYmRkNTRlZTkxYWZlYTkxYTczY2ZjNjY2MzUyYzI3ZTcwNmYyYzM5MjE0MGY3MjAzMTI4YSJ9fX0=" : "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTBhZjMyMzhmNjNhYjIwYzU5YjE1OGY0MDQ3YmViNTVkYjExNmQxYTk0OThhZWE0YjlhZTU4MTk5MGZmOGQxNyJ9fX0=")
-                                .name("&7Flicker (" + (settings.fireworkEffect.hasFlicker() ? "&con" : "&8off") + "&7)")
-                                //.glow(settings.fireworkEffect.hasFlicker()) // TODO heads do not glow :(
+                                .name("&7Flicker (" + (settings.fireworkEffect.hasFlicker() ? "&aon" : "&coff") + "&7)")
                                 .build())
                         .lmb(e -> {
                             // toggle
@@ -185,8 +174,7 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                 // Trail
                 .button(4, 1, new Button.Builder().icon(p40 -> ItemBuilder.from("PLAYER_HEAD")
                                 .skull(settings.fireworkEffect.hasTrail() ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQzMGM1YjkzNTgxNzlkMDk4Nzc0MGQ3NDc4YzBlZWI2YjljN2ZhMDdjZTQ4OGRkNjk4NTE4MWFmNjFmYjhhMiJ9fX0=" : "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzg3ZDgzNWI1NDNlZDFiMDI0MTU3MDFjYTdiM2Y4YzhhMGExMTJhZjEzMThmOWNlYzVhNWU5MWU0ODE0YTI0OSJ9fX0=")
-                                .name("&7Trail (" + (settings.fireworkEffect.hasTrail() ? "&6&lon" : "&8off") + "&r&7)")
-                                //.glow(settings.fireworkEffect.hasTrail())
+                                .name("&7Trail (" + (settings.fireworkEffect.hasTrail() ? "&aon" : "&coff") + "&r&7)")
                                 .build())
                         .lmb(e -> {
                             // toggle
@@ -228,13 +216,13 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                 .parentButton(4, 2);
 
         // Add basic color button
-        this.addColorButton(6, 1, "&2Colors &7(&c%d&7) &2applied",
-                p0 -> "Colors editor", FireworkEffect::getColors,
+        this.addColorButton(6, 1, "&7Colors (&6%d&7)",
+                p0 -> "Color editor", FireworkEffect::getColors,
                 (fb, colors) -> fb.withColor(colors).withFade(settings.fireworkEffect.getFadeColors()));
 
         // Add fade color button
-        this.addColorButton(7, 1, "&2Fade Colors &7(&c%d&7) &2applied",
-                p0 -> "Colors editor", FireworkEffect::getFadeColors,
+        this.addColorButton(7, 1, "&7Fade (&6%d&7)",
+                p0 -> "Fade editor", FireworkEffect::getFadeColors,
                 (fb, colors) -> fb.withColor(settings.fireworkEffect.getColors()).withFade(colors));
     }
 

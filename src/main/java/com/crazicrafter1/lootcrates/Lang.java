@@ -6,6 +6,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 public class Lang {
     // ideally a format like 'editor.button.crates' is best, but I want directly referred variables at the same time
@@ -95,7 +96,7 @@ public class Lang {
     public static String ED_LootSets_PROTO_LootItem_LORE_Count = "&7Count: &f%d";
     public static String ED_LootSets_PROTO_LootItem_LORE_Range = "&7Range: &f[%d, %d]";
 
-    public static String ED_Fireworks_Type = "&8Type &7(Click to change)";
+    public static String ED_Fireworks_Type = "&7Type";
 
     public static String SPECIAL_FORMATTING = "&7&lSpecial formatting";
 
@@ -206,7 +207,7 @@ public class Lang {
                 // get field by that name
                 try {
                     Field field = Lang.class.getDeclaredField(key);
-                    if (field.getType() == String.class) {
+                    if (!Modifier.isFinal(field.getModifiers()) && field.getType() == String.class) {
                         // in this case if the field from the config is not found, then
                         field.set(null, config.getString(key).replace("\\n", "\n"));
                     }

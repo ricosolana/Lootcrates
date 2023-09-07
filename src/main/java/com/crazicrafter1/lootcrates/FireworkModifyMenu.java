@@ -99,6 +99,23 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                             List<Color> constColors = colorFunction.apply(settings.fireworkEffect);
 
                             return Streams.mapWithIndex(constColors.stream(), (color, colorIndex) -> new Button.Builder()
+                                    // Remove color
+                                    .bind(ClickType.SHIFT_RIGHT, e -> {
+                                        if (constColors.size() > 1) {
+                                            // cancel
+                                            List<Color> colors = new ArrayList<>(constColors);
+                                            colors.remove((int)colorIndex); // will shift elements
+
+                                            FireworkEffect effect = settings.fireworkEffect;
+
+                                            settings.fireworkEffect = colorApplier.apply(FireworkEffect.builder()
+                                                    .with(effect.getType())
+                                                    .flicker(effect.hasFlicker())
+                                                    .trail(effect.hasTrail()), colors).build();
+                                            return Result.refresh();
+                                        }
+                                        return Result.message("Unable to remove final element");
+                                    })
                                     .child(self, new TextMenu.TBuilder()
                                             .title(p049 -> "Set color")
                                             .leftRaw(p00202 -> String.format("#%06X", color.asRGB()))
@@ -147,6 +164,7 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                                     )
                                     .icon(p102 -> ItemBuilder.copy(Material.LEATHER_CHESTPLATE)
                                             .name(String.format("&7#%06X %s\u2588", color.asRGB(), ColorUtil.toHexMarker(color)))
+                                            .lore("&2Remove: SHIFT-LMB")
                                             .color(color)
                                             .hideFlags(ItemFlag.HIDE_DYE, ItemFlag.HIDE_ATTRIBUTES)
                                             .build()

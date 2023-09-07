@@ -51,6 +51,8 @@ public class Editor {
             LCMain.get().notifier.warn(p000, Lang.RECOMMEND_CREATIVE);
         }
 
+        RewardSettings settings = LCMain.get().rewardSettings;
+
         new SimpleMenu.SBuilder(3)
                 .title(p -> Lang.Editor_Title)
                 .background()
@@ -88,7 +90,7 @@ public class Editor {
                                 )//.childButton()
                                 .addAll((self, p00) -> {
                                     ArrayList<Button> result = new ArrayList<>();
-                                    for (Map.Entry<String, CrateSettings> entry : LCMain.get().rewardSettings.crates.entrySet()) {
+                                    for (Map.Entry<String, CrateSettings> entry : settings.crates.entrySet()) {
                                         CrateSettings crate = entry.getValue();
                                         result.add(new Button.Builder()
                                                 // https://regexr.com/6fdsi
@@ -104,7 +106,7 @@ public class Editor {
 
                                                             if (interact.shift) {
                                                                 // delete crate then
-                                                                LCMain.get().rewardSettings.crates.remove(crate.id);
+                                                                settings.crates.remove(crate.id);
                                                             } else {
                                                                 CrateSettings copy = crate.copy();
                                                                 Lootcrates.registerCrate(copy);
@@ -127,43 +129,26 @@ public class Editor {
                          */
                         .addAll((self, p1) -> {
                             ArrayList<Button> result = new ArrayList<>();
-                            for (LootCollection lootSet : LCMain.get().rewardSettings.lootSets.values()) {
+                            for (LootCollection lootSet : settings.lootSets.values()) {
                                 /*
                                  * Add Collections
                                  */
                                 result.add(new Button.Builder()
                                         .icon(p -> lootSet.getMenuIcon())
                                         .child(self, lootSet.getBuilder()) // LMB - Edit Loot Collection
-                                        .rmb(
-                                                // RMB - delete lootSet
-                                                interact -> {
-                                                    if (interact.shift) {
-                                                        //if (Main.get().rewardSettings.lootSets.size() > 1) {
-                                                        //    Main.get().rewardSettings.lootSets.remove(lootSet.id);
-                                                        //    for (CrateSettings crate : Main.get().rewardSettings.crates.values()) {
-                                                        //        crate.removeLootSet(lootSet.id);
-                                                        //    }
-                                                        //} else
-                                                        if (!Lootcrates.removeLootSet(lootSet.id))
-                                                            return Result.message("Failed to remove LootSet");
-                                                    } else {
-                                                        LootCollection copy = lootSet.copy();
-                                                        LCMain.get().rewardSettings.lootSets.put(copy.id, copy);
-                                                    }
-
-                                                    //Main.get().notifier.info(interact.player, "Copied crate to clipboard");
-                                                    return Result.refresh();
-
-                                                    //if (Main.get().rewardSettings.lootSets.size() > 1) {
-                                                    //    Main.get().rewardSettings.lootSets.remove(lootSet.id);
-                                                    //    for (CrateSettings crate : Main.get().rewardSettings.crates.values()) {
-                                                    //        crate.loot.remove(lootSet);
-                                                    //    }
-                                                    //    return Result.REFRESH();
-                                                    //}
-                                                    //return null;
-                                                }
-                                        ).get()
+                                        // Shift-RMB - delete lootset
+                                        .bind(ClickType.SHIFT_RIGHT, event -> {
+                                            if (!Lootcrates.removeLootSet(lootSet.id))
+                                                return Result.message("Failed to remove LootSet");
+                                            return Result.refresh();
+                                        })
+                                        // RMB - clone lootset
+                                        .bind(ClickType.RIGHT, event -> {
+                                            LootCollection copy = lootSet.copy();
+                                            settings.lootSets.put(copy.id, copy);
+                                            return Result.refresh();
+                                        })
+                                        .get()
                                 );
                             }
                             return result;
@@ -181,10 +166,10 @@ public class Editor {
                                     if (s.isEmpty())
                                         return Result.text(Lang.ED_INVALID_ID);
 
-                                    if (LCMain.get().rewardSettings.crates.containsKey(s))
+                                    if (settings.crates.containsKey(s))
                                         return Result.text(Lang.ED_DUP_ID);
 
-                                    LCMain.get().rewardSettings.lootSets.put(s,
+                                    settings.lootSets.put(s,
                                             new LootCollection(s, new ItemStack(Material.GLOWSTONE_DUST),
                                                     new ArrayList<>(Collections.singletonList(new LootItem()))));
 
@@ -193,10 +178,8 @@ public class Editor {
                         )
                 )
                 /*
-                 * Global Fireworks Edit
+                 * Fireworks Editor
                  */
-                // TODO this menu is absolutely ugly in every conceivable way
-                //  and requires a long overdue rework
                 .childButton(6, 1, p -> ItemBuilder.from("FIREWORK_ROCKET").name(Lang.ED_BTN_Firework).build(), new FireworkModifyMenu())
                 .open(p000);
 

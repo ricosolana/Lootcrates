@@ -95,25 +95,18 @@ public class Editor {
                                         result.add(new Button.Builder()
                                                 // https://regexr.com/6fdsi
                                                 .icon(p -> crate.getMenuIcon())
-                                                        //.mmb(event -> { clipboardCrate = crate; return Result.REFRESH_GRAB(); })
                                                 .child(self, crate.getBuilder())
-                                                .rmb(
-                                                        /// RMB - delete crate
-                                                        interact -> {
-                                                            // TODO right-click used to delete the crate
-                                                            //Main.get().rewardSettings.crates.remove(crate.id);
-                                                            //return Result.REFRESH();
-
-                                                            if (interact.shift) {
-                                                                // delete crate then
-                                                                settings.crates.remove(crate.id);
-                                                            } else {
-                                                                CrateSettings copy = crate.copy();
-                                                                Lootcrates.registerCrate(copy);
-                                                            }
-                                                            return Result.refresh();
-                                                        }
-                                                ).get()
+                                                // Shift-RMB - delete crate
+                                                .bind(ClickType.SHIFT_RIGHT, event -> {
+                                                    settings.crates.remove(crate.id);
+                                                    return Result.refresh();
+                                                })
+                                                // RMB - clone crate
+                                                .bind(ClickType.RIGHT, event -> {
+                                                    CrateSettings copy = crate.copy();
+                                                    Lootcrates.registerCrate(copy);
+                                                    return Result.refresh();
+                                                }).get()
                                         );
                                     }
                                     return result;

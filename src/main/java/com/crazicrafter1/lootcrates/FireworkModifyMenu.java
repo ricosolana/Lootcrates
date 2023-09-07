@@ -43,9 +43,57 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                         .background()
                         .parentButton(4, 5)
                         // TODO add and remove button
+                        .childButton(5, 5, p -> ItemBuilder.copy(Material.NAME_TAG).name("add").build(), new TextMenu.TBuilder()
+                                .title(p -> "New color editor")
+                                .leftRaw(p -> "#color")
+                                // TODO this code is 99% similar to the color editor
+                                .onComplete((p, text, self) -> {
+                                    int value;
+
+                                    try {
+                                        int i = text.indexOf("0x");
+                                        if (i != -1)
+                                            value = Integer.parseUnsignedInt(text, i + 2, text.length(), 16);
+                                        else {
+                                            i = text.indexOf("#");
+                                            if (i != -1) {
+                                                if (text.length() != 7)
+                                                    return Result.text("Hex must match #ABCDEF");
+                                                value = Integer.parseUnsignedInt(text, i + 1, text.length(), 16);
+                                            } else {
+                                                // decimal
+                                                value = Integer.parseUnsignedInt(text);
+                                            }
+                                        }
+                                    } catch (Exception ignored) {
+                                        return Result.text("Must start with #, 0x, ...");
+                                    }
+
+                                    if (value > 0xFFFFFF)
+                                        return Result.text("Too large");
+
+                                    List<Color> constColors = colorFunction.apply(settings.fireworkEffect);
+
+                                    Color color1 = Color.fromRGB(value);
+                                    if (constColors.contains(color1))
+                                        return Result.text("Color already applied");
+
+                                    List<Color> colors = new ArrayList<>(constColors);
+                                    colors.add(color1);
+
+                                    FireworkEffect effect = settings.fireworkEffect;
+
+                                    settings.fireworkEffect = colorApplier.apply(FireworkEffect.builder()
+                                            .with(effect.getType())
+                                            .flicker(effect.hasFlicker())
+                                            .trail(effect.hasTrail()), colors).build();
+
+                                    return Result.parent(); //.andThen(Result.refresh());
+                                })
+                        )
                         //.button(5, 5, new Button.Builder()
                         //        .icon(p -> ItemBuilder.copy(Material.NAME_TAG).name("add").build())
-                        //        .c
+                        //        .
                         //)
                         .addAll((self, p) -> {
                             List<Color> constColors = colorFunction.apply(settings.fireworkEffect);

@@ -34,6 +34,7 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
         final RewardSettings settings = LCMain.get().rewardSettings;
 
         childButton(x, y,
+                // Menu Icon
                 p0010 -> {
                     FireworkEffect effect = settings.fireworkEffect;
                     List<Color> constColors = colorFunction.apply(effect);
@@ -118,7 +119,7 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                                     })
                                     .icon(p102 -> ItemBuilder.copy(Material.LEATHER_CHESTPLATE)
                                             .name(String.format("&7#%06X %s\u2588", color.asRGB(), ColorUtil.toHexMarker(color)))
-                                            .lore("&2Remove: SHIFT-LMB")
+                                            .lore(Lang.ED_RMB_SHIFT_DELETE)
                                             .color(color)
                                             .hideFlags(ItemFlag.HIDE_DYE, ItemFlag.HIDE_ATTRIBUTES)
                                             .build()
@@ -153,10 +154,8 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                     return ItemBuilder.from("PLAYER_HEAD").skull(base64)
                             .name(Lang.ED_Fireworks_Type)
                             .lore(Arrays.stream(FireworkEffect.Type.values()).map(type -> (effect.getType() == type ? "&6" : "&7") + WordUtils.capitalize(type.name().toLowerCase().replace('_', ' '))).collect(Collectors.toList())).build();
-                }).click(e -> {
+                }).bind(e -> {
                     ClickType clickType = e.clickType;
-                    if (!(clickType.isRightClick() || clickType.isLeftClick()))
-                        return Result.ok();
 
                     FireworkEffect effect = settings.fireworkEffect;
 
@@ -173,7 +172,7 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                             .withFade(effect.getFadeColors()).build();
 
                     return Result.refresh();
-                }))
+                }, ClickType.RIGHT, ClickType.LEFT))
                 // Flicker
                 .button(3, 1, new Button.Builder().icon(p40 -> ItemBuilder.from("PLAYER_HEAD")
                                 .skull(settings.fireworkEffect.hasFlicker() ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmM4YWZiZmUzZmJkYmRkNTRlZTkxYWZlYTkxYTczY2ZjNjY2MzUyYzI3ZTcwNmYyYzM5MjE0MGY3MjAzMTI4YSJ9fX0=" : "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTBhZjMyMzhmNjNhYjIwYzU5YjE1OGY0MDQ3YmViNTVkYjExNmQxYTk0OThhZWE0YjlhZTU4MTk5MGZmOGQxNyJ9fX0=")

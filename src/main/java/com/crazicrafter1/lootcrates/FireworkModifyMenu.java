@@ -2,6 +2,7 @@ package com.crazicrafter1.lootcrates;
 
 import com.crazicrafter1.crutils.ColorUtil;
 import com.crazicrafter1.crutils.ItemBuilder;
+import com.crazicrafter1.crutils.TriFunction;
 import com.crazicrafter1.crutils.ui.*;
 import com.google.common.collect.Streams;
 import org.apache.commons.lang3.text.WordUtils;
@@ -10,11 +11,13 @@ import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -28,7 +31,7 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                                 Function<FireworkEffect, List<Color>> colorFunction,
                                 BiFunction<FireworkEffect.Builder, List<Color>, FireworkEffect.Builder> colorApplier)
     {
-        RewardSettings settings = LCMain.get().rewardSettings;
+        final RewardSettings settings = LCMain.get().rewardSettings;
 
         childButton(x, y,
                 p0010 -> {
@@ -42,7 +45,7 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                         .title(title)
                         .background()
                         .parentButton(4, 5)
-                        // TODO add and remove button
+                        // Add color
                         .childButton(5, 5, p -> ItemBuilder.copy(Material.NAME_TAG).name("add").build(), new TextMenu.TBuilder()
                                 .title(p -> "New color editor")
                                 .leftRaw(p -> "#color")
@@ -88,13 +91,10 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                                             .flicker(effect.hasFlicker())
                                             .trail(effect.hasTrail()), colors).build();
 
-                                    return Result.parent(); //.andThen(Result.refresh());
+                                    return Result.parent();
                                 })
                         )
-                        //.button(5, 5, new Button.Builder()
-                        //        .icon(p -> ItemBuilder.copy(Material.NAME_TAG).name("add").build())
-                        //        .
-                        //)
+                        // Edit colors
                         .addAll((self, p) -> {
                             List<Color> constColors = colorFunction.apply(settings.fireworkEffect);
 
@@ -116,52 +116,6 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                                         }
                                         return Result.message("Unable to remove final element");
                                     })
-                                    .child(self, new TextMenu.TBuilder()
-                                            .title(p049 -> "Set color")
-                                            .leftRaw(p00202 -> String.format("#%06X", color.asRGB()))
-                                            .parentOnClose()
-                                            .onComplete((p0020, text, menu) -> {
-                                                int value;
-
-                                                try {
-                                                    int i = text.indexOf("0x");
-                                                    if (i != -1)
-                                                        value = Integer.parseUnsignedInt(text, i + 2, text.length(), 16);
-                                                    else {
-                                                        i = text.indexOf("#");
-                                                        if (i != -1) {
-                                                            if (text.length() != 7)
-                                                                return Result.text("Hex must match #ABCDEF");
-                                                            value = Integer.parseUnsignedInt(text, i + 1, text.length(), 16);
-                                                        } else {
-                                                            // decimal
-                                                            value = Integer.parseUnsignedInt(text);
-                                                        }
-                                                    }
-                                                } catch (Exception ignored) {
-                                                    return Result.text("Must start with #, 0x, ...");
-                                                }
-
-                                                if (value > 0xFFFFFF)
-                                                    return Result.text("Too large");
-
-                                                Color color1 = Color.fromRGB(value);
-                                                if (constColors.contains(color1))
-                                                    return Result.text("Color already applied");
-
-                                                List<Color> colors = new ArrayList<>(constColors);
-                                                colors.set((int) colorIndex, color1);
-
-                                                FireworkEffect effect = settings.fireworkEffect;
-
-                                                settings.fireworkEffect = colorApplier.apply(FireworkEffect.builder()
-                                                        .with(effect.getType())
-                                                        .flicker(effect.hasFlicker())
-                                                        .trail(effect.hasTrail()), colors).build();
-
-                                                return Result.parent();
-                                            })
-                                    )
                                     .icon(p102 -> ItemBuilder.copy(Material.LEATHER_CHESTPLATE)
                                             .name(String.format("&7#%06X %s\u2588", color.asRGB(), ColorUtil.toHexMarker(color)))
                                             .lore("&2Remove: SHIFT-LMB")
@@ -178,7 +132,7 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
     public FireworkModifyMenu() {
         super(3);
 
-        RewardSettings settings = LCMain.get().rewardSettings;
+        final RewardSettings settings = LCMain.get().rewardSettings;
 
         this.title(p -> Lang.ED_Firework_TI)
                 .background()

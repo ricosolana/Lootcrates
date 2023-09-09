@@ -3,6 +3,7 @@ package com.crazicrafter1.lootcrates;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
 import com.crazicrafter1.crutils.*;
+import com.crazicrafter1.crutils.ui.AbstractMenu;
 import com.crazicrafter1.lootcrates.cmd.Cmd;
 import com.crazicrafter1.lootcrates.cmd.CmdTestParser;
 import com.crazicrafter1.lootcrates.crate.loot.*;
@@ -306,6 +307,9 @@ public class LCMain extends JavaPlugin
 
     public void reloadData(@Nonnull CommandSender sender) {
         PlayerLog.loadAll(sender);
+
+        // TODO close only open editor menus, not other possible ones
+        //AbstractMenu.closeAllMenus();
 
         saveDefaultFile(sender, rewardsConfigFile, false);
         FileConfiguration rewardsConfig = YamlConfiguration.loadConfiguration(rewardsConfigFile);

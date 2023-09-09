@@ -106,7 +106,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             return Result.parent();
                         }))
                 // Edit CustomModelData
-                .childButton(4, 3, p -> ItemBuilder.from("PLAYER_HEAD").skull(BASE64_CUSTOM_MODEL_DATA).name(Lang.CUSTOM_MODEL).lore(Lang.ED_LMB_EDIT).build(), new TextMenu.TBuilder()
+                .childButton(4, 3, p -> ItemBuilder.fromSkull(BASE64_CUSTOM_MODEL_DATA).name(Lang.CUSTOM_MODEL).lore(Lang.ED_LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.CUSTOM_MODEL)
                         .leftRaw(p -> {
                             ItemMeta meta = builder.getMeta();

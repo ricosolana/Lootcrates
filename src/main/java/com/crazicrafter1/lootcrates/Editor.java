@@ -38,13 +38,7 @@ public class Editor {
     public static final String BASE64_DEC = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWM1YThhYThhNGMwMzYwMGEyYjVhNGViNmJlYjUxZDU5MDI2MGIwOTVlZTFjZGFhOTc2YjA5YmRmZTU2NjFjNiJ9fX0=";
     public static final String BASE64_INC = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWFiOTVhODc1MWFlYWEzYzY3MWE4ZTkwYjgzZGU3NmEwMjA0ZjFiZTY1NzUyYWMzMWJlMmY5OGZlYjY0YmY3ZiJ9fX0=";
 
-    public static final Pattern PRIMARY_KEY_PATTERN = Pattern.compile("(?=.*[a-z])[a-z_]+");
-
     public static final Pattern NON_ASCII_PATTERN = Pattern.compile("[^a-zA-Z0-9_.]+");
-
-    //private CrateSettings clipboardCrate;
-    //private LootSetSettings clipboardLootSet;
-    //private ILoot clipboardILoot;
 
     public void open(Player p000) {
         if (p000.getGameMode() != GameMode.CREATIVE) {
@@ -87,7 +81,7 @@ public class Editor {
                                             return Result.parent();
                                         })
 
-                                )//.childButton()
+                                )
                                 .addAll((self, p00) -> {
                                     ArrayList<Button> result = new ArrayList<>();
                                     for (Map.Entry<String, CrateSettings> entry : settings.crates.entrySet()) {

@@ -97,7 +97,7 @@ public abstract class AbstractLootItem implements ILoot {
                     min = MathUtil.clamp(min + change, 1, max);
                     return Result.refresh();
                 })
-                .icon(p -> ItemBuilder.from("PLAYER_HEAD").name(Lang.ED_MIN).skull(Editor.BASE64_DEC).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC + "\n" + Lang.ED_SHIFT_MUL).amount(min).build()))
+                .icon(p -> ItemBuilder.fromSkull(Editor.BASE64_DEC).name(Lang.ED_MIN).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC + "\n" + Lang.ED_SHIFT_MUL).amount(min).build()))
                 // Max
                 .button(x2, y2, new Button.Builder()
                         .click(e -> {
@@ -110,7 +110,7 @@ public abstract class AbstractLootItem implements ILoot {
                             max = MathUtil.clamp(max + change, min, itemStack.getMaxStackSize());
                             return Result.refresh();
                         })
-                        .icon(p -> ItemBuilder.from("PLAYER_HEAD").name(Lang.ED_MAX).skull(Editor.BASE64_INC).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC + "\n" + Lang.ED_SHIFT_MUL).amount(max).build()));
+                        .icon(p -> ItemBuilder.fromSkull(Editor.BASE64_INC).name(Lang.ED_MAX).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC + "\n" + Lang.ED_SHIFT_MUL).amount(max).build()));
 
     }
 

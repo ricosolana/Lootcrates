@@ -15,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class LootCollection {
     public final String id;
@@ -109,11 +108,11 @@ public class LootCollection {
         //).build();
 
         return ItemBuilder.copy(itemStack).lore(
-                  String.format(Lang.FORMAT_ID, id) + "\n"
-                + String.format(Lang.ED_LootSets_BTN_LORE, loot.getMap().size()) + "\n"
-                + Lang.ED_LMB_EDIT + "\n"
-                + Lang.ED_RMB_COPY + "\n"
-                + Lang.ED_RMB_SHIFT_DELETE
+                  String.format(Lang.EDITOR_ID, id) + "\n"
+                + String.format(Lang.EDITOR_LOOT_LORE, loot.getMap().size()) + "\n"
+                + Lang.EDITOR_LMB_EDIT + "\n"
+                + Lang.EDITOR_COPY + "\n"
+                + Lang.EDITOR_DELETE
         ).build();
     }
 
@@ -136,7 +135,7 @@ public class LootCollection {
                         result1.add(new Button.Builder()
                                 .icon(p -> ItemBuilder.copy(copy)
                                         .lore(a.getMenuDesc() + "\n"
-                                                + "&7Weight: " + getFormattedFraction(a) + " (" + getFormattedPercent(a) + ") - NUM\n" + Lang.ED_LMB_EDIT + "\n" + Lang.ED_RMB_SHIFT_DELETE + "\n" + Lang.ED_NUM_SUM + "\n" + Lang.ED_NUM_SUM_DESC).build())
+                                                + "&7Weight: " + getFormattedFraction(a) + " (" + getFormattedPercent(a) + ") - NUM\n" + Lang.EDITOR_LMB_EDIT + "\n" + Lang.EDITOR_DELETE + "\n" + Lang.EDITOR_COUNT_BINDS + "\n" + Lang.EDITOR_COUNT_CHANGE).build())
 
                                 .child(self1, menu)
                                 .rmb(interact -> {
@@ -162,10 +161,10 @@ public class LootCollection {
                     }
                     return result1;
                 })
-                .childButton(3, 5, p -> ItemBuilder.copy(itemStack).name(Lang.EDIT_ICON).lore(Lang.ED_LMB_EDIT).build(), new ItemModifyMenu()
+                .childButton(3, 5, p -> ItemBuilder.copy(itemStack).name(Lang.EDITOR_EDIT_ICON).lore(Lang.EDITOR_LMB_EDIT).build(), new ItemModifyMenu()
                         .build(this.itemStack, itemStack -> this.itemStack = itemStack))
-                .childButton(5, 5, p -> ItemBuilder.copy(Material.GOLDEN_CARROT).name(Lang.NEW_LOOT).lore(Lang.LMB_NEW).build(), new ListMenu.LBuilder()
-                        .title(p -> Lang.ED_LootSets_PROTO_New_TI)
+                .childButton(5, 5, p -> ItemBuilder.copy(Material.GOLDEN_CARROT).name(Lang.NEW_LOOT).lore(Lang.EDITOR_LMB_ADD).build(), new ListMenu.LBuilder()
+                        .title(p -> Lang.EDITOR_LOOT_NEW_TITLE)
                         .parentButton(4, 5)
                         .addAll((self1, p00) -> {
                             ArrayList<Button> result1 = new ArrayList<>();

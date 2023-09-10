@@ -34,9 +34,9 @@ public class Cmd implements CommandExecutor, TabCompleter {
             if (LCMain.get().rev == -1) {
                 return plugin.notifier.commandSevere(sender, String.format(Lang.ASSIGN_REV, ChatColor.UNDERLINE + "/crates rev"));
             }
-            info(sender, String.format(Lang.VERSION, LCMain.get().getDescription().getVersion()));
+            info(sender, String.format(Lang.MESSAGE_VERSION, LCMain.get().getDescription().getVersion()));
             info(sender, String.format(Lang.REV, LCMain.get().rev));
-            return info(sender, Lang.USAGE + "/crates ["
+            return info(sender, Lang.COMMAND_USAGE + "/crates ["
                     + String.join(", ", CmdArg.args.keySet())
                     + "]");
         }
@@ -50,7 +50,7 @@ public class Cmd implements CommandExecutor, TabCompleter {
                 = CmdArg.args.get(args[0].toLowerCase());
 
         if (pair == null)
-            return severe(sender, Lang.ERR_ARG_UNKNOWN);
+            return severe(sender, Lang.COMMAND_ERROR_ARGS1);
 
         try {
             //String[] smartArgs = smartParse(Arrays.copyOfRange(args, 1, args.length)).toArray(new String[0]);
@@ -61,7 +61,7 @@ public class Cmd implements CommandExecutor, TabCompleter {
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
             // Just ensure index with an error print
-            return severe(sender, String.format(Lang.ERR_ARG_MORE, e.getMessage()));
+            return severe(sender, String.format(Lang.COMMAND_ERROR_ARGS0, e.getMessage()));
         }
     }
 

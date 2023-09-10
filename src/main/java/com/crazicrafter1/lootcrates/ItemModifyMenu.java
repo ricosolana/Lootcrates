@@ -23,7 +23,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
 
     public ItemModifyMenu build(ItemStack it, Function<ItemStack, ItemStack> itemStackFunction) {
         builder = ItemBuilder.copy(it);
-        return (ItemModifyMenu) title(p -> Lang.IED_TI)
+        return (ItemModifyMenu) title(p -> Lang.EDITOR_EDIT_ITEM1)
                 //.background()
                 .parentButton(0, 4)
 
@@ -73,10 +73,10 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                 )
 
                 // edit Name
-                .childButton(3, 1, p -> ItemBuilder.copy(Material.NAME_TAG).name(Lang.IED_BTN_Name).lore(Lang.ED_LMB_EDIT).build(), new TextMenu.TBuilder()
-                        .title(p -> Lang.IED_BTN_Name)
+                .childButton(3, 1, p -> ItemBuilder.copy(Material.NAME_TAG).name(Lang.EDITOR_NAME).lore(Lang.EDITOR_LMB_EDIT).build(), new TextMenu.TBuilder()
+                        .title(p -> Lang.EDITOR_NAME)
                         .leftRaw(p -> builder.getNameOrLocaleName())
-                        .right(p -> Lang.SPECIAL_FORMATTING, p -> Editor.getColorDem(), ColorUtil.AS_IS)
+                        .right(p -> Lang.EDITOR_FORMATTING, p -> Editor.getColorDem(), ColorUtil.AS_IS)
                         .onClose((player) -> Result.parent())
                         .onComplete((player, s, b) -> {
                             if (s.isEmpty()) {
@@ -90,10 +90,10 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                         }))
 
                 // edit Lore                                                                                // terrible name
-                .childButton(5, 1, p -> ItemBuilder.from("WRITABLE_BOOK").hideFlags(ItemFlag.HIDE_POTION_EFFECTS).name(Lang.LORE).lore(Lang.ED_LMB_EDIT).build(), new TextMenu.TBuilder()
+                .childButton(5, 1, p -> ItemBuilder.from("WRITABLE_BOOK").hideFlags(ItemFlag.HIDE_POTION_EFFECTS).name(Lang.LORE).lore(Lang.EDITOR_LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.LORE)
                         .leftRaw(p -> Util.def(builder.getLoreString(), Editor.LOREM_IPSUM).replace("\n", "\\n"))
-                        .right(p -> Lang.SPECIAL_FORMATTING, p -> Editor.getColorDem(), ColorUtil.AS_IS)
+                        .right(p -> Lang.EDITOR_FORMATTING, p -> Editor.getColorDem(), ColorUtil.AS_IS)
                         .onClose((player) -> Result.parent())
                         .onComplete((player, s, b) -> {
                             if (s.isEmpty()) {
@@ -106,15 +106,15 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             return Result.parent();
                         }))
                 // Edit CustomModelData
-                .childButton(4, 3, p -> ItemBuilder.fromSkull(BASE64_CUSTOM_MODEL_DATA).name(Lang.CUSTOM_MODEL).lore(Lang.ED_LMB_EDIT).build(), new TextMenu.TBuilder()
-                        .title(p -> Lang.CUSTOM_MODEL)
+                .childButton(4, 3, p -> ItemBuilder.fromSkull(BASE64_CUSTOM_MODEL_DATA).name(Lang.EDITOR_ITEM_MODEL).lore(Lang.EDITOR_LMB_EDIT).build(), new TextMenu.TBuilder()
+                        .title(p -> Lang.EDITOR_ITEM_MODEL)
                         .leftRaw(p -> {
                             ItemMeta meta = builder.getMeta();
                             if (meta != null && meta.hasCustomModelData())
                                 return "" + meta.getCustomModelData();
                             return Editor.LOREM_IPSUM;
                         })
-                        .right(p -> "&7" + Lang.IED_Model_R)
+                        .right(p -> "&7" + Lang.EDITOR_ERROR_MODEL)
                         .onClose((player) -> Result.parent())
                         .onComplete((p, s, b) -> {
                             if (s.isEmpty())
@@ -124,7 +124,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                             try {
                                 i = Integer.parseInt(s);
                             } catch (Exception e00) {
-                                return Result.text(Lang.ERR_INVALID);
+                                return Result.text(Lang.COMMAND_ERROR_INPUT);
                             }
                             builder.model(i);
 
@@ -142,7 +142,7 @@ public class ItemModifyMenu extends SimpleMenu.SBuilder {
                         .icon(p -> ItemBuilder.from("PLAYER_HEAD").name("&c&l[Item here]").build())
                         .lmb(interact -> {
                             if (interact.heldItem == null) {
-                                return Result.message(Lang.IED_Swap_ERROR);
+                                return Result.message(Lang.EDITOR_ERROR_SWAP);
                             }
                             builder = ItemBuilder.copy(itemStackFunction.apply(interact.heldItem));
 

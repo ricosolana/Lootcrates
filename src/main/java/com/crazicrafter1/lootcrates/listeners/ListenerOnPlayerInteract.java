@@ -54,7 +54,7 @@ public class ListenerOnPlayerInteract extends BaseListener {
                     if (p.hasPermission(LCMain.PERM_OPEN)) {
                         new CrateInstance(p, crate, item).open();
                     } else
-                        p.sendMessage(ColorUtil.renderAll(Lang.ERR_NO_PERM_OPEN));
+                        p.sendMessage(ColorUtil.renderAll(Lang.CRATE_ERROR_OPEN));
                 } else {
                     // TODO improve logging
                     plugin.notifier.warn("A crate appears to be duplicated! " + p.getName());
@@ -63,7 +63,7 @@ public class ListenerOnPlayerInteract extends BaseListener {
                 if (p.hasPermission(LCMain.PERM_PREVIEW))
                     Lootcrates.showPreview(p, crate);
                 else
-                    p.sendMessage(ColorUtil.renderAll(Lang.ERR_NO_PERM_PREVIEW));
+                    p.sendMessage(ColorUtil.renderAll(Lang.CRATE_ERROR_PREVIEW));
             }
         } else
             plugin.notifier.globalWarn(Lang.Misc_OpenBug);

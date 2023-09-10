@@ -3,7 +3,6 @@ package com.crazicrafter1.lootcrates;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
 import com.crazicrafter1.crutils.*;
-import com.crazicrafter1.crutils.ui.AbstractMenu;
 import com.crazicrafter1.lootcrates.cmd.Cmd;
 import com.crazicrafter1.lootcrates.cmd.CmdTestParser;
 import com.crazicrafter1.lootcrates.crate.loot.*;
@@ -51,7 +50,6 @@ public class LCMain extends JavaPlugin
 
     public static final String KEY_rev = "rev";
     public static final String Key_language = "language";
-    public static final String KEY_update = "update";
     public static final String KEY_cleanPeriod = "clean-period";
     public static final String KEY_debug = "debug";
     public static final String KEY_checkCerts = "check-certs";
@@ -77,7 +75,6 @@ public class LCMain extends JavaPlugin
     public RewardSettings rewardSettings;
     public int rev = REV_LATEST;
     public String language = "en";
-    public boolean update = false;
     public int cleanPeriod = 30;
     public boolean debug = false;
     public boolean checkCerts = false;
@@ -93,12 +90,12 @@ public class LCMain extends JavaPlugin
 
         notifier = new Notifier(ChatColor.WHITE + "[%sLC" + ChatColor.WHITE + "] %s%s", PERM_ADMIN);
 
-        notifier.info(ColorUtil.renderAll(String.format(Lang.JOIN_DISCORD, DISCORD_URL)));
+        notifier.info(ColorUtil.renderAll(String.format(Lang.MESSAGE_DISCORD, DISCORD_URL)));
 
         try {
             Files.createDirectories(getDataFolder().toPath());
         } catch (IOException e) {
-            notifier.warn(Lang.UNABLE_TO_CREATE);
+            notifier.warn(Lang.FOLDER_ERROR);
             e.printStackTrace();
         }
 
@@ -185,36 +182,17 @@ public class LCMain extends JavaPlugin
 
 
     private void checkUpdates() {
-        if (update) {
-            try {
-                StringBuilder outTag = new StringBuilder();
-                if (GitUtils.updatePlugin(this, "PeriodicSeizures", "Lootcrates", "Lootcrates.jar", outTag)) {
-                    notifier.warn(String.format(Lang.UPDATED, outTag));
-                    notifier.warn(Lang.RECOMMEND_RESTART);
-                } else {
-                    notifier.info(Lang.LATEST_VERSION);
-                }
-            } catch (IOException e) {
-                notifier.warn(Lang.UPDATE_FAIL);
-                e.printStackTrace();
-            }
-        } else {
-            GitUtils.checkForUpdateAsync(this, "PeriodicSeizures", "Lootcrates",
-                    (result, tag) -> {
-                        if (result) notifier.info(String.format(Lang.UPDATE_AVAILABLE, tag));
-                        else notifier.info(Lang.LATEST_VERSION);
-                    });
-        }
+        GitUtils.checkForUpdateAsync(this, "PeriodicSeizures", "Lootcrates",
+                (result, tag) -> {
+                    if (result) notifier.info(String.format(Lang.UPDATE_AVAILABLE, tag));
+                    else notifier.info(Lang.MESSAGE_VERSION1);
+                });
     }
 
 
     private void initMetrics() {
         try {
             Metrics metrics = new Metrics(this, 10395);
-
-            metrics.addCustomChart(new Metrics.SimplePie(KEY_update,
-                    () -> String.valueOf(update))
-            );
 
             metrics.addCustomChart(new Metrics.SimplePie(Key_language,
                     () -> language)
@@ -236,7 +214,7 @@ public class LCMain extends JavaPlugin
             );
 
         } catch (Exception e) {
-            notifier.severe(String.format(Lang.UNABLE_TO_METRICS, e.getMessage()));
+            notifier.severe(String.format(Lang.METRICS_ERROR, e.getMessage()));
         }
     }
 
@@ -257,7 +235,7 @@ public class LCMain extends JavaPlugin
             try {
                 addon.loadClasses(getClass().getPackage().getName(), "sk");
             } catch (Exception e) {
-                notifier.severe(Lang.SKRIPT_INIT_ERROR);
+                notifier.severe(Lang.SKRIPT_ERROR1);
                 e.printStackTrace();
             }
             registerLoot(LootSkriptEvent.class);
@@ -269,7 +247,7 @@ public class LCMain extends JavaPlugin
 
     public void saveDefaultFile(CommandSender sender, File file, boolean replace) {
         if (replace || !Files.exists(file.toPath())) {
-            notifier.info(sender, String.format(Lang.SAVING_DEFAULT, file.getName()));
+            notifier.info(sender, String.format(Lang.CONFIG_SAVING_DEFAULT, file.getName()));
             this.saveResource(file.getName(), true);
         }
     }
@@ -296,12 +274,11 @@ public class LCMain extends JavaPlugin
 
             this.rev = config.getInt(KEY_rev, REV_LATEST);
             this.language = config.getString(Key_language, language);
-            this.update = config.getBoolean(KEY_update, update);
             this.cleanPeriod = config.getInt(KEY_cleanPeriod, cleanPeriod);
             this.debug = config.getBoolean(KEY_debug, debug);
             this.checkCerts = config.getBoolean(KEY_checkCerts, checkCerts);
         } catch (Exception e) {
-            notifier.severe(sender, String.format(Lang.CONFIG_LOAD_FAIL, e.getMessage()));
+            notifier.severe(sender, String.format(Lang.CONFIG_ERROR3, e.getMessage()));
         }
     }
 
@@ -328,12 +305,12 @@ public class LCMain extends JavaPlugin
         }
 
         if (rewardSettings != null) {
-            notifier.info(sender, Lang.REWARDS_SUCCESS);
+            notifier.info(sender, Lang.CONFIG_REWARDS_SUCCESS);
             return;
         }
 
         notifier.severe(sender, Lang.REWARDS_FAIL);
-        notifier.severe(sender, String.format(Lang.REWARDS_REPORT, DISCORD_URL));
+        notifier.severe(sender, String.format(Lang.CONFIG_REWARDS_REPORT, DISCORD_URL));
         Bukkit.getPluginManager().disablePlugin(this);
     }
 
@@ -380,14 +357,13 @@ public class LCMain extends JavaPlugin
 
             config.set(KEY_rev, REV_LATEST);
             config.set(Key_language, language);
-            config.set(KEY_update, update);
             config.set(KEY_cleanPeriod, cleanPeriod);
             config.set(KEY_debug, debug);
             config.set(KEY_checkCerts, checkCerts);
 
             config.save(configFile);
         } catch (IOException e) {
-            notifier.severe(sender, String.format(Lang.CONFIG_SAVING_FAILED, e.getMessage()));
+            notifier.severe(sender, String.format(Lang.CONFIG_ERROR5, e.getMessage()));
             e.printStackTrace();
         }
     }
@@ -398,7 +374,7 @@ public class LCMain extends JavaPlugin
         PlayerLog.saveAll(sender);
 
         if (backupRewards(sender, false)) {
-            notifier.info(sender, Lang.CONFIG_Save);
+            notifier.info(sender, Lang.CONFIG_SAVING);
 
             FileConfiguration rewardsConfig = new YamlConfiguration();
             rewardSettings.serialize(rewardsConfig);
@@ -410,10 +386,10 @@ public class LCMain extends JavaPlugin
                 rewardsConfig.save(rewardsConfigFile);
                 certsConfig.save(certsFile);
             } catch (Exception e) {
-                notifier.severe(sender, Lang.CONFIG_SaveError);
+                notifier.severe(sender, Lang.CONFIG_ERROR6);
                 e.printStackTrace();
             }
-        } else notifier.severe(sender, Lang.CONFIG_BackupError);
+        } else notifier.severe(sender, Lang.CONFIG_ERROR1);
     }
 
     private static final Pattern BACKUP_PATTERN = Pattern.compile("^([0-9])+(_\\S+)?.zip");
@@ -440,10 +416,10 @@ public class LCMain extends JavaPlugin
             }
 
             if (deletedCount > 0)
-                notifier.info(sender, String.format(Lang.CONFIG_DELETES, deletedCount));
+                notifier.info(sender, String.format(Lang.CONFIG_DELETED_OLD, deletedCount));
             else notifier.info(sender, Lang.NO_CONFIG_DELETES);
         } catch (Exception e) {
-            notifier.severe(sender, String.format(Lang.CONFIG_DELETES_FAIL, e.getMessage()));
+            notifier.severe(sender, String.format(Lang.CONFIG_ERROR2, e.getMessage()));
         }
     }
 

@@ -1,6 +1,5 @@
 package com.crazicrafter1.lootcrates.crate.loot;
 
-import com.crazicrafter1.crutils.ColorUtil;
 import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.crutils.ui.*;
 import com.crazicrafter1.lootcrates.Lang;
@@ -78,7 +77,7 @@ public class LootItemQA extends AbstractLootItem {
                 .childButton(5, 5, p -> ItemBuilder.copy(Material.COMPASS).name(Lang.ASSIGN_EXACT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.ASSIGN_EXACT)
                         .leftRaw(p -> name)
-                        .right(p -> Lang.SET_BY_NAME)
+                        .right(p -> Lang.EDITOR_ITEM_SET)
                         .onClose((player) -> Result.parent())
                         .onComplete((p, s, b) -> {
                             CustomBaseObject customBaseObject = QualityArmory.getCustomItemByName(s);
@@ -86,7 +85,7 @@ public class LootItemQA extends AbstractLootItem {
                                 this.name = s;
                                 return Result.parent();
                             }
-                            return Result.text(Lang.ERR_INVALID);
+                            return Result.text(Lang.COMMAND_ERROR_INPUT);
                         })
                 )
                 .addAll((self, p00) -> {

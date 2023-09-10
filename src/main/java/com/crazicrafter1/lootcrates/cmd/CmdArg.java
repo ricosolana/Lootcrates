@@ -149,14 +149,14 @@ class CmdArg {
             //  - ANY_PLAYER (online/offline)
 
             if (crate == null)
-                return severe(sender, Lang.ERR_CRATE_UNKNOWN);
+                return severe(sender, Lang.COMMAND_ERROR_CRATE);
 
             // /crates crate common
             if (args.length == 1) {
                 if (!(sender instanceof Player))
-                    return severe(sender, Lang.ERR_PLAYER_CRATE);
+                    return severe(sender, Lang.CRATE_ERROR_PLAYER0);
                 Util.give((Player) sender, crate.itemStack((Player) sender));
-                return info(sender, String.format(Lang.SELF_GIVE_CRATE, crate.id));
+                return info(sender, String.format(Lang.COMMAND_GIVE_SELF, crate.id));
             }
 
             // crates crate common *
@@ -171,15 +171,15 @@ class CmdArg {
                 }
 
                 if (given == 0)
-                    return severe(sender, Lang.ERR_NONE_ONLINE);
+                    return severe(sender, Lang.COMMAND_ERROR_PLAYERS);
 
-                return info(sender, String.format(Lang.GIVE_CRATE_ALL, crate.id, given));
+                return info(sender, String.format(Lang.COMMAND_GIVE, crate.id, given));
             }
 
             // crates crate common crazicrafter1
             Player p = Bukkit.getServer().getOnlinePlayers().stream().filter(player -> player.getName().equals(args[1])).findFirst().orElse(null);
             if (p == null)
-                return severe(sender, Lang.ERR_PLAYER_UNKNOWN);
+                return severe(sender, Lang.CRATE_ERROR_PLAYER1);
 
             Util.give(p, crate.itemStack(p));
 
@@ -189,10 +189,10 @@ class CmdArg {
             if (p != sender) {
                 if (!(flags.contains("s") || flags.contains("silent")))
                     info(p, String.format(Lang.RECEIVE_CRATE, crate.id));
-                return info(sender, String.format(Lang.GIVE_CRATE_ALL, crate.id, Bukkit.getOnlinePlayers().size()));
+                return info(sender, String.format(Lang.COMMAND_GIVE, crate.id, Bukkit.getOnlinePlayers().size()));
             }
 
-            return info(sender, String.format(Lang.SELF_GIVE_CRATE, crate.id));
+            return info(sender, String.format(Lang.COMMAND_GIVE_SELF, crate.id));
         }, (sender, args) -> {
             if (args.length == 1) {
                 return getMatches(args[0], LCMain.get().rewardSettings.crates.keySet());
@@ -224,12 +224,12 @@ class CmdArg {
                 return true;
             }
 
-            return severe(sender, Lang.ERR_NEED_PLAYER);
+            return severe(sender, Lang.COMMAND_ERROR_PLAYER);
         });
 
         arg("identify", (sender, args, flags) -> {
             if (!(sender instanceof Player))
-                return severe(sender, Lang.ERR_NEED_PLAYER);
+                return severe(sender, Lang.COMMAND_ERROR_PLAYER);
 
             Player p = (Player) sender;
 
@@ -237,7 +237,7 @@ class CmdArg {
             if (itemStack.getType() != Material.AIR) {
                 CrateSettings crate = Lootcrates.getCrate(itemStack);
                 if (crate != null) {
-                    return info(sender, String.format(Lang.IS_CRATE, crate.id));
+                    return info(sender, String.format(Lang.COMMAND_IDENTIFY, crate.id));
                 } else {
                     return info(sender, Lang.NOT_CRATE);
                 }

@@ -58,8 +58,8 @@ public abstract class AbstractLootItem implements ILoot {
     public String getMenuDesc() {
         StringBuilder sb = new StringBuilder();
         if (min == max)
-            sb.append(String.format(Lang.ED_LootSets_PROTO_LootItem_LORE_Count, min));
-        else sb.append(String.format(Lang.ED_LootSets_PROTO_LootItem_LORE_Range, min, max));
+            sb.append(String.format(Lang.EDITOR_LOOT_COUNT, min));
+        else sb.append(String.format(Lang.EDITOR_LOOT_RANGE, min, max));
 
         return sb.toString();
     }
@@ -97,7 +97,7 @@ public abstract class AbstractLootItem implements ILoot {
                     min = MathUtil.clamp(min + change, 1, max);
                     return Result.refresh();
                 })
-                .icon(p -> ItemBuilder.fromSkull(Editor.BASE64_DEC).name(Lang.ED_MIN).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC + "\n" + Lang.ED_SHIFT_MUL).amount(min).build()))
+                .icon(p -> ItemBuilder.fromSkull(Editor.BASE64_DEC).name(Lang.EDITOR_COUNT_MIN).lore(Lang.EDITOR_LMB_DECREMENT + "\n" + Lang.EDITOR_INCREMENT + "\n" + Lang.EDITOR_MULTIPLE).amount(min).build()))
                 // Max
                 .button(x2, y2, new Button.Builder()
                         .click(e -> {
@@ -110,7 +110,7 @@ public abstract class AbstractLootItem implements ILoot {
                             max = MathUtil.clamp(max + change, min, itemStack.getMaxStackSize());
                             return Result.refresh();
                         })
-                        .icon(p -> ItemBuilder.fromSkull(Editor.BASE64_INC).name(Lang.ED_MAX).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC + "\n" + Lang.ED_SHIFT_MUL).amount(max).build()));
+                        .icon(p -> ItemBuilder.fromSkull(Editor.BASE64_INC).name(Lang.EDITOR_COUNT_MAX).lore(Lang.EDITOR_LMB_DECREMENT + "\n" + Lang.EDITOR_INCREMENT + "\n" + Lang.EDITOR_MULTIPLE).amount(max).build()));
 
     }
 

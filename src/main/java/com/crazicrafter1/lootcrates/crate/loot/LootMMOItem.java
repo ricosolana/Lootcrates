@@ -150,7 +150,7 @@ public class LootMMOItem extends AbstractLootItem {
                             min = MathUtil.clamp(min + change, 1, max);
                             return Result.refresh();
                         })
-                        .icon((p) -> ItemBuilder.fromSkull(BASE64_DEC).name(Lang.ED_MIN).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC + "\n" + Lang.ED_SHIFT_MUL).amount(min).build()))
+                        .icon((p) -> ItemBuilder.fromSkull(BASE64_DEC).name(Lang.EDITOR_COUNT_MIN).lore(Lang.EDITOR_LMB_DECREMENT + "\n" + Lang.EDITOR_INCREMENT + "\n" + Lang.EDITOR_MULTIPLE).amount(min).build()))
                 // Max
                 .button(5, 1, new Button.Builder()
                         .lmb(interact -> {
@@ -163,7 +163,7 @@ public class LootMMOItem extends AbstractLootItem {
                             max = MathUtil.clamp(max + change, min, getRenderIcon(null).getMaxStackSize());
                             return Result.refresh();
                         })
-                        .icon((p) -> ItemBuilder.fromSkull(BASE64_INC).name(Lang.ED_MAX).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC + "\n" + Lang.ED_SHIFT_MUL).amount(max).build()))
+                        .icon((p) -> ItemBuilder.fromSkull(BASE64_INC).name(Lang.EDITOR_COUNT_MAX).lore(Lang.EDITOR_LMB_DECREMENT + "\n" + Lang.EDITOR_INCREMENT + "\n" + Lang.EDITOR_MULTIPLE).amount(max).build()))
 
                 // Type/Name menu:
                 .childButton(4, 1, (p) -> ItemBuilder.mut(getRenderIcon(null)).amount(1).name(Lang.ASSIGN_EXACT).lore(type + ":" + name).build(), new TextMenu.TBuilder()
@@ -187,7 +187,7 @@ public class LootMMOItem extends AbstractLootItem {
                             //e.printStackTrace();
                         }
 
-                        return Result.text(Lang.ERR_INVALID);
+                        return Result.text(Lang.COMMAND_ERROR_INPUT);
                     })
                 )
                 //special delimiter reader/writer for
@@ -222,7 +222,7 @@ public class LootMMOItem extends AbstractLootItem {
                                         String tier = sub.substring(index+1); // 6
 
                                         if (!MMOItems.plugin.getTiers().has(tier))
-                                            return Result.text(Lang.ERR_INVALID);
+                                            return Result.text(Lang.COMMAND_ERROR_INPUT);
 
                                         this.tier = tier;
                                     } else if (sub.charAt(0) == 'r') { // random
@@ -234,7 +234,7 @@ public class LootMMOItem extends AbstractLootItem {
                             }
                             catch (Exception ignored) {}
 
-                            return Result.text(Lang.ERR_INVALID);
+                            return Result.text(Lang.COMMAND_ERROR_INPUT);
                         })
                 );
     }

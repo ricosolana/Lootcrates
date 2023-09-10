@@ -50,7 +50,7 @@ public class PlayerLog {
                 playerConfig.save(new File(PATH, rawUUID + ".yml"));
             }
         } catch (Exception e) {
-            LCMain.get().notifier.severe(sender, String.format(Lang.STATS_SAVE_FAIL, e.getMessage()));
+            LCMain.get().notifier.severe(sender, String.format(Lang.CONFIG_ERROR10, e.getMessage()));
         }
     }
 
@@ -82,7 +82,7 @@ public class PlayerLog {
                 } catch (Exception ignored) {}
             }
         } catch (Exception e) {
-            LCMain.get().notifier.severe(sender, String.format(Lang.STATS_LOAD_FAIL, e.getMessage()));
+            LCMain.get().notifier.severe(sender, String.format(Lang.CONFIG_ERROR11, e.getMessage()));
         }
     }
 

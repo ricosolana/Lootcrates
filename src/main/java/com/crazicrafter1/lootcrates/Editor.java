@@ -6,17 +6,13 @@ import com.crazicrafter1.crutils.ui.*;
 import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import com.crazicrafter1.lootcrates.crate.LootCollection;
 import com.crazicrafter1.lootcrates.crate.loot.LootItem;
-import com.google.common.collect.Streams;
-import org.apache.commons.lang3.text.WordUtils;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.FireworkEffectMeta;
 
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class Editor {
 
@@ -29,9 +25,9 @@ public class Editor {
 
     public static String getColorDem() {
         return COLORS
-                +   ColorUtil.renderAll(String.format(Lang.SUPPORT_PLUGIN_X, "PlaceholderAPI") +            "\n"
-                +   Lang.Custom_Macros + "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "%crate_picks%" + "\n"
-                +   Lang.Separate_Lore + "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "\\n")
+                +   ColorUtil.renderAll(String.format(Lang.EDITOR_SUPPORTS, "PlaceholderAPI") +            "\n"
+                +   Lang.EDITOR_ITEM_MACROS + "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "%crate_picks%" + "\n"
+                +   Lang.EDITOR_LORES + "\n" + ChatColor.WHITE + "   : " + ChatColor.GRAY + "\\n")
                 ;
     }
 
@@ -48,33 +44,33 @@ public class Editor {
         RewardSettings settings = LCMain.get().rewardSettings;
 
         new SimpleMenu.SBuilder(3)
-                .title(p -> Lang.Editor_Title)
+                .title(p -> Lang.EDITOR_TITLE)
                 .background()
                 /* *************** *\
                 *                   *
                 * Global Crate List *
                 *                   *
                 \* *************** */
-                .childButton(2, 1, p -> ItemBuilder.copy(Material.CHEST).name(Lang.ED_BTN_Crates).build(), new ListMenu.LBuilder()
-                                .title(p -> Lang.ED_Crates_TI)
+                .childButton(2, 1, p -> ItemBuilder.copy(Material.CHEST).name(Lang.EDITOR_CRATE).build(), new ListMenu.LBuilder()
+                                .title(p -> Lang.EDITOR_CRATE_TITLE)
                                 .parentButton(4, 5)
                                 // *       *      *
                                 // Add Crate button
                                 // *       *      *
-                                .childButton(5, 5, p -> ItemBuilder.copy(Material.END_CRYSTAL).name(Lang.ED_Crates_BTN_New).build(), new TextMenu.TBuilder()
-                                        .title(p -> Lang.ED_Crates_New_TI)
+                                .childButton(5, 5, p -> ItemBuilder.copy(Material.END_CRYSTAL).name(Lang.EDITOR_CRATE_NEW).build(), new TextMenu.TBuilder()
+                                        .title(p -> Lang.EDITOR_CRATE_NEW_TITLE)
                                         .leftRaw(p -> LOREM_IPSUM)
                                         .onClose((player) -> Result.parent())
                                         .onComplete((player, s, b) -> {
                                             s = NON_ASCII_PATTERN.matcher(s.replace(" ", "_")).replaceAll("").toLowerCase();
 
                                             if (s.isEmpty())
-                                                return Result.text(Lang.ED_INVALID_ID);
+                                                return Result.text(Lang.EDITOR_ERROR9);
 
                                             // if crate already exists
                                             CrateSettings crate = Lootcrates.getCrate(s);
                                             if (crate != null)
-                                                return Result.text(Lang.ED_DUP_ID);
+                                                return Result.text(Lang.EDITOR_CRATE_ERROR1);
 
                                             Lootcrates.registerCrate(Lootcrates.createCrate(s));
 
@@ -108,8 +104,8 @@ public class Editor {
                 /*
                  * View LootSets
                  */
-                ).childButton(4, 1, p -> ItemBuilder.from("EXPERIENCE_BOTTLE").name(Lang.ED_BTN_LootSets).build(), new ListMenu.LBuilder()
-                        .title(p -> Lang.ED_LootSets_TI)
+                ).childButton(4, 1, p -> ItemBuilder.from("EXPERIENCE_BOTTLE").name(Lang.EDITOR_LOOT).build(), new ListMenu.LBuilder()
+                        .title(p -> Lang.EDITOR_LOOT_TITLE)
                         .parentButton(4, 5)
                         /*
                          * Each Collection
@@ -143,18 +139,18 @@ public class Editor {
                         /*
                          * Add custom Collection
                          */
-                        .childButton(5, 5, p -> ItemBuilder.copy(Material.NETHER_STAR).name(Lang.ED_LootSets_BTN_New).build(), new TextMenu.TBuilder()
-                                .title(p -> Lang.ED_LootSets_New_TI)
+                        .childButton(5, 5, p -> ItemBuilder.copy(Material.NETHER_STAR).name(Lang.EDITOR_LOOT_NEW).build(), new TextMenu.TBuilder()
+                                .title(p -> Lang.EDITOR_LOOT_ADD_TITLE)
                                 .leftRaw(p -> LOREM_IPSUM) // id
                                 .onClose((player) -> Result.parent())
                                 .onComplete((player, s, b) -> {
                                     s = NON_ASCII_PATTERN.matcher(s.replace(" ", "_")).replaceAll("").toLowerCase();
 
                                     if (s.isEmpty())
-                                        return Result.text(Lang.ED_INVALID_ID);
+                                        return Result.text(Lang.EDITOR_ERROR9);
 
                                     if (settings.crates.containsKey(s))
-                                        return Result.text(Lang.ED_DUP_ID);
+                                        return Result.text(Lang.EDITOR_CRATE_ERROR1);
 
                                     settings.lootSets.put(s,
                                             new LootCollection(s, new ItemStack(Material.GLOWSTONE_DUST),
@@ -167,7 +163,7 @@ public class Editor {
                 /*
                  * Fireworks Editor
                  */
-                .childButton(6, 1, p -> ItemBuilder.from("FIREWORK_ROCKET").name(Lang.ED_BTN_Firework).build(), new FireworkModifyMenu())
+                .childButton(6, 1, p -> ItemBuilder.from("FIREWORK_ROCKET").name(Lang.EDITOR_FIREWORK).build(), new FireworkModifyMenu())
                 .open(p000);
 
     }

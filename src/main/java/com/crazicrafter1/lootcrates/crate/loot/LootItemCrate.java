@@ -26,7 +26,7 @@ public class LootItemCrate implements ILoot {
         try {
             this.id = LCMain.get().rewardSettings.crates.keySet().iterator().next();
         } catch (NoSuchElementException e) {
-            LCMain.get().notifier.severe(Lang.ERR_NO_CRATES);
+            LCMain.get().notifier.severe(Lang.COMMAND_ERROR_CRATES);
         }
     }
 

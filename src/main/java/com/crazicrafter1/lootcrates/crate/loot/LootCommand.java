@@ -67,7 +67,7 @@ public class LootCommand implements ILoot {
     @NotNull
     @Override
     public String getMenuDesc() {
-        return String.format(Lang.ED_LootSets_PROTO_BTN_Command, command);
+        return String.format(Lang.EDITOR_LOOT_COMMAND, command);
     }
 
     @Override
@@ -84,17 +84,17 @@ public class LootCommand implements ILoot {
     public AbstractMenu.Builder getMenuBuilder() {
         return new ItemModifyMenu()
                 .build(itemStack, input -> this.itemStack = input)
-                .childButton(1, 0, p -> ItemBuilder.copy(Material.PAPER).name("&6" + Lang.ED_LootSets_PROTO_Command_TI).lore(Lang.ED_LMB_EDIT).build(), new TextMenu.TBuilder()
-                        .title(p -> Lang.ED_LootSets_PROTO_Command_TI)
+                .childButton(1, 0, p -> ItemBuilder.copy(Material.PAPER).name("&6" + Lang.EDITOR_LOOT_COMMAND_TITLE).lore(Lang.EDITOR_LMB_EDIT).build(), new TextMenu.TBuilder()
+                        .title(p -> Lang.EDITOR_LOOT_COMMAND_TITLE)
                         .onClose((player) -> Result.parent())
                         .leftRaw(p ->  command)
-                        .right(p -> Lang.ED_LootSets_PROTO_Command_R, p -> String.format(Lang.SUPPORT_PLUGIN_X, "PlaceholderAPI"))
+                        .right(p -> Lang.EDITOR_LOOT_COMMAND_INPUT, p -> String.format(Lang.EDITOR_SUPPORTS, "PlaceholderAPI"))
                         .onComplete((p, s, b) -> {
                             if (!s.isEmpty()) {
                                 this.command = s;
                                 return Result.parent();
                             }
-                            return Result.text(Lang.ERR_INVALID);
+                            return Result.text(Lang.COMMAND_ERROR_INPUT);
                         }));
     }
 

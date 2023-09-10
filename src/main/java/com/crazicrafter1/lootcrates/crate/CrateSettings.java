@@ -120,10 +120,10 @@ public class CrateSettings {
 
     public ItemStack getMenuIcon() {
         return ItemBuilder.copy(item).renderAll().lore(
-                  String.format(Lang.FORMAT_ID, id) + "\n"
-                + Lang.ED_LMB_EDIT + "\n"
-                + Lang.ED_RMB_COPY + "\n"
-                + Lang.ED_RMB_SHIFT_DELETE).build();
+                  String.format(Lang.EDITOR_ID, id) + "\n"
+                + Lang.EDITOR_LMB_EDIT + "\n"
+                + Lang.EDITOR_COPY + "\n"
+                + Lang.EDITOR_DELETE).build();
     }
 
     /**
@@ -184,7 +184,7 @@ public class CrateSettings {
                 // *   *   *
                 // Edit Crate ItemStack
                 // *   *   *
-                .childButton(1, 1, p -> ItemBuilder.copy(item).name(Lang.EDIT_ITEM).lore(Lang.ED_LMB_EDIT).build(), new ItemModifyMenu()
+                .childButton(1, 1, p -> ItemBuilder.copy(item).name(Lang.EDITOR_EDIT_ITEM).lore(Lang.EDITOR_LMB_EDIT).build(), new ItemModifyMenu()
                         .build(item, itemStack ->
                                 ItemBuilder.mut(item)
                                         .apply(itemStack,
@@ -192,25 +192,25 @@ public class CrateSettings {
                                         .build())
                 )
                 // Edit Inventory Title
-                .childButton(3, 1, p -> ItemBuilder.copy(Material.PAPER).name(String.format(Lang.EDIT_TITLE, title)).lore(Lang.ED_LMB_EDIT).build(), new TextMenu.TBuilder()
+                .childButton(3, 1, p -> ItemBuilder.copy(Material.PAPER).name(String.format(Lang.EDITOR_EDIT_TITLE, title)).lore(Lang.EDITOR_LMB_EDIT).build(), new TextMenu.TBuilder()
                         .title(p -> Lang.TITLE)
                         .leftRaw(p -> title)
                         .onClose((player) -> Result.parent())
-                        .right(p -> Lang.SPECIAL_FORMATTING, p -> Editor.getColorDem(), ColorUtil.AS_IS)
+                        .right(p -> Lang.EDITOR_FORMATTING, p -> Editor.getColorDem(), ColorUtil.AS_IS)
                         .onComplete((p, s, b) -> {
                             if (!s.isEmpty()) {
                                 title = ColorUtil.RENDER_MARKERS.a(s);
                                 return Result.parent();
                             }
 
-                            return Result.text(Lang.ERR_INVALID);
+                            return Result.text(Lang.COMMAND_ERROR_INPUT);
                         })
                 )
                 // *   *   *
                 // Edit LootSets
                 // *   *   *
-                .childButton(5, 1, p -> ItemBuilder.from("EXPERIENCE_BOTTLE").name(Lang.LOOT).lore(Lang.ED_LMB_EDIT).build(), new ListMenu.LBuilder()
-                        .title(p -> Lang.LOOT)
+                .childButton(5, 1, p -> ItemBuilder.from("EXPERIENCE_BOTTLE").name(Lang.EDITOR_LOOT1).lore(Lang.EDITOR_LMB_EDIT).build(), new ListMenu.LBuilder()
+                        .title(p -> Lang.EDITOR_LOOT1)
                         .parentButton(4, 5)
                         .onClose((player) -> Result.parent())
                         .addAll((builder, p) -> {
@@ -223,9 +223,9 @@ public class CrateSettings {
 
                                 if (weight != null) {
                                     b.lore( "&7Weight: " + getFormattedFraction(lootSet) + " (" + getFormattedPercent(lootSet) + ") - NUM\n" +
-                                            Lang.ED_LMB_TOGGLE + "\n" +
-                                            Lang.ED_NUM_SUM + "\n" +
-                                            Lang.ED_NUM_SUM_DESC).glow(true);
+                                            Lang.EDITOR_LMB_TOGGLE + "\n" +
+                                            Lang.EDITOR_COUNT_BINDS + "\n" +
+                                            Lang.EDITOR_COUNT_CHANGE).glow(true);
 
                                     btn.lmb(interact -> {
                                         if (loot.getMap().size() > 1) {
@@ -246,7 +246,7 @@ public class CrateSettings {
                                         return Result.refresh();
                                     });
                                 } else {
-                                    b.lore(Lang.ED_LMB_TOGGLE);
+                                    b.lore(Lang.EDITOR_LMB_TOGGLE);
                                     btn.lmb(interact -> {
                                         loot.add(lootSet.id, 1);
                                         return Result.refresh();
@@ -262,7 +262,7 @@ public class CrateSettings {
                 // Edit Columns
                 // *   *   *
                 .button(7, 1, new Button.Builder()
-                        .icon(p -> ItemBuilder.copy(Material.LADDER).name(String.format(Lang.ED_Crates_PROTO_BTN_Columns, columns)).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC).amount(columns).build())
+                        .icon(p -> ItemBuilder.copy(Material.LADDER).name(String.format(Lang.EDITOR_CRATE_COLUMNS, columns)).lore(Lang.EDITOR_LMB_DECREMENT + "\n" + Lang.EDITOR_INCREMENT).amount(columns).build())
                         .lmb(interact -> {
                             // decrease
                             columns = MathUtil.clamp(columns - 1, 1, 6);
@@ -277,7 +277,7 @@ public class CrateSettings {
                 // Edit Picks
                 // *   *   *
                 .button(2, 3, new Button.Builder()
-                        .icon(p -> ItemBuilder.copy(Material.MELON_SEEDS).name(String.format(Lang.ED_Crates_PROTO_BTN_Picks, picks)).lore(Lang.ED_LMB_DEC + "\n" + Lang.ED_RMB_INC).amount(picks).build())
+                        .icon(p -> ItemBuilder.copy(Material.MELON_SEEDS).name(String.format(Lang.EDITOR_CRATE_PICKS, picks)).lore(Lang.EDITOR_LMB_DECREMENT + "\n" + Lang.EDITOR_INCREMENT).amount(picks).build())
                         .lmb(interact -> {
                             // decrease
                             picks = MathUtil.clamp(picks - 1, 1, columns*9);
@@ -291,11 +291,11 @@ public class CrateSettings {
                 // *   *   *
                 // Edit Pick Sound
                 // *   *   *
-                .childButton(6, 3, p -> ItemBuilder.copy(Material.JUKEBOX).name(String.format(Lang.ED_Crates_PROTO_BTN_Sound, sound)).lore(Lang.ED_LMB_EDIT).build(),
+                .childButton(6, 3, p -> ItemBuilder.copy(Material.JUKEBOX).name(String.format(Lang.EDITOR_CRATE_SOUND, sound)).lore(Lang.EDITOR_LMB_EDIT).build(),
                         new TextMenu.TBuilder()
-                                .title(p -> Lang.ED_Crates_PROTO_Sound_TI)
+                                .title(p -> Lang.EDITOR_CRATE_SOUND_TITLE)
                                 .leftRaw(p -> Editor.LOREM_IPSUM)
-                                .right(p -> Lang.ED_Crates_PROTO_Sound_R)
+                                .right(p -> Lang.EDITOR_CRATE_SOUND_INPUT)
                                 .onClose((player) -> Result.parent())
                                 .onComplete((p, s, b) -> {
                                     try {
@@ -303,7 +303,7 @@ public class CrateSettings {
                                         p.playSound(p.getLocation(), sound, 1, 1);
                                         return Result.parent();
                                     } catch (Exception e) {
-                                        return Result.text(Lang.ERR_INVALID);
+                                        return Result.text(Lang.COMMAND_ERROR_INPUT);
                                     }
                                 })
                 );

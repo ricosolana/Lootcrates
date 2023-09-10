@@ -44,22 +44,22 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                         .background()
                         .parentButton(4, 5)
                         // Add color
-                        .childButton(5, 5, p -> ItemBuilder.copy(Material.NAME_TAG).name("add").build(), new TextMenu.TBuilder()
-                                .title(p -> "New color editor")
-                                .leftRaw(p -> "#color")
+                        .childButton(5, 5, p -> ItemBuilder.copy(Material.NAME_TAG).name(Lang.EDITOR_FIREWORK_ADD).build(), new TextMenu.TBuilder()
+                                .title(p -> Lang.EDITOR_FIREWORK_COLOR_NEW)
+                                .leftRaw(p -> Lang.EDITOR_FIREWORK_COLOR_HINT)
                                 // TODO this code is 99% similar to the color editor
                                 .onComplete((p, text, self) -> {
                                     int value;
 
                                     try {
-                                        int i = text.indexOf("0x");
+                                        int i = text.indexOf('x');
                                         if (i != -1)
-                                            value = Integer.parseUnsignedInt(text, i + 2, text.length(), 16);
+                                            value = Integer.parseUnsignedInt(text, i + 1, text.length(), 16);
                                         else {
-                                            i = text.indexOf("#");
+                                            i = text.indexOf('#');
                                             if (i != -1) {
                                                 if (text.length() != 7)
-                                                    return Result.text("Hex must match #ABCDEF");
+                                                    return Result.text(Lang.EDITOR_FIREWORK_ERROR1);
                                                 value = Integer.parseUnsignedInt(text, i + 1, text.length(), 16);
                                             } else {
                                                 // decimal
@@ -67,17 +67,17 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                                             }
                                         }
                                     } catch (Exception ignored) {
-                                        return Result.text("Must start with #, 0x, ...");
+                                        return Result.text(Lang.EDITOR_FIREWORK_ERROR3);
                                     }
 
                                     if (value > 0xFFFFFF)
-                                        return Result.text("Too large");
+                                        return Result.text(Lang.EDITOR_FIREWORK_ERROR2);
 
                                     List<Color> constColors = colorFunction.apply(settings.fireworkEffect);
 
                                     Color color1 = Color.fromRGB(value);
                                     if (constColors.contains(color1))
-                                        return Result.text("Color already applied");
+                                        return Result.text(Lang.EDITOR_FIREWORK_ERROR0);
 
                                     List<Color> colors = new ArrayList<>(constColors);
                                     colors.add(color1);
@@ -112,11 +112,11 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                                                     .trail(effect.hasTrail()), colors).build();
                                             return Result.refresh();
                                         }
-                                        return Result.message("Unable to remove final element");
+                                        return Result.message(Lang.EDITOR_FIREWORK_ERROR4);
                                     })
                                     .icon(p102 -> ItemBuilder.copy(Material.LEATHER_CHESTPLATE)
                                             .name(String.format("&7#%06X %s\u2588", color.asRGB(), ColorUtil.toHexMarker(color)))
-                                            .lore(Lang.ED_RMB_SHIFT_DELETE)
+                                            .lore(Lang.EDITOR_DELETE)
                                             .color(color)
                                             .hideFlags(ItemFlag.HIDE_DYE, ItemFlag.HIDE_ATTRIBUTES)
                                             .build()
@@ -132,8 +132,9 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
 
         final RewardSettings settings = LCMain.get().rewardSettings;
 
-        this.title(p -> Lang.ED_Firework_TI)
+        this.title(p -> Lang.EDITOR_FIREWORK_TITLE)
                 .background()
+                // help
                 .button(8, 2, new Button.Builder().icon(p -> ItemBuilder.copy(Material.PAPER).name("&aToggle/change settings with LMB").build()))
                 // Type
                 .button(1, 1, new Button.Builder().icon(p -> {
@@ -149,15 +150,15 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                     }
 
                     return ItemBuilder.fromSkull(base64)
-                            .name(Lang.ED_Fireworks_Type)
+                            .name(Lang.EDITOR_FIREWORK_TYPE)
                             .lore(Arrays.stream(FireworkEffect.Type.values()).map(type -> (effect.getType() == type ? "&6" : "&7") + WordUtils.capitalize(type.name().toLowerCase().replace('_', ' '))).collect(Collectors.toList())).build();
                 }).bind(e -> {
-                    ClickType clickType = e.clickType;
+                    boolean left = e.clickType.isLeftClick();
 
                     FireworkEffect effect = settings.fireworkEffect;
 
                     FireworkEffect.Type[] values = FireworkEffect.Type.values();
-                    int index = (Arrays.asList(values).indexOf(effect.getType()) + (clickType.isLeftClick() ? -1 : 1)) % values.length;
+                    int index = (Arrays.asList(values).indexOf(effect.getType()) + (left ? -1 : 1)) % values.length;
                     if (index < 0) index += values.length;
                     FireworkEffect.Type nextType = values[index];
 
@@ -232,13 +233,13 @@ public class FireworkModifyMenu extends SimpleMenu.SBuilder {
                 .parentButton(4, 2);
 
         // Add basic color button
-        this.addColorButton(6, 1, "&7Colors (&6%d&7)",
-                p0 -> "Color editor", FireworkEffect::getColors,
+        this.addColorButton(6, 1, Lang.EDITOR_FIREWORK_NAME_COLORS,
+                p0 -> Lang.EDITOR_FIREWORK_TITLE_COLORS, FireworkEffect::getColors,
                 (fb, colors) -> fb.withColor(colors).withFade(settings.fireworkEffect.getFadeColors()));
 
         // Add fade color button
-        this.addColorButton(7, 1, "&7Fade (&6%d&7)",
-                p0 -> "Fade editor", FireworkEffect::getFadeColors,
+        this.addColorButton(7, 1, Lang.EDITOR_FIREWORK_NAME_FADE,
+                p0 -> Lang.EDITOR_FIREWORK_TITLE_FADE, FireworkEffect::getFadeColors,
                 (fb, colors) -> fb.withColor(settings.fireworkEffect.getColors()).withFade(colors));
     }
 

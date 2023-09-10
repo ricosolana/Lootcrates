@@ -64,19 +64,19 @@ public class RewardSettings {
 
             this.speed = section.getInt("speed");
 
-            this.unSelectedItem = Objects.requireNonNull(section.getItemStack("unSelectedItem"), String.format(Lang.CONFIG_NULL_VALUE, "unSelectedItem"));
-            this.selectedItem = Objects.requireNonNull(section.getItemStack("selectedItem"), String.format(Lang.CONFIG_NULL_VALUE, "selectedItem"));
+            this.unSelectedItem = Objects.requireNonNull(section.getItemStack("unSelectedItem"), String.format(Lang.CONFIG_ERROR4, "unSelectedItem"));
+            this.selectedItem = Objects.requireNonNull(section.getItemStack("selectedItem"), String.format(Lang.CONFIG_ERROR4, "selectedItem"));
 
             this.lootSets = new LinkedHashMap<>();
             for (Map.Entry<String, Object> entry : section.getConfigurationSection("lootSets").getValues(false).entrySet()) {
                 Map<String, Object> itr = ((ConfigurationSection) entry.getValue()).getValues(false);
 
                 String id = entry.getKey();
-                ItemStack itemStack = Objects.requireNonNull((ItemStack) itr.get("item"), String.format(Lang.CONFIG_NULL_VALUE, "'lootSets.<" + id + ">.item'"));
+                ItemStack itemStack = Objects.requireNonNull((ItemStack) itr.get("item"), String.format(Lang.CONFIG_ERROR4, "'lootSets.<" + id + ">.item'"));
 
                 if (rev <= 6) {
                     List<ILoot> loot = (List<ILoot>) itr.get("loot");
-                    Validate.isTrue(!loot.contains(null), String.format(Lang.CONFIG_NULL_VALUE, "'lootSets.<" + id + ">.loot[]'"));
+                    Validate.isTrue(!loot.contains(null), String.format(Lang.CONFIG_ERROR4, "'lootSets.<" + id + ">.loot[]'"));
 
                     this.lootSets.put(id, new LootCollection(id, itemStack, loot));
                 } else {
@@ -87,9 +87,9 @@ public class RewardSettings {
                     }
 
                     // write the loot as a list containing sub-maps of item, weight
-                    Validate.isTrue(!result.containsKey(null), String.format(Lang.CONFIG_NULL_VALUE, "'lootSets.<" + id + ">.loot.data'"));
-                    Validate.isTrue(!result.containsValue(0), String.format(Lang.CONFIG_ZERO_WEIGHT, "'lootSets.<" + id + ">.loot.weight'"));
-                    Validate.isTrue(!result.containsValue(null), String.format(Lang.CONFIG_NULL_VALUE, "'lootSets.<" + id + ">.loot.weight'"));
+                    Validate.isTrue(!result.containsKey(null), String.format(Lang.CONFIG_ERROR4, "'lootSets.<" + id + ">.loot.data'"));
+                    Validate.isTrue(!result.containsValue(0), String.format(Lang.CONFIG_ERROR7, "'lootSets.<" + id + ">.loot.weight'"));
+                    Validate.isTrue(!result.containsValue(null), String.format(Lang.CONFIG_ERROR4, "'lootSets.<" + id + ">.loot.weight'"));
 
                     this.lootSets.put(id, new LootCollection(id, itemStack, new WeightedRandomContainer<>(result)));
                 }
@@ -106,12 +106,12 @@ public class RewardSettings {
                                 e -> (Integer) e.getValue()));
 
                 crates.put(id, new CrateSettings(id,
-                        Objects.requireNonNull((String) itr.get("title"), String.format(Lang.CONFIG_NULL_VALUE, "'crates.<" + id + ">.title'")),
+                        Objects.requireNonNull((String) itr.get("title"), String.format(Lang.CONFIG_ERROR4, "'crates.<" + id + ">.title'")),
                         (int) itr.get("columns"),
                         (int) itr.get("picks"),
                         Sound.valueOf((String) itr.get("sound")),
                         weights,
-                        Lootcrates.tagItemAsCrate(Objects.requireNonNull((ItemStack) itr.get("item"), String.format(Lang.CONFIG_NULL_VALUE, "'crates.<" + id + ">.item'")), id),
+                        Lootcrates.tagItemAsCrate(Objects.requireNonNull((ItemStack) itr.get("item"), String.format(Lang.CONFIG_ERROR4, "'crates.<" + id + ">.item'")), id),
                         rev >= 8 ? CrateSettings.RevealType.valueOf((String) itr.get("revealType")) : CrateSettings.RevealType.GOOD_OL_DESTY
                     )
                 );

@@ -193,7 +193,7 @@ public class CrateSettings {
                 )
                 // Edit Inventory Title
                 .childButton(3, 1, p -> ItemBuilder.copy(Material.PAPER).name(String.format(Lang.EDITOR_EDIT_TITLE, title)).lore(Lang.EDITOR_LMB_EDIT).build(), new TextMenu.TBuilder()
-                        .title(p -> Lang.TITLE)
+                        .title(p -> Lang.EDITOR_TITLE1)
                         .leftRaw(p -> title)
                         .onClose((player) -> Result.parent())
                         .right(p -> Lang.EDITOR_FORMATTING, p -> Editor.getColorDem(), ColorUtil.AS_IS)

@@ -31,19 +31,11 @@ public class Cmd implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command c, String s, String[] args) {
         if (args.length == 0) {
-            if (LCMain.get().rev == -1) {
-                return plugin.notifier.commandSevere(sender, String.format(Lang.ASSIGN_REV, ChatColor.UNDERLINE + "/crates rev"));
-            }
             info(sender, String.format(Lang.MESSAGE_VERSION, LCMain.get().getDescription().getVersion()));
-            info(sender, String.format(Lang.REV, LCMain.get().rev));
-            return info(sender, Lang.COMMAND_USAGE + "/crates ["
+            info(sender, String.format(Lang.MESSAGE_REV, LCMain.get().rev));
+            return info(sender, Lang.MESSAGE_COMMAND_USAGE + "/crates ["
                     + String.join(", ", CmdArg.args.keySet())
                     + "]");
-        }
-
-        if (LCMain.get().rev == -1
-                && !args[0].equalsIgnoreCase("rev")) {
-            return severe(sender, String.format(Lang.ASSIGN_REV, ChatColor.UNDERLINE + "/crates rev"));
         }
 
         final Pair<TriFunction<CommandSender, String[], Set<String>, Boolean>, BiFunction<CommandSender, String[], List<String>>> pair

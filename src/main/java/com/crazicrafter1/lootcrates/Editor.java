@@ -38,7 +38,7 @@ public class Editor {
 
     public void open(Player p000) {
         if (p000.getGameMode() != GameMode.CREATIVE) {
-            LCMain.get().notifier.warn(p000, Lang.RECOMMEND_CREATIVE);
+            LCMain.get().notifier.warn(p000, Lang.MESSAGE_EDITOR_OPEN);
         }
 
         RewardSettings settings = LCMain.get().rewardSettings;

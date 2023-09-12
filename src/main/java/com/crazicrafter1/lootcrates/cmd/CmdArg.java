@@ -156,7 +156,7 @@ class CmdArg {
                 if (!(sender instanceof Player))
                     return severe(sender, Lang.CRATE_ERROR_PLAYER0);
                 Util.give((Player) sender, crate.itemStack((Player) sender));
-                return info(sender, String.format(Lang.COMMAND_GIVE_SELF, crate.id));
+                return info(sender, String.format(Lang.MESSAGE_RECEIVE_CRATE, crate.id));
             }
 
             // crates crate common *
@@ -165,7 +165,7 @@ class CmdArg {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     Util.give(p, crate.itemStack(p));
                     if (p != sender && !(flags.contains("s") || flags.contains("silent"))) {
-                        info(p, String.format(Lang.RECEIVE_CRATE, crate.id));
+                        info(p, String.format(Lang.MESSAGE_RECEIVE_CRATE, crate.id));
                         given++;
                     }
                 }
@@ -188,11 +188,11 @@ class CmdArg {
             // Redundant spam
             if (p != sender) {
                 if (!(flags.contains("s") || flags.contains("silent")))
-                    info(p, String.format(Lang.RECEIVE_CRATE, crate.id));
+                    info(p, String.format(Lang.MESSAGE_RECEIVE_CRATE, crate.id));
                 return info(sender, String.format(Lang.COMMAND_GIVE, crate.id, Bukkit.getOnlinePlayers().size()));
             }
 
-            return info(sender, String.format(Lang.COMMAND_GIVE_SELF, crate.id));
+            return info(sender, String.format(Lang.MESSAGE_RECEIVE_CRATE, crate.id));
         }, (sender, args) -> {
             if (args.length == 1) {
                 return getMatches(args[0], LCMain.get().rewardSettings.crates.keySet());
@@ -239,10 +239,10 @@ class CmdArg {
                 if (crate != null) {
                     return info(sender, String.format(Lang.COMMAND_IDENTIFY, crate.id));
                 } else {
-                    return info(sender, Lang.NOT_CRATE);
+                    return info(sender, Lang.MESSAGE_NOT_CRATE);
                 }
             }
-            return severe(sender, Lang.REQUIRE_HELD);
+            return severe(sender, Lang.MESSAGE_REQUIRE_ITEM);
         });
 
         arg("lang", (sender, args, flags) -> {

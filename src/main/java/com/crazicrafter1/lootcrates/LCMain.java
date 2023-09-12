@@ -184,7 +184,7 @@ public class LCMain extends JavaPlugin
     private void checkUpdates() {
         GitUtils.checkForUpdateAsync(this, "PeriodicSeizures", "Lootcrates",
                 (result, tag) -> {
-                    if (result) notifier.info(String.format(Lang.UPDATE_AVAILABLE, tag));
+                    if (result) notifier.info(String.format(Lang.MESSAGE_UPDATE_AVAILABLE, tag));
                     else notifier.info(Lang.MESSAGE_VERSION1);
                 });
     }
@@ -235,7 +235,7 @@ public class LCMain extends JavaPlugin
             try {
                 addon.loadClasses(getClass().getPackage().getName(), "sk");
             } catch (Exception e) {
-                notifier.severe(Lang.SKRIPT_ERROR1);
+                notifier.severe(Lang.MESSAGE_SKRIPT_ERROR1);
                 e.printStackTrace();
             }
             registerLoot(LootSkriptEvent.class);
@@ -247,7 +247,7 @@ public class LCMain extends JavaPlugin
 
     public void saveDefaultFile(CommandSender sender, File file, boolean replace) {
         if (replace || !Files.exists(file.toPath())) {
-            notifier.info(sender, String.format(Lang.CONFIG_SAVING_DEFAULT, file.getName()));
+            notifier.info(sender, String.format(Lang.MESSAGE_SAVING_DEFAULT, file.getName()));
             this.saveResource(file.getName(), true);
         }
     }
@@ -259,7 +259,7 @@ public class LCMain extends JavaPlugin
     public boolean backupRewards(CommandSender sender, boolean isBroken) {
         File backupFile = new File(backupPath, System.currentTimeMillis() + "_" + (isBroken ? "broken" : "old") + "_rewards_rev" + rev + ".zip");
 
-        notifier.info(sender, Lang.REWARDS_BACKUP);
+        notifier.info(sender, Lang.MESSAGE_REWARDS_BACKUP);
 
         return Util.zip(rewardsConfigFile, backupFile);
     }
@@ -305,12 +305,11 @@ public class LCMain extends JavaPlugin
         }
 
         if (rewardSettings != null) {
-            notifier.info(sender, Lang.CONFIG_REWARDS_SUCCESS);
+            notifier.info(sender, Lang.MESSAGE_REWARDS_SUCCESS);
             return;
         }
 
-        notifier.severe(sender, Lang.REWARDS_FAIL);
-        notifier.severe(sender, String.format(Lang.CONFIG_REWARDS_REPORT, DISCORD_URL));
+        notifier.severe(sender, String.format(Lang.MESSAGE_REWARDS_REPORT, DISCORD_URL));
         Bukkit.getPluginManager().disablePlugin(this);
     }
 
@@ -417,7 +416,7 @@ public class LCMain extends JavaPlugin
 
             if (deletedCount > 0)
                 notifier.info(sender, String.format(Lang.CONFIG_DELETED_OLD, deletedCount));
-            else notifier.info(sender, Lang.NO_CONFIG_DELETES);
+            else notifier.info(sender, Lang.MESSAGE_NO_CONFIG_DELETES);
         } catch (Exception e) {
             notifier.severe(sender, String.format(Lang.CONFIG_ERROR2, e.getMessage()));
         }

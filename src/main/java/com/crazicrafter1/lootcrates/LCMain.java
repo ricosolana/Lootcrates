@@ -117,6 +117,7 @@ public class LCMain extends JavaPlugin
         new ListenerOnInventoryDrag(this);
         new ListenerOnPlayerInteract(this);
         new ListenerOnPlayerJoinQuit(this);
+        new CraftingListener(this);
     }
 
     @Override

@@ -4,7 +4,6 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
 import com.crazicrafter1.crutils.*;
 import com.crazicrafter1.lootcrates.cmd.Cmd;
-import com.crazicrafter1.lootcrates.cmd.CmdTestParser;
 import com.crazicrafter1.lootcrates.crate.loot.*;
 import com.crazicrafter1.lootcrates.listeners.*;
 import org.bukkit.Bukkit;
@@ -108,7 +107,6 @@ public class LCMain extends JavaPlugin
         initMetrics();
 
         new Cmd(this);
-        new CmdTestParser(this);
 
         new ListenerOnEntityDamageByEntity(this);
         new ListenerCrateInteract(this);

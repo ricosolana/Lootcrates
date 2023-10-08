@@ -13,11 +13,14 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 class CmdArg {
 
@@ -195,7 +198,7 @@ class CmdArg {
             return info(sender, String.format(Lang.MESSAGE_RECEIVE_CRATE, crate.id));
         }, (sender, args) -> {
             if (args.length == 1) {
-                return getMatches(args[0], LCMain.get().rewardSettings.crates.keySet());
+                return getMatches(args[0], plugin.rewardSettings.crates.keySet());
             }
             if (args.length == 2) {
                 return getMatches(args[1],
@@ -246,25 +249,18 @@ class CmdArg {
         });
 
         arg("lang", (sender, args, flags) -> {
-                    if (Lang.load(sender, args[0]))
-                        LCMain.get().language = args[0];
-                    return true;
-                }
-                // todo autocompleting looks at disk each time, which is slow?
-                /* (sender, args) -> {
-            File[] files = Lang.langPath.listFiles();
-
-            //return Arrays.stream(Lang.langPath.listFiles()).filter(file -> file.getName().endsWith(".yml"));
-
-            ArrayList<String> ret = new ArrayList<>();
-            if (args.length == 1) {
-                ret.add("save");
-                ret.add("load");
-            } else if (args.length == 2) {
-                ret.add("confirm");
+            if (Lang.load(sender, args[0]))
+                plugin.language = args[0];
+            return true;
+        }, (sender, args) -> {
+            try {
+                return Files.list(Lang.PATH.toPath()).filter(f -> f.endsWith(".yml")).map(f -> f.getFileName().toString()).collect(Collectors.toList());
+            } catch (IOException e) {
+                //return severe(sender, e.getMessage());
+                //throw new RuntimeException(e);
+                return null;
             }
-            return ret;
-        }*/);
+        });
 
         arg("reload", (sender, args, flags) -> {
             plugin.reloadConfig(sender);

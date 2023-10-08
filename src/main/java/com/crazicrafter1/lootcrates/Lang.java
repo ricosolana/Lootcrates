@@ -11,7 +11,7 @@ import java.lang.reflect.Modifier;
 public class Lang {
     // ideally a format like 'editor.button.crates' is best, but I want directly referred variables at the same time
 
-    private static final File PATH = new File(LCMain.get().getDataFolder(), "lang/");
+    public static final File PATH = new File(LCMain.get().getDataFolder(), "lang/");
     public static String Misc_OpenBug = "A player is cheating or Lootcrates has malfunctioned\n" +
             "%s attempted to open crate while already open";
     public static String ASSIGN_EXACT = "Search or assign";

@@ -16,9 +16,6 @@ public class ListenerCrateInteract extends BaseListener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent e)
     {
-        if (plugin.rev == -1)
-            return;
-
         Player p = (Player) e.getWhoClicked();
 
         // If player is opening crate

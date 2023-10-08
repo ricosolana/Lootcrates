@@ -18,27 +18,8 @@ public class ListenerOnPlayerJoinQuit extends BaseListener {
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent e) {
-        Player p = e.getPlayer();
-
-        if (!p.hasPermission(LCMain.get().PERM_ADMIN))
-            return;
-
-        if (plugin.rev == -1) {
-            plugin.notifier.warn(p, ChatColor.GRAY + "Unable to detect config revision");
-            TextComponent message = new TextComponent(ChatColor.GRAY + "To fix this, run: " + ChatColor.DARK_GRAY + "/crates rev <value> " + ChatColor.GOLD + ChatColor.BOLD + "[CLICK]");
-
-            message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/crates rev "));
-            p.spigot().sendMessage(message);
-        }
-    }
-
-    @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e)
     {
-        if (plugin.rev == -1)
-            return;
-
         Player p = e.getPlayer();
 
         if (CrateInstance.CRATES.containsKey(p.getUniqueId())) {

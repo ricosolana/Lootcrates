@@ -16,9 +16,6 @@ public class ListenerOnInventoryClose extends BaseListener {
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent e)
     {
-        if (plugin.rev == -1)
-            return;
-
         Player p = (Player)e.getPlayer();
 
         if (CrateInstance.CRATES.containsKey(p.getUniqueId())) {

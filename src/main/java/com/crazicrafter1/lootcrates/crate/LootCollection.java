@@ -17,6 +17,8 @@ import javax.annotation.Nonnull;
 import java.util.*;
 
 public class LootCollection {
+    private static LCMain PLUGIN = LCMain.get();
+
     public final String id;
     public ItemStack itemStack;
     //public List<ILoot> loot;
@@ -26,7 +28,7 @@ public class LootCollection {
         final String strippedId = LCMain.NUMBER_AT_END.matcher(id).replaceAll("");
         String newId;
         //noinspection StatementWithEmptyBody
-        for (int i = 0; LCMain.get().rewardSettings.lootSets.containsKey(newId = strippedId + i); i++) {}
+        for (int i = 0; PLUGIN.rewardSettings.lootSets.containsKey(newId = strippedId + i); i++) {}
 
         return new LootCollection(newId, itemStack.clone(),
                 new WeightedRandomContainer<>(loot.getMap().entrySet().stream().collect(CollectorUtils.toLinkedMap(e -> e.getKey().copy(), Map.Entry::getValue))));
@@ -169,7 +171,7 @@ public class LootCollection {
                         .addAll((self1, p00) -> {
                             ArrayList<Button> result1 = new ArrayList<>();
                             for (Map.Entry<Class<? extends ILoot>, ItemStack> entry
-                                    : LCMain.get().lootClasses.entrySet()) {
+                                    : PLUGIN.lootClasses.entrySet()) {
 
                                 //AbstractLoot aLootInstance = new a
                                 result1.add(new Button.Builder()

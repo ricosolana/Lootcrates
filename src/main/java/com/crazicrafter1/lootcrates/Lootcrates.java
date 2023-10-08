@@ -4,8 +4,6 @@ import com.crazicrafter1.crutils.ItemBuilder;
 import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import com.crazicrafter1.lootcrates.crate.LootCollection;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import org.apache.commons.lang3.Validate;
@@ -16,7 +14,10 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
 
 public class Lootcrates {
     //public static Map<Class<? extends ILoot>, ItemStack> lootClasses = new HashMap<>();
@@ -32,11 +33,17 @@ public class Lootcrates {
     //    return crateSettings.
     //}
 
+    private static String CRATE_KEY = "Crate";
+    private static String CRATE_CERT_KEY = "CrateCert";
+    private static String TAG_KEY = "tag";
+
+    private static LCMain PLUGIN = LCMain.get();
+
     // TODO I do not like how this loot set reduction and append is handled
     //  too unsafe and tacky
     @Deprecated
     public static boolean removeLootSet(String id, boolean failIfReferenced) {
-        if (LCMain.get().rewardSettings.lootSets.size() > 1) {
+        if (PLUGIN.rewardSettings.lootSets.size() > 1) {
             if (failIfReferenced) {
                 for (Iterator<CrateSettings> it = getCrates(); it.hasNext(); ) {
                     CrateSettings crate = it.next();
@@ -47,7 +54,7 @@ public class Lootcrates {
                 }
             }
 
-            LootCollection lootCollection = LCMain.get().rewardSettings.lootSets.remove(id);
+            LootCollection lootCollection = PLUGIN.rewardSettings.lootSets.remove(id);
             if (lootCollection == null)
                 return false;
 
@@ -55,12 +62,9 @@ public class Lootcrates {
                 CrateSettings crate = it.next();
                 crate.loot.remove(id);
                 if (crate.loot.getMap().isEmpty()) {
-                    LootCollection next = LCMain.get().rewardSettings.lootSets.values().iterator().next();
+                    LootCollection next = PLUGIN.rewardSettings.lootSets.values().iterator().next();
                     crate.loot.add(next.id, 1);
                 }
-
-                //crate.removeLootSet(lootSetSettings.id);
-                // crates should directly refer
             }
 
             return true;
@@ -75,8 +79,8 @@ public class Lootcrates {
      * @return whether successful
      */
     public static boolean removeLootSet(String id) {
-        if (LCMain.get().rewardSettings.lootSets.size() > 1) {
-            LootCollection lootCollection = LCMain.get().rewardSettings.lootSets.remove(id);
+        if (PLUGIN.rewardSettings.lootSets.size() > 1) {
+            LootCollection lootCollection = PLUGIN.rewardSettings.lootSets.remove(id);
             if (lootCollection == null)
                 return false;
 
@@ -107,12 +111,12 @@ public class Lootcrates {
     }
 
     public static void registerCrate(CrateSettings crateSettings) {
-        LCMain.get().rewardSettings.crates.put(crateSettings.id, crateSettings);
+        PLUGIN.rewardSettings.crates.put(crateSettings.id, crateSettings);
     }
 
     @Nullable
     public static CrateSettings getCrate(@Nonnull String id) {
-        return LCMain.get().rewardSettings.crates.get(id);
+        return PLUGIN.rewardSettings.crates.get(id);
     }
 
     @Nullable
@@ -122,9 +126,9 @@ public class Lootcrates {
 
         // item.nbt["tag"]["Crate"] (pseudocode)
 
-        ReadWriteNBT tag = NBT.itemStackToNBT(itemStack).getCompound("tag");
+        ReadWriteNBT tag = NBT.itemStackToNBT(itemStack).getCompound(TAG_KEY);
         if (tag == null) return null;
-        return getCrate(tag.getString("Crate"));
+        return getCrate(tag.getString(CRATE_KEY));
 
         //INBTTagCompound nbt = NMSAPI.getNBT(itemStack);
         //if (nbt == null) return null;
@@ -136,14 +140,16 @@ public class Lootcrates {
         Validate.notNull(id);
 
         ReadWriteNBT nbt = NBT.itemStackToNBT(itemStack);
-        ReadWriteNBT tag = nbt.getOrCreateCompound("tag");
-        tag.setString("Crate", id);
+        ReadWriteNBT tag = nbt.getOrCreateCompound(TAG_KEY);
+        tag.setString(CRATE_KEY, id);
         return NBT.itemStackFromNBT(nbt);
 
         //INBTTagCompound nbt = NMSAPI.getOrCreateNBT(itemStack);
         //nbt.setString("Crate", id);
         //return nbt.setNBT(itemStack);
     }
+
+
 
     /**
      * Try to claim the UUID ticket attached to a crate (to prevent duplication)
@@ -152,9 +158,9 @@ public class Lootcrates {
      * @return The attached UUID or null if illegal
      */
     public static UUID claimTicket(ItemStack itemStack) {
-        ReadWriteNBT tag = NBT.itemStackToNBT(itemStack).getCompound("tag");
+        ReadWriteNBT tag = NBT.itemStackToNBT(itemStack).getCompound(TAG_KEY);
         if (tag == null) return null; // hmm
-        UUID ticket = tag.getUUID("CrateCert");
+        UUID ticket = tag.getUUID(CRATE_CERT_KEY);
         return LCMain.crateCerts.remove(ticket) ? ticket : null;
     }
 
@@ -164,18 +170,18 @@ public class Lootcrates {
      * @return The attached UUID or null if illegal
      */
     public static UUID canClaimTicket(ItemStack itemStack) {
-        ReadWriteNBT tag = NBT.itemStackToNBT(itemStack).getCompound("tag");
+        ReadWriteNBT tag = NBT.itemStackToNBT(itemStack).getCompound(TAG_KEY);
         if (tag == null) return null; // hmm
-        UUID ticket = tag.getUUID("CrateCert");
+        UUID ticket = tag.getUUID(CRATE_CERT_KEY);
         return LCMain.crateCerts.contains(ticket) ? ticket : null;
     }
 
     public static Iterator<CrateSettings> getCrates() {
-        return LCMain.get().rewardSettings.crates.values().iterator();
+        return PLUGIN.rewardSettings.crates.values().iterator();
     }
 
     public static Iterator<LootCollection> getLoot() {
-        return LCMain.get().rewardSettings.lootSets.values().iterator();
+        return PLUGIN.rewardSettings.lootSets.values().iterator();
     }
 
     // TODO add force-or prevention check

@@ -16,10 +16,6 @@ public class ListenerOnEntityDamageByEntity extends BaseListener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
-        // TODO remove rev
-        if (plugin.rev == -1)
-            return;
-
         //noinspection SuspiciousMethodCalls
         if (CrateInstance.crateFireworks.contains(e.getDamager())) {
             e.setCancelled(true);

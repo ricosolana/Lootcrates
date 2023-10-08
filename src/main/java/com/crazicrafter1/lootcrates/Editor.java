@@ -36,12 +36,14 @@ public class Editor {
 
     public static final Pattern NON_ASCII_PATTERN = Pattern.compile("[^a-zA-Z0-9_.]+");
 
+    private static LCMain PLUGIN = LCMain.get();
+
     public void open(Player p000) {
         if (p000.getGameMode() != GameMode.CREATIVE) {
-            LCMain.get().notifier.warn(p000, Lang.MESSAGE_EDITOR_OPEN);
+            PLUGIN.notifier.warn(p000, Lang.MESSAGE_EDITOR_OPEN);
         }
 
-        RewardSettings settings = LCMain.get().rewardSettings;
+        RewardSettings settings = PLUGIN.rewardSettings;
 
         new SimpleMenu.SBuilder(3)
                 .title(p -> Lang.EDITOR_TITLE)

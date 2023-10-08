@@ -94,8 +94,7 @@ public class LCMain extends JavaPlugin
         try {
             Files.createDirectories(getDataFolder().toPath());
         } catch (IOException e) {
-            notifier.warn(Lang.FOLDER_ERROR);
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         doSplash();
@@ -146,7 +145,7 @@ public class LCMain extends JavaPlugin
     private void registerLoot(@Nonnull Class<? extends ILoot> lootClass) {
         lootClasses.put(lootClass, (ItemStack) ReflectionUtil.getFieldInstance(ReflectionUtil.getField(lootClass, "EDITOR_ICON"), null));
         ConfigurationSerialization.registerClass(lootClass, lootClass.getSimpleName());
-        LCMain.get().notifier.info("Registering " + lootClass.getSimpleName());
+        notifier.info("Registering " + lootClass.getSimpleName());
     }
 
 

@@ -38,15 +38,14 @@ public class ListenerOnPlayerInteract extends BaseListener {
 
         //noinspection deprecation
         ItemStack item = inventory.getItemInHand();
-        if (item.getType().isAir() && Version.AT_LEAST_v1_9.a())
+        if (item.getType().isAir())
             item = inventory.getItemInOffHand();
 
         CrateSettings crate = Lootcrates.getCrate(item);
-        if (crate != null)
-            e.setCancelled(true);
-
         if (crate == null)
             return;
+
+        e.setCancelled(true);
 
         if (!CrateInstance.CRATES.containsKey(p.getUniqueId())) {
             if (action == Action.RIGHT_CLICK_BLOCK || action == Action.RIGHT_CLICK_AIR) {

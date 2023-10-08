@@ -30,10 +30,10 @@ public class ListenerDestroyCrate extends BaseListener {
     }
 
     // checking for anvil is harder
-    @EventHandler
-    private void onPrepare(PrepareInventoryResultEvent e) {
-        //new PrepareAnvilEvent().se
-        //if (Arrays.stream(e.getInventory().getContents()).anyMatch(itemStack -> Lootcrates.getCrate(itemStack) != null).)
-    }
+//    @EventHandler
+//    private void onPrepare(PrepareInventoryResultEvent e) {
+//        //new PrepareAnvilEvent().se
+//        //if (Arrays.stream(e.getInventory().getContents()).anyMatch(itemStack -> Lootcrates.getCrate(itemStack) != null).)
+//    }
 
 }

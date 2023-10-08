@@ -61,7 +61,7 @@ dependencies {
     //shadow "de.tr7zw:item-nbt-api:2.11.3" // doesnt work
     //implementation 'com.github.PeriodicSeizures:CRUtils:main-SNAPSHOT'
     // Load from files during dev for no hour long delay for jit
-    implementation files('C:\\Users\\rico\\Documents\\MinecraftDev\\Servers\\1.20.1 paper\\plugins\\CRUtils.jar')
+    implementation files('C:\\Users\\rico\\Documents\\MinecraftDev\\Servers\\1.20.2 paper\\plugins\\CRUtils.jar')
     //implementation files("C:\\Users\\Rico\\Documents\\MinecraftDev\\api\\CRUtils.jar");
     //implementation 'com.github.PeriodicSeizures:Gapi:main-SNAPSHOT'
     //implementation files('C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.19 paper\\plugins\\Gapi.jar')
@@ -92,7 +92,7 @@ tasks.withType(JavaCompile).configureEach {
 tasks.withType(Jar) {
     //destinationDirectory = file("C:\\Users\\Rico\\Documents\\MinecraftDev\\servers\\1.18.2 paper\\plugins\\")
     //destinationDirectory = file("C:\\Users\\rico\\Documents\\MinecraftDev\\servers\\1.20 spigot\\plugins")
-    destinationDirectory = file("C:\\Users\\rico\\Documents\\MinecraftDev\\Servers\\1.20.1 paper\\plugins")
+    destinationDirectory = file("C:\\Users\\rico\\Documents\\MinecraftDev\\Servers\\1.20.2 paper\\plugins")
     //destinationDirectory = file('C:\\Users\\Rico\\Downloads\\mohist_server_test\\plugins')
 }
 

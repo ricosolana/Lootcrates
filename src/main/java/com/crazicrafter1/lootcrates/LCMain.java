@@ -242,15 +242,15 @@ public class LCMain extends JavaPlugin
 
 
 
-    public void saveDefaultFile(CommandSender sender, File file, boolean replace) {
-        if (replace || !Files.exists(file.toPath())) {
+    public void saveDefaultFile(CommandSender sender, File file, boolean overwrite) {
+        if (overwrite || !Files.exists(file.toPath())) {
             notifier.info(sender, String.format(Lang.MESSAGE_SAVING_DEFAULT, file.getName()));
             this.saveResource(file.getName(), true);
         }
     }
 
-    public void saveDefaultConfig(CommandSender sender, boolean replace) {
-        saveDefaultFile(sender, configFile, replace);
+    public void saveDefaultConfig(CommandSender sender, boolean overwrite) {
+        saveDefaultFile(sender, configFile, overwrite);
     }
 
     public boolean backupRewards(CommandSender sender, boolean isBroken) {

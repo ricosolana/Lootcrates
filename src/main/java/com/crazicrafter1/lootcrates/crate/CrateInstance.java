@@ -8,6 +8,8 @@ import com.crazicrafter1.lootcrates.Lootcrates;
 import com.crazicrafter1.lootcrates.PlayerLog;
 import com.crazicrafter1.lootcrates.RewardSettings;
 import com.crazicrafter1.lootcrates.crate.loot.ILoot;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.*;
 import org.bukkit.entity.EntityType;
@@ -33,11 +35,11 @@ public final class CrateInstance {
     public static Map<UUID, CrateInstance> CRATES = new HashMap<>();
     public static Set<Firework> crateFireworks = Collections.newSetFromMap(new WeakHashMap<>());
 
-    private static final class QSlot { //TODO rename
-        boolean isHidden = true;
+    private static final class TmpSlot {
         ILoot randomLoot;
+        boolean isHidden = true;
 
-        QSlot(ILoot randomLoot) {
+        TmpSlot(ILoot randomLoot) {
             this.randomLoot = randomLoot;
         }
     }
@@ -52,7 +54,7 @@ public final class CrateInstance {
     private final Inventory inventory;
 
     // Live variables
-    private final HashMap<Integer, QSlot> slots = new HashMap<>();
+    private final HashMap<Integer, TmpSlot> slots = new HashMap<>();
     private State state = State.SELECTING;
     private int taskID = -1;
     //private int lockSlot;
@@ -94,7 +96,7 @@ public final class CrateInstance {
         inventory.setItem(slot, data.selectedItemStack(player, crate));
 
         ILoot randomLoot = lootChances[slot].getRandomLoot();
-        slots.put(slot, new QSlot(randomLoot));
+        slots.put(slot, new TmpSlot(randomLoot));
 
         if (sound != null)
             getPlayer().playSound(getPlayer().getLocation(), sound, 1, 1);
@@ -221,7 +223,7 @@ public final class CrateInstance {
             int iterations = 0;
 
             //int delay = 10;
-            float delay = 5;
+            double delay = 5;
 
             //int timer = 0;
 
@@ -297,23 +299,27 @@ public final class CrateInstance {
     /**
      * A panel was clicked, show it
      */
-    private boolean flipSlot(int slot, QSlot qSlot) {
-        if (!qSlot.isHidden) {
+    private boolean flipSlot(int slot, TmpSlot tmpSlot) {
+        if (!tmpSlot.isHidden) {
             return false;
         }
 
-        ItemStack visual = qSlot.randomLoot.getRenderIcon(player);
+        ItemStack visual = tmpSlot.randomLoot.getRenderIcon(player);
 
         inventory.setItem(slot, visual);
-        qSlot.isHidden = false;
+        tmpSlot.isHidden = false;
 
         return true;
     }
 
     public void close() {
         // Give items if still making selecting
+        if (state == State.CLOSED) {
+            return;
+        }
+
         if (state != State.SELECTING) {
-            for (Map.Entry<Integer, QSlot> entry : slots.entrySet()) {
+            for (Map.Entry<Integer, TmpSlot> entry : slots.entrySet()) {
                 if (entry.getValue().randomLoot.execute(this)) {
                     if (entry.getValue().isHidden)
                         Util.give(player, entry.getValue().randomLoot.getRenderIcon(player));
@@ -325,8 +331,15 @@ public final class CrateInstance {
 
         PlayerLog.get(player.getUniqueId()).increment(this.crate.id);
 
-        if (state == State.REVEALING)
+        if (state == State.REVEALING) {
             LCMain.get().getServer().getScheduler().cancelTask(taskID);
+        }
+
+        if (inventory.equals(player.getOpenInventory().getTopInventory())) {
+            player.closeInventory();
+        }
+
+        state = State.CLOSED;
     }
 
     private void fill() {
@@ -353,10 +366,7 @@ public final class CrateInstance {
             int slot = e.getSlot();
 
             // If crate GUI clicked on
-
-            // On MohistMC and certain versions, '==' does not work, meaning that the same representing
-            // object does not share the same address space (so not same object but still could be same inventory)
-            if (Objects.equals(e.getClickedInventory(), inventory)) {
+            if (inventory.equals(e.getClickedInventory())) {
                 switch (state) {
                     case SELECTING:
                         selectSlot(slot);
@@ -367,31 +377,55 @@ public final class CrateInstance {
                     case REVEALED: {
 
                         // If slot is selected
-                        QSlot qSlot = slots.get(slot);
+                        TmpSlot tmpSlot = slots.get(slot);
 
                         // If slot does not exist
                         // If there was an item on mouse virtual slot
-                        if (qSlot == null
+                        if (tmpSlot == null
                                 || getPlayer().getItemOnCursor().getType() != Material.AIR)
                             return;
 
                         // If the slot was flipped, do nothing else
-                        if (flipSlot(slot, qSlot))
+                        if (flipSlot(slot, tmpSlot))
                             return;
 
                         // Give item
-                        if (qSlot.randomLoot.execute(this)) {
+                        if (tmpSlot.randomLoot.execute(this)) {
                             e.setCancelled(false);
                         } else // Remove item
                             inventory.setItem(slot, null);
 
                         slots.remove(slot);
+                        if (slots.isEmpty()) {
+                            if (LCMain.get().rewardSettings.autoCloseTime == 0) {
+                                // close inventory
+                                //close();
+                                // TODO fix
+                                close();
+                            } else if (LCMain.get().rewardSettings.autoCloseTime > 0) {
+                                // TODO fix
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        close();
+                                    }
+                                }.runTaskLater(LCMain.get(), LCMain.get().rewardSettings.autoCloseTime);
+                            }
+                        }
+
                         break;
                     }
                 }
             } else if (e.getClickedInventory() == e.getWhoClicked().getInventory()) {
+                // TODO give control back over hotbar
+                //if (Objects.equals(hostItem, e.getClickedInventory().getItem(slot))) {
+                //
+                //}
                 if (hostItem == null || !(slot >= 0 && slot <= 8)) {
                     e.setCancelled(false);
+                } else {
+                    // TODO fix this, better message? play a sound instead?
+                    player.sendMessage("Click somewhere else");
                 }
             }
         }
@@ -400,6 +434,8 @@ public final class CrateInstance {
     public enum State {
         SELECTING,
         REVEALING,
-        REVEALED
+        REVEALED,
+        CLOSING, // TODO is this required for anything?
+        CLOSED
     }
 }

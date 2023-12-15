@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 public class RewardSettings {
     public int speed;
 
+    public int autoCloseTime; // -1 to never close, 0 to close immediately after final loot, else x(s) after last loot
+
     public ItemStack unSelectedItem;
     public ItemStack selectedItem;
     public FireworkEffect fireworkEffect;
@@ -29,8 +31,9 @@ public class RewardSettings {
     public Map<String, CrateSettings> crates;
     public Map<String, LootCollection> lootSets;
 
-    public RewardSettings(int speed, ItemStack unSelectedItem, ItemStack selectedItem, FireworkEffect fireworkEffect, Map<String, CrateSettings> crates, Map<String, LootCollection> lootSets) {
+    public RewardSettings(int speed, int autoCloseTime, ItemStack unSelectedItem, ItemStack selectedItem, FireworkEffect fireworkEffect, Map<String, CrateSettings> crates, Map<String, LootCollection> lootSets) {
         this.speed = speed;
+        this.autoCloseTime = autoCloseTime;
         this.unSelectedItem = unSelectedItem;
         this.selectedItem = selectedItem;
         this.fireworkEffect = fireworkEffect;
@@ -43,6 +46,7 @@ public class RewardSettings {
      */
     public RewardSettings() {
         speed = 4;
+        autoCloseTime = -1;
         unSelectedItem = ItemBuilder.copy(Material.CHEST).name("&f&l???").lore("&7&oChoose 4 mystery chests, and\n&7&oyour loot will be revealed!").build();
         selectedItem = ItemBuilder.from("WHITE_STAINED_GLASS_PANE").name("&7&l???").lore("&7You have selected this mystery chest").build();
 
@@ -62,7 +66,9 @@ public class RewardSettings {
         try {
             final int rev = LCMain.get().rev;
 
-            this.speed = section.getInt("speed");
+            this.speed = section.getInt("speed", 4);
+
+            this.autoCloseTime = section.getInt("auto-close-time", -1);
 
             this.unSelectedItem = Objects.requireNonNull(section.getItemStack("unSelectedItem"), String.format(Lang.CONFIG_ERROR4, "unSelectedItem"));
             this.selectedItem = Objects.requireNonNull(section.getItemStack("selectedItem"), String.format(Lang.CONFIG_ERROR4, "selectedItem"));
@@ -126,7 +132,7 @@ public class RewardSettings {
     public final void serialize(ConfigurationSection section) {
         try {
             section.set("speed", speed);
-            section.set("speed", speed);
+            section.set("auto-close-time", autoCloseTime);
 
             section.set("unSelectedItem", unSelectedItem);
             section.set("selectedItem", selectedItem);

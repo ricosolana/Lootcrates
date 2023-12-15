@@ -20,7 +20,6 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 class CmdArg {
 
@@ -176,7 +175,7 @@ class CmdArg {
                 if (given == 0)
                     return severe(sender, Lang.COMMAND_ERROR_PLAYERS);
 
-                return info(sender, String.format(Lang.COMMAND_GIVE, crate.id, given));
+                return info(sender, String.format(Lang.COMMAND_GIVE_ALL, crate.id, given));
             }
 
             // crates crate common crazicrafter1
@@ -192,7 +191,7 @@ class CmdArg {
             if (p != sender) {
                 if (!(flags.contains("s") || flags.contains("silent")))
                     info(p, String.format(Lang.MESSAGE_RECEIVE_CRATE, crate.id));
-                return info(sender, String.format(Lang.COMMAND_GIVE, crate.id, Bukkit.getOnlinePlayers().size()));
+                return info(sender, String.format(Lang.COMMAND_GIVE, crate.id, p.getDisplayName()));
             }
 
             return info(sender, String.format(Lang.MESSAGE_RECEIVE_CRATE, crate.id));

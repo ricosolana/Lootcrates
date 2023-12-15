@@ -96,7 +96,8 @@ public class Lang {
     public static String CRATE_ERROR_PLAYER1 = "That player cannot be found";
     public static String EDITOR_TITLE = "Editor";
     public static String EDITOR_ID = "&8id: %s";
-    public static String COMMAND_GIVE = "Gave a %s crate to all players (%d online)";
+    public static String COMMAND_GIVE = "Gave a %s crate to %s";
+    public static String COMMAND_GIVE_ALL = "Gave a %s crate to all players (%d online)";
     public static String COMMAND_IDENTIFY = "Item is a '%s' crate";
     public static String MESSAGE_DISCORD = "Join the &8&lDiscord &rfor help and more &n%s&r ";
     public static String MESSAGE_VERSION1 = "Using the latest version";

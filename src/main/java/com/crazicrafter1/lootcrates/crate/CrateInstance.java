@@ -359,6 +359,11 @@ public final class CrateInstance {
     public void onInventoryClick(InventoryClickEvent e) {
         e.setCancelled(true);
 
+        // If inventory clicked outside, nothing matters
+        Inventory clickedInventory = e.getClickedInventory();
+        if (clickedInventory == null)
+            return;
+
         if (e.getClick() != ClickType.DOUBLE_CLICK
                 && !e.isShiftClick()
                 && e.isLeftClick()) {
@@ -366,7 +371,7 @@ public final class CrateInstance {
             int slot = e.getSlot();
 
             // If crate GUI clicked on
-            if (inventory.equals(e.getClickedInventory())) {
+            if (inventory.equals(clickedInventory)) {
                 switch (state) {
                     case SELECTING:
                         selectSlot(slot);
@@ -397,35 +402,37 @@ public final class CrateInstance {
 
                         slots.remove(slot);
                         if (slots.isEmpty()) {
-                            if (LCMain.get().rewardSettings.autoCloseTime == 0) {
+                            if (data.autoCloseTime == 0) {
                                 // close inventory
                                 //close();
                                 // TODO fix
                                 close();
-                            } else if (LCMain.get().rewardSettings.autoCloseTime > 0) {
+                            } else if (data.autoCloseTime > 0) {
                                 // TODO fix
                                 new BukkitRunnable() {
                                     @Override
                                     public void run() {
                                         close();
                                     }
-                                }.runTaskLater(LCMain.get(), LCMain.get().rewardSettings.autoCloseTime);
+                                }.runTaskLater(LCMain.get(), data.autoCloseTime);
                             }
                         }
 
                         break;
                     }
                 }
-            } else if (e.getClickedInventory() == e.getWhoClicked().getInventory()) {
+            } else { //if (clickedInventory == e.getWhoClicked().getInventory()) {
                 // TODO give control back over hotbar
                 //if (Objects.equals(hostItem, e.getClickedInventory().getItem(slot))) {
                 //
                 //}
-                if (hostItem == null || !(slot >= 0 && slot <= 8)) {
+                if (hostItem == null || !hostItem.equals(clickedInventory.getItem(slot))) {
                     e.setCancelled(false);
                 } else {
                     // TODO fix this, better message? play a sound instead?
-                    player.sendMessage("Click somewhere else");
+                    player.sendMessage(ChatColor.RED + "Try clicking somewhere else");
+                    //player.playSound(player.getLocation(), Sound);
+                    player.playNote(player.getLocation(), Instrument.BASS_GUITAR, Note.natural(0, Note.Tone.C));
                 }
             }
         }

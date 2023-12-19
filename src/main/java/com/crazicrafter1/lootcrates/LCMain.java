@@ -39,9 +39,9 @@ public class LCMain extends JavaPlugin
 
     public Notifier notifier;
 
-    public static final int REV_LATEST = 9;
+    public static final int REV_LATEST = 10;
 
-    public static final String DISCORD_URL = "https://discord.gg/2JkFBnyvNQ";
+    public static final String DISCORD_URL = "https://discord.gg/K9xDtEKyXT";
 
     public static final String PERM_ADMIN = "lootcrates.admin";
     public static final String PERM_OPEN = "lootcrates.open";
@@ -107,13 +107,9 @@ public class LCMain extends JavaPlugin
 
         new Cmd(this);
 
-        new ListenerOnEntityDamageByEntity(this);
-        new ListenerCrateInteract(this);
-        new ListenerOnInventoryClose(this);
-        new ListenerDestroyCrate(this);
-        new ListenerOnInventoryDrag(this);
-        new ListenerOnPlayerInteract(this);
-        new ListenerOnPlayerJoinQuit(this);
+        new ListenerCrates(this);
+        new ListenerCrateDeletion(this);
+        new ListenerOnEditorChatCommandLoot(this);
     }
 
     @Override

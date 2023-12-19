@@ -66,9 +66,11 @@ public class Lang {
     public static String EDITOR_LOOT_LORE = "&8%d items";
     public static String EDITOR_LOOT_NEW = "&6Add new collection...";
     public static String EDITOR_LOOT_ADD_TITLE = "Name of collection:";
-    public static String EDITOR_LOOT_COMMAND = "&7Command: &f%s";
-    public static String EDITOR_LOOT_COMMAND_INPUT = "Input the command";
-    public static String EDITOR_LOOT_COMMAND_TITLE = "Edit command";
+    //public static String EDITOR_LOOT_COMMAND = "&7Command: &f%s";
+    //public static String EDITOR_LOOT_COMMANDS = "&7Commands: ";
+    //public static String EDITOR_LOOT_COMMAND_INPUT = "Input the command";
+    public static String EDITOR_LOOT_COMMAND_EDIT = "Edit commands";
+    public static String EDITOR_LOOT_COMMAND_ADD = "&6Add command";
     public static String EDITOR_LOOT_COUNT = "&7Count: &f%d";
     public static String EDITOR_LOOT_RANGE = "&7Range: &f[%d, %d]";
     public static String EDITOR_LOOT_NEW_TITLE = "Add loot";

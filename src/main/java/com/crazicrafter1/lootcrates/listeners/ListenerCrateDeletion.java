@@ -1,19 +1,34 @@
 package com.crazicrafter1.lootcrates.listeners;
 
 import com.crazicrafter1.lootcrates.LCMain;
+import com.crazicrafter1.lootcrates.Lootcrates;
 import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 
-public class ListenerOnInventoryDrag extends BaseListener {
+public class ListenerCrateDeletion extends BaseListener {
 
-    public ListenerOnInventoryDrag(LCMain plugin) {
+    public ListenerCrateDeletion(LCMain plugin) {
         super(plugin);
     }
 
     @EventHandler
-    public void onInventoryDrag(InventoryDragEvent e) {
+    private void onFurnaceBurn(FurnaceBurnEvent e) {
+        // creative inventory is partly client side (making middle clicks not detectable)
+        //if (e.getClick().isCreativeAction()
+        //       && Lootcrates.getCrate(e.getCurrentItem()) != null) {
+        //   // cancel
+        //   e.setCancelled(true);
+        //}
+        if (Lootcrates.getCrate(e.getFuel()) != null) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    private void onInventoryDrag(InventoryDragEvent e) {
         Player p = (Player)e.getWhoClicked();
         if (CrateInstance.CRATES.containsKey(p.getUniqueId())) {
             e.setCancelled(true);
@@ -42,5 +57,12 @@ public class ListenerOnInventoryDrag extends BaseListener {
                 }
         }*/
     }
+
+    // checking for anvil is harder
+//    @EventHandler
+//    private void onPrepare(PrepareInventoryResultEvent e) {
+//        //new PrepareAnvilEvent().se
+//        //if (Arrays.stream(e.getInventory().getContents()).anyMatch(itemStack -> Lootcrates.getCrate(itemStack) != null).)
+//    }
 
 }

@@ -84,7 +84,7 @@ public final class CrateInstance {
     }
 
     private void populate(CrateSettings crate) {
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < lootChances.length; i++) {
             this.lootChances[i] = crate.getRandomLootSet();
         }
     }

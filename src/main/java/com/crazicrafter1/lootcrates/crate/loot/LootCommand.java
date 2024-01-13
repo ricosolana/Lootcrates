@@ -99,6 +99,7 @@ public class LootCommand implements ILoot {
     public AbstractMenu.Builder getMenuBuilder() {
         return new ItemModifyMenu()
                 .build(itemStack, input -> this.itemStack = input)
+                // OLD
                 //.button(1, 0, new Button.Builder()
                 //        .icon(p -> ItemBuilder.copy(Material.CHAIN_COMMAND_BLOCK).name("&6" + Lang.EDITOR_LOOT_COMMAND_EDIT).lore(Lang.EDITOR_LMB_EDIT).build())
                 //        .lmb(event -> {
@@ -144,6 +145,7 @@ public class LootCommand implements ILoot {
                         }));
     }
 
+    @NotNull
     @Override
     public Map<String, Object> serialize() {
         Map<String, Object> result = new LinkedHashMap<>();

@@ -55,7 +55,7 @@ public class LootSkriptEvent implements ILoot {
     }
 
     @Override
-    public boolean execute(CrateInstance activeCrate) {
+    public boolean execute(@NotNull CrateInstance activeCrate) {
         Bukkit.getServer().getPluginManager().callEvent(new SkriptLootEvent(tag, activeCrate.getPlayer()));
         return false;
     }

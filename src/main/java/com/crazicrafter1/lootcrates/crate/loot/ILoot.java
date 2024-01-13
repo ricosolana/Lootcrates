@@ -26,6 +26,7 @@ public interface ILoot extends ConfigurationSerializable {
      * @param activeCrate the reference crate
      * @return whether the player should keep the clicked {@link ItemStack}
      */
+    // TODO return something more descriptive than a bool
     boolean execute(@Nonnull CrateInstance activeCrate);
 
     /**

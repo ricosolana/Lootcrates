@@ -1,37 +1,32 @@
-package com.crazicrafter1.lootcrates.listeners;
+package com.crazicrafter1.lootcrates.listeners
 
-import com.crazicrafter1.lootcrates.LCMain;
-import com.crazicrafter1.lootcrates.Lootcrates;
-import com.crazicrafter1.lootcrates.crate.CrateInstance;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.inventory.FurnaceBurnEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
+import com.crazicrafter1.lootcrates.LCMain
+import com.crazicrafter1.lootcrates.Lootcrates
+import com.crazicrafter1.lootcrates.crate.CrateInstance
+import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
+import org.bukkit.event.inventory.FurnaceBurnEvent
+import org.bukkit.event.inventory.InventoryDragEvent
 
-public class ListenerCrateDeletion extends BaseListener {
-
-    public ListenerCrateDeletion(LCMain plugin) {
-        super(plugin);
-    }
-
+class ListenerCrateDeletion(plugin: LCMain?) : BaseListener(plugin) {
     @EventHandler
-    private void onFurnaceBurn(FurnaceBurnEvent e) {
+    private fun onFurnaceBurn(e: FurnaceBurnEvent) {
         // creative inventory is partly client side (making middle clicks not detectable)
         //if (e.getClick().isCreativeAction()
         //       && Lootcrates.getCrate(e.getCurrentItem()) != null) {
         //   // cancel
         //   e.setCancelled(true);
         //}
-        if (Lootcrates.getCrate(e.getFuel()) != null) {
-            e.setCancelled(true);
+        if (Lootcrates.getCrate(e.fuel) != null) {
+            e.isCancelled = true
         }
     }
 
     @EventHandler
-    private void onInventoryDrag(InventoryDragEvent e) {
-        Player p = (Player)e.getWhoClicked();
-        if (CrateInstance.CRATES.containsKey(p.getUniqueId())) {
-            e.setCancelled(true);
+    private fun onInventoryDrag(e: InventoryDragEvent) {
+        val p = e.whoClicked as Player
+        if (CrateInstance.Companion.CRATES.containsKey(p.uniqueId)) {
+            e.isCancelled = true
         } /*else {
             if (LootCratesAPI.extractCrateFromItem(e.getCursor()) != null)
                 // Java 16+
@@ -56,13 +51,10 @@ public class ListenerCrateDeletion extends BaseListener {
                         break;
                 }
         }*/
-    }
-
-    // checking for anvil is harder
-//    @EventHandler
-//    private void onPrepare(PrepareInventoryResultEvent e) {
-//        //new PrepareAnvilEvent().se
-//        //if (Arrays.stream(e.getInventory().getContents()).anyMatch(itemStack -> Lootcrates.getCrate(itemStack) != null).)
-//    }
-
+    } // checking for anvil is harder
+    //    @EventHandler
+    //    private void onPrepare(PrepareInventoryResultEvent e) {
+    //        //new PrepareAnvilEvent().se
+    //        //if (Arrays.stream(e.getInventory().getContents()).anyMatch(itemStack -> Lootcrates.getCrate(itemStack) != null).)
+    //    }
 }

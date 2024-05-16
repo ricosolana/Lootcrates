@@ -8,7 +8,6 @@ import me.zombie_striker.qg.api.QualityArmory;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -38,19 +37,19 @@ public class LootItemQA extends AbstractLootItem {
         this.name = (String) args.get("name");
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    public ItemStack getRenderIcon(@NotNull Player p) {
+    public ItemStack getRenderIcon(@Nonnull Player p) {
         return ofRange(p, QualityArmory.getCustomItemAsItemStack(name));
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public ItemStack getMenuIcon() {
         return QualityArmory.getCustomItemAsItemStack(name);
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public String getMenuDesc() {
         return "&8Quality armory: &f" + name + "\n" +
@@ -112,7 +111,7 @@ public class LootItemQA extends AbstractLootItem {
                 }), getMenuIcon(), 1, 5, 2, 5);
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public LootItemQA copy() {
         return new LootItemQA();

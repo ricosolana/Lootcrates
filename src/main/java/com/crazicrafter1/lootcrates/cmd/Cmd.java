@@ -9,8 +9,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -99,7 +99,7 @@ public class Cmd implements CommandExecutor, TabCompleter {
     // An efficient tab complete algorithm would involve a tree map
     // only worth it for many matches
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command c, @NotNull String s, String[] args) {
+    public List<String> onTabComplete(@Nonnull CommandSender sender, @Nonnull Command c, @Nonnull String s, String[] args) {
         if (args.length == 0)
             return new ArrayList<>();
 

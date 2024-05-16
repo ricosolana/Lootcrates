@@ -15,7 +15,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -65,13 +64,13 @@ public class LootCommand implements ILoot {
                 .renderAll().build();
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public ItemStack getMenuIcon() {
         return itemStack.clone();
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public String getMenuDesc() {
         StringBuilder builder = new StringBuilder("&7Commands: ");
@@ -84,7 +83,7 @@ public class LootCommand implements ILoot {
     }
 
     @Override
-    public boolean execute(@NotNull CrateInstance activeCrate) {
+    public boolean execute(@Nonnull CrateInstance activeCrate) {
         for (String command : commands) {
             Bukkit.getServer().dispatchCommand(
                     Bukkit.getConsoleSender(),
@@ -145,7 +144,7 @@ public class LootCommand implements ILoot {
                         }));
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public Map<String, Object> serialize() {
         Map<String, Object> result = new LinkedHashMap<>();

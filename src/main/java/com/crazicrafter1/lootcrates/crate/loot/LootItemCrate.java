@@ -9,7 +9,6 @@ import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -39,7 +38,7 @@ public class LootItemCrate implements ILoot {
     }
 
     @Override
-    public boolean execute(@NotNull CrateInstance activeCrate) {
+    public boolean execute(@Nonnull CrateInstance activeCrate) {
         return true;
     }
 
@@ -52,13 +51,13 @@ public class LootItemCrate implements ILoot {
                         "which doesn't have a definition in config").itemStack(p);
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public ItemStack getMenuIcon() {
         return LCMain.get().rewardSettings.crates.get(id).item.clone();
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public String getMenuDesc() {
         return "&7Crate: &f" + id;
@@ -98,7 +97,7 @@ public class LootItemCrate implements ILoot {
                 });
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public LootItemCrate copy() {
         return new LootItemCrate(this);

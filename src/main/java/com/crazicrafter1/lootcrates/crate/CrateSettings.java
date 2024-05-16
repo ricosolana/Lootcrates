@@ -11,8 +11,8 @@ import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -82,7 +82,6 @@ public class CrateSettings {
     //    this.item = (ItemStack) args.get("item");
     //}
 
-    @NotNull
     public void serialize(ConfigurationSection section) {
         section.set("item", item);
         section.set("title", ColorUtil.invertRendered(title));

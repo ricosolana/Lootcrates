@@ -1,6 +1,7 @@
 package com.crazicrafter1.lootcrates;
 
 import com.crazicrafter1.crutils.ItemBuilder;
+import com.crazicrafter1.crutils.Version;
 import com.crazicrafter1.lootcrates.crate.CrateInstance;
 import com.crazicrafter1.lootcrates.crate.CrateSettings;
 import com.crazicrafter1.lootcrates.crate.LootCollection;
@@ -33,11 +34,11 @@ public class Lootcrates {
     //    return crateSettings.
     //}
 
-    private static String CRATE_KEY = "Crate";
-    private static String CRATE_CERT_KEY = "CrateCert";
-    private static String TAG_KEY = "tag";
+    private static final String CRATE_KEY = "Crate"; //Version.AT_LEAST_v1_20_5.a() ? "\"Crate\"" : "Crate";
+    private static final String CRATE_CERT_KEY = "CrateCert";
+    private static final String TAG_PK = Version.AT_LEAST_v1_20_5.a() ? "components" : "tag";
 
-    private static LCMain PLUGIN = LCMain.get();
+    private static final LCMain PLUGIN = LCMain.get();
 
     // TODO I do not like how this loot set reduction and append is handled
     //  too unsafe and tacky
@@ -119,16 +120,34 @@ public class Lootcrates {
         return PLUGIN.rewardSettings.crates.get(id);
     }
 
+    /*
+    private ReadWriteNBT getMutableShelf(@Nullable final ItemStack itemStack) {
+        if (itemStack == null || itemStack.getType() == Material.AIR)
+            return null;
+    }*/
+
     @Nullable
     public static CrateSettings getCrate(@Nullable final ItemStack itemStack) {
         if (itemStack == null || itemStack.getType() == Material.AIR)
             return null;
 
+        // 1.20.4 and earlier:
         // item.nbt["tag"]["Crate"] (pseudocode)
 
-        ReadWriteNBT tag = NBT.itemStackToNBT(itemStack).getCompound(TAG_KEY);
-        if (tag == null) return null;
-        return getCrate(tag.getString(CRATE_KEY));
+        // 1.20.5 and later
+        // item.nbt["components"]["custom_data"]["Crate"]
+
+        // https://youtu.be/uHn-e01Srg8?t=277
+        //components.custom_data.BLAH_BLAH_BLAH
+
+        ReadWriteNBT parent = NBT.itemStackToNBT(itemStack);
+        ReadWriteNBT data = parent.getCompound(TAG_PK);
+        if (data == null) return null;
+        if (Version.AT_LEAST_v1_20_5.a()) {
+            data = data.getCompound("minecraft:custom_data");
+            if (data == null) return null;
+        }
+        return getCrate(data.getString(CRATE_KEY));
 
         //INBTTagCompound nbt = NMSAPI.getNBT(itemStack);
         //if (nbt == null) return null;
@@ -139,10 +158,13 @@ public class Lootcrates {
     public static ItemStack tagItemAsCrate(@Nonnull final ItemStack itemStack, @Nonnull final String id) {
         Validate.notNull(id);
 
-        ReadWriteNBT nbt = NBT.itemStackToNBT(itemStack);
-        ReadWriteNBT tag = nbt.getOrCreateCompound(TAG_KEY);
-        tag.setString(CRATE_KEY, id);
-        return NBT.itemStackFromNBT(nbt);
+        ReadWriteNBT parent = NBT.itemStackToNBT(itemStack);
+        ReadWriteNBT data = parent.getOrCreateCompound(TAG_PK);
+        if (Version.AT_LEAST_v1_20_5.a()) {
+            data = data.getOrCreateCompound("minecraft:custom_data");
+        }
+        data.setString(CRATE_KEY, id);
+        return NBT.itemStackFromNBT(parent);
 
         //INBTTagCompound nbt = NMSAPI.getOrCreateNBT(itemStack);
         //nbt.setString("Crate", id);
@@ -158,7 +180,8 @@ public class Lootcrates {
      * @return The attached UUID or null if illegal
      */
     public static UUID claimTicket(ItemStack itemStack) {
-        ReadWriteNBT tag = NBT.itemStackToNBT(itemStack).getCompound(TAG_KEY);
+        // TODO fix this to use components and custom_data with 1.20.5+
+        ReadWriteNBT tag = NBT.itemStackToNBT(itemStack).getCompound(TAG_PK);
         if (tag == null) return null; // hmm
         UUID ticket = tag.getUUID(CRATE_CERT_KEY);
         return LCMain.crateCerts.remove(ticket) ? ticket : null;
@@ -170,7 +193,7 @@ public class Lootcrates {
      * @return The attached UUID or null if illegal
      */
     public static UUID canClaimTicket(ItemStack itemStack) {
-        ReadWriteNBT tag = NBT.itemStackToNBT(itemStack).getCompound(TAG_KEY);
+        ReadWriteNBT tag = NBT.itemStackToNBT(itemStack).getCompound(TAG_PK);
         if (tag == null) return null; // hmm
         UUID ticket = tag.getUUID(CRATE_CERT_KEY);
         return LCMain.crateCerts.contains(ticket) ? ticket : null;

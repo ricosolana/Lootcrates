@@ -14,7 +14,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
@@ -417,7 +416,7 @@ public class LCMain extends JavaPlugin
 
 
 
-    @NotNull
+    @Nonnull
     @Override
     public FileConfiguration getConfig() {
         if (this.config == null) {

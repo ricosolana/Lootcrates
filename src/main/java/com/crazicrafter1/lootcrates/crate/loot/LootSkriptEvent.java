@@ -11,7 +11,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.LinkedHashMap;
@@ -55,18 +54,18 @@ public class LootSkriptEvent implements ILoot {
     }
 
     @Override
-    public boolean execute(@NotNull CrateInstance activeCrate) {
+    public boolean execute(@Nonnull CrateInstance activeCrate) {
         Bukkit.getServer().getPluginManager().callEvent(new SkriptLootEvent(tag, activeCrate.getPlayer()));
         return false;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public ItemStack getMenuIcon() {
         return item.clone();
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public String getMenuDesc() {
         return "&7tag: &f" + tag;
@@ -91,7 +90,7 @@ public class LootSkriptEvent implements ILoot {
                         }));
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public Map<String, Object> serialize() {
         Map<String, Object> result = new LinkedHashMap<>();
@@ -102,7 +101,7 @@ public class LootSkriptEvent implements ILoot {
         return result;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public LootSkriptEvent copy() {
         return new LootSkriptEvent(this);

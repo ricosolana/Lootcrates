@@ -10,7 +10,6 @@ import net.Indyuce.mmoitems.api.player.PlayerData;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
@@ -97,7 +96,7 @@ public class LootMMOItem extends AbstractLootItem {
         }
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public ItemStack getMenuIcon() {
         ItemTier itemTier = MMOItems.plugin.getTiers().getOrThrow(tier);
@@ -105,7 +104,7 @@ public class LootMMOItem extends AbstractLootItem {
                 MMOItems.plugin.getTypes().get(type), name);
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public String getMenuDesc() {
         return "&8MMOItem: &f" + type + ":" + name + "\n" +
@@ -243,7 +242,7 @@ public class LootMMOItem extends AbstractLootItem {
         return (mode == 0) ? "exact:" + level + "," + tier : (mode == 1) ? "random" : "scale";
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public LootMMOItem copy() {
         return new LootMMOItem(this);

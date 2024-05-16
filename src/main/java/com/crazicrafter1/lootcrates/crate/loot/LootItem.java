@@ -8,7 +8,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
@@ -88,7 +87,7 @@ public class LootItem extends AbstractLootItem {
                 itemStack, 0, 0, 1, 0);
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public LootItem copy() {
         return new LootItem(this);

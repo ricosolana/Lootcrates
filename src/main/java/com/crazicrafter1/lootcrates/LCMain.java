@@ -9,6 +9,7 @@ import com.crazicrafter1.lootcrates.listeners.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -281,7 +282,29 @@ public class LCMain extends JavaPlugin
         //AbstractMenu.closeAllMenus();
 
         saveDefaultFile(sender, rewardsConfigFile, false);
-        FileConfiguration rewardsConfig = YamlConfiguration.loadConfiguration(rewardsConfigFile);
+        // On versions earlier than the generated config, an error will occur (version is not yet recognized)
+        try {
+            // Attempt bare bukkit config load
+            //FileConfiguration rewardsConfig = YamlConfiguration.loadConfiguration(rewardsConfigFile);
+            FileConfiguration rewardsConfig = new YamlConfiguration(); //.load(rewardsConfigFile);
+            rewardsConfig.load(rewardsConfigFile);
+
+            this.rewardSettings = new RewardSettings(rewardsConfig);
+        } catch (Exception e) {
+            // Fallback, load default empty config, then save config
+            e.printStackTrace();
+            notifier.warn("Loading fallback config!");
+
+            this.rewardSettings = new RewardSettings();
+            rewardSettings.loadFallback();
+            //FileConfiguration cfg = new YamlConfiguration();
+            //rewardSettings.serialize(cfg);
+            //try {
+            //    cfg.save(rewardsConfigFile);
+            //} catch (IOException ex) {
+            //    throw new RuntimeException(ex);
+            //}
+        }
 
         FileConfiguration certsConfig = YamlConfiguration.loadConfiguration(certsFile);
         crateCerts = certsConfig.getStringList(KEY_certs).stream().map(UUID::fromString).collect(Collectors.toSet());
@@ -290,11 +313,7 @@ public class LCMain extends JavaPlugin
         Lang.save(sender, "en", false);
         Lang.load(sender, language);
 
-        try {
-            this.rewardSettings = new RewardSettings(rewardsConfig);
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
+
 
         if (rewardSettings != null) {
             notifier.info(sender, Lang.MESSAGE_REWARDS_SUCCESS);

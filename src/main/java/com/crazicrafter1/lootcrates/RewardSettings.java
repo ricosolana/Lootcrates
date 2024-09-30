@@ -41,10 +41,12 @@ public class RewardSettings {
         this.lootSets = lootSets;
     }
 
+    public RewardSettings() {}
+
     /**
      * fallback
      */
-    public RewardSettings() {
+    public void loadFallback() {
         speed = 4;
         autoCloseTime = -1;
         unSelectedItem = ItemBuilder.copy(Material.CHEST).name("&f&l???").lore("&7&oChoose 4 mystery chests, and\n&7&oyour loot will be revealed!").build();
@@ -57,13 +59,14 @@ public class RewardSettings {
                 new ArrayList<>(Collections.singletonList(new LootItem())));
         lootSets.put(lootSet.id, lootSet);
 
+        crates = new HashMap<>();
         crates.put("peasant", Lootcrates.createCrate("peasant"));
 
         fireworkEffect = FireworkEffect.builder().withColor(Color.RED, Color.BLUE, Color.WHITE).with(FireworkEffect.Type.BURST).build();
     }
 
     public RewardSettings(ConfigurationSection section) {
-        try {
+        //try {
             final int rev = LCMain.get().rev;
 
             this.speed = section.getInt("speed", 4);
@@ -124,9 +127,9 @@ public class RewardSettings {
             }
 
             fireworkEffect = (FireworkEffect) section.get("fireworkEffect");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        //} catch (Exception e) {
+        //    e.printStackTrace();
+        //}
     }
 
     public final void serialize(ConfigurationSection section) {

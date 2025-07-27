@@ -1,0 +1,56 @@
+better /crates editor initial message
+    [] some editor features...
+
+    [] Hey! Use creative mode! ...
+
+    check that message is printed in non-creative
+
+    or just prevent entering editor if not in creative...
+
+perhaps verbose execution, so that user knows whats is changing or not
+    > for editor modifications
+
+retexture head of inc/dec-rement buttons
+    too ugly right now
+
+    increase/decrease signifiers that are easier for user to understand
+
+    make the help notes glow
+
+editor QOL
+    return to parent, or escape completely?
+
+rename editor 'add' buttons to 'create', or something to seem 'newly' create
+
+"Firework" name in editor root
+    umm... really..? change name to more, modern
+    also, hide "Flight Duration" text if possible, unless this is intentional..
+
+add glow effect for 'on' items in Firework menu toggles
+
+improve Fireworks 'help' note
+    also add a help note for sub menus
+
+
+
+undo / redo buttons?
+    this is what backup configs are for though...
+
+    backup methods (choose 1):
+        > save a backup cfg per change (simple implementation, resource intense, O(1) revisiting certain points)
+        > record the action per change (complex implementation, resource efficient, O(n) revisiting certain points)
+
+copy button for crates / lootsets / rewards
+
+weights for reward-items
+    basically, are loot items are equally weighted (1:1:1:1:1:1...), all weights of 1 per item
+        so equal chance per reward (1/n % chance)
+
+    per-item weighting will give each specific chances ()
+        the only reason I can see this being desired by a owner is if they want secret p2w / gambling... undisclosed chances
+            otherwise, just make more lootsets...
+
+
+###editor / gui bug?
+###    > shift-left and shift-right on an item in player inventory
+###        swaps it into other inventory... should be prevented

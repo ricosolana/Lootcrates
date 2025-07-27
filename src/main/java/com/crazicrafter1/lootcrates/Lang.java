@@ -121,7 +121,7 @@ public class Lang {
     public static String MESSAGE_NOT_CRATE = "Item is not a crate";
     public static String MESSAGE_NO_CONFIG_DELETES = "No configurations were deleted";
     public static String MESSAGE_RECEIVE_CRATE = "You received 1 %s crate";
-    public static String MESSAGE_EDITOR_OPEN = "Some editor features do not work properly outside of creative mode";
+    public static String MESSAGE_EDITOR_OPEN = "Hey, you! Please use creative mode!";
     public static String MESSAGE_REQUIRE_ITEM = "Must hold an item to detect";
     public static String MESSAGE_REV = "Using revision: %d";
     public static String MESSAGE_REWARDS_BACKUP = "Making a backup of rewards.yml";

@@ -43,6 +43,17 @@ public class Editor {
             PLUGIN.notifier.warn(p000, Lang.MESSAGE_EDITOR_OPEN);
         }
 
+        /*
+        GameMode previousGameMode = p000.getGameMode();
+
+        if (previousGameMode != GameMode.CREATIVE) {
+            if (p000.hasPermission("bukkit.command.gamemode")) {
+                p000.setGameMode(GameMode.CREATIVE);
+            } else {
+                PLUGIN.notifier.warn(p000, Lang.MESSAGE_EDITOR_OPEN);
+            }
+        }*/
+
         RewardSettings settings = PLUGIN.rewardSettings;
 
         new SimpleMenu.SBuilder(3)
@@ -87,6 +98,9 @@ public class Editor {
                                         result.add(new Button.Builder()
                                                 // https://regexr.com/6fdsi
                                                 .icon(p -> crate.getMenuIcon())
+                                                // TODO
+                                                //  why is 'child' accepting a 'PARENT'???
+                                                //  isn't it assumed that the calling object IS THE PARENT?
                                                 .child(self, crate.getBuilder())
                                                 // Shift-RMB - delete crate
                                                 .bind(ClickType.SHIFT_RIGHT, event -> {

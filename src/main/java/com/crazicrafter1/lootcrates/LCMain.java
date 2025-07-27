@@ -87,7 +87,7 @@ public class LCMain extends JavaPlugin
     public void onEnable() {
         LCMain.instance = this;
 
-        notifier = new Notifier(ChatColor.WHITE + "[%sLC" + ChatColor.WHITE + "] %s%s", PERM_ADMIN);
+        notifier = new Notifier(ChatColor.WHITE + "[%sLC" + ChatColor.WHITE + "] %s%s", PERM_ADMIN, debug);
 
         notifier.info(ColorUtil.renderAll(String.format(Lang.MESSAGE_DISCORD, DISCORD_URL)));
 
